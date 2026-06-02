@@ -1,7 +1,7 @@
-import { NavLink, Outlet } from 'react-router-dom'
+import { Link, NavLink, Outlet } from 'react-router-dom'
 
 const links = [
-  { to: '/', label: 'Standings', end: true },
+  { to: '/standings', label: 'Standings' },
   { to: '/calendar', label: 'Calendar' },
   { to: '/drivers', label: 'Drivers' },
   { to: '/teams', label: 'Teams' },
@@ -12,15 +12,14 @@ export default function Layout() {
   return (
     <div className="app">
       <header className="topbar">
-        <span className="brand">
+        <Link to="/" className="brand" title="Home">
           <span className="mark">F1</span> DASHBOARD
-        </span>
+        </Link>
         <nav className="nav">
           {links.map((l) => (
             <NavLink
               key={l.to}
               to={l.to}
-              end={l.end}
               className={({ isActive }) => (isActive ? 'nav-link active' : 'nav-link')}
             >
               {l.label}

@@ -41,6 +41,8 @@ body {
   font-weight: 900;
   font-style: italic;
   letter-spacing: 0.5px;
+  color: #fff;
+  text-decoration: none;
 }
 
 .brand .mark {
@@ -566,6 +568,138 @@ table.standings {
 .modal-body {
   padding: 0.5rem 1.4rem 1.4rem;
   overflow-y: auto;
+}
+
+/* ---------- Home / hero ---------- */
+.hero {
+  position: relative;
+  height: 340px;
+  border-radius: 16px;
+  overflow: hidden;
+  background:
+    radial-gradient(120% 100% at 50% 0%, #2a2a38 0%, #15151e 60%),
+    linear-gradient(180deg, #1b1b24, #0c0c11);
+  border: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.hero-driver {
+  position: absolute;
+  bottom: 0;
+  height: 320px;
+  object-fit: contain;
+  filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.5));
+  z-index: 1;
+}
+
+.hero-left {
+  left: 0;
+  mask-image: linear-gradient(90deg, #000 70%, transparent);
+  -webkit-mask-image: linear-gradient(90deg, #000 70%, transparent);
+}
+
+.hero-right {
+  right: 0;
+  mask-image: linear-gradient(270deg, #000 70%, transparent);
+  -webkit-mask-image: linear-gradient(270deg, #000 70%, transparent);
+}
+
+.hero-content {
+  position: relative;
+  z-index: 2;
+  text-align: center;
+  padding: 0 1rem;
+}
+
+.hero-kicker {
+  color: var(--accent);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 3px;
+  margin: 0 0 0.3rem;
+  font-size: 0.85rem;
+}
+
+.hero-title {
+  font-size: 3.2rem;
+  font-weight: 900;
+  font-style: italic;
+  margin: 0;
+  line-height: 1;
+  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.6);
+}
+
+.hero-title span {
+  color: var(--accent);
+}
+
+.hero-tag {
+  color: var(--muted);
+  margin: 0.8rem 0 0;
+  font-weight: 600;
+  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.8);
+}
+
+.hero-vs {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.8rem;
+  margin-top: 1.2rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.vs-dot {
+  color: var(--accent);
+  font-style: italic;
+}
+
+.vs-ham {
+  color: #e8002d;
+}
+
+.vs-ver {
+  color: #3671c6;
+}
+
+.home-links {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.home-link {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1rem 1.1rem;
+  text-decoration: none;
+  color: var(--text);
+  transition: border-color 0.15s ease, transform 0.15s ease;
+}
+
+.home-link:hover {
+  border-color: var(--accent);
+  transform: translateY(-2px);
+}
+
+.hl-label {
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.hl-desc {
+  color: var(--muted);
+  font-size: 0.85rem;
 }
 
 /* ---------- States / misc ---------- */
