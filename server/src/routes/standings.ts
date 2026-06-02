@@ -2,7 +2,7 @@ import { Router } from "express";
 import {
   getConstructorStandings,
   getDriverStandings,
-} from "../services/jolpica";
+} from "../services/f1db";
 
 const router = Router();
 

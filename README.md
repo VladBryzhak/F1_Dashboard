@@ -7,7 +7,7 @@ A web dashboard for Formula 1: championship standings, race calendar, driver & t
 - **client/** — React + Vite + TypeScript
 - **server/** — Node + Express + TypeScript (proxies & caches public F1 APIs)
 
-Data comes from [Jolpica-F1](https://github.com/jolpica/jolpica-f1) (standings, schedule, results) and [OpenF1](https://openf1.org/) (telemetry). Both are free and need no API key.
+Data comes from [f1db](https://github.com/f1db/f1db) (standings, schedule, results, drivers, constructors — 1950 to now, CC-BY 4.0) and [OpenF1](https://openf1.org/) (telemetry, 2023+). Both are free and need no API key. f1db ships as downloadable data files, so there's no live API to rate-limit or go down.
 
 ## Getting started
 

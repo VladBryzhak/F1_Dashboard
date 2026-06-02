@@ -8,6 +8,7 @@ const NATIONALITY_FLAG: Record<string, string> = {
   Dutch: '🇳🇱',
   Spanish: '🇪🇸',
   Monegasque: '🇲🇨',
+  Monégasque: '🇲🇨',
   Mexican: '🇲🇽',
   Australian: '🇦🇺',
   Finnish: '🇫🇮',
@@ -32,18 +33,21 @@ const NATIONALITY_FLAG: Record<string, string> = {
   Indonesian: '🇮🇩',
 }
 
+// Keyed by f1db constructorId.
 const TEAM_COLOR: Record<string, string> = {
-  red_bull: '#3671C6',
+  'red-bull': '#3671C6',
   ferrari: '#E8002D',
   mercedes: '#27F4D2',
   mclaren: '#FF8000',
-  aston_martin: '#229971',
+  'aston-martin': '#229971',
   alpine: '#0093CC',
   williams: '#64C4FF',
   rb: '#6692FF',
-  alphatauri: '#6692FF',
+  'racing-bulls': '#6692FF',
+  alphatauri: '#2B4562',
+  'kick-sauber': '#52E252',
   sauber: '#52E252',
-  kick_sauber: '#52E252',
+  'alfa-romeo': '#C92D4B',
   audi: '#BB0A30',
   haas: '#B6BABD',
   cadillac: '#C9B037',

@@ -29,7 +29,9 @@ Run both (two terminals): `server` then `client`. The Vite proxy (`client/vite.c
 
 ## Data sources (free, no API key)
 
-- **Jolpica-F1** (`https://api.jolpi.ca/ergast/f1`) — standings, schedule, results, driver/constructor info. Ergast-compatible (Ergast shut down early 2025). Volunteer-run and rate-limited → all responses are cached server-side. Wrapped in `server/src/services/jolpica.ts` with a 12s request timeout (fails fast as a 502 if the API is down).
+- **f1db** (`https://github.com/f1db/f1db`, CC-BY 4.0) — standings, results, drivers, constructors, schedule; 1950→present. Distributed as **downloadable release artifacts, not a live API**, so there is nothing to rate-limit or time out. `server/src/services/f1db.ts` downloads the latest `f1db-json-splitted.zip` once, unzips it in memory (adm-zip), and joins the normalized tables into our flat shapes. The dataset is held in a single in-flight promise for the process lifetime — **restart the server to pick up a newer f1db release**. f1db ids are kebab-case (`max-verstappen`, `red-bull`); team colours in `client/src/lib/f1meta.ts` are keyed by these constructorIds.
+  - Note: f1db season standings don't carry the driver's team or win count, so the service joins `seasons-entrants-drivers` (team per season, most-rounds wins) and counts P1 finishes in `races-race-results` (wins). Nationality demonym/flag comes from `countries.json`.
+  - We previously used Jolpica-F1; it was dropped (unreliable, frequent outages) in favour of f1db.
 - **OpenF1** (`https://api.openf1.org/v1`) — telemetry (speed/throttle/brake/DRS/gear), laps, sectors. Historical data free from 2023 onward. Used for the Telemetry feature (`server/src/services/openf1.ts`, M4).
 
 ## Server conventions
