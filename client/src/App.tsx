@@ -1,5 +1,6 @@
 import { Route, Routes } from 'react-router-dom'
 import Layout from './components/Layout'
+import Calendar from './pages/Calendar'
 import Drivers from './pages/Drivers'
 import Placeholder from './pages/Placeholder'
 import Standings from './pages/Standings'
@@ -10,10 +11,7 @@ export default function App() {
     <Routes>
       <Route element={<Layout />}>
         <Route index element={<Standings />} />
-        <Route
-          path="calendar"
-          element={<Placeholder title="Race Calendar" milestone="M2" />}
-        />
+        <Route path="calendar" element={<Calendar />} />
         <Route path="drivers" element={<Drivers />} />
         <Route path="teams" element={<Teams />} />
         <Route

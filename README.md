@@ -33,7 +33,7 @@ Built incrementally by milestone:
 
 - [x] **M0** — project setup, routing, layout, server caching
 - [x] **M1** — championship standings (drivers & constructors, by season)
-- [ ] **M2** — race calendar
+- [x] **M2** — race calendar / results
 - [ ] **M3** — driver & team profiles
 - [ ] **M4** — telemetry from past races
 - [ ] **M5** — visual design pass

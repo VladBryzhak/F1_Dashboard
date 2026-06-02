@@ -29,3 +29,23 @@ export interface StandingsResponse<T> {
   round: string;
   standings: T[];
 }
+
+export interface CalendarRace {
+  round: number;
+  grandPrixId: string;
+  name: string;
+  officialName: string;
+  date: string; // ISO yyyy-mm-dd
+  circuitName: string;
+  placeName: string;
+  nationality: string; // GP country demonym (for flag lookup)
+  winnerDriverId: string | null;
+  winnerName: string | null;
+  winnerConstructorId: string | null;
+  winnerConstructorName: string | null;
+}
+
+export interface CalendarResponse {
+  season: string;
+  races: CalendarRace[];
+}

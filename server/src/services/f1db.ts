@@ -1,5 +1,7 @@
 import AdmZip from "adm-zip";
 import type {
+  CalendarRace,
+  CalendarResponse,
   ConstructorStanding,
   DriverStanding,
   StandingsResponse,
@@ -58,14 +60,38 @@ interface RawEntrantDriver {
 }
 interface RawRaceResult {
   year: number;
+  round: number;
   positionNumber: number | null;
   driverId: string;
   constructorId: string;
+}
+interface RawRace {
+  year: number;
+  round: number;
+  date: string;
+  grandPrixId: string;
+  officialName: string;
+  circuitId: string;
+}
+interface RawGrandPrix {
+  id: string;
+  name: string;
+  countryId: string;
+}
+interface RawCircuit {
+  id: string;
+  name: string;
+  placeName: string;
 }
 
 interface WinCounts {
   drivers: Map<string, number>;
   constructors: Map<string, number>;
+}
+
+interface RaceWinner {
+  driverId: string;
+  constructorId: string;
 }
 
 interface Dataset {
@@ -75,9 +101,14 @@ interface Dataset {
   drivers: Map<string, RawDriver>;
   constructors: Map<string, RawConstructor>;
   countries: Map<string, RawCountry>;
+  races: RawRace[];
+  grandsPrix: Map<string, RawGrandPrix>;
+  circuits: Map<string, RawCircuit>;
   // `${year}:${driverId}` -> constructorId the driver raced most rounds for
   teamByYearDriver: Map<string, string>;
   winsByYear: Map<number, WinCounts>;
+  // `${year}:${round}` -> winner (P1 finisher)
+  winnerByRace: Map<string, RaceWinner>;
 }
 
 let datasetPromise: Promise<Dataset> | null = null;
@@ -121,6 +152,13 @@ async function loadDataset(): Promise<Dataset> {
   const countries = new Map(
     read<RawCountry>("f1db-countries.json").map((c) => [c.id, c])
   );
+  const races = read<RawRace>("f1db-races.json");
+  const grandsPrix = new Map(
+    read<RawGrandPrix>("f1db-grands-prix.json").map((g) => [g.id, g])
+  );
+  const circuits = new Map(
+    read<RawCircuit>("f1db-circuits.json").map((c) => [c.id, c])
+  );
 
   // Resolve each driver's constructor for a season (most rounds wins, to handle
   // mid-season swaps).
@@ -138,8 +176,10 @@ async function loadDataset(): Promise<Dataset> {
     }
   }
 
-  // Win counts per season from race results (P1 finishes).
+  // Single pass over race results: P1 finishes give both per-season win counts
+  // and the per-race winner.
   const winsByYear = new Map<number, WinCounts>();
+  const winnerByRace = new Map<string, RaceWinner>();
   for (const r of read<RawRaceResult>("f1db-races-race-results.json")) {
     if (r.positionNumber !== 1) continue;
     let w = winsByYear.get(r.year);
@@ -152,6 +192,10 @@ async function loadDataset(): Promise<Dataset> {
       r.constructorId,
       (w.constructors.get(r.constructorId) ?? 0) + 1
     );
+    winnerByRace.set(`${r.year}:${r.round}`, {
+      driverId: r.driverId,
+      constructorId: r.constructorId,
+    });
   }
 
   return {
@@ -161,8 +205,12 @@ async function loadDataset(): Promise<Dataset> {
     drivers,
     constructors,
     countries,
+    races,
+    grandsPrix,
+    circuits,
     teamByYearDriver,
     winsByYear,
+    winnerByRace,
   };
 }
 
@@ -233,4 +281,38 @@ export async function getConstructorStandings(
       };
     });
   return { season, round: "final", standings };
+}
+
+export async function getCalendar(season: string): Promise<CalendarResponse> {
+  const ds = await dataset();
+  const year = Number(season);
+  const races: CalendarRace[] = ds.races
+    .filter((r) => r.year === year)
+    .sort((a, b) => a.round - b.round)
+    .map((r) => {
+      const gp = ds.grandsPrix.get(r.grandPrixId);
+      const circuit = ds.circuits.get(r.circuitId);
+      const winner = ds.winnerByRace.get(`${year}:${r.round}`);
+      const winnerDriver = winner ? ds.drivers.get(winner.driverId) : undefined;
+      const winnerTeam = winner
+        ? ds.constructors.get(winner.constructorId)
+        : undefined;
+      return {
+        round: r.round,
+        grandPrixId: r.grandPrixId,
+        name: gp?.name ?? r.grandPrixId,
+        officialName: r.officialName,
+        date: r.date,
+        circuitName: circuit?.name ?? r.circuitId,
+        placeName: circuit?.placeName ?? "",
+        nationality: demonym(ds, gp?.countryId),
+        winnerDriverId: winner?.driverId ?? null,
+        winnerName: winnerDriver
+          ? `${winnerDriver.firstName} ${winnerDriver.lastName}`
+          : null,
+        winnerConstructorId: winner?.constructorId ?? null,
+        winnerConstructorName: winnerTeam?.name ?? null,
+      };
+    });
+  return { season, races };
 }

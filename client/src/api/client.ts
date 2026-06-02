@@ -17,6 +17,7 @@ async function getJson<T>(path: string): Promise<T> {
 }
 
 import type {
+  CalendarResponse,
   ConstructorStanding,
   DriverStanding,
   StandingsResponse,
@@ -29,4 +30,6 @@ export const api = {
     getJson<StandingsResponse<ConstructorStanding>>(
       `/standings/constructors/${season}`,
     ),
+  calendar: (season: string) =>
+    getJson<CalendarResponse>(`/calendar/${season}`),
 }
