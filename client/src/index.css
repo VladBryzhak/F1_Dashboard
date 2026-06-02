@@ -480,6 +480,94 @@ table.standings {
   margin: 1.25rem 0 0.5rem;
 }
 
+/* ---------- Clickable calendar rows ---------- */
+.row-clickable {
+  cursor: pointer;
+  transition: background 0.12s ease;
+}
+
+.row-clickable:hover {
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.row-clickable .chevron {
+  text-align: right;
+  font-size: 1.2rem;
+  color: var(--muted-2);
+}
+
+.row-clickable:hover .chevron {
+  color: var(--accent);
+}
+
+/* ---------- Modal ---------- */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.65);
+  backdrop-filter: blur(2px);
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 4vh 1rem;
+  z-index: 50;
+}
+
+.modal {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  width: 100%;
+  max-width: 760px;
+  max-height: 88vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+}
+
+.modal-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  padding: 1.1rem 1.4rem;
+  border-bottom: 1px solid var(--border);
+  border-top: 3px solid var(--accent);
+}
+
+.modal-title {
+  font-size: 1.3rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin: 0;
+}
+
+.modal-sub {
+  margin: 0.25rem 0 0;
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+.modal-close {
+  background: none;
+  border: none;
+  color: var(--muted);
+  font-size: 1.8rem;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0 0.25rem;
+}
+
+.modal-close:hover {
+  color: #fff;
+}
+
+.modal-body {
+  padding: 0.5rem 1.4rem 1.4rem;
+  overflow-y: auto;
+}
+
 /* ---------- States / misc ---------- */
 .muted {
   color: var(--muted);

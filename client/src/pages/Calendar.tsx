@@ -1,10 +1,12 @@
 import { useState } from 'react'
 import { api } from '../api/client'
 import Flag from '../components/Flag'
+import RaceResultModal from '../components/RaceResultModal'
 import SeasonSelect from '../components/SeasonSelect'
 import { useAsync } from '../hooks/useAsync'
 import { teamColor } from '../lib/f1meta'
 import { CURRENT_SEASON } from '../lib/seasons'
+import type { CalendarRace } from '../types/f1'
 
 function formatDate(iso: string): string {
   const d = new Date(iso)
@@ -14,6 +16,7 @@ function formatDate(iso: string): string {
 
 export default function Calendar() {
   const [season, setSeason] = useState(String(CURRENT_SEASON))
+  const [selected, setSelected] = useState<CalendarRace | null>(null)
   const { data, loading, error } = useAsync(() => api.calendar(season), [season])
 
   return (
@@ -37,11 +40,17 @@ export default function Calendar() {
                 <th>Date</th>
                 <th>Winner</th>
                 <th>Team</th>
+                <th></th>
               </tr>
             </thead>
             <tbody>
               {data.races.map((r) => (
-                <tr key={r.round}>
+                <tr
+                  key={r.round}
+                  className="row-clickable"
+                  onClick={() => setSelected(r)}
+                  title={`View ${r.name} results`}
+                >
                   <td>
                     <span className="entity">
                       <Flag code={r.countryCode} nationality={r.nationality} />
@@ -73,11 +82,21 @@ export default function Calendar() {
                       <span className="muted">—</span>
                     )}
                   </td>
+                  <td className="muted chevron">›</td>
                 </tr>
               ))}
             </tbody>
           </table>
         </div>
+      )}
+
+      {selected && (
+        <RaceResultModal
+          season={season}
+          round={selected.round}
+          title={`${selected.name} ${season}`}
+          onClose={() => setSelected(null)}
+        />
       )}
     </section>
   )

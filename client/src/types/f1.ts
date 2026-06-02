@@ -52,6 +52,29 @@ export interface CalendarResponse {
   races: CalendarRace[]
 }
 
+export interface RaceResult {
+  positionText: string
+  driverId: string
+  driverName: string
+  driverCode: string | null
+  nationality: string
+  countryCode: string | null
+  constructorId: string
+  constructorName: string
+  timeDisplay: string
+  laps: number | null
+  points: number
+}
+
+export interface RaceResultResponse {
+  season: string
+  round: string
+  raceName: string
+  officialName: string
+  date: string
+  results: RaceResult[]
+}
+
 export interface TelemetrySession {
   sessionKey: number
   name: string

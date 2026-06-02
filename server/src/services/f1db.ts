@@ -4,6 +4,8 @@ import type {
   CalendarResponse,
   ConstructorStanding,
   DriverStanding,
+  RaceResult,
+  RaceResultResponse,
   StandingsResponse,
 } from "../types/f1";
 
@@ -61,9 +63,17 @@ interface RawEntrantDriver {
 interface RawRaceResult {
   year: number;
   round: number;
+  positionDisplayOrder: number;
   positionNumber: number | null;
+  positionText: string;
   driverId: string;
   constructorId: string;
+  time: string | null;
+  gap: string | null;
+  gapLaps: number | null;
+  reasonRetired: string | null;
+  laps: number | null;
+  points: number | null;
 }
 interface RawRace {
   year: number;
@@ -109,6 +119,8 @@ interface Dataset {
   winsByYear: Map<number, WinCounts>;
   // `${year}:${round}` -> winner (P1 finisher)
   winnerByRace: Map<string, RaceWinner>;
+  // `${year}:${round}` -> full classification (all finishers/retirements)
+  resultsByRace: Map<string, RawRaceResult[]>;
 }
 
 let datasetPromise: Promise<Dataset> | null = null;
@@ -176,11 +188,20 @@ async function loadDataset(): Promise<Dataset> {
     }
   }
 
-  // Single pass over race results: P1 finishes give both per-season win counts
-  // and the per-race winner.
+  // Single pass over race results: collect the full classification per race,
+  // and from P1 finishes derive per-season win counts and the race winner.
   const winsByYear = new Map<number, WinCounts>();
   const winnerByRace = new Map<string, RaceWinner>();
+  const resultsByRace = new Map<string, RawRaceResult[]>();
   for (const r of read<RawRaceResult>("f1db-races-race-results.json")) {
+    const raceKey = `${r.year}:${r.round}`;
+    let arr = resultsByRace.get(raceKey);
+    if (!arr) {
+      arr = [];
+      resultsByRace.set(raceKey, arr);
+    }
+    arr.push(r);
+
     if (r.positionNumber !== 1) continue;
     let w = winsByYear.get(r.year);
     if (!w) {
@@ -192,7 +213,7 @@ async function loadDataset(): Promise<Dataset> {
       r.constructorId,
       (w.constructors.get(r.constructorId) ?? 0) + 1
     );
-    winnerByRace.set(`${r.year}:${r.round}`, {
+    winnerByRace.set(raceKey, {
       driverId: r.driverId,
       constructorId: r.constructorId,
     });
@@ -211,6 +232,7 @@ async function loadDataset(): Promise<Dataset> {
     teamByYearDriver,
     winsByYear,
     winnerByRace,
+    resultsByRace,
   };
 }
 
@@ -289,6 +311,61 @@ export async function getConstructorStandings(
       };
     });
   return { season, round: "final", standings };
+}
+
+function formatResultTime(r: {
+  positionNumber: number | null;
+  time: string | null;
+  gap: string | null;
+  gapLaps: number | null;
+  reasonRetired: string | null;
+}): string {
+  if (r.positionNumber === 1 && r.time) return r.time;
+  if (r.gap) return r.gap;
+  if (r.gapLaps) return `+${r.gapLaps} lap${r.gapLaps > 1 ? "s" : ""}`;
+  if (r.reasonRetired) return r.reasonRetired;
+  return "—";
+}
+
+export async function getRaceResults(
+  season: string,
+  round: string
+): Promise<RaceResultResponse> {
+  const ds = await dataset();
+  const rows = (ds.resultsByRace.get(`${season}:${round}`) ?? [])
+    .slice()
+    .sort((a, b) => a.positionDisplayOrder - b.positionDisplayOrder);
+  const race = ds.races.find(
+    (r) => r.year === Number(season) && r.round === Number(round)
+  );
+  const gp = race ? ds.grandsPrix.get(race.grandPrixId) : undefined;
+
+  const results: RaceResult[] = rows.map((r) => {
+    const d = ds.drivers.get(r.driverId);
+    const c = ds.constructors.get(r.constructorId);
+    return {
+      positionText: r.positionText,
+      driverId: r.driverId,
+      driverName: d ? `${d.firstName} ${d.lastName}` : r.driverId,
+      driverCode: d?.abbreviation ?? null,
+      nationality: demonym(ds, d?.nationalityCountryId),
+      countryCode: alpha2(ds, d?.nationalityCountryId),
+      constructorId: r.constructorId,
+      constructorName: c?.name ?? r.constructorId,
+      timeDisplay: formatResultTime(r),
+      laps: r.laps ?? null,
+      points: r.points ?? 0,
+    };
+  });
+
+  return {
+    season,
+    round,
+    raceName: gp?.name ?? "",
+    officialName: race?.officialName ?? "",
+    date: race?.date ?? "",
+    results,
+  };
 }
 
 export async function getCalendar(season: string): Promise<CalendarResponse> {

@@ -53,6 +53,29 @@ export interface CalendarResponse {
   races: CalendarRace[];
 }
 
+export interface RaceResult {
+  positionText: string; // "1".."20", "DNF", "NC", "DSQ"
+  driverId: string;
+  driverName: string;
+  driverCode: string | null;
+  nationality: string;
+  countryCode: string | null;
+  constructorId: string;
+  constructorName: string;
+  timeDisplay: string; // winner total time / "+gap" / "+N laps" / retirement
+  laps: number | null;
+  points: number;
+}
+
+export interface RaceResultResponse {
+  season: string;
+  round: string;
+  raceName: string;
+  officialName: string;
+  date: string;
+  results: RaceResult[];
+}
+
 export interface TelemetrySession {
   sessionKey: number;
   name: string; // e.g. country / location
