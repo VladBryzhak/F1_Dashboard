@@ -12,7 +12,9 @@ export default function Layout() {
   return (
     <div className="app">
       <header className="topbar">
-        <span className="brand">F1 Dashboard</span>
+        <span className="brand">
+          <span className="mark">F1</span> DASHBOARD
+        </span>
         <nav className="nav">
           {links.map((l) => (
             <NavLink

@@ -1,13 +1,15 @@
 :root {
-  --bg: #0f0f14;
-  --panel: #1a1a22;
-  --border: #2a2a35;
-  --text: #e8e8ee;
-  --muted: #9a9aa8;
+  /* F1.com-inspired palette */
+  --bg: #15151e;
+  --panel: #1f1f27;
+  --card: #0c0c11;
+  --border: #38383f;
+  --text: #ffffff;
+  --muted: #b3b3bd;
+  --muted-2: #6f6f78;
   --accent: #e10600; /* F1 red */
-  --accent-2: #00d2be;
 
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+  font-family: 'Titillium Web', system-ui, Arial, sans-serif;
   color-scheme: dark;
 }
 
@@ -19,50 +21,79 @@ body {
   margin: 0;
   background: var(--bg);
   color: var(--text);
+  font-weight: 400;
 }
 
+/* ---------- Top bar ---------- */
 .topbar {
   display: flex;
   align-items: center;
-  gap: 2rem;
-  padding: 0 1.5rem;
-  height: 60px;
-  background: var(--panel);
-  border-bottom: 2px solid var(--accent);
+  gap: 2.5rem;
+  padding: 0 1.75rem;
+  height: 56px;
+  background: #000;
 }
 
 .brand {
-  font-weight: 800;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-weight: 900;
+  font-style: italic;
   letter-spacing: 0.5px;
-  text-transform: uppercase;
+}
+
+.brand .mark {
+  background: var(--accent);
+  color: #fff;
+  font-style: italic;
+  font-weight: 900;
+  padding: 2px 7px;
+  border-radius: 3px;
+  font-size: 0.95rem;
 }
 
 .nav {
   display: flex;
-  gap: 1.25rem;
+  gap: 1.75rem;
+  height: 100%;
+  align-items: center;
 }
 
 .nav-link {
+  position: relative;
   color: var(--muted);
   text-decoration: none;
   font-size: 0.95rem;
-  padding: 0.25rem 0;
-  border-bottom: 2px solid transparent;
+  font-weight: 600;
+  height: 100%;
+  display: flex;
+  align-items: center;
 }
 
 .nav-link:hover {
-  color: var(--text);
+  color: #fff;
 }
 
 .nav-link.active {
-  color: var(--text);
-  border-bottom-color: var(--accent);
+  color: #fff;
 }
 
+.nav-link.active::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 3px;
+  background: var(--accent);
+}
+
+/* ---------- Layout ---------- */
 .content {
-  max-width: 1000px;
+  max-width: 1080px;
   margin: 0 auto;
-  padding: 2rem 1.5rem;
+  padding: 2.5rem 1.75rem 4rem;
 }
 
 .page-head {
@@ -70,62 +101,97 @@ body {
   align-items: center;
   justify-content: space-between;
   gap: 1rem;
+  margin-bottom: 1.25rem;
 }
 
 h1 {
-  font-size: 1.6rem;
-  margin: 0 0 1rem;
+  font-size: 1.9rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin: 0;
 }
 
+/* ---------- Season selector (pill) ---------- */
 select {
-  background: var(--panel);
+  background: transparent;
   color: var(--text);
   border: 1px solid var(--border);
-  border-radius: 6px;
-  padding: 0.4rem 0.6rem;
-}
-
-.tabs {
-  display: flex;
-  gap: 0.5rem;
-  margin: 0.5rem 0 1.25rem;
-}
-
-.tab {
-  background: var(--panel);
-  color: var(--muted);
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  padding: 0.4rem 0.9rem;
+  border-radius: 999px;
+  padding: 0.45rem 1rem;
+  font-family: inherit;
+  font-weight: 600;
   cursor: pointer;
 }
 
+/* ---------- Tabs ---------- */
+.tabs {
+  display: flex;
+  gap: 1.75rem;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 1.5rem;
+}
+
+.tab {
+  position: relative;
+  background: none;
+  border: none;
+  color: var(--muted);
+  font-family: inherit;
+  font-size: 1rem;
+  font-weight: 700;
+  padding: 0 0 0.75rem;
+  cursor: pointer;
+}
+
+.tab:hover {
+  color: #fff;
+}
+
 .tab.active {
-  color: var(--text);
-  border-color: var(--accent);
+  color: #fff;
+}
+
+.tab.active::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -1px;
+  height: 3px;
+  background: var(--accent);
+}
+
+/* ---------- Results card ---------- */
+.card {
+  background: var(--card);
+  border-radius: 14px;
+  padding: 1.25rem 1.5rem;
+  position: relative;
+  overflow: hidden;
 }
 
 table.standings {
   width: 100%;
   border-collapse: collapse;
-  background: var(--panel);
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  overflow: hidden;
-}
-
-.standings th,
-.standings td {
-  text-align: left;
-  padding: 0.6rem 0.8rem;
-  border-bottom: 1px solid var(--border);
 }
 
 .standings th {
-  font-size: 0.8rem;
+  text-align: left;
+  font-size: 0.72rem;
+  font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
-  color: var(--muted);
+  letter-spacing: 0.8px;
+  color: var(--muted-2);
+  padding: 0.5rem 0.75rem 0.9rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.standings td {
+  text-align: left;
+  padding: 0.75rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  font-weight: 600;
 }
 
 .standings tr:last-child td {
@@ -136,20 +202,93 @@ table.standings {
   text-align: right;
 }
 
-.standings .points {
-  font-weight: 700;
-  color: var(--accent-2);
+.standings .pos {
+  color: var(--muted);
+  width: 36px;
 }
 
-.standings .code {
-  color: var(--muted);
+/* circular flag badge */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: #23232c;
+  font-size: 1rem;
+  margin-right: 0.65rem;
+  vertical-align: middle;
+}
+
+.entity {
+  display: flex;
+  align-items: center;
+}
+
+.entity .name {
+  font-weight: 700;
+}
+
+.entity .code {
+  color: var(--muted-2);
+  font-weight: 600;
+  margin-left: 0.4rem;
   font-size: 0.85em;
 }
 
+/* team colour bar */
+.team {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.team .dot {
+  width: 4px;
+  height: 18px;
+  border-radius: 2px;
+  display: inline-block;
+}
+
+.points {
+  font-weight: 900;
+}
+
+/* decorative circular arrow, like the F1 results card */
+.card-arrow {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: #fff;
+  color: #000;
+  border: none;
+  font-size: 1.1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+/* ---------- States / misc ---------- */
 .muted {
   color: var(--muted);
 }
 
 .error {
   color: #ff6b6b;
+}
+
+.banner {
+  background: rgba(225, 6, 0, 0.12);
+  border: 1px solid rgba(225, 6, 0, 0.4);
+  color: #ffb3b0;
+  border-radius: 8px;
+  padding: 0.6rem 0.9rem;
+  margin-bottom: 1rem;
+  font-size: 0.9rem;
+  font-weight: 600;
 }

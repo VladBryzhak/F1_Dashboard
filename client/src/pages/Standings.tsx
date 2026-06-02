@@ -5,6 +5,10 @@ import {
   DriverStandingsTable,
 } from '../components/StandingsTable'
 import { useAsync } from '../hooks/useAsync'
+import {
+  SAMPLE_CONSTRUCTOR_STANDINGS,
+  SAMPLE_DRIVER_STANDINGS,
+} from '../lib/sampleData'
 
 const CURRENT_SEASON = 2026
 const SEASONS = Array.from({ length: CURRENT_SEASON - 2015 }, (_, i) =>
@@ -58,16 +62,25 @@ export default function Standings() {
       </div>
 
       {active.loading && <p className="muted">Loading…</p>}
-      {active.error && (
-        <p className="error">Could not load standings: {active.error}</p>
+
+      {!active.loading && active.error && (
+        <p className="banner">
+          Live standings API unavailable ({active.error}). Showing sample data so
+          the layout is visible — real {season} standings appear automatically
+          once the API is reachable.
+        </p>
       )}
-      {!active.loading && !active.error && active.data && (
-        tab === 'drivers' ? (
-          <DriverStandingsTable rows={drivers.data?.standings ?? []} />
+
+      {!active.loading &&
+        (tab === 'drivers' ? (
+          <DriverStandingsTable
+            rows={drivers.data?.standings ?? SAMPLE_DRIVER_STANDINGS}
+          />
         ) : (
-          <ConstructorStandingsTable rows={constructors.data?.standings ?? []} />
-        )
-      )}
+          <ConstructorStandingsTable
+            rows={constructors.data?.standings ?? SAMPLE_CONSTRUCTOR_STANDINGS}
+          />
+        ))}
     </section>
   )
 }
