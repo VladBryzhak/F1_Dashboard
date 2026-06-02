@@ -1,8 +1,9 @@
 import { useState } from 'react'
 import { api } from '../api/client'
+import Flag from '../components/Flag'
 import SeasonSelect from '../components/SeasonSelect'
 import { useAsync } from '../hooks/useAsync'
-import { flagFor, teamColor } from '../lib/f1meta'
+import { teamColor } from '../lib/f1meta'
 import { CURRENT_SEASON } from '../lib/seasons'
 
 function formatDate(iso: string): string {
@@ -43,8 +44,10 @@ export default function Calendar() {
                 <tr key={r.round}>
                   <td>
                     <span className="entity">
-                      <span className="badge">{flagFor(r.nationality)}</span>
-                      <span className="name">{r.name}</span>
+                      <Flag code={r.countryCode} nationality={r.nationality} />
+                      <span className="name" style={{ marginLeft: '0.65rem' }}>
+                        {r.name}
+                      </span>
                     </span>
                   </td>
                   <td className="muted">{formatDate(r.date)}</td>

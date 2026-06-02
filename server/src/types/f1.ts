@@ -41,6 +41,7 @@ export interface CalendarRace {
   circuitName: string;
   placeName: string;
   nationality: string; // GP country demonym (for flag lookup)
+  countryCode: string | null; // ISO alpha-2, lowercase (for flag images)
   winnerDriverId: string | null;
   winnerName: string | null;
   winnerConstructorId: string | null;

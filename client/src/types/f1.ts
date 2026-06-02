@@ -40,6 +40,7 @@ export interface CalendarRace {
   circuitName: string
   placeName: string
   nationality: string
+  countryCode: string | null
   winnerDriverId: string | null
   winnerName: string | null
   winnerConstructorId: string | null

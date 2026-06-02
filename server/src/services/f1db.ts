@@ -314,6 +314,7 @@ export async function getCalendar(season: string): Promise<CalendarResponse> {
         circuitName: circuit?.name ?? r.circuitId,
         placeName: circuit?.placeName ?? "",
         nationality: demonym(ds, gp?.countryId),
+        countryCode: alpha2(ds, gp?.countryId),
         winnerDriverId: winner?.driverId ?? null,
         winnerName: winnerDriver
           ? `${winnerDriver.firstName} ${winnerDriver.lastName}`

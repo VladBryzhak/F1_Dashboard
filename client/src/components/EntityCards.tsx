@@ -1,6 +1,7 @@
 import { useState } from 'react'
-import { flagFor, teamCarUrl, teamColor } from '../lib/f1meta'
+import { teamCarUrl, teamColor } from '../lib/f1meta'
 import type { ConstructorStanding, DriverStanding } from '../types/f1'
+import Flag from './Flag'
 
 // Official car render; hides itself if the image is missing (e.g. older seasons).
 function CarImage({
@@ -62,7 +63,7 @@ export function DriverCard({
         {d.givenName} {d.familyName}
       </h3>
       <div className="esub">
-        <span className="badge">{flagFor(d.nationality)}</span>
+        <Flag code={d.countryCode} nationality={d.nationality} />
         {d.constructorName}
       </div>
       <div className="efoot">
@@ -91,7 +92,7 @@ export function TeamCard({
       <div className="rank">P{c.position}</div>
       <h3 className="ename">{c.name}</h3>
       <div className="esub">
-        <span className="badge">{flagFor(c.nationality)}</span>
+        <Flag code={c.countryCode} nationality={c.nationality} />
         {c.nationality}
       </div>
       <div className="efoot">
