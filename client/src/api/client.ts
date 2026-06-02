@@ -36,6 +36,8 @@ export const api = {
     ),
   calendar: (season: string) =>
     getJson<CalendarResponse>(`/calendar/${season}`),
+  driverHeadshots: (season: string) =>
+    getJson<Record<string, string>>(`/telemetry/headshots/${season}`),
   telemetrySessions: (season: string) =>
     getJson<TelemetrySession[]>(`/telemetry/sessions/${season}`),
   sessionDrivers: (sessionKey: number) =>

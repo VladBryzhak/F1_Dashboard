@@ -60,3 +60,32 @@ export function flagFor(nationality: string): string {
 export function teamColor(constructorId: string): string {
   return TEAM_COLOR[constructorId] ?? '#9a9aa8'
 }
+
+// f1db constructorId -> the slug formula1.com uses in its car image URLs.
+const TEAM_CAR_SLUG: Record<string, string> = {
+  mclaren: 'mclaren',
+  ferrari: 'ferrari',
+  mercedes: 'mercedes',
+  'red-bull': 'redbullracing',
+  williams: 'williams',
+  'aston-martin': 'astonmartin',
+  alpine: 'alpine',
+  haas: 'haas',
+  'racing-bulls': 'racingbulls',
+  audi: 'audi',
+  cadillac: 'cadillac',
+}
+
+/**
+ * Official car ("bolid") render from formula1.com's CDN for a given season.
+ * Returns null for teams without a known slug; the <img> should also handle
+ * onError (older seasons may 404 and fall back to the plain card).
+ */
+export function teamCarUrl(constructorId: string, season: string): string | null {
+  const slug = TEAM_CAR_SLUG[constructorId]
+  if (!slug) return null
+  return (
+    `https://media.formula1.com/image/upload/c_lfill,w_800/q_auto/` +
+    `v1740000001/common/f1/${season}/${slug}/${season}${slug}carright.webp`
+  )
+}

@@ -1,11 +1,61 @@
-import { flagFor, teamColor } from '../lib/f1meta'
+import { useState } from 'react'
+import { flagFor, teamCarUrl, teamColor } from '../lib/f1meta'
 import type { ConstructorStanding, DriverStanding } from '../types/f1'
 
-export function DriverCard({ d }: { d: DriverStanding }) {
+// Official car render; hides itself if the image is missing (e.g. older seasons).
+function CarImage({
+  constructorId,
+  season,
+  color,
+}: {
+  constructorId: string
+  season: string
+  color: string
+}) {
+  const [failed, setFailed] = useState(false)
+  const url = teamCarUrl(constructorId, season)
+  if (!url || failed) return null
+  return (
+    <div className="car-wrap" style={{ background: `${color}22` }}>
+      <img
+        className="car-img"
+        src={url}
+        alt=""
+        loading="lazy"
+        onError={() => setFailed(true)}
+      />
+    </div>
+  )
+}
+
+function Headshot({ url, color }: { url: string; color: string }) {
+  const [failed, setFailed] = useState(false)
+  if (failed) return null
+  return (
+    <div className="head-wrap" style={{ background: `${color}22` }}>
+      <img
+        className="head-img"
+        src={url}
+        alt=""
+        loading="lazy"
+        onError={() => setFailed(true)}
+      />
+    </div>
+  )
+}
+
+export function DriverCard({
+  d,
+  headshot,
+}: {
+  d: DriverStanding
+  headshot?: string
+}) {
   const color = teamColor(d.constructorId)
   return (
     <article className="ecard">
       <span className="stripe" style={{ background: color }} />
+      {headshot ? <Headshot url={headshot} color={color} /> : null}
       {d.permanentNumber ? <span className="big-num">{d.permanentNumber}</span> : null}
       <div className="rank">P{d.position}</div>
       <h3 className="ename">
@@ -26,11 +76,18 @@ export function DriverCard({ d }: { d: DriverStanding }) {
   )
 }
 
-export function TeamCard({ c }: { c: ConstructorStanding }) {
+export function TeamCard({
+  c,
+  season,
+}: {
+  c: ConstructorStanding
+  season: string
+}) {
   const color = teamColor(c.constructorId)
   return (
     <article className="ecard">
       <span className="stripe" style={{ background: color }} />
+      <CarImage constructorId={c.constructorId} season={season} color={color} />
       <div className="rank">P{c.position}</div>
       <h3 className="ename">{c.name}</h3>
       <div className="esub">

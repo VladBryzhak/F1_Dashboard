@@ -1,5 +1,6 @@
 import { Router } from "express";
 import {
+  getDriverHeadshots,
   getDriverLaps,
   getLapTelemetry,
   getRaceSessions,
@@ -7,6 +8,15 @@ import {
 } from "../services/openf1";
 
 const router = Router();
+
+// GET /api/telemetry/headshots/:season
+router.get("/headshots/:season", async (req, res, next) => {
+  try {
+    res.json(await getDriverHeadshots(req.params.season));
+  } catch (err) {
+    next(err);
+  }
+});
 
 // GET /api/telemetry/sessions/:season
 router.get("/sessions/:season", async (req, res, next) => {

@@ -12,6 +12,11 @@ export default function Drivers() {
     () => api.driverStandings(season),
     [season],
   )
+  // Official headshots (OpenF1, 2023+). Optional — failures are non-fatal.
+  const headshots = useAsync<Record<string, string>>(
+    () => api.driverHeadshots(season).catch(() => ({})),
+    [season],
+  )
 
   const drivers = data?.standings ?? SAMPLE_DRIVER_STANDINGS
 
@@ -34,7 +39,11 @@ export default function Drivers() {
       {!loading && (
         <div className="grid">
           {drivers.map((d) => (
-            <DriverCard key={d.driverId} d={d} />
+            <DriverCard
+              key={d.driverId}
+              d={d}
+              headshot={d.code ? headshots.data?.[d.code] : undefined}
+            />
           ))}
         </div>
       )}

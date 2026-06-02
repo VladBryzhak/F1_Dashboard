@@ -47,6 +47,7 @@ interface RawDriver {
   name_acronym: string;
   team_name: string;
   team_colour: string | null;
+  headshot_url?: string | null;
 }
 interface RawLap {
   lap_number: number;
@@ -82,6 +83,29 @@ export async function getRaceSessions(
         circuit: s.circuit_short_name,
         date: s.date_start,
       }));
+  });
+}
+
+/**
+ * Map of driver acronym (e.g. "VER") -> official headshot URL for a season's
+ * grid. Uses the season's most recent race session. Empty for pre-2023 seasons
+ * (OpenF1 has no data there); callers fall back to a placeholder.
+ */
+export async function getDriverHeadshots(
+  season: string
+): Promise<Record<string, string>> {
+  return cached(`of1:headshots:${season}`, 12 * 60 * 60, async () => {
+    const sessions = await getRaceSessions(season);
+    if (!sessions.length) return {};
+    const latest = sessions[sessions.length - 1].sessionKey;
+    const drivers = await getJson<RawDriver[]>(
+      `/drivers?session_key=${latest}`
+    );
+    const out: Record<string, string> = {};
+    for (const d of drivers) {
+      if (d.name_acronym && d.headshot_url) out[d.name_acronym] = d.headshot_url;
+    }
+    return out;
   });
 }
 
