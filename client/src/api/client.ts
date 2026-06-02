@@ -19,8 +19,12 @@ async function getJson<T>(path: string): Promise<T> {
 import type {
   CalendarResponse,
   ConstructorStanding,
+  DriverLap,
   DriverStanding,
+  LapTelemetry,
+  SessionDriver,
   StandingsResponse,
+  TelemetrySession,
 } from '../types/f1'
 
 export const api = {
@@ -32,4 +36,14 @@ export const api = {
     ),
   calendar: (season: string) =>
     getJson<CalendarResponse>(`/calendar/${season}`),
+  telemetrySessions: (season: string) =>
+    getJson<TelemetrySession[]>(`/telemetry/sessions/${season}`),
+  sessionDrivers: (sessionKey: number) =>
+    getJson<SessionDriver[]>(`/telemetry/drivers/${sessionKey}`),
+  driverLaps: (sessionKey: number, driverNumber: number) =>
+    getJson<DriverLap[]>(`/telemetry/laps/${sessionKey}/${driverNumber}`),
+  lapTelemetry: (sessionKey: number, driverNumber: number, lapNumber: number) =>
+    getJson<LapTelemetry>(
+      `/telemetry/lap/${sessionKey}/${driverNumber}/${lapNumber}`,
+    ),
 }

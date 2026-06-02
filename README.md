@@ -35,5 +35,5 @@ Built incrementally by milestone:
 - [x] **M1** — championship standings (drivers & constructors, by season)
 - [x] **M2** — race calendar / results
 - [ ] **M3** — driver & team profiles
-- [ ] **M4** — telemetry from past races
-- [ ] **M5** — visual design pass
+- [x] **M4** — telemetry from past races (OpenF1, 2023+)
+- [x] **M5** — F1.com-inspired visual design

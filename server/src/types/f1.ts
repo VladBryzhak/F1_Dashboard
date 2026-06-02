@@ -49,3 +49,44 @@ export interface CalendarResponse {
   season: string;
   races: CalendarRace[];
 }
+
+export interface TelemetrySession {
+  sessionKey: number;
+  name: string; // e.g. country / location
+  location: string;
+  circuit: string;
+  date: string;
+}
+
+export interface SessionDriver {
+  driverNumber: number;
+  fullName: string;
+  acronym: string;
+  team: string;
+  colour: string; // hex without '#'
+}
+
+export interface DriverLap {
+  lapNumber: number;
+  lapDuration: number | null; // seconds
+  sector1: number | null;
+  sector2: number | null;
+  sector3: number | null;
+  isPitOutLap: boolean;
+}
+
+export interface TelemetryPoint {
+  t: number; // seconds since lap start
+  speed: number;
+  throttle: number;
+  brake: number;
+  gear: number;
+  drs: number;
+}
+
+export interface LapTelemetry {
+  sessionKey: number;
+  driverNumber: number;
+  lapNumber: number;
+  points: TelemetryPoint[];
+}

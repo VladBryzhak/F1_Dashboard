@@ -2,9 +2,9 @@ import { Route, Routes } from 'react-router-dom'
 import Layout from './components/Layout'
 import Calendar from './pages/Calendar'
 import Drivers from './pages/Drivers'
-import Placeholder from './pages/Placeholder'
 import Standings from './pages/Standings'
 import Teams from './pages/Teams'
+import Telemetry from './pages/Telemetry'
 
 export default function App() {
   return (
@@ -14,10 +14,7 @@ export default function App() {
         <Route path="calendar" element={<Calendar />} />
         <Route path="drivers" element={<Drivers />} />
         <Route path="teams" element={<Teams />} />
-        <Route
-          path="telemetry"
-          element={<Placeholder title="Telemetry" milestone="M4" />}
-        />
+        <Route path="telemetry" element={<Telemetry />} />
       </Route>
     </Routes>
   )
