@@ -46,7 +46,7 @@ interface RawErgast {
   };
 }
 
-const REQUEST_TIMEOUT_MS = 12_000;
+const REQUEST_TIMEOUT_MS = 6_000;
 
 async function getJson<T>(path: string): Promise<T> {
   let res: Response;
