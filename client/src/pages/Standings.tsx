@@ -23,6 +23,10 @@ export default function Standings() {
     () => api.constructorStandings(season),
     [season],
   )
+  const headshots = useAsync<Record<string, string>>(
+    () => api.driverHeadshots(season).catch(() => ({})),
+    [season],
+  )
 
   const active = tab === 'drivers' ? drivers : constructors
 
@@ -62,6 +66,7 @@ export default function Standings() {
         (tab === 'drivers' ? (
           <DriverStandingsTable
             rows={drivers.data?.standings ?? SAMPLE_DRIVER_STANDINGS}
+            headshots={headshots.data ?? undefined}
           />
         ) : (
           <ConstructorStandingsTable

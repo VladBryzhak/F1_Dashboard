@@ -1,18 +1,54 @@
-import { flagFor, teamColor } from '../lib/f1meta'
+import { useState } from 'react'
+import { teamColor } from '../lib/f1meta'
 import type { ConstructorStanding, DriverStanding } from '../types/f1'
+import Flag from './Flag'
 
-export function DriverStandingsTable({ rows }: { rows: DriverStanding[] }) {
+// Circular driver photo for a standings row; falls back to a colour chip with
+// the driver's code when no headshot is available.
+function DriverAvatar({
+  url,
+  code,
+  color,
+}: {
+  url?: string
+  code: string | null
+  color: string
+}) {
+  const [failed, setFailed] = useState(false)
+  if (url && !failed) {
+    return (
+      <img
+        className="avatar"
+        src={url}
+        alt=""
+        loading="lazy"
+        onError={() => setFailed(true)}
+      />
+    )
+  }
+  return (
+    <span className="avatar avatar-fallback" style={{ background: `${color}33`, color }}>
+      {code ?? '–'}
+    </span>
+  )
+}
+
+export function DriverStandingsTable({
+  rows,
+  headshots,
+}: {
+  rows: DriverStanding[]
+  headshots?: Record<string, string>
+}) {
   return (
     <div className="card">
-      <button className="card-arrow" aria-label="More">
-        ›
-      </button>
       <table className="standings">
         <thead>
           <tr>
             <th className="pos">Pos</th>
             <th>Driver</th>
             <th>Team</th>
+            <th>Country</th>
             <th className="num">Wins</th>
             <th className="num">Points</th>
           </tr>
@@ -23,7 +59,11 @@ export function DriverStandingsTable({ rows }: { rows: DriverStanding[] }) {
               <td className="pos">{r.position}</td>
               <td>
                 <span className="entity">
-                  <span className="badge">{flagFor(r.nationality)}</span>
+                  <DriverAvatar
+                    url={r.code ? headshots?.[r.code] : undefined}
+                    code={r.code}
+                    color={teamColor(r.constructorId)}
+                  />
                   <span className="name">
                     {r.givenName} {r.familyName}
                   </span>
@@ -37,6 +77,12 @@ export function DriverStandingsTable({ rows }: { rows: DriverStanding[] }) {
                     style={{ background: teamColor(r.constructorId) }}
                   />
                   {r.constructorName}
+                </span>
+              </td>
+              <td>
+                <span className="country">
+                  <Flag code={r.countryCode} nationality={r.nationality} />
+                  {r.nationality}
                 </span>
               </td>
               <td className="num">{r.wins}</td>
@@ -56,15 +102,12 @@ export function ConstructorStandingsTable({
 }) {
   return (
     <div className="card">
-      <button className="card-arrow" aria-label="More">
-        ›
-      </button>
       <table className="standings">
         <thead>
           <tr>
             <th className="pos">Pos</th>
             <th>Team</th>
-            <th>Nationality</th>
+            <th>Country</th>
             <th className="num">Wins</th>
             <th className="num">Points</th>
           </tr>
@@ -83,8 +126,8 @@ export function ConstructorStandingsTable({
                 </span>
               </td>
               <td>
-                <span className="entity">
-                  <span className="badge">{flagFor(r.nationality)}</span>
+                <span className="country">
+                  <Flag code={r.countryCode} nationality={r.nationality} />
                   {r.nationality}
                 </span>
               </td>

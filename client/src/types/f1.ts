@@ -8,6 +8,7 @@ export interface DriverStanding {
   givenName: string
   familyName: string
   nationality: string
+  countryCode: string | null
   permanentNumber: string | null
   code: string | null
   constructorId: string
@@ -21,6 +22,7 @@ export interface ConstructorStanding {
   constructorId: string
   name: string
   nationality: string
+  countryCode: string | null
 }
 
 export interface StandingsResponse<T> {

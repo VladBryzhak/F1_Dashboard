@@ -9,6 +9,7 @@ export interface DriverStanding {
   givenName: string;
   familyName: string;
   nationality: string;
+  countryCode: string | null; // ISO alpha-2, lowercase (for flag images)
   permanentNumber: string | null;
   code: string | null;
   constructorId: string;
@@ -22,6 +23,7 @@ export interface ConstructorStanding {
   constructorId: string;
   name: string;
   nationality: string;
+  countryCode: string | null; // ISO alpha-2, lowercase (for flag images)
 }
 
 export interface StandingsResponse<T> {

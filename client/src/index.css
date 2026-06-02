@@ -230,6 +230,44 @@ table.standings {
   font-weight: 700;
 }
 
+/* driver photo avatar in standings rows */
+.avatar {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  margin-right: 0.7rem;
+  object-fit: cover;
+  object-position: top center;
+  background: #23232c;
+  flex-shrink: 0;
+}
+
+.avatar-fallback {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.72rem;
+  font-weight: 800;
+}
+
+/* country cell: flag + demonym */
+.country {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+}
+
+.flag {
+  border-radius: 3px;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.12);
+  flex-shrink: 0;
+}
+
+.flag-emoji {
+  box-shadow: none;
+  font-size: 1.1rem;
+}
+
 .entity .code {
   color: var(--muted-2);
   font-weight: 600;

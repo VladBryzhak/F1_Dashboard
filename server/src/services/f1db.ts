@@ -230,6 +230,12 @@ function demonym(ds: Dataset, countryId: string | undefined): string {
   return ds.countries.get(countryId)?.demonym ?? "";
 }
 
+function alpha2(ds: Dataset, countryId: string | undefined): string | null {
+  if (!countryId) return null;
+  const code = ds.countries.get(countryId)?.alpha2Code;
+  return code ? code.toLowerCase() : null;
+}
+
 export async function getDriverStandings(
   season: string
 ): Promise<StandingsResponse<DriverStanding>> {
@@ -251,6 +257,7 @@ export async function getDriverStandings(
         givenName: d?.firstName ?? "",
         familyName: d?.lastName ?? s.driverId,
         nationality: demonym(ds, d?.nationalityCountryId),
+        countryCode: alpha2(ds, d?.nationalityCountryId),
         permanentNumber: d?.permanentNumber != null ? String(d.permanentNumber) : null,
         code: d?.abbreviation ?? null,
         constructorId,
@@ -278,6 +285,7 @@ export async function getConstructorStandings(
         constructorId: s.constructorId,
         name: c?.name ?? s.constructorId,
         nationality: demonym(ds, c?.countryId),
+        countryCode: alpha2(ds, c?.countryId),
       };
     });
   return { season, round: "final", standings };
