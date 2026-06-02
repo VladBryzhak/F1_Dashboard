@@ -1,0 +1,13 @@
+# Render Blueprint — deploys the whole app (React client + Express API) as one
+# free web service. In production the Express server serves both /api and the
+# built client. See https://render.com/docs/blueprint-spec
+services:
+  - type: web
+    name: f1-dashboard
+    runtime: node
+    plan: free
+    buildCommand: npm run build
+    startCommand: npm start
+    envVars:
+      - key: NODE_VERSION
+        value: "20"

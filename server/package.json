@@ -14,6 +14,7 @@
     "adm-zip": "^0.5.17",
     "cors": "^2.8.5",
     "express": "^4.21.2",
+    "f1-dashboard": "file:..",
     "node-cache": "^5.1.2"
   },
   "devDependencies": {
