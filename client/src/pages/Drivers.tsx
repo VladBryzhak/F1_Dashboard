@@ -42,6 +42,7 @@ export default function Drivers() {
             <DriverCard
               key={d.driverId}
               d={d}
+              season={season}
               headshot={d.code ? headshots.data?.[d.code] : undefined}
             />
           ))}

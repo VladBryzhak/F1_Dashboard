@@ -66,6 +66,7 @@ export default function Standings() {
         (tab === 'drivers' ? (
           <DriverStandingsTable
             rows={drivers.data?.standings ?? SAMPLE_DRIVER_STANDINGS}
+            season={season}
             headshots={headshots.data ?? undefined}
           />
         ) : (

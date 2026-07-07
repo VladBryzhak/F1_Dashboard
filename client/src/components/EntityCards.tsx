@@ -1,5 +1,5 @@
-import { useState } from 'react'
-import { teamCarUrl, teamColor } from '../lib/f1meta'
+import { useEffect, useState } from 'react'
+import { driverPortraitUrl, teamCarUrl, teamColor } from '../lib/f1meta'
 import type { ConstructorStanding, DriverStanding } from '../types/f1'
 import Flag from './Flag'
 
@@ -29,17 +29,31 @@ function CarImage({
   )
 }
 
-function Headshot({ url, color }: { url: string; color: string }) {
-  const [failed, setFailed] = useState(false)
-  if (failed) return null
+// Season/team-accurate portrait first, OpenF1 headshot as fallback; hides
+// itself once both candidates have failed.
+function Headshot({
+  portraitUrl,
+  fallbackUrl,
+  color,
+}: {
+  portraitUrl?: string | null
+  fallbackUrl?: string
+  color: string
+}) {
+  const candidates = [portraitUrl, fallbackUrl].filter((u): u is string => !!u)
+  const key = candidates.join('|')
+  const [idx, setIdx] = useState(0)
+  useEffect(() => setIdx(0), [key])
+  const src = candidates[idx]
+  if (!src) return null
   return (
     <div className="head-wrap" style={{ background: `${color}22` }}>
       <img
         className="head-img"
-        src={url}
+        src={src}
         alt=""
         loading="lazy"
-        onError={() => setFailed(true)}
+        onError={() => setIdx((i) => i + 1)}
       />
     </div>
   )
@@ -47,16 +61,22 @@ function Headshot({ url, color }: { url: string; color: string }) {
 
 export function DriverCard({
   d,
+  season,
   headshot,
 }: {
   d: DriverStanding
+  season: string
   headshot?: string
 }) {
   const color = teamColor(d.constructorId)
   return (
     <article className="ecard">
       <span className="stripe" style={{ background: color }} />
-      {headshot ? <Headshot url={headshot} color={color} /> : null}
+      <Headshot
+        portraitUrl={driverPortraitUrl(d.driverId, d.constructorId, season)}
+        fallbackUrl={headshot}
+        color={color}
+      />
       {d.permanentNumber ? <span className="big-num">{d.permanentNumber}</span> : null}
       <div className="rank">P{d.position}</div>
       <h3 className="ename">
