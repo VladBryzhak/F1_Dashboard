@@ -2,7 +2,11 @@ import AdmZip from "adm-zip";
 import type {
   CalendarRace,
   CalendarResponse,
+  ConstructorProfile,
+  ConstructorSeasonEntry,
   ConstructorStanding,
+  DriverProfile,
+  DriverSeasonEntry,
   DriverStanding,
   RaceResult,
   RaceResultResponse,
@@ -104,6 +108,13 @@ interface RaceWinner {
   constructorId: string;
 }
 
+interface CareerAgg {
+  firstSeason: number;
+  lastSeason: number;
+  races: number;
+  podiums: number;
+}
+
 interface Dataset {
   version: string;
   driverStandings: RawSeasonDriverStanding[];
@@ -121,6 +132,9 @@ interface Dataset {
   winnerByRace: Map<string, RaceWinner>;
   // `${year}:${round}` -> full classification (all finishers/retirements)
   resultsByRace: Map<string, RawRaceResult[]>;
+  // career totals for profile pages, keyed by driverId / constructorId
+  driverCareer: Map<string, CareerAgg>;
+  constructorCareer: Map<string, CareerAgg>;
 }
 
 let datasetPromise: Promise<Dataset> | null = null;
@@ -189,10 +203,35 @@ async function loadDataset(): Promise<Dataset> {
   }
 
   // Single pass over race results: collect the full classification per race,
-  // and from P1 finishes derive per-season win counts and the race winner.
+  // derive per-season win counts + the race winner from P1 finishes, and
+  // accumulate career totals (first/last season, races entered, podiums) per
+  // driver and per constructor for the profile pages.
   const winsByYear = new Map<number, WinCounts>();
   const winnerByRace = new Map<string, RaceWinner>();
   const resultsByRace = new Map<string, RawRaceResult[]>();
+  const driverCareer = new Map<string, CareerAgg>();
+  const constructorCareer = new Map<string, CareerAgg>();
+  // Constructors field two cars per race, so "races entered" must dedupe by
+  // race, not count raw result rows (which would double it).
+  const constructorRaceKeys = new Map<string, Set<string>>();
+
+  const bumpCareer = (
+    map: Map<string, CareerAgg>,
+    id: string,
+    year: number,
+    isPodium: boolean
+  ) => {
+    let agg = map.get(id);
+    if (!agg) {
+      agg = { firstSeason: year, lastSeason: year, races: 0, podiums: 0 };
+      map.set(id, agg);
+    }
+    agg.firstSeason = Math.min(agg.firstSeason, year);
+    agg.lastSeason = Math.max(agg.lastSeason, year);
+    if (isPodium) agg.podiums += 1;
+    return agg;
+  };
+
   for (const r of read<RawRaceResult>("f1db-races-race-results.json")) {
     const raceKey = `${r.year}:${r.round}`;
     let arr = resultsByRace.get(raceKey);
@@ -201,6 +240,19 @@ async function loadDataset(): Promise<Dataset> {
       resultsByRace.set(raceKey, arr);
     }
     arr.push(r);
+
+    const isPodium = r.positionNumber !== null && r.positionNumber <= 3;
+
+    const driverAgg = bumpCareer(driverCareer, r.driverId, r.year, isPodium);
+    driverAgg.races += 1;
+
+    bumpCareer(constructorCareer, r.constructorId, r.year, isPodium);
+    let raceKeys = constructorRaceKeys.get(r.constructorId);
+    if (!raceKeys) {
+      raceKeys = new Set();
+      constructorRaceKeys.set(r.constructorId, raceKeys);
+    }
+    raceKeys.add(raceKey);
 
     if (r.positionNumber !== 1) continue;
     let w = winsByYear.get(r.year);
@@ -219,6 +271,12 @@ async function loadDataset(): Promise<Dataset> {
     });
   }
 
+  // Fix up constructor "races" to distinct-race counts (see note above).
+  for (const [constructorId, keys] of constructorRaceKeys) {
+    const agg = constructorCareer.get(constructorId);
+    if (agg) agg.races = keys.size;
+  }
+
   return {
     version,
     driverStandings,
@@ -233,6 +291,8 @@ async function loadDataset(): Promise<Dataset> {
     winsByYear,
     winnerByRace,
     resultsByRace,
+    driverCareer,
+    constructorCareer,
   };
 }
 
@@ -401,4 +461,85 @@ export async function getCalendar(season: string): Promise<CalendarResponse> {
       };
     });
   return { season, races };
+}
+
+export async function getDriverProfile(
+  driverId: string
+): Promise<DriverProfile | null> {
+  const ds = await dataset();
+  const career = ds.driverCareer.get(driverId);
+  if (!career) return null;
+
+  const d = ds.drivers.get(driverId);
+  const rawSeasons = ds.driverStandings
+    .filter((s) => s.driverId === driverId)
+    .sort((a, b) => a.year - b.year);
+
+  const seasons: DriverSeasonEntry[] = rawSeasons.map((s) => {
+    const constructorId =
+      ds.teamByYearDriver.get(`${s.year}:${driverId}`) ?? "";
+    const c = ds.constructors.get(constructorId);
+    return {
+      season: s.year,
+      constructorId,
+      constructorName: c?.name ?? "",
+      position: s.positionNumber ?? s.positionDisplayOrder,
+      points: s.points,
+      wins: ds.winsByYear.get(s.year)?.drivers.get(driverId) ?? 0,
+    };
+  });
+
+  return {
+    driverId,
+    givenName: d?.firstName ?? "",
+    familyName: d?.lastName ?? driverId,
+    nationality: demonym(ds, d?.nationalityCountryId),
+    countryCode: alpha2(ds, d?.nationalityCountryId),
+    permanentNumber:
+      d?.permanentNumber != null ? String(d.permanentNumber) : null,
+    code: d?.abbreviation ?? null,
+    firstSeason: career.firstSeason,
+    lastSeason: career.lastSeason,
+    championships: rawSeasons.filter((s) => s.positionNumber === 1).length,
+    wins: seasons.reduce((sum, s) => sum + s.wins, 0),
+    podiums: career.podiums,
+    points: rawSeasons.reduce((sum, s) => sum + s.points, 0),
+    races: career.races,
+    seasons,
+  };
+}
+
+export async function getConstructorProfile(
+  constructorId: string
+): Promise<ConstructorProfile | null> {
+  const ds = await dataset();
+  const career = ds.constructorCareer.get(constructorId);
+  if (!career) return null;
+
+  const c = ds.constructors.get(constructorId);
+  const rawSeasons = ds.constructorStandings
+    .filter((s) => s.constructorId === constructorId)
+    .sort((a, b) => a.year - b.year);
+
+  const seasons: ConstructorSeasonEntry[] = rawSeasons.map((s) => ({
+    season: s.year,
+    position: s.positionNumber ?? s.positionDisplayOrder,
+    points: s.points,
+    wins: ds.winsByYear.get(s.year)?.constructors.get(constructorId) ?? 0,
+  }));
+
+  return {
+    constructorId,
+    name: c?.name ?? constructorId,
+    nationality: demonym(ds, c?.countryId),
+    countryCode: alpha2(ds, c?.countryId),
+    firstSeason: career.firstSeason,
+    lastSeason: career.lastSeason,
+    championships: rawSeasons.filter((s) => s.positionNumber === 1).length,
+    wins: seasons.reduce((sum, s) => sum + s.wins, 0),
+    podiums: career.podiums,
+    points: rawSeasons.reduce((sum, s) => sum + s.points, 0),
+    races: career.races,
+    seasons,
+  };
 }

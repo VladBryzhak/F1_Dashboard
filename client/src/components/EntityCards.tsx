@@ -1,10 +1,12 @@
 import { useEffect, useState } from 'react'
+import { Link } from 'react-router-dom'
 import { driverPortraitUrl, teamCarUrl, teamColor } from '../lib/f1meta'
 import type { ConstructorStanding, DriverStanding } from '../types/f1'
 import Flag from './Flag'
 
 // Official car render; hides itself if the image is missing (e.g. older seasons).
-function CarImage({
+// Exported so profile pages can reuse the same season-accurate art + fallback.
+export function CarImage({
   constructorId,
   season,
   color,
@@ -31,7 +33,8 @@ function CarImage({
 
 // Season/team-accurate portrait first, OpenF1 headshot as fallback; hides
 // itself once both candidates have failed.
-function Headshot({
+// Exported so profile pages can reuse the same season-accurate art + fallback.
+export function Headshot({
   portraitUrl,
   fallbackUrl,
   color,
@@ -70,7 +73,7 @@ export function DriverCard({
 }) {
   const color = teamColor(d.constructorId)
   return (
-    <article className="ecard">
+    <Link to={`/drivers/${d.driverId}`} className="ecard">
       <span className="stripe" style={{ background: color }} />
       <Headshot
         portraitUrl={driverPortraitUrl(d.driverId, d.constructorId, season)}
@@ -93,7 +96,7 @@ export function DriverCard({
           {d.wins} {d.wins === 1 ? 'win' : 'wins'}
         </span>
       </div>
-    </article>
+    </Link>
   )
 }
 
@@ -106,7 +109,7 @@ export function TeamCard({
 }) {
   const color = teamColor(c.constructorId)
   return (
-    <article className="ecard">
+    <Link to={`/teams/${c.constructorId}`} className="ecard">
       <span className="stripe" style={{ background: color }} />
       <CarImage constructorId={c.constructorId} season={season} color={color} />
       <div className="rank">P{c.position}</div>
@@ -122,6 +125,6 @@ export function TeamCard({
           {c.wins} {c.wins === 1 ? 'win' : 'wins'}
         </span>
       </div>
-    </article>
+    </Link>
   )
 }

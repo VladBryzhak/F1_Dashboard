@@ -3,6 +3,7 @@ import express, { NextFunction, Request, Response } from "express";
 import fs from "fs";
 import path from "path";
 import calendarRouter from "./routes/calendar";
+import profilesRouter from "./routes/profiles";
 import standingsRouter from "./routes/standings";
 import telemetryRouter from "./routes/telemetry";
 
@@ -19,6 +20,8 @@ app.get("/api/health", (_req, res) => {
 app.use("/api/standings", standingsRouter);
 app.use("/api/calendar", calendarRouter);
 app.use("/api/telemetry", telemetryRouter);
+// Owns two top-level paths directly: /api/drivers/:id and /api/constructors/:id
+app.use("/api", profilesRouter);
 
 // In production we serve the built React client from the same server, so the
 // whole app runs as one service (one origin, no CORS, no separate frontend

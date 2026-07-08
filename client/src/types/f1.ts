@@ -31,6 +31,55 @@ export interface StandingsResponse<T> {
   standings: T[]
 }
 
+export interface DriverSeasonEntry {
+  season: number
+  constructorId: string
+  constructorName: string
+  position: number
+  points: number
+  wins: number
+}
+
+export interface DriverProfile {
+  driverId: string
+  givenName: string
+  familyName: string
+  nationality: string
+  countryCode: string | null
+  permanentNumber: string | null
+  code: string | null
+  firstSeason: number
+  lastSeason: number
+  championships: number
+  wins: number
+  podiums: number
+  points: number
+  races: number
+  seasons: DriverSeasonEntry[]
+}
+
+export interface ConstructorSeasonEntry {
+  season: number
+  position: number
+  points: number
+  wins: number
+}
+
+export interface ConstructorProfile {
+  constructorId: string
+  name: string
+  nationality: string
+  countryCode: string | null
+  firstSeason: number
+  lastSeason: number
+  championships: number
+  wins: number
+  podiums: number
+  points: number
+  races: number
+  seasons: ConstructorSeasonEntry[]
+}
+
 export interface CalendarRace {
   round: number
   grandPrixId: string

@@ -18,8 +18,10 @@ async function getJson<T>(path: string): Promise<T> {
 
 import type {
   CalendarResponse,
+  ConstructorProfile,
   ConstructorStanding,
   DriverLap,
+  DriverProfile,
   DriverStanding,
   LapTelemetry,
   RaceResultResponse,
@@ -41,6 +43,10 @@ export const api = {
     getJson<RaceResultResponse>(`/calendar/${season}/${round}`),
   driverHeadshots: (season: string) =>
     getJson<Record<string, string>>(`/telemetry/headshots/${season}`),
+  driverProfile: (driverId: string) =>
+    getJson<DriverProfile>(`/drivers/${driverId}`),
+  constructorProfile: (constructorId: string) =>
+    getJson<ConstructorProfile>(`/constructors/${constructorId}`),
   telemetrySessions: (season: string) =>
     getJson<TelemetrySession[]>(`/telemetry/sessions/${season}`),
   sessionDrivers: (sessionKey: number) =>
