@@ -747,44 +747,80 @@ table.standings {
 /* ---------- Home / hero ---------- */
 .hero {
   position: relative;
-  height: 340px;
+  min-height: 420px;
   border-radius: 16px;
   overflow: hidden;
-  background:
-    radial-gradient(120% 100% at 50% 0%, #2a2a38 0%, #15151e 60%),
-    linear-gradient(180deg, #1b1b24, #0c0c11);
   border: 1px solid var(--border);
   display: flex;
   align-items: center;
   justify-content: center;
+  /* Split team wash: Mercedes teal in from the left, Ferrari red from the
+     right, with a dark centre vignette so the banner stays legible. */
+  background:
+    radial-gradient(72% 130% at 50% 8%, transparent 0%, rgba(8, 8, 12, 0.62) 74%),
+    linear-gradient(105deg, rgba(39, 244, 210, 0.5) 0%, rgba(39, 244, 210, 0) 44%),
+    linear-gradient(255deg, rgba(232, 0, 45, 0.5) 0%, rgba(232, 0, 45, 0) 44%),
+    #0d0d15;
 }
 
-.hero-driver {
+/* Each podium photo covers its own half and fades toward the centre where the
+   battle banner sits. Faded on the inner edge (and softly top/bottom). */
+.hero-side {
   position: absolute;
+  top: 0;
   bottom: 0;
-  height: 320px;
-  object-fit: contain;
-  filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.5));
+  width: 54%;
+  overflow: hidden;
   z-index: 1;
+  pointer-events: none;
+}
+
+.hero-photo {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0.82;
 }
 
 .hero-left {
   left: 0;
-  mask-image: linear-gradient(90deg, #000 70%, transparent);
-  -webkit-mask-image: linear-gradient(90deg, #000 70%, transparent);
+}
+.hero-left .hero-photo {
+  object-position: 52% 22%;
+  mask-image: linear-gradient(90deg, #000 0%, #000 52%, transparent 100%);
+  -webkit-mask-image: linear-gradient(90deg, #000 0%, #000 52%, transparent 100%);
 }
 
 .hero-right {
   right: 0;
-  mask-image: linear-gradient(270deg, #000 70%, transparent);
-  -webkit-mask-image: linear-gradient(270deg, #000 70%, transparent);
+}
+.hero-right .hero-photo {
+  object-position: 62% 28%;
+  mask-image: linear-gradient(270deg, #000 0%, #000 52%, transparent 100%);
+  -webkit-mask-image: linear-gradient(270deg, #000 0%, #000 52%, transparent 100%);
+}
+
+/* Dark vignette over the photos so the central banner stays legible. */
+.hero-veil {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  background: radial-gradient(
+    62% 130% at 50% 46%,
+    rgba(8, 8, 12, 0.9) 0%,
+    rgba(8, 8, 12, 0.9) 24%,
+    rgba(8, 8, 12, 0.5) 52%,
+    transparent 78%
+  );
 }
 
 .hero-content {
   position: relative;
-  z-index: 2;
+  z-index: 3;
   text-align: center;
   padding: 0 1rem;
+  max-width: 560px;
 }
 
 .hero-kicker {
@@ -809,35 +845,78 @@ table.standings {
   color: var(--accent);
 }
 
-.hero-tag {
-  color: var(--muted);
-  margin: 0.8rem 0 0;
-  font-weight: 600;
-  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.8);
+/* Central battle banner — the season fight between the two sides. */
+.hero-battle {
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
+  gap: 0;
+  margin: 1.3rem auto 0;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: rgba(10, 10, 14, 0.55);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
 }
 
-.hero-vs {
+.battle-side {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.15rem;
+  padding: 0.7rem 1.4rem;
+  min-width: 130px;
+}
+
+.battle-team {
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: var(--muted);
+}
+
+.battle-driver {
+  font-size: 1.25rem;
+  font-weight: 900;
+  font-style: italic;
+  letter-spacing: 0.5px;
+}
+
+.battle-merc {
+  border-top: 3px solid #27f4d2;
+}
+.battle-merc .battle-driver {
+  color: #27f4d2;
+}
+
+.battle-fer {
+  border-top: 3px solid #e8002d;
+}
+.battle-fer .battle-driver {
+  color: #ff2a4d;
+}
+
+.battle-vs {
   display: flex;
   align-items: center;
-  justify-content: center;
-  gap: 0.8rem;
-  margin-top: 1.2rem;
-  font-weight: 800;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-}
-
-.vs-dot {
-  color: var(--accent);
+  padding: 0 0.9rem;
+  font-weight: 900;
   font-style: italic;
+  font-size: 0.95rem;
+  color: #fff;
+  background: rgba(255, 255, 255, 0.06);
 }
 
-.vs-ham {
-  color: #e8002d;
-}
-
-.vs-ver {
-  color: #3671c6;
+.hero-tag {
+  color: var(--muted);
+  margin: 1rem auto 0;
+  max-width: 420px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.8);
 }
 
 .home-links {
