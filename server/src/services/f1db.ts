@@ -19,8 +19,8 @@ import type {
 //
 // Data: https://github.com/f1db/f1db (CC-BY 4.0).
 
-const RELEASE_API = "https://api.github.com/repos/f1db/f1db/releases/latest";
-const ASSET_NAME = "f1db-json-splitted.zip";
+const LATEST_ZIP_URL =
+  "https://github.com/f1db/f1db/releases/latest/download/f1db-json-splitted.zip";
 
 // --- raw f1db record shapes (only the fields we use) ---
 interface RawSeasonDriverStanding {
@@ -140,22 +140,20 @@ interface Dataset {
 let datasetPromise: Promise<Dataset> | null = null;
 
 async function fetchLatestZip(): Promise<{ version: string; zip: AdmZip }> {
-  const relRes = await fetch(RELEASE_API, {
-    headers: { "User-Agent": "f1-dashboard", Accept: "application/json" },
-  });
-  if (!relRes.ok) throw new Error(`f1db release lookup failed: ${relRes.status}`);
-  const rel = (await relRes.json()) as {
-    tag_name: string;
-    assets: { name: string; browser_download_url: string }[];
-  };
-  const asset = rel.assets.find((a) => a.name === ASSET_NAME);
-  if (!asset) throw new Error(`f1db asset ${ASSET_NAME} not found`);
-  const zipRes = await fetch(asset.browser_download_url, {
+  // Pull the stable-named asset straight from GitHub's "latest release" download
+  // redirect instead of resolving it via api.github.com. The REST API caps
+  // unauthenticated callers at 60 req/hr per IP, which shared hosting egress IPs
+  // (e.g. Render's free tier) exhaust quickly → 403; the release-download path
+  // has no such limit.
+  const res = await fetch(LATEST_ZIP_URL, {
     headers: { "User-Agent": "f1-dashboard" },
   });
-  if (!zipRes.ok) throw new Error(`f1db download failed: ${zipRes.status}`);
-  const buf = Buffer.from(await zipRes.arrayBuffer());
-  return { version: rel.tag_name, zip: new AdmZip(buf) };
+  if (!res.ok) throw new Error(`f1db download failed: ${res.status}`);
+  // The redirect chain passes through /releases/download/<tag>/…; recover the
+  // tag from the resolved URL when present, else label it "latest".
+  const version = res.url.match(/\/releases\/download\/([^/]+)\//)?.[1] ?? "latest";
+  const buf = Buffer.from(await res.arrayBuffer());
+  return { version, zip: new AdmZip(buf) };
 }
 
 async function loadDataset(): Promise<Dataset> {
@@ -296,15 +294,50 @@ async function loadDataset(): Promise<Dataset> {
   };
 }
 
-// Single in-flight load; cached for the process lifetime (restart to refresh).
+// How often a long-lived process re-pulls the latest f1db release in the
+// background. On Render's free tier cold starts already refresh the data (a woken
+// instance is a new process that re-downloads); this keeps an always-on instance
+// current without a redeploy. Override with F1DB_REFRESH_MS; set 0 to disable.
+const REFRESH_INTERVAL_MS =
+  process.env.F1DB_REFRESH_MS !== undefined
+    ? Number(process.env.F1DB_REFRESH_MS)
+    : 12 * 60 * 60 * 1000; // 12h
+
+let refreshTimer: NodeJS.Timeout | null = null;
+
+// Cached for the process lifetime and refreshed in the background on a timer.
 function dataset(): Promise<Dataset> {
   if (!datasetPromise) {
-    datasetPromise = loadDataset().catch((err) => {
-      datasetPromise = null; // allow retry on next request
-      throw err;
-    });
+    datasetPromise = loadDataset().then(
+      (ds) => {
+        scheduleRefresh();
+        return ds;
+      },
+      (err) => {
+        datasetPromise = null; // allow retry on the next request
+        throw err;
+      },
+    );
   }
   return datasetPromise;
+}
+
+// Periodically load a fresh copy in the background and swap it in only on
+// success, so a failed refresh never replaces good data and requests are never
+// blocked waiting on it.
+function scheduleRefresh(): void {
+  if (refreshTimer || !(REFRESH_INTERVAL_MS > 0)) return;
+  refreshTimer = setInterval(() => {
+    loadDataset().then(
+      (fresh) => {
+        datasetPromise = Promise.resolve(fresh);
+      },
+      (err) => {
+        console.warn(`f1db refresh failed, keeping cached data: ${String(err)}`);
+      },
+    );
+  }, REFRESH_INTERVAL_MS);
+  refreshTimer.unref(); // don't keep the process alive for the timer alone
 }
 
 function demonym(ds: Dataset, countryId: string | undefined): string {
