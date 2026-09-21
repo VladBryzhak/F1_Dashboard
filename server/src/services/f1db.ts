@@ -11,8 +11,10 @@ import type {
   HomeHighlights,
   NotableRetirement,
   PodiumEntry,
+  ProgressionSeries,
   RaceResult,
   RaceResultResponse,
+  SeasonProgression,
   StandingsResponse,
 } from "../types/f1";
 
@@ -111,6 +113,16 @@ interface RaceWinner {
   constructorId: string;
 }
 
+// Cumulative championship standing for a driver after a given race (round).
+interface RawRaceDriverStanding {
+  year: number;
+  round: number;
+  positionDisplayOrder: number;
+  positionNumber: number | null;
+  driverId: string;
+  points: number;
+}
+
 interface CareerAgg {
   firstSeason: number;
   lastSeason: number;
@@ -138,6 +150,8 @@ interface Dataset {
   // career totals for profile pages, keyed by driverId / constructorId
   driverCareer: Map<string, CareerAgg>;
   constructorCareer: Map<string, CareerAgg>;
+  // per-round cumulative driver standings (for the title-race chart)
+  racesDriverStandings: RawRaceDriverStanding[];
 }
 
 let datasetPromise: Promise<Dataset> | null = null;
@@ -180,6 +194,9 @@ async function loadDataset(): Promise<Dataset> {
     read<RawCountry>("f1db-countries.json").map((c) => [c.id, c])
   );
   const races = read<RawRace>("f1db-races.json");
+  const racesDriverStandings = read<RawRaceDriverStanding>(
+    "f1db-races-driver-standings.json"
+  );
   const grandsPrix = new Map(
     read<RawGrandPrix>("f1db-grands-prix.json").map((g) => [g.id, g])
   );
@@ -294,6 +311,7 @@ async function loadDataset(): Promise<Dataset> {
     resultsByRace,
     driverCareer,
     constructorCareer,
+    racesDriverStandings,
   };
 }
 
@@ -686,4 +704,68 @@ export async function getHomeHighlights(): Promise<HomeHighlights> {
   }
 
   return { season, latestRace, notableRetirement, championshipLeader, nextRace };
+}
+
+// Per-round title-race chart: cumulative points across the season for the top
+// drivers. Uses the `races-driver-standings` table (points after each round).
+export async function getSeasonProgression(
+  season: string,
+  topN = 6,
+): Promise<SeasonProgression> {
+  const ds = await dataset();
+  const year = Number(season);
+  const rows = ds.racesDriverStandings.filter((s) => s.year === year);
+
+  const rounds = [...new Set(rows.map((r) => r.round))].sort((a, b) => a - b);
+
+  // Short GP label per round, for the x-axis.
+  const grandPrixNames = rounds.map((round) => {
+    const race = ds.races.find((r) => r.year === year && r.round === round);
+    const gp = race ? ds.grandsPrix.get(race.grandPrixId) : undefined;
+    return gp?.name ?? `R${round}`;
+  });
+
+  if (rounds.length === 0) {
+    return { season: year, rounds: [], grandPrixNames: [], series: [] };
+  }
+
+  // Rank drivers by their standing after the final available round.
+  const lastRound = rounds[rounds.length - 1];
+  const topDrivers = rows
+    .filter((r) => r.round === lastRound)
+    .sort((a, b) => a.positionDisplayOrder - b.positionDisplayOrder)
+    .slice(0, topN)
+    .map((r) => r.driverId);
+
+  // points[driverId][round] lookup for fast alignment + carry-forward.
+  const byDriverRound = new Map<string, Map<number, number>>();
+  for (const r of rows) {
+    let m = byDriverRound.get(r.driverId);
+    if (!m) {
+      m = new Map();
+      byDriverRound.set(r.driverId, m);
+    }
+    m.set(r.round, r.points);
+  }
+
+  const series: ProgressionSeries[] = topDrivers.map((driverId, i) => {
+    const roundPoints = byDriverRound.get(driverId) ?? new Map<number, number>();
+    let carried = 0;
+    const points = rounds.map((round) => {
+      const p = roundPoints.get(round);
+      if (p != null) carried = p;
+      return carried; // carry the last known total across missed rounds
+    });
+    const d = ds.drivers.get(driverId);
+    return {
+      driverId,
+      driverName: driverName(ds, driverId),
+      driverCode: d?.abbreviation ?? null,
+      constructorId: ds.teamByYearDriver.get(`${year}:${driverId}`) ?? "",
+      finalPosition: i + 1,
+      points,
+    };
+  });
+
+  return { season: year, rounds, grandPrixNames, series };
 }

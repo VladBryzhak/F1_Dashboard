@@ -26,6 +26,7 @@ import type {
   HomeResponse,
   LapTelemetry,
   RaceResultResponse,
+  SeasonProgression,
   SessionDriver,
   StandingsResponse,
   TelemetrySession,
@@ -35,6 +36,8 @@ export const api = {
   home: () => getJson<HomeResponse>('/home'),
   driverStandings: (season: string) =>
     getJson<StandingsResponse<DriverStanding>>(`/standings/drivers/${season}`),
+  seasonProgression: (season: string) =>
+    getJson<SeasonProgression>(`/standings/progression/${season}`),
   constructorStandings: (season: string) =>
     getJson<StandingsResponse<ConstructorStanding>>(
       `/standings/constructors/${season}`,

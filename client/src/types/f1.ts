@@ -187,6 +187,24 @@ export interface HomeResponse {
   news: NewsItem[]
 }
 
+// ----- Championship progression (title-race chart) -----
+
+export interface ProgressionSeries {
+  driverId: string
+  driverName: string
+  driverCode: string | null
+  constructorId: string
+  finalPosition: number
+  points: number[]
+}
+
+export interface SeasonProgression {
+  season: number
+  rounds: number[]
+  grandPrixNames: string[]
+  series: ProgressionSeries[]
+}
+
 export interface TelemetrySession {
   sessionKey: number
   name: string

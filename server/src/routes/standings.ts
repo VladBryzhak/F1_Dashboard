@@ -2,9 +2,19 @@ import { Router } from "express";
 import {
   getConstructorStandings,
   getDriverStandings,
+  getSeasonProgression,
 } from "../services/f1db";
 
 const router = Router();
+
+// GET /api/standings/progression/:season — per-round title-race chart data
+router.get("/progression/:season", async (req, res, next) => {
+  try {
+    res.json(await getSeasonProgression(req.params.season));
+  } catch (err) {
+    next(err);
+  }
+});
 
 // GET /api/standings/drivers/:season
 router.get("/drivers/:season", async (req, res, next) => {

@@ -5,6 +5,7 @@ import {
   ConstructorStandingsTable,
   DriverStandingsTable,
 } from '../components/StandingsTable'
+import TitleRaceChart from '../components/TitleRaceChart'
 import { useAsync } from '../hooks/useAsync'
 import { CURRENT_SEASON } from '../lib/seasons'
 import {
@@ -12,7 +13,7 @@ import {
   SAMPLE_DRIVER_STANDINGS,
 } from '../lib/sampleData'
 
-type Tab = 'drivers' | 'constructors'
+type Tab = 'drivers' | 'constructors' | 'progression'
 
 export default function Standings() {
   const [season, setSeason] = useState(String(CURRENT_SEASON))
@@ -27,8 +28,14 @@ export default function Standings() {
     () => api.driverHeadshots(season).catch(() => ({})),
     [season],
   )
+  const progression = useAsync(() => api.seasonProgression(season), [season])
 
-  const active = tab === 'drivers' ? drivers : constructors
+  const active =
+    tab === 'drivers'
+      ? drivers
+      : tab === 'constructors'
+        ? constructors
+        : progression
 
   return (
     <section>
@@ -50,6 +57,12 @@ export default function Standings() {
         >
           Constructors
         </button>
+        <button
+          className={tab === 'progression' ? 'tab active' : 'tab'}
+          onClick={() => setTab('progression')}
+        >
+          Title Race
+        </button>
       </div>
 
       {active.loading && <p className="muted">Loading…</p>}
@@ -62,18 +75,21 @@ export default function Standings() {
         </p>
       )}
 
-      {!active.loading &&
-        (tab === 'drivers' ? (
-          <DriverStandingsTable
-            rows={drivers.data?.standings ?? SAMPLE_DRIVER_STANDINGS}
-            season={season}
-            headshots={headshots.data ?? undefined}
-          />
-        ) : (
-          <ConstructorStandingsTable
-            rows={constructors.data?.standings ?? SAMPLE_CONSTRUCTOR_STANDINGS}
-          />
-        ))}
+      {!active.loading && tab === 'drivers' && (
+        <DriverStandingsTable
+          rows={drivers.data?.standings ?? SAMPLE_DRIVER_STANDINGS}
+          season={season}
+          headshots={headshots.data ?? undefined}
+        />
+      )}
+      {!active.loading && tab === 'constructors' && (
+        <ConstructorStandingsTable
+          rows={constructors.data?.standings ?? SAMPLE_CONSTRUCTOR_STANDINGS}
+        />
+      )}
+      {!active.loading && tab === 'progression' && progression.data && (
+        <TitleRaceChart data={progression.data} />
+      )}
     </section>
   )
 }

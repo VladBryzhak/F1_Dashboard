@@ -188,6 +188,24 @@ export interface HomeResponse {
   news: NewsItem[];
 }
 
+// ----- Championship progression (title-race chart) -----
+
+export interface ProgressionSeries {
+  driverId: string;
+  driverName: string;
+  driverCode: string | null;
+  constructorId: string;
+  finalPosition: number;
+  points: number[]; // cumulative points, aligned to `rounds`
+}
+
+export interface SeasonProgression {
+  season: number;
+  rounds: number[];
+  grandPrixNames: string[]; // short GP labels, aligned to `rounds`
+  series: ProgressionSeries[]; // top drivers, ordered by final position
+}
+
 export interface TelemetrySession {
   sessionKey: number;
   name: string; // e.g. country / location

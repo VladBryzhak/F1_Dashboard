@@ -1200,3 +1200,82 @@ table.standings {
   font-size: 0.9rem;
   font-weight: 600;
 }
+
+/* ---------- Title-race chart ---------- */
+/* Clip the recharts tooltip wrapper to the card so it never widens the page
+   (recharts keeps the tooltip inside the plot area, so nothing useful is lost). */
+.title-race {
+  overflow: hidden;
+}
+.title-race-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+.title-race-head h3 {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.chart-tip {
+  background: #1a1a22;
+  border: 1px solid #2a2a35;
+  border-radius: 8px;
+  padding: 0.55rem 0.7rem;
+  font-size: 0.8rem;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+}
+.chart-tip-head {
+  font-weight: 800;
+  margin-bottom: 0.4rem;
+  color: var(--text);
+}
+.chart-tip-row {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  line-height: 1.6;
+}
+.chart-tip-name {
+  font-weight: 700;
+}
+.chart-tip-val {
+  margin-left: auto;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.chart-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1.1rem;
+  margin-top: 1rem;
+  padding-top: 0.9rem;
+  border-top: 1px solid var(--border);
+}
+.legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-size: 0.82rem;
+}
+.legend-line {
+  width: 18px;
+  height: 0;
+  border-top: 3px solid currentColor;
+  border-radius: 2px;
+}
+.legend-line.dashed {
+  border-top-style: dashed;
+}
+.legend-code {
+  font-weight: 800;
+}
+.legend-name {
+  font-weight: 600;
+}
