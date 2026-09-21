@@ -1420,3 +1420,71 @@ table.standings {
 .cmp-h2h-bar > span {
   height: 100%;
 }
+
+/* ---------- Race weekend page ---------- */
+.table-scroll {
+  overflow-x: auto;
+}
+.wknd-title {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+  margin-bottom: 1.25rem;
+}
+.wknd-title h1 {
+  margin: 0;
+}
+.wknd-title p {
+  margin: 0.25rem 0 0;
+  font-weight: 600;
+}
+
+.wknd-highlights {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: 0.9rem;
+  margin-bottom: 1.5rem;
+}
+.wknd-hl {
+  position: relative;
+  overflow: hidden;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 0.9rem 1.1rem;
+}
+.wknd-hl-label {
+  color: var(--muted-2);
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+}
+.wknd-hl-name {
+  font-weight: 900;
+  font-size: 1.1rem;
+  margin: 0.25rem 0 0.15rem;
+}
+.wknd-hl-detail {
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+
+.wknd-section {
+  margin: 0 0 0.75rem;
+  font-size: 0.95rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.delta {
+  font-weight: 800;
+  font-size: 0.85rem;
+}
+.delta.up {
+  color: #52e252;
+}
+.delta.down {
+  color: #ff6b6b;
+}

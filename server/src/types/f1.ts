@@ -227,6 +227,46 @@ export interface DriverComparison {
   headToHead: HeadToHead;
 }
 
+// ----- Race weekend detail -----
+
+export interface QualifyingEntry {
+  position: number | null;
+  driverId: string;
+  driverName: string;
+  driverCode: string | null;
+  constructorId: string;
+  constructorName: string;
+  q1: string | null;
+  q2: string | null;
+  q3: string | null;
+}
+
+export interface WeekendResult extends RaceResult {
+  gridPosition: number | null;
+  positionsGained: number | null; // grid − finish (positive = places gained)
+}
+
+export interface WeekendHighlight {
+  driverId: string;
+  driverName: string;
+  constructorId: string;
+  constructorName: string;
+  detail: string; // fastest-lap time / "30%" driver-of-the-day share
+}
+
+export interface RaceWeekend {
+  season: string;
+  round: number;
+  grandPrixName: string;
+  officialName: string;
+  date: string;
+  countryCode: string | null;
+  qualifying: QualifyingEntry[];
+  results: WeekendResult[];
+  fastestLap: WeekendHighlight | null;
+  driverOfTheDay: WeekendHighlight | null;
+}
+
 export interface TelemetrySession {
   sessionKey: number;
   name: string; // e.g. country / location

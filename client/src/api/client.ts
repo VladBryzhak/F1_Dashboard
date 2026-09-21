@@ -28,6 +28,7 @@ import type {
   HomeResponse,
   LapTelemetry,
   RaceResultResponse,
+  RaceWeekend,
   SeasonProgression,
   SessionDriver,
   StandingsResponse,
@@ -48,6 +49,8 @@ export const api = {
     getJson<CalendarResponse>(`/calendar/${season}`),
   raceResults: (season: string, round: number) =>
     getJson<RaceResultResponse>(`/calendar/${season}/${round}`),
+  raceWeekend: (season: string, round: number) =>
+    getJson<RaceWeekend>(`/calendar/${season}/${round}/weekend`),
   driverHeadshots: (season: string) =>
     getJson<Record<string, string>>(`/telemetry/headshots/${season}`),
   drivers: () => getJson<DriverListItem[]>('/drivers'),

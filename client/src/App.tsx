@@ -5,6 +5,7 @@ import Compare from './pages/Compare'
 import DriverProfile from './pages/DriverProfile'
 import Drivers from './pages/Drivers'
 import Home from './pages/Home'
+import RaceWeekend from './pages/RaceWeekend'
 import Standings from './pages/Standings'
 import TeamProfile from './pages/TeamProfile'
 import Teams from './pages/Teams'
@@ -17,6 +18,7 @@ export default function App() {
         <Route index element={<Home />} />
         <Route path="standings" element={<Standings />} />
         <Route path="calendar" element={<Calendar />} />
+        <Route path="calendar/:season/:round" element={<RaceWeekend />} />
         <Route path="drivers" element={<Drivers />} />
         <Route path="drivers/:driverId" element={<DriverProfile />} />
         <Route path="teams" element={<Teams />} />

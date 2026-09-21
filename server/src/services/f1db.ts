@@ -15,10 +15,14 @@ import type {
   NotableRetirement,
   PodiumEntry,
   ProgressionSeries,
+  QualifyingEntry,
   RaceResult,
   RaceResultResponse,
+  RaceWeekend,
   SeasonProgression,
   StandingsResponse,
+  WeekendHighlight,
+  WeekendResult,
 } from "../types/f1";
 
 // f1db ships its data as downloadable release artifacts (no live API to time
@@ -126,6 +130,56 @@ interface RawRaceDriverStanding {
   points: number;
 }
 
+// --- race-weekend detail tables (kept compact per race) ---
+interface RawQualifying {
+  year: number;
+  round: number;
+  positionDisplayOrder: number;
+  positionNumber: number | null;
+  driverId: string;
+  constructorId: string;
+  q1: string | null;
+  q2: string | null;
+  q3: string | null;
+}
+interface RawGrid {
+  year: number;
+  round: number;
+  positionNumber: number | null;
+  driverId: string;
+}
+interface RawFastestLap {
+  year: number;
+  round: number;
+  positionNumber: number | null;
+  driverId: string;
+  constructorId: string;
+  lap: number | null;
+  time: string | null;
+}
+interface RawDriverOfTheDay {
+  year: number;
+  round: number;
+  positionNumber: number | null;
+  driverId: string;
+  constructorId: string;
+  percentage: number | null;
+}
+
+interface QualiRow {
+  position: number | null;
+  driverId: string;
+  constructorId: string;
+  q1: string | null;
+  q2: string | null;
+  q3: string | null;
+}
+interface HighlightRow {
+  driverId: string;
+  constructorId: string;
+  detail: string;
+}
+
 interface CareerAgg {
   firstSeason: number;
   lastSeason: number;
@@ -155,6 +209,11 @@ interface Dataset {
   constructorCareer: Map<string, CareerAgg>;
   // per-round cumulative driver standings (for the title-race chart)
   racesDriverStandings: RawRaceDriverStanding[];
+  // race-weekend detail, keyed by `${year}:${round}` (compact)
+  qualifyingByRace: Map<string, QualiRow[]>;
+  gridByRace: Map<string, Map<string, number>>; // driverId → grid position
+  fastestLapByRace: Map<string, HighlightRow>;
+  driverOfDayByRace: Map<string, HighlightRow>;
 }
 
 let datasetPromise: Promise<Dataset> | null = null;
@@ -298,6 +357,61 @@ async function loadDataset(): Promise<Dataset> {
     if (agg) agg.races = keys.size;
   }
 
+  // Race-weekend detail. We reduce each big table to a compact per-race shape
+  // right away (the large parsed arrays are then free to GC) to keep the
+  // retained footprint small; pit stops are intentionally not loaded.
+  const qualifyingByRace = new Map<string, QualiRow[]>();
+  for (const q of read<RawQualifying>("f1db-races-qualifying-results.json")) {
+    const key = `${q.year}:${q.round}`;
+    let arr = qualifyingByRace.get(key);
+    if (!arr) {
+      arr = [];
+      qualifyingByRace.set(key, arr);
+    }
+    arr.push({
+      position: q.positionNumber,
+      driverId: q.driverId,
+      constructorId: q.constructorId,
+      q1: q.q1,
+      q2: q.q2,
+      q3: q.q3,
+    });
+  }
+
+  const gridByRace = new Map<string, Map<string, number>>();
+  for (const g of read<RawGrid>("f1db-races-starting-grid-positions.json")) {
+    if (g.positionNumber == null) continue;
+    const key = `${g.year}:${g.round}`;
+    let m = gridByRace.get(key);
+    if (!m) {
+      m = new Map();
+      gridByRace.set(key, m);
+    }
+    m.set(g.driverId, g.positionNumber);
+  }
+
+  const fastestLapByRace = new Map<string, HighlightRow>();
+  for (const f of read<RawFastestLap>("f1db-races-fastest-laps.json")) {
+    if (f.positionNumber !== 1) continue; // overall fastest lap only
+    fastestLapByRace.set(`${f.year}:${f.round}`, {
+      driverId: f.driverId,
+      constructorId: f.constructorId,
+      detail: f.time ? `${f.time}${f.lap ? ` (lap ${f.lap})` : ""}` : "",
+    });
+  }
+
+  const driverOfDayByRace = new Map<string, HighlightRow>();
+  for (const d of read<RawDriverOfTheDay>(
+    "f1db-races-driver-of-the-day-results.json"
+  )) {
+    if (d.positionNumber !== 1) continue; // the winner of the vote
+    driverOfDayByRace.set(`${d.year}:${d.round}`, {
+      driverId: d.driverId,
+      constructorId: d.constructorId,
+      detail: d.percentage != null ? `${d.percentage}% of the vote` : "",
+    });
+  }
+
   return {
     version,
     driverStandings,
@@ -315,6 +429,10 @@ async function loadDataset(): Promise<Dataset> {
     driverCareer,
     constructorCareer,
     racesDriverStandings,
+    qualifyingByRace,
+    gridByRace,
+    fastestLapByRace,
+    driverOfDayByRace,
   };
 }
 
@@ -826,4 +944,88 @@ export async function getDriverComparison(
     aheadB,
   };
   return { a, b, headToHead };
+}
+
+// Full race-weekend detail: qualifying, race (with grid → finish delta),
+// fastest lap and driver of the day. Returns null for an unknown race.
+export async function getRaceWeekend(
+  season: string,
+  round: string,
+): Promise<RaceWeekend | null> {
+  const ds = await dataset();
+  const key = `${season}:${round}`;
+  const race = ds.races.find(
+    (r) => r.year === Number(season) && r.round === Number(round),
+  );
+  if (!race) return null;
+  const gp = ds.grandsPrix.get(race.grandPrixId);
+
+  const nameOf = (id: string) => driverName(ds, id);
+  const teamOf = (id: string) => ds.constructors.get(id)?.name ?? id;
+  const codeOf = (id: string) => ds.drivers.get(id)?.abbreviation ?? null;
+
+  const qualifying: QualifyingEntry[] = (ds.qualifyingByRace.get(key) ?? []).map(
+    (q) => ({
+      position: q.position,
+      driverId: q.driverId,
+      driverName: nameOf(q.driverId),
+      driverCode: codeOf(q.driverId),
+      constructorId: q.constructorId,
+      constructorName: teamOf(q.constructorId),
+      q1: q.q1,
+      q2: q.q2,
+      q3: q.q3,
+    }),
+  );
+
+  const grid = ds.gridByRace.get(key);
+  const rows = (ds.resultsByRace.get(key) ?? [])
+    .slice()
+    .sort((a, b) => a.positionDisplayOrder - b.positionDisplayOrder);
+  const results: WeekendResult[] = rows.map((r) => {
+    const gridPosition = grid?.get(r.driverId) ?? null;
+    const gained =
+      gridPosition != null && r.positionNumber != null
+        ? gridPosition - r.positionNumber
+        : null;
+    return {
+      positionText: r.positionText,
+      driverId: r.driverId,
+      driverName: nameOf(r.driverId),
+      driverCode: codeOf(r.driverId),
+      nationality: demonym(ds, ds.drivers.get(r.driverId)?.nationalityCountryId),
+      countryCode: alpha2(ds, ds.drivers.get(r.driverId)?.nationalityCountryId),
+      constructorId: r.constructorId,
+      constructorName: teamOf(r.constructorId),
+      timeDisplay: formatResultTime(r),
+      laps: r.laps ?? null,
+      points: r.points ?? 0,
+      gridPosition,
+      positionsGained: gained,
+    };
+  });
+
+  const toHighlight = (h: HighlightRow | undefined): WeekendHighlight | null =>
+    h
+      ? {
+          driverId: h.driverId,
+          driverName: nameOf(h.driverId),
+          constructorId: h.constructorId,
+          constructorName: teamOf(h.constructorId),
+          detail: h.detail,
+        }
+      : null;
+
+  return {
+    season,
+    round: Number(round),
+    grandPrixName: gp?.name ?? race.grandPrixId,
+    officialName: race.officialName,
+    date: race.date,
+    countryCode: alpha2(ds, gp?.countryId),
+    qualifying,
+    results,
+    fastestLap: toHighlight(ds.fastestLapByRace.get(key)),
+    driverOfTheDay: toHighlight(ds.driverOfDayByRace.get(key)),
+  };
 }
