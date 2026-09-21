@@ -8,6 +8,9 @@ import type {
   DriverProfile,
   DriverSeasonEntry,
   DriverStanding,
+  HomeHighlights,
+  NotableRetirement,
+  PodiumEntry,
   RaceResult,
   RaceResultResponse,
   StandingsResponse,
@@ -575,4 +578,112 @@ export async function getConstructorProfile(
     races: career.races,
     seasons,
   };
+}
+
+// Retirement reasons that read as an on-track incident (for the "notable crash"
+// highlight), rather than a mechanical/technical DNF.
+const CRASH_REASON = /collision|accident|crash|spun|spin|contact|damage/i;
+
+function driverName(ds: Dataset, driverId: string): string {
+  const d = ds.drivers.get(driverId);
+  return d ? `${d.firstName} ${d.lastName}` : driverId;
+}
+
+// Dynamic home-page highlights derived from the latest completed race in the
+// in-memory dataset — no external call. Colours stay client-side.
+export async function getHomeHighlights(): Promise<HomeHighlights> {
+  const ds = await dataset();
+  const season = Math.max(...ds.races.map((r) => r.year));
+  const seasonRaces = ds.races
+    .filter((r) => r.year === season)
+    .sort((a, b) => a.round - b.round);
+
+  // Latest completed round = highest round that has a recorded winner.
+  let latestRound = 0;
+  for (const r of seasonRaces) {
+    if (ds.winnerByRace.has(`${season}:${r.round}`) && r.round > latestRound) {
+      latestRound = r.round;
+    }
+  }
+
+  let latestRace: HomeHighlights["latestRace"] = null;
+  let notableRetirement: NotableRetirement | null = null;
+
+  if (latestRound > 0) {
+    const race = seasonRaces.find((r) => r.round === latestRound);
+    const gp = race ? ds.grandsPrix.get(race.grandPrixId) : undefined;
+    const rows = (ds.resultsByRace.get(`${season}:${latestRound}`) ?? [])
+      .slice()
+      .sort((a, b) => a.positionDisplayOrder - b.positionDisplayOrder);
+
+    const podium: PodiumEntry[] = rows
+      .filter((r) => r.positionNumber != null && r.positionNumber <= 3)
+      .map((r) => {
+        const c = ds.constructors.get(r.constructorId);
+        const d = ds.drivers.get(r.driverId);
+        return {
+          position: r.positionNumber as number,
+          driverId: r.driverId,
+          driverName: driverName(ds, r.driverId),
+          driverCode: d?.abbreviation ?? null,
+          constructorId: r.constructorId,
+          constructorName: c?.name ?? r.constructorId,
+          countryCode: alpha2(ds, d?.nationalityCountryId),
+        };
+      });
+
+    // Prefer the best-classified driver who retired due to an incident.
+    const crash = rows.find(
+      (r) => r.reasonRetired != null && CRASH_REASON.test(r.reasonRetired),
+    );
+    if (crash?.reasonRetired) {
+      notableRetirement = {
+        driverId: crash.driverId,
+        driverName: driverName(ds, crash.driverId),
+        constructorId: crash.constructorId,
+        reason: crash.reasonRetired,
+      };
+    }
+
+    latestRace = {
+      season,
+      round: latestRound,
+      grandPrixName: gp?.name ?? race?.grandPrixId ?? "",
+      date: race?.date ?? "",
+      countryCode: alpha2(ds, gp?.countryId),
+      podium,
+    };
+  }
+
+  // Championship leader from this season's driver standings (display order 1).
+  const leaderRow = ds.driverStandings
+    .filter((s) => s.year === season)
+    .sort((a, b) => a.positionDisplayOrder - b.positionDisplayOrder)[0];
+  let championshipLeader: HomeHighlights["championshipLeader"] = null;
+  if (leaderRow) {
+    const constructorId =
+      ds.teamByYearDriver.get(`${season}:${leaderRow.driverId}`) ?? "";
+    championshipLeader = {
+      driverId: leaderRow.driverId,
+      driverName: driverName(ds, leaderRow.driverId),
+      constructorId,
+      constructorName: ds.constructors.get(constructorId)?.name ?? "",
+      points: leaderRow.points,
+    };
+  }
+
+  // Next race = first upcoming round after the latest completed one.
+  const upcoming = seasonRaces.find((r) => r.round > latestRound);
+  let nextRace: HomeHighlights["nextRace"] = null;
+  if (upcoming) {
+    const gp = ds.grandsPrix.get(upcoming.grandPrixId);
+    nextRace = {
+      round: upcoming.round,
+      grandPrixName: gp?.name ?? upcoming.grandPrixId,
+      date: upcoming.date,
+      countryCode: alpha2(ds, gp?.countryId),
+    };
+  }
+
+  return { season, latestRace, notableRetirement, championshipLeader, nextRace };
 }

@@ -125,6 +125,69 @@ export interface RaceResultResponse {
   results: RaceResult[];
 }
 
+// ----- Home page: dynamic weekend highlights + news -----
+
+export interface PodiumEntry {
+  position: number; // 1..3
+  driverId: string;
+  driverName: string;
+  driverCode: string | null;
+  constructorId: string;
+  constructorName: string;
+  countryCode: string | null;
+}
+
+export interface RaceHighlight {
+  season: number;
+  round: number;
+  grandPrixName: string;
+  date: string;
+  countryCode: string | null;
+  podium: PodiumEntry[]; // P1..P3, ascending by position
+}
+
+export interface NotableRetirement {
+  driverId: string;
+  driverName: string;
+  constructorId: string;
+  reason: string; // e.g. "Collision", "Accident"
+}
+
+export interface NextRace {
+  round: number;
+  grandPrixName: string;
+  date: string;
+  countryCode: string | null;
+}
+
+export interface LeaderSummary {
+  driverId: string;
+  driverName: string;
+  constructorId: string;
+  constructorName: string;
+  points: number;
+}
+
+export interface HomeHighlights {
+  season: number;
+  latestRace: RaceHighlight | null;
+  notableRetirement: NotableRetirement | null;
+  championshipLeader: LeaderSummary | null;
+  nextRace: NextRace | null;
+}
+
+export interface NewsItem {
+  title: string;
+  link: string;
+  source: string;
+  pubDate: string; // ISO
+}
+
+export interface HomeResponse {
+  highlights: HomeHighlights;
+  news: NewsItem[];
+}
+
 export interface TelemetrySession {
   sessionKey: number;
   name: string; // e.g. country / location
