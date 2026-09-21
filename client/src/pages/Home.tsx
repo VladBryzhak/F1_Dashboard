@@ -26,6 +26,7 @@ const SECTIONS = [
   { to: '/calendar', label: 'Calendar', desc: 'Races & results' },
   { to: '/drivers', label: 'Drivers', desc: 'Grid profiles' },
   { to: '/teams', label: 'Teams', desc: 'Constructor line-up' },
+  { to: '/compare', label: 'Compare', desc: 'Driver head-to-head' },
   { to: '/telemetry', label: 'Telemetry', desc: 'Speed & lap traces' },
 ]
 

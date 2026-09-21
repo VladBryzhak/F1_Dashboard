@@ -8,6 +8,9 @@ import type {
   DriverProfile,
   DriverSeasonEntry,
   DriverStanding,
+  DriverComparison,
+  DriverListItem,
+  HeadToHead,
   HomeHighlights,
   NotableRetirement,
   PodiumEntry,
@@ -768,4 +771,59 @@ export async function getSeasonProgression(
   });
 
   return { season: year, rounds, grandPrixNames, series };
+}
+
+// All drivers who ever started a race, most-recent first — for the comparison
+// pickers.
+export async function getAllDrivers(): Promise<DriverListItem[]> {
+  const ds = await dataset();
+  const list: DriverListItem[] = [];
+  for (const [driverId, career] of ds.driverCareer) {
+    list.push({
+      driverId,
+      name: driverName(ds, driverId),
+      lastSeason: career.lastSeason,
+    });
+  }
+  return list.sort(
+    (a, b) => b.lastSeason - a.lastSeason || a.name.localeCompare(b.name),
+  );
+}
+
+// Head-to-head: two drivers' career profiles plus their race-by-race record in
+// events both contested (lower finishing order = ahead; DNFs still ranked by
+// the classification order).
+export async function getDriverComparison(
+  idA: string,
+  idB: string,
+): Promise<DriverComparison | null> {
+  const [a, b] = await Promise.all([
+    getDriverProfile(idA),
+    getDriverProfile(idB),
+  ]);
+  if (!a || !b) return null;
+
+  const ds = await dataset();
+  const sharedSeasons = new Set<number>();
+  let racesTogether = 0;
+  let aheadA = 0;
+  let aheadB = 0;
+
+  for (const [raceKey, rows] of ds.resultsByRace) {
+    const ra = rows.find((r) => r.driverId === idA);
+    const rb = rows.find((r) => r.driverId === idB);
+    if (!ra || !rb) continue;
+    racesTogether += 1;
+    sharedSeasons.add(Number(raceKey.split(":")[0]));
+    if (ra.positionDisplayOrder < rb.positionDisplayOrder) aheadA += 1;
+    else if (rb.positionDisplayOrder < ra.positionDisplayOrder) aheadB += 1;
+  }
+
+  const headToHead: HeadToHead = {
+    sharedSeasons: [...sharedSeasons].sort((x, y) => x - y),
+    racesTogether,
+    aheadA,
+    aheadB,
+  };
+  return { a, b, headToHead };
 }

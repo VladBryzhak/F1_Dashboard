@@ -1,6 +1,7 @@
 import { Route, Routes } from 'react-router-dom'
 import Layout from './components/Layout'
 import Calendar from './pages/Calendar'
+import Compare from './pages/Compare'
 import DriverProfile from './pages/DriverProfile'
 import Drivers from './pages/Drivers'
 import Home from './pages/Home'
@@ -20,6 +21,7 @@ export default function App() {
         <Route path="drivers/:driverId" element={<DriverProfile />} />
         <Route path="teams" element={<Teams />} />
         <Route path="teams/:constructorId" element={<TeamProfile />} />
+        <Route path="compare" element={<Compare />} />
         <Route path="telemetry" element={<Telemetry />} />
       </Route>
     </Routes>

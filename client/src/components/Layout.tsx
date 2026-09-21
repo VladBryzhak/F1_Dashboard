@@ -5,6 +5,7 @@ const links = [
   { to: '/calendar', label: 'Calendar' },
   { to: '/drivers', label: 'Drivers' },
   { to: '/teams', label: 'Teams' },
+  { to: '/compare', label: 'Compare' },
   { to: '/telemetry', label: 'Telemetry' },
 ]
 

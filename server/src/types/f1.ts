@@ -206,6 +206,27 @@ export interface SeasonProgression {
   series: ProgressionSeries[]; // top drivers, ordered by final position
 }
 
+// ----- Head-to-head driver comparison -----
+
+export interface DriverListItem {
+  driverId: string;
+  name: string;
+  lastSeason: number;
+}
+
+export interface HeadToHead {
+  sharedSeasons: number[];
+  racesTogether: number;
+  aheadA: number; // races where driver A finished ahead of B
+  aheadB: number;
+}
+
+export interface DriverComparison {
+  a: DriverProfile;
+  b: DriverProfile;
+  headToHead: HeadToHead;
+}
+
 export interface TelemetrySession {
   sessionKey: number;
   name: string; // e.g. country / location

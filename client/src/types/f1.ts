@@ -205,6 +205,27 @@ export interface SeasonProgression {
   series: ProgressionSeries[]
 }
 
+// ----- Head-to-head driver comparison -----
+
+export interface DriverListItem {
+  driverId: string
+  name: string
+  lastSeason: number
+}
+
+export interface HeadToHead {
+  sharedSeasons: number[]
+  racesTogether: number
+  aheadA: number
+  aheadB: number
+}
+
+export interface DriverComparison {
+  a: DriverProfile
+  b: DriverProfile
+  headToHead: HeadToHead
+}
+
 export interface TelemetrySession {
   sessionKey: number
   name: string

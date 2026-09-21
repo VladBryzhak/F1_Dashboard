@@ -20,7 +20,9 @@ import type {
   CalendarResponse,
   ConstructorProfile,
   ConstructorStanding,
+  DriverComparison,
   DriverLap,
+  DriverListItem,
   DriverProfile,
   DriverStanding,
   HomeResponse,
@@ -48,8 +50,11 @@ export const api = {
     getJson<RaceResultResponse>(`/calendar/${season}/${round}`),
   driverHeadshots: (season: string) =>
     getJson<Record<string, string>>(`/telemetry/headshots/${season}`),
+  drivers: () => getJson<DriverListItem[]>('/drivers'),
   driverProfile: (driverId: string) =>
     getJson<DriverProfile>(`/drivers/${driverId}`),
+  compareDrivers: (a: string, b: string) =>
+    getJson<DriverComparison>(`/compare/drivers/${a}/${b}`),
   constructorProfile: (constructorId: string) =>
     getJson<ConstructorProfile>(`/constructors/${constructorId}`),
   telemetrySessions: (season: string) =>
