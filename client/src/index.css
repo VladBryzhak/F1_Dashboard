@@ -32,6 +32,13 @@ body {
   padding: 0 1.75rem;
   height: 56px;
   background: #000;
+  /* In an installed PWA (iOS standalone) content runs under the status bar /
+     notch; pad the black bar down by the safe-area inset so the logo and nav
+     clear it. env() is 0 on non-notch devices and desktop. */
+  padding-top: env(safe-area-inset-top);
+  padding-left: max(1.75rem, env(safe-area-inset-left));
+  padding-right: max(1.75rem, env(safe-area-inset-right));
+  box-sizing: content-box;
 }
 
 .brand {
@@ -621,7 +628,9 @@ table.standings {
   .topbar {
     flex-wrap: wrap;
     height: auto;
-    padding: 0.55rem 1rem;
+    /* Add the iOS status-bar / notch inset to the top padding in standalone. */
+    padding: calc(0.55rem + env(safe-area-inset-top)) max(1rem, env(safe-area-inset-right))
+      0.55rem max(1rem, env(safe-area-inset-left));
     gap: 0.5rem 1rem;
   }
   .nav {
