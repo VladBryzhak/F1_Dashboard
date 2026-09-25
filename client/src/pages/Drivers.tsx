@@ -3,11 +3,17 @@ import { api } from '../api/client'
 import { DriverCard } from '../components/EntityCards'
 import SeasonSelect from '../components/SeasonSelect'
 import { useAsync } from '../hooks/useAsync'
+import { useSeo } from '../hooks/useSeo'
 import { CURRENT_SEASON } from '../lib/seasons'
 import { SAMPLE_DRIVER_STANDINGS } from '../lib/sampleData'
 
 export default function Drivers() {
   const [season, setSeason] = useState(String(CURRENT_SEASON))
+
+  useSeo({
+    title: `${season} F1 Drivers`,
+    description: `Every Formula 1 driver on the ${season} grid — points, wins and team, with links to full career profiles.`,
+  })
   const { data, loading, error } = useAsync(
     () => api.driverStandings(season),
     [season],

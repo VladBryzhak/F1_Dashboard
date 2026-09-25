@@ -7,6 +7,7 @@ import {
 } from '../components/StandingsTable'
 import TitleRaceChart from '../components/TitleRaceChart'
 import { useAsync } from '../hooks/useAsync'
+import { useSeo } from '../hooks/useSeo'
 import { CURRENT_SEASON } from '../lib/seasons'
 import {
   SAMPLE_CONSTRUCTOR_STANDINGS,
@@ -18,6 +19,11 @@ type Tab = 'drivers' | 'constructors' | 'progression'
 export default function Standings() {
   const [season, setSeason] = useState(String(CURRENT_SEASON))
   const [tab, setTab] = useState<Tab>('drivers')
+
+  useSeo({
+    title: `${season} F1 Championship Standings`,
+    description: `Formula 1 drivers' and constructors' championship standings for the ${season} season — points, wins and gaps to the leader.`,
+  })
 
   const drivers = useAsync(() => api.driverStandings(season), [season])
   const constructors = useAsync(

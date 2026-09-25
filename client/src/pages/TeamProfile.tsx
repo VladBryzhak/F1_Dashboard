@@ -4,6 +4,7 @@ import { api } from '../api/client'
 import { CarImage } from '../components/EntityCards'
 import Flag from '../components/Flag'
 import { useAsync } from '../hooks/useAsync'
+import { useSeo } from '../hooks/useSeo'
 import { teamColor } from '../lib/f1meta'
 
 export default function TeamProfile() {
@@ -15,6 +16,13 @@ export default function TeamProfile() {
   } = useAsync(() => api.constructorProfile(constructorId ?? ''), [constructorId])
 
   const color = teamColor(constructorId ?? '')
+
+  useSeo({
+    title: profile ? `${profile.name} — F1 History, Titles & Wins` : undefined,
+    description: profile
+      ? `${profile.name} in Formula 1: ${profile.championships} constructors' title${profile.championships === 1 ? '' : 's'}, ${profile.wins} wins, ${profile.podiums} podiums and ${profile.races} races since ${profile.firstSeason}.`
+      : undefined,
+  })
 
   return (
     <section>

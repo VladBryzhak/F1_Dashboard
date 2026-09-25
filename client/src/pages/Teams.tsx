@@ -3,11 +3,17 @@ import { api } from '../api/client'
 import { TeamCard } from '../components/EntityCards'
 import SeasonSelect from '../components/SeasonSelect'
 import { useAsync } from '../hooks/useAsync'
+import { useSeo } from '../hooks/useSeo'
 import { CURRENT_SEASON } from '../lib/seasons'
 import { SAMPLE_CONSTRUCTOR_STANDINGS } from '../lib/sampleData'
 
 export default function Teams() {
   const [season, setSeason] = useState(String(CURRENT_SEASON))
+
+  useSeo({
+    title: `${season} F1 Teams & Constructors`,
+    description: `Formula 1 constructors on the ${season} grid — points, wins and championship position, with full team histories.`,
+  })
   const { data, loading, error } = useAsync(
     () => api.constructorStandings(season),
     [season],

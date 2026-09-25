@@ -4,6 +4,7 @@ import { api } from '../api/client'
 import Flag from '../components/Flag'
 import { Headshot } from '../components/EntityCards'
 import { useAsync } from '../hooks/useAsync'
+import { useSeo } from '../hooks/useSeo'
 import { driverPortraitUrl, teamColor } from '../lib/f1meta'
 
 export default function DriverProfile() {
@@ -17,6 +18,15 @@ export default function DriverProfile() {
   const seasons = profile?.seasons ?? []
   const lastTeamId = seasons[seasons.length - 1]?.constructorId ?? ''
   const color = teamColor(lastTeamId)
+
+  useSeo({
+    title: profile
+      ? `${profile.givenName} ${profile.familyName} — F1 Career Stats`
+      : undefined,
+    description: profile
+      ? `${profile.givenName} ${profile.familyName}'s Formula 1 career: ${profile.championships} title${profile.championships === 1 ? '' : 's'}, ${profile.wins} wins, ${profile.podiums} podiums and ${profile.races} races across ${profile.firstSeason}–${profile.lastSeason}.`
+      : undefined,
+  })
 
   // OpenF1 headshot fallback for seasons the formula1.com CDN doesn't cover.
   const headshots = useAsync<Record<string, string>>(

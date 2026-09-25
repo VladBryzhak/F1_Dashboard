@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <!-- Main pages -->
+  <url><loc>https://f1-dashboard-bryzhak.onrender.com/</loc><changefreq>daily</changefreq><priority>1.0</priority></url>
+  <url><loc>https://f1-dashboard-bryzhak.onrender.com/standings</loc><changefreq>daily</changefreq><priority>0.9</priority></url>
+  <url><loc>https://f1-dashboard-bryzhak.onrender.com/calendar</loc><changefreq>weekly</changefreq><priority>0.9</priority></url>
+  <url><loc>https://f1-dashboard-bryzhak.onrender.com/drivers</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://f1-dashboard-bryzhak.onrender.com/teams</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://f1-dashboard-bryzhak.onrender.com/compare</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://f1-dashboard-bryzhak.onrender.com/telemetry</loc><changefreq>weekly</changefreq><priority>0.6</priority></url>
+
+  <!-- Popular driver profiles (long-tail) -->
+  <url><loc>https://f1-dashboard-bryzhak.onrender.com/drivers/lewis-hamilton</loc><priority>0.7</priority></url>
+  <url><loc>https://f1-dashboard-bryzhak.onrender.com/drivers/max-verstappen</loc><priority>0.7</priority></url>
+  <url><loc>https://f1-dashboard-bryzhak.onrender.com/drivers/michael-schumacher</loc><priority>0.7</priority></url>
+  <url><loc>https://f1-dashboard-bryzhak.onrender.com/drivers/ayrton-senna</loc><priority>0.7</priority></url>
+  <url><loc>https://f1-dashboard-bryzhak.onrender.com/drivers/alain-prost</loc><priority>0.6</priority></url>
+  <url><loc>https://f1-dashboard-bryzhak.onrender.com/drivers/sebastian-vettel</loc><priority>0.6</priority></url>
+  <url><loc>https://f1-dashboard-bryzhak.onrender.com/drivers/fernando-alonso</loc><priority>0.6</priority></url>
+  <url><loc>https://f1-dashboard-bryzhak.onrender.com/drivers/charles-leclerc</loc><priority>0.6</priority></url>
+  <url><loc>https://f1-dashboard-bryzhak.onrender.com/drivers/lando-norris</loc><priority>0.6</priority></url>
+  <url><loc>https://f1-dashboard-bryzhak.onrender.com/drivers/oscar-piastri</loc><priority>0.6</priority></url>
+  <url><loc>https://f1-dashboard-bryzhak.onrender.com/drivers/george-russell</loc><priority>0.6</priority></url>
+  <url><loc>https://f1-dashboard-bryzhak.onrender.com/drivers/kimi-antonelli</loc><priority>0.6</priority></url>
+  <url><loc>https://f1-dashboard-bryzhak.onrender.com/drivers/kimi-raikkonen</loc><priority>0.6</priority></url>
+  <url><loc>https://f1-dashboard-bryzhak.onrender.com/drivers/nico-rosberg</loc><priority>0.5</priority></url>
+  <url><loc>https://f1-dashboard-bryzhak.onrender.com/drivers/jenson-button</loc><priority>0.5</priority></url>
+  <url><loc>https://f1-dashboard-bryzhak.onrender.com/drivers/niki-lauda</loc><priority>0.5</priority></url>
+  <url><loc>https://f1-dashboard-bryzhak.onrender.com/drivers/nigel-mansell</loc><priority>0.5</priority></url>
+  <url><loc>https://f1-dashboard-bryzhak.onrender.com/drivers/jackie-stewart</loc><priority>0.5</priority></url>
+  <url><loc>https://f1-dashboard-bryzhak.onrender.com/drivers/sergio-perez</loc><priority>0.5</priority></url>
+  <url><loc>https://f1-dashboard-bryzhak.onrender.com/drivers/carlos-sainz-jr</loc><priority>0.5</priority></url>
+  <url><loc>https://f1-dashboard-bryzhak.onrender.com/drivers/daniel-ricciardo</loc><priority>0.5</priority></url>
+  <url><loc>https://f1-dashboard-bryzhak.onrender.com/drivers/valtteri-bottas</loc><priority>0.5</priority></url>
+  <url><loc>https://f1-dashboard-bryzhak.onrender.com/drivers/mika-hakkinen</loc><priority>0.5</priority></url>
+  <url><loc>https://f1-dashboard-bryzhak.onrender.com/drivers/damon-hill</loc><priority>0.5</priority></url>
+
+  <!-- Team / constructor profiles -->
+  <url><loc>https://f1-dashboard-bryzhak.onrender.com/teams/ferrari</loc><priority>0.7</priority></url>
+  <url><loc>https://f1-dashboard-bryzhak.onrender.com/teams/mercedes</loc><priority>0.7</priority></url>
+  <url><loc>https://f1-dashboard-bryzhak.onrender.com/teams/red-bull</loc><priority>0.7</priority></url>
+  <url><loc>https://f1-dashboard-bryzhak.onrender.com/teams/mclaren</loc><priority>0.7</priority></url>
+  <url><loc>https://f1-dashboard-bryzhak.onrender.com/teams/williams</loc><priority>0.6</priority></url>
+  <url><loc>https://f1-dashboard-bryzhak.onrender.com/teams/aston-martin</loc><priority>0.6</priority></url>
+  <url><loc>https://f1-dashboard-bryzhak.onrender.com/teams/alpine</loc><priority>0.5</priority></url>
+  <url><loc>https://f1-dashboard-bryzhak.onrender.com/teams/renault</loc><priority>0.5</priority></url>
+  <url><loc>https://f1-dashboard-bryzhak.onrender.com/teams/lotus-f1</loc><priority>0.5</priority></url>
+  <url><loc>https://f1-dashboard-bryzhak.onrender.com/teams/benetton</loc><priority>0.5</priority></url>
+  <url><loc>https://f1-dashboard-bryzhak.onrender.com/teams/sauber</loc><priority>0.5</priority></url>
+  <url><loc>https://f1-dashboard-bryzhak.onrender.com/teams/haas</loc><priority>0.5</priority></url>
+</urlset>

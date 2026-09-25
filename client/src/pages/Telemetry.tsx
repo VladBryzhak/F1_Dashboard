@@ -11,6 +11,7 @@ import {
 } from 'recharts'
 import { api } from '../api/client'
 import { useAsync } from '../hooks/useAsync'
+import { useSeo } from '../hooks/useSeo'
 
 // OpenF1 telemetry is available from 2023 onward.
 const TELEMETRY_SEASONS = ['2026', '2025', '2024', '2023']
@@ -26,6 +27,12 @@ export default function Telemetry() {
   const [season, setSeason] = useState('2024')
   const [sessionKey, setSessionKey] = useState<number | null>(null)
   const [driverNumber, setDriverNumber] = useState<number | null>(null)
+
+  useSeo({
+    title: 'F1 Telemetry — Speed, Throttle & Lap Traces',
+    description:
+      'Past-race Formula 1 telemetry: speed, throttle, brake, gear and DRS traces lap by lap, from 2023 onward (OpenF1).',
+  })
   const [lapNumber, setLapNumber] = useState<number | null>(null)
 
   const sessions = useAsync(() => api.telemetrySessions(season), [season])

@@ -2,6 +2,7 @@ import { Link, useParams } from 'react-router-dom'
 import { api } from '../api/client'
 import Flag from '../components/Flag'
 import { useAsync } from '../hooks/useAsync'
+import { useSeo } from '../hooks/useSeo'
 import { teamColor } from '../lib/f1meta'
 import type { WeekendHighlight } from '../types/f1'
 
@@ -53,6 +54,15 @@ export default function RaceWeekend() {
     () => api.raceWeekend(season, Number(round)),
     [season, round],
   )
+
+  useSeo({
+    title: data
+      ? `${data.grandPrixName} GP ${data.season} — Results & Qualifying`
+      : undefined,
+    description: data
+      ? `${data.grandPrixName} Grand Prix ${data.season}: full race result, starting grid, qualifying times, fastest lap and Driver of the Day.`
+      : undefined,
+  })
 
   const pole =
     data?.qualifying.find((q) => q.position === 1) ?? data?.qualifying[0]

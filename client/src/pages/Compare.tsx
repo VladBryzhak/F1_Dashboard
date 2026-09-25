@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react'
 import { api } from '../api/client'
 import Flag from '../components/Flag'
 import { useAsync } from '../hooks/useAsync'
+import { useSeo } from '../hooks/useSeo'
 import { teamColor } from '../lib/f1meta'
 import type { DriverProfile } from '../types/f1'
 
@@ -117,6 +118,11 @@ function Comparison({ a, b, h2h }: { a: DriverProfile; b: DriverProfile; h2h: { 
 }
 
 export default function Compare() {
+  useSeo({
+    title: 'F1 Driver Comparison — Head to Head',
+    description:
+      'Compare any two Formula 1 drivers head-to-head: championships, wins, podiums, points and their race-by-race record.',
+  })
   const drivers = useAsync(() => api.drivers(), [])
   const [idA, setIdA] = useState(DEFAULT_A)
   const [idB, setIdB] = useState(DEFAULT_B)

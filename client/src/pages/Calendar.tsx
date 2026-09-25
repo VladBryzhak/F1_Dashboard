@@ -3,6 +3,7 @@ import { api } from '../api/client'
 import Flag from '../components/Flag'
 import SeasonSelect from '../components/SeasonSelect'
 import { useAsync } from '../hooks/useAsync'
+import { useSeo } from '../hooks/useSeo'
 import { teamColor } from '../lib/f1meta'
 import { CURRENT_SEASON } from '../lib/seasons'
 import { useState } from 'react'
@@ -16,6 +17,11 @@ function formatDate(iso: string): string {
 export default function Calendar() {
   const [season, setSeason] = useState(String(CURRENT_SEASON))
   const navigate = useNavigate()
+
+  useSeo({
+    title: `${season} F1 Race Calendar & Results`,
+    description: `The ${season} Formula 1 race calendar with winners, teams and full results for every Grand Prix.`,
+  })
   const { data, loading, error } = useAsync(() => api.calendar(season), [season])
 
   return (
