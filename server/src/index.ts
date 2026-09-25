@@ -1,6 +1,7 @@
 import cors from "cors";
 import express, { NextFunction, Request, Response } from "express";
 import fs from "fs";
+import helmet from "helmet";
 import path from "path";
 import calendarRouter from "./routes/calendar";
 import homeRouter from "./routes/home";
@@ -11,6 +12,19 @@ import telemetryRouter from "./routes/telemetry";
 const app = express();
 const PORT = process.env.PORT ?? 3001;
 
+// Security headers. HSTS + clickjacking/MIME/referrer protection are on; the
+// Content-Security-Policy is left off here and added as a separate, tailored
+// step (it must allow our external sources: Google Fonts, formula1.com images,
+// flagcdn, OpenF1). CORP is cross-origin because the API is consumed by other
+// origins (the mobile app on capacitor://localhost).
+app.use(
+  helmet({
+    contentSecurityPolicy: false,
+    crossOriginResourcePolicy: { policy: "cross-origin" },
+    hsts: { maxAge: 31536000, includeSubDomains: true },
+    referrerPolicy: { policy: "strict-origin-when-cross-origin" },
+  })
+);
 app.use(cors());
 app.use(express.json());
 

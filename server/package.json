@@ -15,6 +15,7 @@
     "cors": "^2.8.5",
     "express": "^4.21.2",
     "f1-dashboard": "file:..",
+    "helmet": "^8.3.0",
     "node-cache": "^5.1.2"
   },
   "devDependencies": {
