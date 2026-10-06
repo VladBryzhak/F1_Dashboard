@@ -29,6 +29,7 @@ export default function App() {
       <Route element={<Layout />}>
         <Route index element={<Home />} />
         <Route path="standings" element={<Standings />} />
+        <Route path="standings/:season" element={<Standings />} />
         <Route path="calendar" element={<Calendar />} />
         <Route path="calendar/:season/:round" element={<RaceWeekend />} />
         <Route path="drivers" element={<Drivers />} />

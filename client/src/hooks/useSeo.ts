@@ -25,10 +25,15 @@ export function useSeo(
     // One or more schema.org objects, injected as a single JSON-LD <script> so
     // Google can show rich results (driver facts, event cards, breadcrumbs).
     jsonLd?: object | object[]
+    // Override the canonical path (default: the current pathname). Used where
+    // several URLs show the same content — e.g. /standings and
+    // /standings/<currentSeason> both point at /standings.
+    canonicalPath?: string
   } = {},
 ) {
   const title = opts.title ? `${opts.title} · ${SITE}` : DEFAULT_TITLE
   const description = opts.description ?? BASE_DESC
+  const canonicalPath = opts.canonicalPath
   // Serialize here so the effect has a stable primitive dependency (the object
   // identity changes every render, which would otherwise loop forever).
   const jsonLd = opts.jsonLd
@@ -92,7 +97,10 @@ export function useSeo(
       canonical.setAttribute('rel', 'canonical')
       document.head.appendChild(canonical)
     }
-    canonical.setAttribute('href', window.location.origin + window.location.pathname)
+    canonical.setAttribute(
+      'href',
+      window.location.origin + (canonicalPath ?? window.location.pathname),
+    )
 
     // JSON-LD: keep a single hook-managed script in sync with the current route.
     let ld = document.head.querySelector<HTMLScriptElement>(
@@ -109,5 +117,5 @@ export function useSeo(
     } else if (ld) {
       ld.remove()
     }
-  }, [title, description, jsonLd])
+  }, [title, description, jsonLd, canonicalPath])
 }

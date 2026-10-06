@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { Navigate, useNavigate, useParams } from 'react-router-dom'
 import { api } from '../api/client'
 import SeasonSelect from '../components/SeasonSelect'
 import {
@@ -16,13 +17,37 @@ import {
 
 type Tab = 'drivers' | 'constructors' | 'progression'
 
+// A valid F1 season is a four-digit year from the first championship to now.
+function isValidSeason(s: string | undefined): s is string {
+  if (!s || !/^\d{4}$/.test(s)) return false
+  const n = Number(s)
+  return n >= 1950 && n <= CURRENT_SEASON
+}
+
 export default function Standings() {
-  const [season, setSeason] = useState(String(CURRENT_SEASON))
+  const { season: seasonParam } = useParams()
+  const navigate = useNavigate()
   const [tab, setTab] = useState<Tab>('drivers')
+
+  // Season comes from the URL (/standings/:season); bare /standings is the
+  // current season. A malformed season in the path redirects to /standings
+  // rather than rendering a junk page Google might index.
+  const badSeason = seasonParam !== undefined && !isValidSeason(seasonParam)
+  const season = isValidSeason(seasonParam) ? seasonParam : String(CURRENT_SEASON)
+
+  // /standings and /standings/<currentSeason> show the same thing, so both
+  // declare /standings as canonical to avoid duplicate-content splitting.
+  const canonicalPath =
+    season === String(CURRENT_SEASON) ? '/standings' : `/standings/${season}`
+
+  function goToSeason(s: string) {
+    navigate(s === String(CURRENT_SEASON) ? '/standings' : `/standings/${s}`)
+  }
 
   useSeo({
     title: `${season} F1 Championship Standings`,
     description: `Formula 1 drivers' and constructors' championship standings for the ${season} season — points, wins and gaps to the leader.`,
+    canonicalPath,
   })
 
   const drivers = useAsync(() => api.driverStandings(season), [season])
@@ -43,11 +68,13 @@ export default function Standings() {
         ? constructors
         : progression
 
+  if (badSeason) return <Navigate to="/standings" replace />
+
   return (
     <section>
       <div className="page-head">
         <h1>Championship Standings</h1>
-        <SeasonSelect value={season} onChange={setSeason} />
+        <SeasonSelect value={season} onChange={goToSeason} />
       </div>
 
       <div className="tabs">

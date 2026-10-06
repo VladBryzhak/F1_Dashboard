@@ -3,6 +3,33 @@
   <!-- Main pages -->
   <url><loc>https://f1-dashboard-bryzhak.onrender.com/</loc><changefreq>daily</changefreq><priority>1.0</priority></url>
   <url><loc>https://f1-dashboard-bryzhak.onrender.com/standings</loc><changefreq>daily</changefreq><priority>0.9</priority></url>
+  <!-- Standings by season (long-tail: "f1 standings <year>") -->
+  <url><loc>https://f1-dashboard-bryzhak.onrender.com/standings/2025</loc><changefreq>yearly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://f1-dashboard-bryzhak.onrender.com/standings/2024</loc><changefreq>yearly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://f1-dashboard-bryzhak.onrender.com/standings/2023</loc><changefreq>yearly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://f1-dashboard-bryzhak.onrender.com/standings/2022</loc><changefreq>yearly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://f1-dashboard-bryzhak.onrender.com/standings/2021</loc><changefreq>yearly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://f1-dashboard-bryzhak.onrender.com/standings/2020</loc><changefreq>yearly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://f1-dashboard-bryzhak.onrender.com/standings/2019</loc><changefreq>yearly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://f1-dashboard-bryzhak.onrender.com/standings/2018</loc><changefreq>yearly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://f1-dashboard-bryzhak.onrender.com/standings/2017</loc><changefreq>yearly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://f1-dashboard-bryzhak.onrender.com/standings/2016</loc><changefreq>yearly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://f1-dashboard-bryzhak.onrender.com/standings/2015</loc><changefreq>yearly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://f1-dashboard-bryzhak.onrender.com/standings/2014</loc><changefreq>yearly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://f1-dashboard-bryzhak.onrender.com/standings/2013</loc><changefreq>yearly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://f1-dashboard-bryzhak.onrender.com/standings/2012</loc><changefreq>yearly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://f1-dashboard-bryzhak.onrender.com/standings/2011</loc><changefreq>yearly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://f1-dashboard-bryzhak.onrender.com/standings/2010</loc><changefreq>yearly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://f1-dashboard-bryzhak.onrender.com/standings/2009</loc><changefreq>yearly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://f1-dashboard-bryzhak.onrender.com/standings/2008</loc><changefreq>yearly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://f1-dashboard-bryzhak.onrender.com/standings/2007</loc><changefreq>yearly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://f1-dashboard-bryzhak.onrender.com/standings/2006</loc><changefreq>yearly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://f1-dashboard-bryzhak.onrender.com/standings/2005</loc><changefreq>yearly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://f1-dashboard-bryzhak.onrender.com/standings/2004</loc><changefreq>yearly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://f1-dashboard-bryzhak.onrender.com/standings/2003</loc><changefreq>yearly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://f1-dashboard-bryzhak.onrender.com/standings/2002</loc><changefreq>yearly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://f1-dashboard-bryzhak.onrender.com/standings/2001</loc><changefreq>yearly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://f1-dashboard-bryzhak.onrender.com/standings/2000</loc><changefreq>yearly</changefreq><priority>0.7</priority></url>
   <url><loc>https://f1-dashboard-bryzhak.onrender.com/calendar</loc><changefreq>weekly</changefreq><priority>0.9</priority></url>
   <url><loc>https://f1-dashboard-bryzhak.onrender.com/drivers</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
   <url><loc>https://f1-dashboard-bryzhak.onrender.com/teams</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
