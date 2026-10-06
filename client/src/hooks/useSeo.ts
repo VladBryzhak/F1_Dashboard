@@ -18,9 +18,24 @@ function upsert(selector: string, make: () => HTMLMetaElement, content: string) 
   el.setAttribute('content', content)
 }
 
-export function useSeo(opts: { title?: string; description?: string } = {}) {
+export function useSeo(
+  opts: {
+    title?: string
+    description?: string
+    // One or more schema.org objects, injected as a single JSON-LD <script> so
+    // Google can show rich results (driver facts, event cards, breadcrumbs).
+    jsonLd?: object | object[]
+  } = {},
+) {
   const title = opts.title ? `${opts.title} · ${SITE}` : DEFAULT_TITLE
   const description = opts.description ?? BASE_DESC
+  // Serialize here so the effect has a stable primitive dependency (the object
+  // identity changes every render, which would otherwise loop forever).
+  const jsonLd = opts.jsonLd
+    ? JSON.stringify(
+        Array.isArray(opts.jsonLd) ? opts.jsonLd : [opts.jsonLd],
+      )
+    : ''
 
   useEffect(() => {
     document.title = title
@@ -78,5 +93,21 @@ export function useSeo(opts: { title?: string; description?: string } = {}) {
       document.head.appendChild(canonical)
     }
     canonical.setAttribute('href', window.location.origin + window.location.pathname)
-  }, [title, description])
+
+    // JSON-LD: keep a single hook-managed script in sync with the current route.
+    let ld = document.head.querySelector<HTMLScriptElement>(
+      'script[type="application/ld+json"][data-seo="1"]',
+    )
+    if (jsonLd) {
+      if (!ld) {
+        ld = document.createElement('script')
+        ld.setAttribute('type', 'application/ld+json')
+        ld.setAttribute('data-seo', '1')
+        document.head.appendChild(ld)
+      }
+      ld.textContent = jsonLd
+    } else if (ld) {
+      ld.remove()
+    }
+  }, [title, description, jsonLd])
 }

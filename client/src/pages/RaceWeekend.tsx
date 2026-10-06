@@ -3,6 +3,7 @@ import { api } from '../api/client'
 import Flag from '../components/Flag'
 import { useAsync } from '../hooks/useAsync'
 import { useSeo } from '../hooks/useSeo'
+import { breadcrumbLd, raceLd } from '../lib/jsonld'
 import { teamColor } from '../lib/f1meta'
 import type { WeekendHighlight } from '../types/f1'
 
@@ -61,6 +62,19 @@ export default function RaceWeekend() {
       : undefined,
     description: data
       ? `${data.grandPrixName} Grand Prix ${data.season}: full race result, starting grid, qualifying times, fastest lap and Driver of the Day.`
+      : undefined,
+    jsonLd: data
+      ? [
+          raceLd(data),
+          breadcrumbLd([
+            { name: 'Home', path: '/' },
+            { name: 'Calendar', path: '/calendar' },
+            {
+              name: `${data.grandPrixName} GP ${data.season}`,
+              path: `/calendar/${data.season}/${data.round}`,
+            },
+          ]),
+        ]
       : undefined,
   })
 

@@ -5,6 +5,7 @@ import Flag from '../components/Flag'
 import { Headshot } from '../components/EntityCards'
 import { useAsync } from '../hooks/useAsync'
 import { useSeo } from '../hooks/useSeo'
+import { breadcrumbLd, driverLd } from '../lib/jsonld'
 import { driverPortraitUrl, teamColor } from '../lib/f1meta'
 
 export default function DriverProfile() {
@@ -25,6 +26,19 @@ export default function DriverProfile() {
       : undefined,
     description: profile
       ? `${profile.givenName} ${profile.familyName}'s Formula 1 career: ${profile.championships} title${profile.championships === 1 ? '' : 's'}, ${profile.wins} wins, ${profile.podiums} podiums and ${profile.races} races across ${profile.firstSeason}–${profile.lastSeason}.`
+      : undefined,
+    jsonLd: profile
+      ? [
+          driverLd(profile),
+          breadcrumbLd([
+            { name: 'Home', path: '/' },
+            { name: 'Drivers', path: '/drivers' },
+            {
+              name: `${profile.givenName} ${profile.familyName}`,
+              path: `/drivers/${profile.driverId}`,
+            },
+          ]),
+        ]
       : undefined,
   })
 

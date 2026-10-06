@@ -5,6 +5,7 @@ import { CarImage } from '../components/EntityCards'
 import Flag from '../components/Flag'
 import { useAsync } from '../hooks/useAsync'
 import { useSeo } from '../hooks/useSeo'
+import { breadcrumbLd, teamLd } from '../lib/jsonld'
 import { teamColor } from '../lib/f1meta'
 
 export default function TeamProfile() {
@@ -21,6 +22,19 @@ export default function TeamProfile() {
     title: profile ? `${profile.name} — F1 History, Titles & Wins` : undefined,
     description: profile
       ? `${profile.name} in Formula 1: ${profile.championships} constructors' title${profile.championships === 1 ? '' : 's'}, ${profile.wins} wins, ${profile.podiums} podiums and ${profile.races} races since ${profile.firstSeason}.`
+      : undefined,
+    jsonLd: profile
+      ? [
+          teamLd(profile),
+          breadcrumbLd([
+            { name: 'Home', path: '/' },
+            { name: 'Teams', path: '/teams' },
+            {
+              name: profile.name,
+              path: `/teams/${profile.constructorId}`,
+            },
+          ]),
+        ]
       : undefined,
   })
 

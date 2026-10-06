@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { Headshot } from '../components/EntityCards'
 import { useAsync } from '../hooks/useAsync'
 import { useSeo } from '../hooks/useSeo'
+import { siteLd } from '../lib/jsonld'
 import { api } from '../api/client'
 import { driverPortraitUrl, teamColor } from '../lib/f1meta'
 import type { HomeHighlights, NewsItem, RaceHighlight } from '../types/f1'
@@ -183,7 +184,7 @@ function NewsStrip({ news }: { news: NewsItem[] }) {
 }
 
 export default function Home() {
-  useSeo()
+  useSeo({ jsonLd: siteLd() })
   const { data } = useAsync(() => api.home(), [])
   const hasRace = !!data?.highlights.latestRace
 
