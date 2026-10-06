@@ -5,6 +5,7 @@ import { useAsync } from '../hooks/useAsync'
 import { useSeo } from '../hooks/useSeo'
 import { breadcrumbLd, raceLd } from '../lib/jsonld'
 import { teamColor } from '../lib/f1meta'
+import { raceSummary } from '../lib/summaries'
 import type { WeekendHighlight } from '../types/f1'
 
 function formatDate(iso: string): string {
@@ -125,6 +126,8 @@ export default function RaceWeekend() {
               </p>
             </div>
           </div>
+
+          <p className="profile-summary">{raceSummary(data)}</p>
 
           <div className="wknd-highlights">
             {highlights.map(

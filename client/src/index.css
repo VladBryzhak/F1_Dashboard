@@ -113,6 +113,15 @@ body {
   margin-bottom: 1.25rem;
 }
 
+/* Data-driven intro paragraph on profile / standings / race pages. */
+.profile-summary {
+  max-width: 68ch;
+  margin: 0 0 1.25rem;
+  color: var(--muted, #b7b7c0);
+  font-size: 1rem;
+  line-height: 1.6;
+}
+
 h1 {
   font-size: 1.9rem;
   font-weight: 900;

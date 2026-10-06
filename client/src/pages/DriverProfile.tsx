@@ -7,6 +7,7 @@ import { useAsync } from '../hooks/useAsync'
 import { useSeo } from '../hooks/useSeo'
 import { breadcrumbLd, driverLd } from '../lib/jsonld'
 import { driverPortraitUrl, teamColor } from '../lib/f1meta'
+import { driverSummary } from '../lib/summaries'
 
 export default function DriverProfile() {
   const { driverId } = useParams<{ driverId: string }>()
@@ -84,6 +85,7 @@ export default function DriverProfile() {
               )}
               fallbackUrl={profile.code ? headshots.data?.[profile.code] : undefined}
               color={color}
+              alt={`${profile.givenName} ${profile.familyName}`}
             />
             <div className="profile-heading">
               <h1 className="profile-name">
@@ -127,6 +129,8 @@ export default function DriverProfile() {
               </div>
             </div>
           </div>
+
+          <p className="profile-summary">{driverSummary(profile)}</p>
 
           <div className="card">
             <table className="standings">

@@ -10,10 +10,12 @@ export function CarImage({
   constructorId,
   season,
   color,
+  alt = '',
 }: {
   constructorId: string
   season: string
   color: string
+  alt?: string
 }) {
   const [failed, setFailed] = useState(false)
   const url = teamCarUrl(constructorId, season)
@@ -23,7 +25,7 @@ export function CarImage({
       <img
         className="car-img"
         src={url}
-        alt=""
+        alt={alt}
         loading="lazy"
         onError={() => setFailed(true)}
       />
@@ -38,10 +40,12 @@ export function Headshot({
   portraitUrl,
   fallbackUrl,
   color,
+  alt = '',
 }: {
   portraitUrl?: string | null
   fallbackUrl?: string
   color: string
+  alt?: string
 }) {
   const candidates = [portraitUrl, fallbackUrl].filter((u): u is string => !!u)
   const key = candidates.join('|')
@@ -54,7 +58,7 @@ export function Headshot({
       <img
         className="head-img"
         src={src}
-        alt=""
+        alt={alt}
         loading="lazy"
         onError={() => setIdx((i) => i + 1)}
       />
@@ -79,6 +83,7 @@ export function DriverCard({
         portraitUrl={driverPortraitUrl(d.driverId, d.constructorId, season)}
         fallbackUrl={headshot}
         color={color}
+        alt={`${d.givenName} ${d.familyName}`}
       />
       {d.permanentNumber ? <span className="big-num">{d.permanentNumber}</span> : null}
       <div className="rank">P{d.position}</div>
@@ -111,7 +116,12 @@ export function TeamCard({
   return (
     <Link to={`/teams/${c.constructorId}`} className="ecard">
       <span className="stripe" style={{ background: color }} />
-      <CarImage constructorId={c.constructorId} season={season} color={color} />
+      <CarImage
+        constructorId={c.constructorId}
+        season={season}
+        color={color}
+        alt={`${c.name} Formula 1 car`}
+      />
       <div className="rank">P{c.position}</div>
       <h3 className="ename">{c.name}</h3>
       <div className="esub">

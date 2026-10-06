@@ -10,6 +10,7 @@ import TitleRaceChart from '../components/TitleRaceChart'
 import { useAsync } from '../hooks/useAsync'
 import { useSeo } from '../hooks/useSeo'
 import { CURRENT_SEASON } from '../lib/seasons'
+import { seasonSummary } from '../lib/summaries'
 import {
   SAMPLE_CONSTRUCTOR_STANDINGS,
   SAMPLE_DRIVER_STANDINGS,
@@ -70,12 +71,20 @@ export default function Standings() {
 
   if (badSeason) return <Navigate to="/standings" replace />
 
+  const intro = seasonSummary(
+    season,
+    drivers.data?.standings?.[0],
+    constructors.data?.standings?.[0],
+  )
+
   return (
     <section>
       <div className="page-head">
-        <h1>Championship Standings</h1>
+        <h1>{season} Championship Standings</h1>
         <SeasonSelect value={season} onChange={goToSeason} />
       </div>
+
+      {intro && <p className="profile-summary">{intro}</p>}
 
       <div className="tabs">
         <button

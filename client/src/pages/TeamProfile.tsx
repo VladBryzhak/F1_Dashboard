@@ -7,6 +7,7 @@ import { useAsync } from '../hooks/useAsync'
 import { useSeo } from '../hooks/useSeo'
 import { breadcrumbLd, teamLd } from '../lib/jsonld'
 import { teamColor } from '../lib/f1meta'
+import { teamSummary } from '../lib/summaries'
 
 export default function TeamProfile() {
   const { constructorId } = useParams<{ constructorId: string }>()
@@ -67,6 +68,7 @@ export default function TeamProfile() {
               constructorId={profile.constructorId}
               season={String(profile.lastSeason)}
               color={color}
+              alt={`${profile.name} Formula 1 car`}
             />
             <div className="profile-heading">
               <h1 className="profile-name">{profile.name}</h1>
@@ -105,6 +107,8 @@ export default function TeamProfile() {
               </div>
             </div>
           </div>
+
+          <p className="profile-summary">{teamSummary(profile)}</p>
 
           <div className="card">
             <table className="standings">
