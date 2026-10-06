@@ -1,5 +1,6 @@
 import { Link, useParams } from 'react-router-dom'
 import { api } from '../api/client'
+import Breadcrumbs from '../components/Breadcrumbs'
 import Flag from '../components/Flag'
 import { useAsync } from '../hooks/useAsync'
 import { useSeo } from '../hooks/useSeo'
@@ -104,11 +105,13 @@ export default function RaceWeekend() {
 
   return (
     <section>
-      <div className="page-head">
-        <Link to="/calendar" className="back-link">
-          ← Calendar
-        </Link>
-      </div>
+      {!data && (
+        <div className="page-head">
+          <Link to="/calendar" className="back-link">
+            ← Calendar
+          </Link>
+        </div>
+      )}
 
       {loading && <p className="muted">Loading…</p>}
       {!loading && error && (
@@ -117,6 +120,17 @@ export default function RaceWeekend() {
 
       {!loading && data && (
         <>
+          <Breadcrumbs
+            trail={[
+              { name: 'Home', path: '/' },
+              { name: 'Calendar', path: '/calendar' },
+              {
+                name: `${data.grandPrixName} GP ${data.season}`,
+                path: `/calendar/${data.season}/${data.round}`,
+              },
+            ]}
+          />
+
           <div className="wknd-title">
             <Flag code={data.countryCode} nationality="" />
             <div>

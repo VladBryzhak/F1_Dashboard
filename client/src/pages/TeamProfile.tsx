@@ -1,6 +1,7 @@
 import type { CSSProperties } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { api } from '../api/client'
+import Breadcrumbs from '../components/Breadcrumbs'
 import { CarImage } from '../components/EntityCards'
 import Flag from '../components/Flag'
 import { useAsync } from '../hooks/useAsync'
@@ -10,7 +11,7 @@ import { teamColor } from '../lib/f1meta'
 import { teamSummary } from '../lib/summaries'
 
 export default function TeamProfile() {
-  const { constructorId } = useParams<{ constructorId: string }>()
+  const { slug: constructorId } = useParams<{ slug: string }>()
   const {
     data: profile,
     loading,
@@ -54,11 +55,13 @@ export default function TeamProfile() {
 
       {!loading && profile && (
         <>
-          <div className="page-head">
-            <Link to="/teams" className="back-link">
-              ← Teams
-            </Link>
-          </div>
+          <Breadcrumbs
+            trail={[
+              { name: 'Home', path: '/' },
+              { name: 'Teams', path: '/teams' },
+              { name: profile.name, path: `/teams/${profile.constructorId}` },
+            ]}
+          />
 
           <div
             className="profile-hero profile-hero--team"

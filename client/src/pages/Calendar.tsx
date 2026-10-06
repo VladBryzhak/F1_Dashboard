@@ -1,12 +1,11 @@
-import { useNavigate } from 'react-router-dom'
+import { Navigate, useNavigate, useParams } from 'react-router-dom'
 import { api } from '../api/client'
 import Flag from '../components/Flag'
 import SeasonSelect from '../components/SeasonSelect'
 import { useAsync } from '../hooks/useAsync'
+import { useSeasonRoute } from '../hooks/useSeasonRoute'
 import { useSeo } from '../hooks/useSeo'
 import { teamColor } from '../lib/f1meta'
-import { CURRENT_SEASON } from '../lib/seasons'
-import { useState } from 'react'
 
 function formatDate(iso: string): string {
   const d = new Date(iso)
@@ -15,20 +14,27 @@ function formatDate(iso: string): string {
 }
 
 export default function Calendar() {
-  const [season, setSeason] = useState(String(CURRENT_SEASON))
+  const { season: seasonParam } = useParams()
+  const { season, canonicalPath, goToSeason, badSeason } = useSeasonRoute(
+    '/calendar',
+    seasonParam,
+  )
   const navigate = useNavigate()
 
   useSeo({
     title: `${season} F1 Race Calendar & Results`,
     description: `The ${season} Formula 1 race calendar with winners, teams and full results for every Grand Prix.`,
+    canonicalPath,
   })
   const { data, loading, error } = useAsync(() => api.calendar(season), [season])
+
+  if (badSeason) return <Navigate to="/calendar" replace />
 
   return (
     <section>
       <div className="page-head">
         <h1>{season} Race Results</h1>
-        <SeasonSelect value={season} onChange={setSeason} />
+        <SeasonSelect value={season} onChange={goToSeason} />
       </div>
 
       {loading && <p className="muted">Loading…</p>}

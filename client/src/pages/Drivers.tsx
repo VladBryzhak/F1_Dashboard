@@ -1,18 +1,23 @@
-import { useState } from 'react'
+import { Navigate, useParams } from 'react-router-dom'
 import { api } from '../api/client'
 import { DriverCard } from '../components/EntityCards'
 import SeasonSelect from '../components/SeasonSelect'
 import { useAsync } from '../hooks/useAsync'
+import { useSeasonRoute } from '../hooks/useSeasonRoute'
 import { useSeo } from '../hooks/useSeo'
-import { CURRENT_SEASON } from '../lib/seasons'
 import { SAMPLE_DRIVER_STANDINGS } from '../lib/sampleData'
 
 export default function Drivers() {
-  const [season, setSeason] = useState(String(CURRENT_SEASON))
+  const { slug } = useParams()
+  const { season, canonicalPath, goToSeason, badSeason } = useSeasonRoute(
+    '/drivers',
+    slug,
+  )
 
   useSeo({
     title: `${season} F1 Drivers`,
     description: `Every Formula 1 driver on the ${season} grid — points, wins and team, with links to full career profiles.`,
+    canonicalPath,
   })
   const { data, loading, error } = useAsync(
     () => api.driverStandings(season),
@@ -26,11 +31,13 @@ export default function Drivers() {
 
   const drivers = data?.standings ?? SAMPLE_DRIVER_STANDINGS
 
+  if (badSeason) return <Navigate to="/drivers" replace />
+
   return (
     <section>
       <div className="page-head">
-        <h1>Drivers</h1>
-        <SeasonSelect value={season} onChange={setSeason} />
+        <h1>{season} F1 Drivers</h1>
+        <SeasonSelect value={season} onChange={goToSeason} />
       </div>
 
       {loading && <p className="muted">Loading…</p>}

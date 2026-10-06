@@ -1,6 +1,7 @@
 import type { CSSProperties } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { api } from '../api/client'
+import Breadcrumbs from '../components/Breadcrumbs'
 import Flag from '../components/Flag'
 import { Headshot } from '../components/EntityCards'
 import { useAsync } from '../hooks/useAsync'
@@ -10,7 +11,7 @@ import { driverPortraitUrl, teamColor } from '../lib/f1meta'
 import { driverSummary } from '../lib/summaries'
 
 export default function DriverProfile() {
-  const { driverId } = useParams<{ driverId: string }>()
+  const { slug: driverId } = useParams<{ slug: string }>()
   const {
     data: profile,
     loading,
@@ -67,11 +68,16 @@ export default function DriverProfile() {
 
       {!loading && profile && (
         <>
-          <div className="page-head">
-            <Link to="/drivers" className="back-link">
-              ← Drivers
-            </Link>
-          </div>
+          <Breadcrumbs
+            trail={[
+              { name: 'Home', path: '/' },
+              { name: 'Drivers', path: '/drivers' },
+              {
+                name: `${profile.givenName} ${profile.familyName}`,
+                path: `/drivers/${profile.driverId}`,
+              },
+            ]}
+          />
 
           <div
             className="profile-hero"
@@ -151,13 +157,20 @@ export default function DriverProfile() {
                     <tr key={s.season}>
                       <td>{s.season}</td>
                       <td>
-                        <span className="team">
-                          <span
-                            className="dot"
-                            style={{ background: teamColor(s.constructorId) }}
-                          />
-                          {s.constructorName || '—'}
-                        </span>
+                        {s.constructorId ? (
+                          <Link
+                            to={`/teams/${s.constructorId}`}
+                            className="team team-link"
+                          >
+                            <span
+                              className="dot"
+                              style={{ background: teamColor(s.constructorId) }}
+                            />
+                            {s.constructorName || '—'}
+                          </Link>
+                        ) : (
+                          <span className="team">{s.constructorName || '—'}</span>
+                        )}
                       </td>
                       <td className="num">{s.position}</td>
                       <td className="num points">{s.points}</td>

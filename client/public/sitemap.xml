@@ -31,8 +31,89 @@
   <url><loc>https://f1-dashboard-bryzhak.onrender.com/standings/2001</loc><changefreq>yearly</changefreq><priority>0.7</priority></url>
   <url><loc>https://f1-dashboard-bryzhak.onrender.com/standings/2000</loc><changefreq>yearly</changefreq><priority>0.7</priority></url>
   <url><loc>https://f1-dashboard-bryzhak.onrender.com/calendar</loc><changefreq>weekly</changefreq><priority>0.9</priority></url>
+  <!-- Calendar by season (long-tail: "f1 calendar <year>") -->
+  <url><loc>https://f1-dashboard-bryzhak.onrender.com/calendar/2025</loc><changefreq>yearly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://f1-dashboard-bryzhak.onrender.com/calendar/2024</loc><changefreq>yearly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://f1-dashboard-bryzhak.onrender.com/calendar/2023</loc><changefreq>yearly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://f1-dashboard-bryzhak.onrender.com/calendar/2022</loc><changefreq>yearly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://f1-dashboard-bryzhak.onrender.com/calendar/2021</loc><changefreq>yearly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://f1-dashboard-bryzhak.onrender.com/calendar/2020</loc><changefreq>yearly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://f1-dashboard-bryzhak.onrender.com/calendar/2019</loc><changefreq>yearly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://f1-dashboard-bryzhak.onrender.com/calendar/2018</loc><changefreq>yearly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://f1-dashboard-bryzhak.onrender.com/calendar/2017</loc><changefreq>yearly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://f1-dashboard-bryzhak.onrender.com/calendar/2016</loc><changefreq>yearly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://f1-dashboard-bryzhak.onrender.com/calendar/2015</loc><changefreq>yearly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://f1-dashboard-bryzhak.onrender.com/calendar/2014</loc><changefreq>yearly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://f1-dashboard-bryzhak.onrender.com/calendar/2013</loc><changefreq>yearly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://f1-dashboard-bryzhak.onrender.com/calendar/2012</loc><changefreq>yearly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://f1-dashboard-bryzhak.onrender.com/calendar/2011</loc><changefreq>yearly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://f1-dashboard-bryzhak.onrender.com/calendar/2010</loc><changefreq>yearly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://f1-dashboard-bryzhak.onrender.com/calendar/2009</loc><changefreq>yearly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://f1-dashboard-bryzhak.onrender.com/calendar/2008</loc><changefreq>yearly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://f1-dashboard-bryzhak.onrender.com/calendar/2007</loc><changefreq>yearly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://f1-dashboard-bryzhak.onrender.com/calendar/2006</loc><changefreq>yearly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://f1-dashboard-bryzhak.onrender.com/calendar/2005</loc><changefreq>yearly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://f1-dashboard-bryzhak.onrender.com/calendar/2004</loc><changefreq>yearly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://f1-dashboard-bryzhak.onrender.com/calendar/2003</loc><changefreq>yearly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://f1-dashboard-bryzhak.onrender.com/calendar/2002</loc><changefreq>yearly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://f1-dashboard-bryzhak.onrender.com/calendar/2001</loc><changefreq>yearly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://f1-dashboard-bryzhak.onrender.com/calendar/2000</loc><changefreq>yearly</changefreq><priority>0.6</priority></url>
   <url><loc>https://f1-dashboard-bryzhak.onrender.com/drivers</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <!-- Drivers by season (long-tail: "f1 drivers <year>") -->
+  <url><loc>https://f1-dashboard-bryzhak.onrender.com/drivers/2025</loc><changefreq>yearly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://f1-dashboard-bryzhak.onrender.com/drivers/2024</loc><changefreq>yearly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://f1-dashboard-bryzhak.onrender.com/drivers/2023</loc><changefreq>yearly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://f1-dashboard-bryzhak.onrender.com/drivers/2022</loc><changefreq>yearly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://f1-dashboard-bryzhak.onrender.com/drivers/2021</loc><changefreq>yearly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://f1-dashboard-bryzhak.onrender.com/drivers/2020</loc><changefreq>yearly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://f1-dashboard-bryzhak.onrender.com/drivers/2019</loc><changefreq>yearly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://f1-dashboard-bryzhak.onrender.com/drivers/2018</loc><changefreq>yearly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://f1-dashboard-bryzhak.onrender.com/drivers/2017</loc><changefreq>yearly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://f1-dashboard-bryzhak.onrender.com/drivers/2016</loc><changefreq>yearly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://f1-dashboard-bryzhak.onrender.com/drivers/2015</loc><changefreq>yearly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://f1-dashboard-bryzhak.onrender.com/drivers/2014</loc><changefreq>yearly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://f1-dashboard-bryzhak.onrender.com/drivers/2013</loc><changefreq>yearly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://f1-dashboard-bryzhak.onrender.com/drivers/2012</loc><changefreq>yearly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://f1-dashboard-bryzhak.onrender.com/drivers/2011</loc><changefreq>yearly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://f1-dashboard-bryzhak.onrender.com/drivers/2010</loc><changefreq>yearly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://f1-dashboard-bryzhak.onrender.com/drivers/2009</loc><changefreq>yearly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://f1-dashboard-bryzhak.onrender.com/drivers/2008</loc><changefreq>yearly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://f1-dashboard-bryzhak.onrender.com/drivers/2007</loc><changefreq>yearly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://f1-dashboard-bryzhak.onrender.com/drivers/2006</loc><changefreq>yearly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://f1-dashboard-bryzhak.onrender.com/drivers/2005</loc><changefreq>yearly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://f1-dashboard-bryzhak.onrender.com/drivers/2004</loc><changefreq>yearly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://f1-dashboard-bryzhak.onrender.com/drivers/2003</loc><changefreq>yearly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://f1-dashboard-bryzhak.onrender.com/drivers/2002</loc><changefreq>yearly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://f1-dashboard-bryzhak.onrender.com/drivers/2001</loc><changefreq>yearly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://f1-dashboard-bryzhak.onrender.com/drivers/2000</loc><changefreq>yearly</changefreq><priority>0.6</priority></url>
   <url><loc>https://f1-dashboard-bryzhak.onrender.com/teams</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <!-- Teams by season (long-tail: "f1 teams <year>") -->
+  <url><loc>https://f1-dashboard-bryzhak.onrender.com/teams/2025</loc><changefreq>yearly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://f1-dashboard-bryzhak.onrender.com/teams/2024</loc><changefreq>yearly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://f1-dashboard-bryzhak.onrender.com/teams/2023</loc><changefreq>yearly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://f1-dashboard-bryzhak.onrender.com/teams/2022</loc><changefreq>yearly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://f1-dashboard-bryzhak.onrender.com/teams/2021</loc><changefreq>yearly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://f1-dashboard-bryzhak.onrender.com/teams/2020</loc><changefreq>yearly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://f1-dashboard-bryzhak.onrender.com/teams/2019</loc><changefreq>yearly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://f1-dashboard-bryzhak.onrender.com/teams/2018</loc><changefreq>yearly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://f1-dashboard-bryzhak.onrender.com/teams/2017</loc><changefreq>yearly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://f1-dashboard-bryzhak.onrender.com/teams/2016</loc><changefreq>yearly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://f1-dashboard-bryzhak.onrender.com/teams/2015</loc><changefreq>yearly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://f1-dashboard-bryzhak.onrender.com/teams/2014</loc><changefreq>yearly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://f1-dashboard-bryzhak.onrender.com/teams/2013</loc><changefreq>yearly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://f1-dashboard-bryzhak.onrender.com/teams/2012</loc><changefreq>yearly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://f1-dashboard-bryzhak.onrender.com/teams/2011</loc><changefreq>yearly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://f1-dashboard-bryzhak.onrender.com/teams/2010</loc><changefreq>yearly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://f1-dashboard-bryzhak.onrender.com/teams/2009</loc><changefreq>yearly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://f1-dashboard-bryzhak.onrender.com/teams/2008</loc><changefreq>yearly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://f1-dashboard-bryzhak.onrender.com/teams/2007</loc><changefreq>yearly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://f1-dashboard-bryzhak.onrender.com/teams/2006</loc><changefreq>yearly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://f1-dashboard-bryzhak.onrender.com/teams/2005</loc><changefreq>yearly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://f1-dashboard-bryzhak.onrender.com/teams/2004</loc><changefreq>yearly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://f1-dashboard-bryzhak.onrender.com/teams/2003</loc><changefreq>yearly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://f1-dashboard-bryzhak.onrender.com/teams/2002</loc><changefreq>yearly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://f1-dashboard-bryzhak.onrender.com/teams/2001</loc><changefreq>yearly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://f1-dashboard-bryzhak.onrender.com/teams/2000</loc><changefreq>yearly</changefreq><priority>0.6</priority></url>
   <url><loc>https://f1-dashboard-bryzhak.onrender.com/compare</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>
   <url><loc>https://f1-dashboard-bryzhak.onrender.com/telemetry</loc><changefreq>weekly</changefreq><priority>0.6</priority></url>
 
