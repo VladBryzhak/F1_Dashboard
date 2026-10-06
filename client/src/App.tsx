@@ -1,4 +1,5 @@
-import { Route, Routes } from 'react-router-dom'
+import { useEffect } from 'react'
+import { Route, Routes, useLocation } from 'react-router-dom'
 import Layout from './components/Layout'
 import Calendar from './pages/Calendar'
 import Compare from './pages/Compare'
@@ -10,8 +11,19 @@ import Standings from './pages/Standings'
 import TeamProfile from './pages/TeamProfile'
 import Teams from './pages/Teams'
 import Telemetry from './pages/Telemetry'
+import { trackPageView } from './lib/analytics'
+
+// Reports a GA4 page_view whenever the SPA route changes (react-router keeps the
+// page mounted, so there's no real document load for GA to catch on its own).
+function usePageViews() {
+  const location = useLocation()
+  useEffect(() => {
+    trackPageView(location.pathname + location.search)
+  }, [location.pathname, location.search])
+}
 
 export default function App() {
+  usePageViews()
   return (
     <Routes>
       <Route element={<Layout />}>
