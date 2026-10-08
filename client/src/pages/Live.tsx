@@ -79,11 +79,13 @@ function DriverDetail({
           {detail.stints.length === 0 && <p className="muted">—</p>}
           {detail.stints.map((s) => {
             const t = tyre(s.compound)
+            const n = s.lapEnd - s.lapStart + 1
             return (
               <div className="ld-kv" key={s.stintNumber}>
                 <span>
                   <span className={`tyre tyre-${t.cls}`}>{t.label}</span>{' '}
-                  Laps {s.lapStart}–{s.lapEnd}
+                  Laps {s.lapStart}–{s.lapEnd}{' '}
+                  <span className="muted">· {n} {n === 1 ? 'lap' : 'laps'}</span>
                 </span>
                 <span className="muted">{s.compound ?? ''}</span>
               </div>
