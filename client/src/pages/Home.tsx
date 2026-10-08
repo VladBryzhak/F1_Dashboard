@@ -183,14 +183,31 @@ function NewsStrip({ news }: { news: NewsItem[] }) {
   )
 }
 
+// Placeholder shown while /api/home is loading. Reuses the .hero frame (same
+// 420px height, team-colour wash) so there's no layout jump, and — crucially —
+// we no longer flash the static off-season poster during a cold start.
+function HeroSkeleton() {
+  return (
+    <div className="hero hero-skeleton" aria-busy="true" aria-label="Loading latest race">
+      <span className="hero-kicker">Loading latest race…</span>
+    </div>
+  )
+}
+
 export default function Home() {
   useSeo({ jsonLd: siteLd() })
-  const { data } = useAsync(() => api.home(), [])
+  const { data, loading } = useAsync(() => api.home(), [])
   const hasRace = !!data?.highlights.latestRace
 
   return (
     <section>
-      {hasRace ? <WinnerHero highlights={data!.highlights} /> : <TitleFightHero />}
+      {loading ? (
+        <HeroSkeleton />
+      ) : hasRace ? (
+        <WinnerHero highlights={data!.highlights} />
+      ) : (
+        <TitleFightHero />
+      )}
 
       {data && <NewsStrip news={data.news} />}
 
