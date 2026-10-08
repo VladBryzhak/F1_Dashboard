@@ -1,4 +1,5 @@
 import { Link, NavLink, Outlet } from 'react-router-dom'
+import CookieBanner from './CookieBanner'
 import Footer from './Footer'
 
 const links = [
@@ -33,6 +34,7 @@ export default function Layout() {
         <Outlet />
       </main>
       <Footer />
+      <CookieBanner />
     </div>
   )
 }
