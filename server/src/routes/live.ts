@@ -1,10 +1,24 @@
 import { Router } from "express";
-import { getBoard, getDriverDetail, getLatestSession } from "../services/live";
+import {
+  getBoard,
+  getDriverDetail,
+  getLatestSession,
+  getLiveStatus,
+} from "../services/live";
 
 const router = Router();
 
-// GET /api/live/session — which session the board should show. For the prototype
-// this is the latest completed race; Phase 2 will return the live session.
+// GET /api/live/status — is a session live now, what's next, what was last, and
+// which session the board should show.
+router.get("/status", async (_req, res, next) => {
+  try {
+    res.json(await getLiveStatus());
+  } catch (err) {
+    next(err);
+  }
+});
+
+// GET /api/live/session — the latest completed session (kept for compatibility).
 router.get("/session", async (_req, res, next) => {
   try {
     const session = await getLatestSession();

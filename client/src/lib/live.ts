@@ -47,6 +47,19 @@ export function teamColor(hex: string | null): string {
   return hex ? `#${hex}` : '#888'
 }
 
+// "2d 14:32:10" / "14:32:10" — time from `now` (ms) until `targetIso`.
+export function fmtCountdown(targetIso: string, now: number): string {
+  let s = Math.max(0, Math.floor((new Date(targetIso).getTime() - now) / 1000))
+  const d = Math.floor(s / 86400)
+  s -= d * 86400
+  const h = Math.floor(s / 3600)
+  s -= h * 3600
+  const m = Math.floor(s / 60)
+  s -= m * 60
+  const pad = (n: number) => String(n).padStart(2, '0')
+  return `${d > 0 ? `${d}d ` : ''}${pad(h)}:${pad(m)}:${pad(s)}`
+}
+
 // Colour a sector time: purple = fastest in the session, green = this driver's
 // personal best, yellow = slower.
 export function sectorClass(

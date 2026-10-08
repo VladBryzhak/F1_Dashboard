@@ -381,17 +381,73 @@ nav.footer-col ul {
   width: 9px;
   height: 9px;
   border-radius: 50%;
-  background: #ffb020;
-  box-shadow: 0 0 0 0 rgba(255, 176, 32, 0.6);
+  background: var(--muted-2);
+  flex: none;
+}
+.live-dot.on {
+  background: #e10600;
+  box-shadow: 0 0 0 0 rgba(225, 6, 0, 0.6);
   animation: livePulse 1.6s infinite;
 }
 @keyframes livePulse {
   70% {
-    box-shadow: 0 0 0 7px rgba(255, 176, 32, 0);
+    box-shadow: 0 0 0 7px rgba(225, 6, 0, 0);
   }
   100% {
-    box-shadow: 0 0 0 0 rgba(255, 176, 32, 0);
+    box-shadow: 0 0 0 0 rgba(225, 6, 0, 0);
   }
+}
+.live-count {
+  margin-left: 0.6rem;
+  font-variant-numeric: tabular-nums;
+  color: var(--muted);
+  font-weight: 700;
+}
+
+/* "Live" nav-link status dot (grey = nothing, red = session live). */
+.nav-live-dot {
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--muted-2);
+  margin-right: 0.4rem;
+  vertical-align: middle;
+}
+.nav-live-dot.on {
+  background: #e10600;
+  box-shadow: 0 0 0 0 rgba(225, 6, 0, 0.6);
+  animation: livePulse 1.6s infinite;
+}
+
+/* Next-session countdown card (shown when nothing is live). */
+.next-card {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.4rem 0.9rem;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 0.9rem 1.1rem;
+  margin-bottom: 1rem;
+}
+.next-label {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-weight: 700;
+  color: var(--muted-2);
+}
+.next-name {
+  font-weight: 800;
+}
+.next-count {
+  margin-left: auto;
+  font-variant-numeric: tabular-nums;
+  font-weight: 800;
+  font-size: 1.05rem;
+  color: var(--accent);
 }
 .live-replay {
   margin-left: 0.5rem;

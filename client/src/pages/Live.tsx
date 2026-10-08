@@ -1,11 +1,28 @@
 import { useEffect, useState } from 'react'
 import { api } from '../api/client'
-import { useAsync } from '../hooks/useAsync'
+import { useLiveStatus } from '../hooks/useLiveStatus'
 import { useSeo } from '../hooks/useSeo'
-import { fmtTime, sectorClass, segmentClass, teamColor, tyre } from '../lib/live'
+import {
+  fmtCountdown,
+  fmtTime,
+  sectorClass,
+  segmentClass,
+  teamColor,
+  tyre,
+} from '../lib/live'
 import type { LiveBoard, LiveDriverDetail, LiveLap } from '../types/f1'
 
 const REFRESH_MS = 7000
+
+// A clock that ticks once a second, for the countdown.
+function useNow(): number {
+  const [now, setNow] = useState(Date.now())
+  useEffect(() => {
+    const id = setInterval(() => setNow(Date.now()), 1000)
+    return () => clearInterval(id)
+  }, [])
+  return now
+}
 
 // A sector's mini-sectors as a colour-coded bar.
 function SegmentBar({ segments }: { segments: number[] }) {
@@ -117,9 +134,9 @@ export default function Live() {
       'Live Formula 1 timing board — positions, gaps, lap times, sectors, mini-sectors and tyres, with expandable per-driver detail.',
   })
 
-  const { data: session, loading: sessionLoading, error: sessionError } =
-    useAsync(() => api.liveSession(), [])
-  const sessionKey = session?.sessionKey ?? null
+  const status = useLiveStatus(30000)
+  const now = useNow()
+  const sessionKey = status?.boardSessionKey ?? null
 
   const [board, setBoard] = useState<LiveBoard | null>(null)
   const [boardError, setBoardError] = useState<string | null>(null)
@@ -169,17 +186,41 @@ export default function Live() {
         <h1>Live Timing</h1>
       </div>
 
-      {sessionLoading && <p className="muted">Finding the latest session…</p>}
-      {sessionError && (
-        <p className="banner">Could not load a session: {sessionError}</p>
-      )}
+      {!status && <p className="muted">Loading…</p>}
 
-      {session && (
+      {status?.live ? (
         <p className="live-session">
-          <span className="live-dot" /> {session.sessionName} ·{' '}
-          {session.location} · {session.year}
-          <span className="live-replay">replay of the latest session</span>
+          <span className="live-dot on" /> LIVE · {status.live.sessionName} ·{' '}
+          {status.live.location}
+          {status.live.dateEnd && (
+            <span className="live-count">
+              ends in {fmtCountdown(status.live.dateEnd, now)}
+            </span>
+          )}
         </p>
+      ) : (
+        status && (
+          <>
+            {status.next && (
+              <div className="next-card">
+                <span className="next-label">Next session</span>
+                <span className="next-name">
+                  {status.next.sessionName} · {status.next.location}
+                </span>
+                <span className="next-count">
+                  in {fmtCountdown(status.next.dateStart, now)}
+                </span>
+              </div>
+            )}
+            {status.last && (
+              <p className="live-session">
+                <span className="live-dot" /> {status.last.sessionName} ·{' '}
+                {status.last.location} · {status.last.year}
+                <span className="live-replay">replay</span>
+              </p>
+            )}
+          </>
+        )
       )}
 
       {boardError && !board && (

@@ -371,3 +371,10 @@ export interface LiveDriverDetail {
   stints: LiveStint[];
   pits: LivePit[];
 }
+
+export interface LiveStatus {
+  live: LiveSessionMeta | null; // a session in progress right now
+  next: LiveSessionMeta | null; // the next upcoming session (for the countdown)
+  last: LiveSessionMeta | null; // the most recent completed session
+  boardSessionKey: number | null; // which session the board should show
+}

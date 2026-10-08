@@ -6,6 +6,7 @@ import type {
   LiveLap,
   LivePit,
   LiveSessionMeta,
+  LiveStatus,
   LiveStint,
 } from "../types/f1";
 
@@ -149,6 +150,60 @@ export async function getLatestSession(): Promise<LiveSessionMeta | null> {
       if (past.length) return toMeta(past[0]);
     }
     return null;
+  });
+}
+
+// Default session length when OpenF1 hasn't published date_end yet.
+const DEFAULT_LEN_MS = 2 * 60 * 60 * 1000;
+
+function endOf(s: RawSession): number {
+  return s.date_end
+    ? new Date(s.date_end).getTime()
+    : new Date(s.date_start).getTime() + DEFAULT_LEN_MS;
+}
+
+// Is a session happening right now? What's next? What was last? Drives the live
+// dot, the board source, and the countdown. Cached briefly so a session going
+// live (or ending) is picked up within ~30s.
+export async function getLiveStatus(): Promise<LiveStatus> {
+  return cached("live:status", 30, async () => {
+    const now = Date.now();
+    const year = new Date().getFullYear();
+    let sessions = await get<RawSession[]>(`/sessions?year=${year}`);
+    // Near a season boundary this year may hold no upcoming session; peek ahead.
+    if (!sessions.some((s) => new Date(s.date_start).getTime() > now)) {
+      const nextYear = await get<RawSession[]>(
+        `/sessions?year=${year + 1}`,
+      ).catch(() => [] as RawSession[]);
+      sessions = sessions.concat(nextYear);
+    }
+
+    let live: RawSession | null = null;
+    let next: RawSession | null = null;
+    let last: RawSession | null = null;
+    for (const s of sessions) {
+      const start = new Date(s.date_start).getTime();
+      if (start <= now && now <= endOf(s)) live = s;
+      if (start > now && (!next || start < new Date(next.date_start).getTime())) {
+        next = s;
+      }
+      if (
+        endOf(s) <= now &&
+        (!last ||
+          new Date(s.date_start).getTime() >
+            new Date(last.date_start).getTime())
+      ) {
+        last = s;
+      }
+    }
+
+    const boardSource = live ?? last;
+    return {
+      live: live ? toMeta(live) : null,
+      next: next ? toMeta(next) : null,
+      last: last ? toMeta(last) : null,
+      boardSessionKey: boardSource?.session_key ?? null,
+    };
   });
 }
 

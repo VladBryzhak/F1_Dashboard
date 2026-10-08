@@ -370,3 +370,10 @@ export interface LiveDriverDetail {
   stints: LiveStint[]
   pits: LivePit[]
 }
+
+export interface LiveStatus {
+  live: LiveSessionMeta | null
+  next: LiveSessionMeta | null
+  last: LiveSessionMeta | null
+  boardSessionKey: number | null
+}

@@ -48,6 +48,7 @@ import type {
   LiveBoard,
   LiveDriverDetail,
   LiveSessionMeta,
+  LiveStatus,
   LapTelemetry,
   RaceResultResponse,
   RaceWeekend,
@@ -94,6 +95,7 @@ export const api = {
     ),
   feedback: (body: { message: string; contact?: string; website?: string }) =>
     postJson<{ ok: true }>('/feedback', body),
+  liveStatus: () => getJson<LiveStatus>('/live/status'),
   liveSession: () => getJson<LiveSessionMeta>('/live/session'),
   liveBoard: (sessionKey: number) =>
     getJson<LiveBoard>(`/live/${sessionKey}/board`),
