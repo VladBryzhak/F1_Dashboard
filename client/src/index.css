@@ -153,50 +153,95 @@ body {
   text-decoration: underline;
 }
 
-/* Global site footer: attributions, disclaimer, analytics notice, quick links. */
+/* Global site footer: brand + attributions + disclaimer + links, laid out as
+   columns spread across the full content width. */
 .site-footer {
   border-top: 1px solid var(--border);
   margin-top: 3rem;
-  padding: 2rem 1.75rem calc(2.5rem + env(safe-area-inset-bottom));
+  padding: 2.5rem 1.75rem calc(2.5rem + env(safe-area-inset-bottom));
 }
-.site-footer > * {
+.footer-grid {
   max-width: 1080px;
-  margin-left: auto;
-  margin-right: auto;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1.6fr 1fr 1.1fr 1.9fr;
+  gap: 2rem 2.75rem;
 }
-.footer-links {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem 1.4rem;
-  margin-bottom: 1.4rem;
-}
-.footer-links a {
-  color: var(--muted);
-  text-decoration: none;
-  font-weight: 600;
-  font-size: 0.9rem;
-}
-.footer-links a:hover {
-  color: var(--text);
-}
-.footer-meta {
-  font-size: 0.8rem;
-  line-height: 1.65;
+.footer-col h4 {
+  margin: 0 0 0.9rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
   color: var(--muted-2);
 }
-.footer-meta p {
-  margin: 0 0 0.6rem;
-  max-width: 85ch;
-}
-.footer-meta a {
+.footer-col ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+  font-size: 0.85rem;
   color: var(--muted);
-  text-decoration: underline;
 }
-.footer-meta a:hover {
+.footer-col a {
+  color: var(--muted);
+  text-decoration: none;
+}
+.footer-col a:hover {
   color: var(--text);
 }
+.footer-col ul a {
+  font-weight: 600;
+}
+
+/* Brand column. */
+.footer-logo {
+  font-weight: 900;
+  font-size: 1.1rem;
+  letter-spacing: 0.5px;
+  color: var(--text);
+  margin-bottom: 0.7rem;
+}
+.footer-logo .mark {
+  background: var(--accent);
+  color: #fff;
+  padding: 0.05em 0.35em;
+  border-radius: 4px;
+}
+.footer-brand p {
+  margin: 0 0 0.6rem;
+  font-size: 0.82rem;
+  line-height: 1.6;
+  color: var(--muted);
+  max-width: 34ch;
+}
 .footer-copy {
-  margin-top: 0.9rem;
+  color: var(--muted-2);
+}
+
+/* Legal column: small print. */
+.footer-legal p {
+  margin: 0 0 0.7rem;
+  font-size: 0.76rem;
+  line-height: 1.6;
+  color: var(--muted-2);
+}
+.footer-legal a {
+  text-decoration: underline;
+}
+
+@media (max-width: 860px) {
+  .footer-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+@media (max-width: 520px) {
+  .footer-grid {
+    grid-template-columns: 1fr;
+    gap: 1.75rem;
+  }
 }
 
 /* Feedback form. */
