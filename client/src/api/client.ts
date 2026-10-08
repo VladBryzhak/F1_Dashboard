@@ -45,6 +45,9 @@ import type {
   DriverProfile,
   DriverStanding,
   HomeResponse,
+  LiveBoard,
+  LiveDriverDetail,
+  LiveSessionMeta,
   LapTelemetry,
   RaceResultResponse,
   RaceWeekend,
@@ -91,4 +94,9 @@ export const api = {
     ),
   feedback: (body: { message: string; contact?: string; website?: string }) =>
     postJson<{ ok: true }>('/feedback', body),
+  liveSession: () => getJson<LiveSessionMeta>('/live/session'),
+  liveBoard: (sessionKey: number) =>
+    getJson<LiveBoard>(`/live/${sessionKey}/board`),
+  liveDriver: (sessionKey: number, driverNumber: number) =>
+    getJson<LiveDriverDetail>(`/live/${sessionKey}/driver/${driverNumber}`),
 }

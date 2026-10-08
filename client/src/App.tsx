@@ -33,6 +33,7 @@ const Teams = lazyPage(() => import('./pages/Teams'))
 const TeamProfile = lazyPage(() => import('./pages/TeamProfile'))
 const Compare = lazyPage(() => import('./pages/Compare'))
 const Telemetry = lazyPage(() => import('./pages/Telemetry'))
+const Live = lazyPage(() => import('./pages/Live'))
 const Feedback = lazyPage(() => import('./pages/Feedback'))
 
 // Reports a GA4 page_view whenever the SPA route changes (react-router keeps the
@@ -87,6 +88,7 @@ export default function App() {
           <Route path="teams/:slug" element={<TeamsOrProfile />} />
           <Route path="compare" element={<Compare />} />
           <Route path="telemetry" element={<Telemetry />} />
+          <Route path="live" element={<Live />} />
           <Route path="feedback" element={<Feedback />} />
         </Route>
       </Routes>

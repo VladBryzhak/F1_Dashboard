@@ -369,6 +369,255 @@ nav.footer-col ul {
   color: var(--text);
 }
 
+/* ---- Live timing board ---- */
+.live-session {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 600;
+  margin: 0 0 1.25rem;
+}
+.live-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: #ffb020;
+  box-shadow: 0 0 0 0 rgba(255, 176, 32, 0.6);
+  animation: livePulse 1.6s infinite;
+}
+@keyframes livePulse {
+  70% {
+    box-shadow: 0 0 0 7px rgba(255, 176, 32, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(255, 176, 32, 0);
+  }
+}
+.live-replay {
+  margin-left: 0.5rem;
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--muted-2);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 0.1rem 0.6rem;
+}
+
+.live-board {
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+}
+.lb-head,
+.lb-row {
+  display: grid;
+  grid-template-columns: 2.2rem minmax(110px, 1fr) 4.6rem 4.6rem 5rem 5rem 3.4rem;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0 0.9rem;
+}
+.lb-head {
+  height: 34px;
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--muted-2);
+  border-bottom: 1px solid var(--border);
+}
+.lb-row {
+  width: 100%;
+  height: 46px;
+  background: none;
+  border: none;
+  border-top: 1px solid rgba(255, 255, 255, 0.04);
+  color: var(--text);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.lb-row-wrap:first-child .lb-row {
+  border-top: none;
+}
+.lb-row:hover {
+  background: rgba(255, 255, 255, 0.03);
+}
+.lb-row-wrap.open .lb-row {
+  background: rgba(255, 255, 255, 0.05);
+}
+.lb-pos {
+  font-weight: 800;
+  color: var(--muted);
+}
+.lb-drv {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: 0;
+}
+.lb-stripe {
+  width: 4px;
+  height: 20px;
+  border-radius: 2px;
+  flex: none;
+}
+.lb-code {
+  font-weight: 800;
+}
+.lb-team {
+  color: var(--muted-2);
+  font-size: 0.8rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.mono {
+  font-variant-numeric: tabular-nums;
+}
+.lb-tyre {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+.tyre-age {
+  font-size: 0.72rem;
+  color: var(--muted-2);
+}
+
+/* Tyre compound badge. */
+.tyre {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  font-size: 0.72rem;
+  font-weight: 800;
+  flex: none;
+}
+.tyre-soft {
+  background: #e10600;
+  color: #fff;
+}
+.tyre-medium {
+  background: #f5c518;
+  color: #111;
+}
+.tyre-hard {
+  background: #eaeaea;
+  color: #111;
+}
+.tyre-inter {
+  background: #43b02a;
+  color: #fff;
+}
+.tyre-wet {
+  background: #2a6df4;
+  color: #fff;
+}
+.tyre-unknown {
+  background: #3a3a44;
+  color: var(--muted);
+}
+
+/* Expanded driver detail. */
+.ld-detail {
+  padding: 1rem 1.1rem 1.2rem;
+  background: var(--card);
+  border-top: 1px solid var(--border);
+}
+.ld-sectors {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.9rem;
+  margin-bottom: 1.1rem;
+}
+.ld-sector-head {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.78rem;
+  color: var(--muted);
+  margin-bottom: 0.35rem;
+}
+.ld-sector-time {
+  font-variant-numeric: tabular-nums;
+  color: var(--text);
+  font-weight: 700;
+}
+.seg-bar {
+  display: flex;
+  gap: 2px;
+}
+.seg {
+  flex: 1;
+  height: 7px;
+  border-radius: 2px;
+  background: #33333c;
+}
+.seg-green {
+  background: #43b02a;
+}
+.seg-purple {
+  background: #b14be8;
+}
+.seg-yellow {
+  background: #e0c04a;
+}
+.seg-pit {
+  background: #2a6df4;
+}
+.seg-none {
+  background: #33333c;
+}
+.ld-cols {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5rem;
+}
+.ld-col h4 {
+  margin: 0 0 0.6rem;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--muted-2);
+}
+.ld-kv {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.75rem;
+  font-size: 0.82rem;
+  padding: 0.22rem 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+}
+.ld-kv .tyre {
+  width: 18px;
+  height: 18px;
+  font-size: 0.66rem;
+}
+
+@media (max-width: 680px) {
+  .lb-head,
+  .lb-row {
+    grid-template-columns: 1.8rem minmax(70px, 1fr) 4.3rem 4.6rem 2.8rem;
+    gap: 0.4rem;
+    padding: 0 0.6rem;
+  }
+  .lb-team,
+  .lb-int,
+  .lb-best {
+    display: none;
+  }
+  .ld-cols {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+  .ld-sectors {
+    gap: 0.5rem;
+  }
+}
+
 h1 {
   font-size: 1.9rem;
   font-weight: 900;

@@ -7,6 +7,7 @@ import { Link } from 'react-router-dom'
 // columns spread across the full content width.
 const quickLinks = [
   { to: '/', label: 'Home' },
+  { to: '/live', label: 'Live' },
   { to: '/standings', label: 'Standings' },
   { to: '/calendar', label: 'Calendar' },
   { to: '/drivers', label: 'Drivers' },

@@ -307,3 +307,66 @@ export interface LapTelemetry {
   lapNumber: number;
   points: TelemetryPoint[];
 }
+
+// --- Live timing (OpenF1) ---
+export interface LiveSessionMeta {
+  sessionKey: number;
+  sessionName: string;
+  location: string;
+  countryName: string;
+  year: number;
+  dateStart: string;
+  dateEnd: string | null;
+  isRace: boolean;
+}
+
+export interface LiveBoardRow {
+  driverNumber: number;
+  position: number | null;
+  code: string;
+  fullName: string;
+  teamName: string;
+  teamColour: string | null;
+  gapToLeader: string | null;
+  interval: string | null;
+  lastLap: number | null;
+  bestLap: number | null;
+  tyreCompound: string | null;
+  tyreAge: number | null;
+}
+
+export interface LiveBoard {
+  session: LiveSessionMeta;
+  rows: LiveBoardRow[];
+}
+
+export interface LiveLap {
+  lapNumber: number;
+  lapDuration: number | null;
+  sectors: (number | null)[];
+  segments: number[][];
+  speeds: { i1: number | null; i2: number | null; st: number | null };
+  isPitOut: boolean;
+}
+
+export interface LiveStint {
+  stintNumber: number;
+  compound: string | null;
+  lapStart: number;
+  lapEnd: number;
+  tyreAgeAtStart: number | null;
+}
+
+export interface LivePit {
+  lapNumber: number | null;
+  pitDuration: number | null;
+}
+
+export interface LiveDriverDetail {
+  driverNumber: number;
+  laps: LiveLap[];
+  bestLap: number | null;
+  bestSectors: (number | null)[];
+  stints: LiveStint[];
+  pits: LivePit[];
+}

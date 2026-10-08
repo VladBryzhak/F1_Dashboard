@@ -3,6 +3,7 @@ import CookieBanner from './CookieBanner'
 import Footer from './Footer'
 
 const links = [
+  { to: '/live', label: 'Live' },
   { to: '/standings', label: 'Standings' },
   { to: '/calendar', label: 'Calendar' },
   { to: '/drivers', label: 'Drivers' },

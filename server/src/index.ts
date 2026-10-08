@@ -6,6 +6,7 @@ import path from "path";
 import calendarRouter from "./routes/calendar";
 import feedbackRouter from "./routes/feedback";
 import homeRouter from "./routes/home";
+import liveRouter from "./routes/live";
 import profilesRouter from "./routes/profiles";
 import standingsRouter from "./routes/standings";
 import telemetryRouter from "./routes/telemetry";
@@ -35,6 +36,7 @@ app.get("/api/health", (_req, res) => {
 
 app.use("/api/home", homeRouter);
 app.use("/api/feedback", feedbackRouter);
+app.use("/api/live", liveRouter);
 app.use("/api/standings", standingsRouter);
 app.use("/api/calendar", calendarRouter);
 app.use("/api/telemetry", telemetryRouter);
