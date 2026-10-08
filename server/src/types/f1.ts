@@ -211,7 +211,12 @@ export interface SeasonProgression {
 export interface DriverListItem {
   driverId: string;
   name: string;
+  nationality: string;
+  countryCode: string | null;
+  firstSeason: number;
   lastSeason: number;
+  races: number;
+  podiums: number;
 }
 
 export interface HeadToHead {

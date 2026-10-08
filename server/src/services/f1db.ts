@@ -897,10 +897,16 @@ export async function getAllDrivers(): Promise<DriverListItem[]> {
   const ds = await dataset();
   const list: DriverListItem[] = [];
   for (const [driverId, career] of ds.driverCareer) {
+    const d = ds.drivers.get(driverId);
     list.push({
       driverId,
       name: driverName(ds, driverId),
+      nationality: demonym(ds, d?.nationalityCountryId),
+      countryCode: alpha2(ds, d?.nationalityCountryId),
+      firstSeason: career.firstSeason,
       lastSeason: career.lastSeason,
+      races: career.races,
+      podiums: career.podiums,
     });
   }
   return list.sort(

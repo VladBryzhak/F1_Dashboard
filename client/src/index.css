@@ -449,6 +449,68 @@ nav.footer-col ul {
   font-size: 1.05rem;
   color: var(--accent);
 }
+
+/* Driver search (Drivers → Search tab). */
+.ds-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  margin: 1.1rem 0 1.25rem;
+}
+.ds-input {
+  flex: 1 1 220px;
+  min-width: 0;
+}
+.ds-input,
+.ds-controls select {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text);
+  font: inherit;
+  padding: 0.6rem 0.75rem;
+}
+.ds-input:focus,
+.ds-controls select:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+.ds-count {
+  margin: 0 0 0.8rem;
+  font-size: 0.85rem;
+}
+.ds-results {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(215px, 1fr));
+  gap: 0.7rem;
+}
+.ds-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  padding: 0.8rem 0.9rem;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  text-decoration: none;
+  color: var(--text);
+}
+.ds-card:hover {
+  border-color: var(--accent);
+}
+.ds-name {
+  font-weight: 800;
+}
+.ds-sub {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.82rem;
+  color: var(--muted);
+}
+.ds-stats {
+  font-size: 0.78rem;
+}
 .live-replay {
   margin-left: 0.5rem;
   font-size: 0.7rem;
