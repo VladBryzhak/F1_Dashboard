@@ -274,11 +274,37 @@ export async function getBoard(sessionKey: number): Promise<LiveBoard> {
       };
     });
 
-    rows.sort((a, b) => {
-      if (a.position == null) return 1;
-      if (b.position == null) return -1;
-      return a.position - b.position;
-    });
+    if (session.isRace) {
+      rows.sort((a, b) => {
+        if (a.position == null) return 1;
+        if (b.position == null) return -1;
+        return a.position - b.position;
+      });
+    } else {
+      // Practice / Qualifying: OpenF1 has no race-style intervals, so classify by
+      // best lap and show the gap to the fastest lap (pole) and to the car ahead.
+      const ranked = rows
+        .filter((r) => r.bestLap != null)
+        .sort((a, b) => a.bestLap! - b.bestLap!);
+      const rest = rows.filter((r) => r.bestLap == null);
+      const pole = ranked[0]?.bestLap ?? null;
+      ranked.forEach((r, i) => {
+        r.position = i + 1;
+        r.gapToLeader =
+          pole != null && r.bestLap! > pole
+            ? `+${(r.bestLap! - pole).toFixed(3)}`
+            : null;
+        const prev = ranked[i - 1];
+        r.interval = prev ? `+${(r.bestLap! - prev.bestLap!).toFixed(3)}` : null;
+      });
+      rest.forEach((r) => {
+        r.position = null;
+        r.gapToLeader = null;
+        r.interval = null;
+      });
+      rows.length = 0;
+      rows.push(...ranked, ...rest);
+    }
 
     // Session-wide best lap + best individual sectors, for "purple" colouring.
     let sbLap: number | null = null;
