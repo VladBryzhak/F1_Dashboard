@@ -41,17 +41,21 @@ export function CarImage({
 export function Headshot({
   portraitUrl,
   fallbackUrl,
+  thirdUrl,
   color,
   alt = '',
   eager = false,
 }: {
   portraitUrl?: string | null
   fallbackUrl?: string
+  thirdUrl?: string | null
   color: string
   alt?: string
   eager?: boolean
 }) {
-  const candidates = [portraitUrl, fallbackUrl].filter((u): u is string => !!u)
+  const candidates = [portraitUrl, fallbackUrl, thirdUrl].filter(
+    (u): u is string => !!u,
+  )
   const key = candidates.join('|')
   const [idx, setIdx] = useState(0)
   useEffect(() => setIdx(0), [key])

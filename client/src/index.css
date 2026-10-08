@@ -486,9 +486,9 @@ nav.footer-col ul {
 }
 .ds-card {
   display: flex;
-  flex-direction: column;
-  gap: 0.3rem;
-  padding: 0.8rem 0.9rem;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.7rem 0.8rem;
   background: var(--card);
   border: 1px solid var(--border);
   border-radius: 10px;
@@ -497,6 +497,29 @@ nav.footer-col ul {
 }
 .ds-card:hover {
   border-color: var(--accent);
+}
+.ds-photo {
+  width: 52px;
+  height: 52px;
+  border-radius: 8px;
+  object-fit: cover;
+  object-position: top center;
+  background: var(--panel);
+  flex: none;
+}
+.ds-photo--none {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 1.3rem;
+  color: var(--muted-2);
+}
+.ds-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  min-width: 0;
 }
 .ds-name {
   font-weight: 800;

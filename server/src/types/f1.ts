@@ -56,6 +56,7 @@ export interface DriverProfile {
   podiums: number;
   points: number;
   races: number;
+  photoUrl?: string | null; // Wikimedia Commons photo, when found
   seasons: DriverSeasonEntry[]; // ascending by season
 }
 

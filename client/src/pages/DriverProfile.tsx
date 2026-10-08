@@ -90,6 +90,7 @@ export default function DriverProfile() {
                 String(profile.lastSeason),
               )}
               fallbackUrl={profile.code ? headshots.data?.[profile.code] : undefined}
+              thirdUrl={profile.photoUrl}
               color={color}
               alt={`${profile.givenName} ${profile.familyName}`}
               eager

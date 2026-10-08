@@ -1,5 +1,9 @@
 import { Router } from "express";
 import {
+  getDriverPhoto,
+  getDriverPhotos,
+} from "../services/driverPhotos";
+import {
   getAllDrivers,
   getConstructorProfile,
   getDriverComparison,
@@ -12,6 +16,16 @@ const router = Router();
 router.get("/drivers", async (_req, res, next) => {
   try {
     res.json(await getAllDrivers());
+  } catch (err) {
+    next(err);
+  }
+});
+
+// GET /api/drivers/photos — map of driverId -> Wikimedia photo URL. Registered
+// before /drivers/:driverId so "photos" isn't read as a driver id.
+router.get("/drivers/photos", async (_req, res, next) => {
+  try {
+    res.json(await getDriverPhotos());
   } catch (err) {
     next(err);
   }
@@ -39,7 +53,10 @@ router.get("/drivers/:driverId", async (req, res, next) => {
         .status(404)
         .json({ error: `Unknown driver: ${req.params.driverId}` });
     }
-    res.json(profile);
+    const photoUrl = await getDriverPhoto(
+      `${profile.givenName} ${profile.familyName}`,
+    ).catch(() => null);
+    res.json({ ...profile, photoUrl });
   } catch (err) {
     next(err);
   }

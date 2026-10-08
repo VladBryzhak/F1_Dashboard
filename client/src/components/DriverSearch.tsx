@@ -10,6 +10,8 @@ const DECADES = [2020, 2010, 2000, 1990, 1980, 1970, 1960, 1950]
 // filters. The full list (~860 drivers) is small enough to filter in the browser.
 export default function DriverSearch() {
   const { data, loading, error } = useAsync(() => api.drivers(), [])
+  // Photos load separately so the list renders instantly; they pop in after.
+  const photos = useAsync(() => api.driverPhotos(), [])
   const [q, setQ] = useState('')
   const [nat, setNat] = useState('')
   const [decade, setDecade] = useState('')
@@ -86,22 +88,39 @@ export default function DriverSearch() {
             <p className="muted">No drivers match those filters.</p>
           ) : (
             <div className="ds-results">
-              {shown.map((d) => (
-                <Link
-                  key={d.driverId}
-                  to={`/drivers/${d.driverId}`}
-                  className="ds-card"
-                >
-                  <span className="ds-name">{d.name}</span>
-                  <span className="ds-sub">
-                    <Flag code={d.countryCode} nationality={d.nationality} />
-                    {d.nationality} · {d.firstSeason}–{d.lastSeason}
-                  </span>
-                  <span className="ds-stats muted">
-                    {d.races} races · {d.podiums} podiums
-                  </span>
-                </Link>
-              ))}
+              {shown.map((d) => {
+                const photo = photos.data?.[d.driverId]
+                return (
+                  <Link
+                    key={d.driverId}
+                    to={`/drivers/${d.driverId}`}
+                    className="ds-card"
+                  >
+                    {photo ? (
+                      <img
+                        className="ds-photo"
+                        src={photo}
+                        alt={d.name}
+                        loading="lazy"
+                      />
+                    ) : (
+                      <span className="ds-photo ds-photo--none" aria-hidden="true">
+                        {d.name.charAt(0)}
+                      </span>
+                    )}
+                    <span className="ds-info">
+                      <span className="ds-name">{d.name}</span>
+                      <span className="ds-sub">
+                        <Flag code={d.countryCode} nationality={d.nationality} />
+                        {d.nationality} · {d.firstSeason}–{d.lastSeason}
+                      </span>
+                      <span className="ds-stats muted">
+                        {d.races} races · {d.podiums} podiums
+                      </span>
+                    </span>
+                  </Link>
+                )
+              })}
             </div>
           )}
         </>

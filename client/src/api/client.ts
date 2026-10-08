@@ -77,6 +77,7 @@ export const api = {
   driverHeadshots: (season: string) =>
     getJson<Record<string, string>>(`/telemetry/headshots/${season}`),
   drivers: () => getJson<DriverListItem[]>('/drivers'),
+  driverPhotos: () => getJson<Record<string, string>>('/drivers/photos'),
   driverProfile: (driverId: string) =>
     getJson<DriverProfile>(`/drivers/${driverId}`),
   compareDrivers: (a: string, b: string) =>

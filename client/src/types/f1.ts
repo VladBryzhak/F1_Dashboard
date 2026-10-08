@@ -55,6 +55,7 @@ export interface DriverProfile {
   podiums: number
   points: number
   races: number
+  photoUrl?: string | null
   seasons: DriverSeasonEntry[]
 }
 
