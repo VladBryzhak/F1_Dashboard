@@ -11,11 +11,13 @@ export function CarImage({
   season,
   color,
   alt = '',
+  eager = false,
 }: {
   constructorId: string
   season: string
   color: string
   alt?: string
+  eager?: boolean
 }) {
   const [failed, setFailed] = useState(false)
   const url = teamCarUrl(constructorId, season)
@@ -26,7 +28,7 @@ export function CarImage({
         className="car-img"
         src={url}
         alt={alt}
-        loading="lazy"
+        loading={eager ? 'eager' : 'lazy'}
         onError={() => setFailed(true)}
       />
     </div>
@@ -41,11 +43,13 @@ export function Headshot({
   fallbackUrl,
   color,
   alt = '',
+  eager = false,
 }: {
   portraitUrl?: string | null
   fallbackUrl?: string
   color: string
   alt?: string
+  eager?: boolean
 }) {
   const candidates = [portraitUrl, fallbackUrl].filter((u): u is string => !!u)
   const key = candidates.join('|')
@@ -59,7 +63,7 @@ export function Headshot({
         className="head-img"
         src={src}
         alt={alt}
-        loading="lazy"
+        loading={eager ? 'eager' : 'lazy'}
         onError={() => setIdx((i) => i + 1)}
       />
     </div>

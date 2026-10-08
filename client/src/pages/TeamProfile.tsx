@@ -72,6 +72,7 @@ export default function TeamProfile() {
               season={String(profile.lastSeason)}
               color={color}
               alt={`${profile.name} Formula 1 car`}
+              eager
             />
             <div className="profile-heading">
               <h1 className="profile-name">{profile.name}</h1>

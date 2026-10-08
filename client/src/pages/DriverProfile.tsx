@@ -92,6 +92,7 @@ export default function DriverProfile() {
               fallbackUrl={profile.code ? headshots.data?.[profile.code] : undefined}
               color={color}
               alt={`${profile.givenName} ${profile.familyName}`}
+              eager
             />
             <div className="profile-heading">
               <h1 className="profile-name">
