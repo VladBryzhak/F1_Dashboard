@@ -153,6 +153,52 @@ body {
   text-decoration: underline;
 }
 
+/* Global site footer: attributions, disclaimer, analytics notice, quick links. */
+.site-footer {
+  border-top: 1px solid var(--border);
+  margin-top: 3rem;
+  padding: 2rem 1.75rem calc(2.5rem + env(safe-area-inset-bottom));
+}
+.site-footer > * {
+  max-width: 1080px;
+  margin-left: auto;
+  margin-right: auto;
+}
+.footer-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1.4rem;
+  margin-bottom: 1.4rem;
+}
+.footer-links a {
+  color: var(--muted);
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+.footer-links a:hover {
+  color: var(--text);
+}
+.footer-meta {
+  font-size: 0.8rem;
+  line-height: 1.65;
+  color: var(--muted-2);
+}
+.footer-meta p {
+  margin: 0 0 0.6rem;
+  max-width: 85ch;
+}
+.footer-meta a {
+  color: var(--muted);
+  text-decoration: underline;
+}
+.footer-meta a:hover {
+  color: var(--text);
+}
+.footer-copy {
+  margin-top: 0.9rem;
+}
+
 h1 {
   font-size: 1.9rem;
   font-weight: 900;

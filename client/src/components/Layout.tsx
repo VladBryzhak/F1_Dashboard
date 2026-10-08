@@ -1,4 +1,5 @@
 import { Link, NavLink, Outlet } from 'react-router-dom'
+import Footer from './Footer'
 
 const links = [
   { to: '/standings', label: 'Standings' },
@@ -31,6 +32,7 @@ export default function Layout() {
       <main className="content">
         <Outlet />
       </main>
+      <Footer />
     </div>
   )
 }
