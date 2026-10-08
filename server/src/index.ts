@@ -4,6 +4,7 @@ import fs from "fs";
 import helmet from "helmet";
 import path from "path";
 import calendarRouter from "./routes/calendar";
+import feedbackRouter from "./routes/feedback";
 import homeRouter from "./routes/home";
 import profilesRouter from "./routes/profiles";
 import standingsRouter from "./routes/standings";
@@ -33,6 +34,7 @@ app.get("/api/health", (_req, res) => {
 });
 
 app.use("/api/home", homeRouter);
+app.use("/api/feedback", feedbackRouter);
 app.use("/api/standings", standingsRouter);
 app.use("/api/calendar", calendarRouter);
 app.use("/api/telemetry", telemetryRouter);

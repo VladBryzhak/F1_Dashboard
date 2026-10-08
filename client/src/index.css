@@ -199,6 +199,72 @@ body {
   margin-top: 0.9rem;
 }
 
+/* Feedback form. */
+.feedback {
+  max-width: 620px;
+}
+.feedback-intro {
+  margin-bottom: 1.5rem;
+}
+.feedback-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.1rem;
+}
+.feedback-form .field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+.feedback-form .field > span {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--muted);
+}
+.feedback-form textarea,
+.feedback-form input {
+  width: 100%;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text);
+  font: inherit;
+  padding: 0.7rem 0.8rem;
+  resize: vertical;
+}
+.feedback-form textarea:focus,
+.feedback-form input:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+.feedback-form button {
+  align-self: flex-start;
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font: inherit;
+  font-weight: 700;
+  padding: 0.65rem 1.4rem;
+  cursor: pointer;
+}
+.feedback-form button:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+/* Honeypot field — present in the DOM, invisible to people. */
+.hp-field {
+  position: absolute;
+  left: -9999px;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+}
+.banner-ok {
+  border-color: #1f7a3f;
+  color: #7be0a0;
+}
+
 h1 {
   font-size: 1.9rem;
   font-weight: 900;

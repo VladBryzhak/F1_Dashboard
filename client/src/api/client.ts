@@ -16,6 +16,25 @@ async function getJson<T>(path: string): Promise<T> {
   return (await res.json()) as T
 }
 
+async function postJson<T>(path: string, body: unknown): Promise<T> {
+  const res = await fetch(`/api${path}`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body),
+  })
+  if (!res.ok) {
+    let detail = `${res.status} ${res.statusText}`
+    try {
+      const b = (await res.json()) as { error?: string }
+      if (b.error) detail = b.error
+    } catch {
+      // response had no JSON body; keep the status text
+    }
+    throw new Error(detail)
+  }
+  return (await res.json()) as T
+}
+
 import type {
   CalendarResponse,
   ConstructorProfile,
@@ -70,4 +89,6 @@ export const api = {
     getJson<LapTelemetry>(
       `/telemetry/lap/${sessionKey}/${driverNumber}/${lapNumber}`,
     ),
+  feedback: (body: { message: string; contact?: string; website?: string }) =>
+    postJson<{ ok: true }>('/feedback', body),
 }

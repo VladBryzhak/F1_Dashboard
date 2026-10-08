@@ -12,6 +12,7 @@ const quickLinks = [
   { to: '/teams', label: 'Teams' },
   { to: '/compare', label: 'Compare' },
   { to: '/telemetry', label: 'Telemetry' },
+  { to: '/feedback', label: 'Feedback' },
 ]
 
 function Ext({ href, children }: { href: string; children: React.ReactNode }) {
