@@ -546,6 +546,15 @@ nav.footer-col ul {
   color: var(--text);
   font-weight: 700;
 }
+.ld-sector-time.sector-purple {
+  color: #c06bf0;
+}
+.ld-sector-time.sector-green {
+  color: #4fcf5f;
+}
+.ld-sector-time.sector-yellow {
+  color: #e0c04a;
+}
 .seg-bar {
   display: flex;
   gap: 2px;

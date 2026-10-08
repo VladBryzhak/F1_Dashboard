@@ -338,6 +338,7 @@ export interface LiveBoardRow {
 export interface LiveBoard {
   session: LiveSessionMeta;
   rows: LiveBoardRow[];
+  sessionBest: { lap: number | null; sectors: (number | null)[] };
 }
 
 export interface LiveLap {

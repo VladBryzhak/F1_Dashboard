@@ -46,3 +46,17 @@ export function tyre(compound: string | null): { label: string; cls: string } {
 export function teamColor(hex: string | null): string {
   return hex ? `#${hex}` : '#888'
 }
+
+// Colour a sector time: purple = fastest in the session, green = this driver's
+// personal best, yellow = slower.
+export function sectorClass(
+  time: number | null,
+  personalBest: number | null,
+  sessionBest: number | null,
+): string {
+  if (time == null) return ''
+  const eps = 1e-6
+  if (sessionBest != null && time <= sessionBest + eps) return 'purple'
+  if (personalBest != null && time <= personalBest + eps) return 'green'
+  return 'yellow'
+}

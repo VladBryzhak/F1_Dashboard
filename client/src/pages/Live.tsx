@@ -2,10 +2,10 @@ import { useEffect, useState } from 'react'
 import { api } from '../api/client'
 import { useAsync } from '../hooks/useAsync'
 import { useSeo } from '../hooks/useSeo'
-import { fmtTime, segmentClass, teamColor, tyre } from '../lib/live'
+import { fmtTime, sectorClass, segmentClass, teamColor, tyre } from '../lib/live'
 import type { LiveBoard, LiveDriverDetail, LiveLap } from '../types/f1'
 
-const REFRESH_MS = 5000
+const REFRESH_MS = 7000
 
 // A sector's mini-sectors as a colour-coded bar.
 function SegmentBar({ segments }: { segments: number[] }) {
@@ -19,7 +19,13 @@ function SegmentBar({ segments }: { segments: number[] }) {
   )
 }
 
-function DriverDetail({ detail }: { detail: LiveDriverDetail }) {
+function DriverDetail({
+  detail,
+  sessionBest,
+}: {
+  detail: LiveDriverDetail
+  sessionBest: LiveBoard['sessionBest']
+}) {
   const latest: LiveLap | undefined = detail.laps[0]
   return (
     <div className="ld-detail">
@@ -29,7 +35,15 @@ function DriverDetail({ detail }: { detail: LiveDriverDetail }) {
             <div className="ld-sector" key={i}>
               <div className="ld-sector-head">
                 <span>Sector {i + 1}</span>
-                <span className="ld-sector-time">{fmtTime(latest.sectors[i])}</span>
+                <span
+                  className={`ld-sector-time sector-${sectorClass(
+                    latest.sectors[i],
+                    detail.bestSectors[i],
+                    sessionBest.sectors[i],
+                  )}`}
+                >
+                  {fmtTime(latest.sectors[i])}
+                </span>
               </div>
               <SegmentBar segments={latest.segments[i]} />
             </div>
@@ -210,7 +224,7 @@ export default function Live() {
 
                 {open &&
                   (detail && detail.driverNumber === r.driverNumber ? (
-                    <DriverDetail detail={detail} />
+                    <DriverDetail detail={detail} sessionBest={board.sessionBest} />
                   ) : (
                     <div className="ld-detail">
                       <p className="muted">Loading detail…</p>

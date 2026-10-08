@@ -153,7 +153,7 @@ export async function getLatestSession(): Promise<LiveSessionMeta | null> {
 }
 
 export async function getBoard(sessionKey: number): Promise<LiveBoard> {
-  return cached(`live:board:${sessionKey}`, 5, async () => {
+  return cached(`live:board:${sessionKey}`, 8, async () => {
     // Two batches of three to keep concurrency (and OpenF1's rate limit) sane.
     const [sessions, drivers, stints] = await Promise.all([
       get<RawSession[]>(`/sessions?session_key=${sessionKey}`),
@@ -225,7 +225,22 @@ export async function getBoard(sessionKey: number): Promise<LiveBoard> {
       return a.position - b.position;
     });
 
-    return { session, rows };
+    // Session-wide best lap + best individual sectors, for "purple" colouring.
+    let sbLap: number | null = null;
+    const sbSectors: (number | null)[] = [null, null, null];
+    for (const l of laps) {
+      if (l.lap_duration != null && (sbLap == null || l.lap_duration < sbLap)) {
+        sbLap = l.lap_duration;
+      }
+      const secs = [l.duration_sector_1, l.duration_sector_2, l.duration_sector_3];
+      secs.forEach((s, i) => {
+        if (s != null && (sbSectors[i] == null || s < sbSectors[i]!)) {
+          sbSectors[i] = s;
+        }
+      });
+    }
+
+    return { session, rows, sessionBest: { lap: sbLap, sectors: sbSectors } };
   });
 }
 
@@ -233,7 +248,7 @@ export async function getDriverDetail(
   sessionKey: number,
   driverNumber: number,
 ): Promise<LiveDriverDetail> {
-  return cached(`live:driver:${sessionKey}:${driverNumber}`, 5, async () => {
+  return cached(`live:driver:${sessionKey}:${driverNumber}`, 8, async () => {
     const [rawLaps, rawStints, rawPits] = await Promise.all([
       get<RawLap[]>(
         `/laps?session_key=${sessionKey}&driver_number=${driverNumber}`,
