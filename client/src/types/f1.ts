@@ -377,6 +377,42 @@ export interface LiveDriverDetail {
   pits: LivePit[]
 }
 
+// --- Session replay ---
+export interface ReplayLap {
+  num: number
+  lap: number
+  t: number
+  d: number | null
+  s: (number | null)[]
+  sc: string[]
+  seg: number[][]
+  sp: (number | null)[]
+  gl: string | null
+  iv: string | null
+}
+export interface ReplayDriver {
+  num: number
+  code: string
+  name: string
+  colour: string | null
+}
+export interface ReplayStint {
+  num: number
+  compound: string | null
+  start: number
+  end: number
+  age: number | null
+}
+export interface ReplayData {
+  session: LiveSessionMeta
+  startMs: number
+  endMs: number
+  drivers: ReplayDriver[]
+  laps: ReplayLap[]
+  pos: { num: number; p: number; t: number }[]
+  stints: ReplayStint[]
+}
+
 export interface LiveStatus {
   live: LiveSessionMeta | null
   next: LiveSessionMeta | null

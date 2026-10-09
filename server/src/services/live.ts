@@ -8,6 +8,8 @@ import type {
   LiveSessionMeta,
   LiveStatus,
   LiveStint,
+  ReplayData,
+  ReplayLap,
 } from "../types/f1";
 
 // Live timing from OpenF1 (https://openf1.org). For the prototype this reads a
@@ -82,6 +84,7 @@ interface RawLap {
   i2_speed: number | null;
   st_speed: number | null;
   is_pit_out_lap: boolean;
+  date_start: string | null;
 }
 interface RawStint {
   driver_number: number;
@@ -406,5 +409,168 @@ export async function getDriverDetail(
     }));
 
     return { driverNumber, laps, bestLap, bestSectors, stints, pits };
+  });
+}
+
+// Full session replay: compact per-lap records (sector colours and gaps baked
+// in) plus the position time-series, so the client can play the session back on
+// a virtual clock, revealing sectors one at a time. Cached long — a finished
+// session never changes.
+export async function getReplay(sessionKey: number): Promise<ReplayData> {
+  return cached(`live:replay:${sessionKey}`, 6 * 3600, async () => {
+    const [sessions, drivers, stints] = await Promise.all([
+      get<RawSession[]>(`/sessions?session_key=${sessionKey}`),
+      get<RawDriver[]>(`/drivers?session_key=${sessionKey}`),
+      get<RawStint[]>(`/stints?session_key=${sessionKey}`),
+    ]);
+    const [positions, rawLaps] = await Promise.all([
+      get<RawPosition[]>(`/position?session_key=${sessionKey}`),
+      get<RawLap[]>(`/laps?session_key=${sessionKey}`),
+    ]);
+
+    const session = sessions[0] ? toMeta(sessions[0]) : null;
+    if (!session) throw new Error(`Session ${sessionKey} not found`);
+
+    const laps: ReplayLap[] = [];
+    for (const l of rawLaps) {
+      if (!l.date_start) continue;
+      const t = Date.parse(l.date_start);
+      if (Number.isNaN(t)) continue;
+      laps.push({
+        num: l.driver_number,
+        lap: l.lap_number,
+        t,
+        d: l.lap_duration,
+        s: [l.duration_sector_1, l.duration_sector_2, l.duration_sector_3],
+        sc: ["", "", ""],
+        seg: [
+          l.segments_sector_1 ?? [],
+          l.segments_sector_2 ?? [],
+          l.segments_sector_3 ?? [],
+        ],
+        sp: [l.i1_speed, l.i2_speed, l.st_speed],
+        gl: null,
+        iv: null,
+      });
+    }
+
+    // Bake sector colours in completion-time order: purple = fastest in the
+    // session so far, green = that driver's personal best so far, else yellow.
+    interface SecDone {
+      lap: ReplayLap;
+      i: number;
+      dur: number;
+      done: number;
+    }
+    const done: SecDone[] = [];
+    for (const lap of laps) {
+      let acc = 0;
+      for (let i = 0; i < 3; i++) {
+        const dur = lap.s[i];
+        if (dur == null) continue;
+        acc += dur;
+        done.push({ lap, i, dur, done: lap.t + acc * 1000 });
+      }
+    }
+    done.sort((a, b) => a.done - b.done);
+    const sessBest: (number | null)[] = [null, null, null];
+    const pb = new Map<string, number>();
+    for (const sd of done) {
+      const key = `${sd.lap.num}:${sd.i}`;
+      if (sessBest[sd.i] == null || sd.dur < sessBest[sd.i]!) {
+        sd.lap.sc[sd.i] = "p";
+        sessBest[sd.i] = sd.dur;
+        pb.set(key, sd.dur);
+      } else if (!pb.has(key) || sd.dur < pb.get(key)!) {
+        sd.lap.sc[sd.i] = "g";
+        pb.set(key, sd.dur);
+      } else {
+        sd.lap.sc[sd.i] = "y";
+      }
+    }
+
+    // Gaps from lap-crossing times, per lap number.
+    const byLap = new Map<number, { lap: ReplayLap; end: number }[]>();
+    for (const lap of laps) {
+      if (lap.d == null) continue;
+      const end = lap.t + lap.d * 1000;
+      const arr = byLap.get(lap.lap) ?? [];
+      arr.push({ lap, end });
+      byLap.set(lap.lap, arr);
+    }
+    for (const arr of byLap.values()) {
+      arr.sort((a, b) => a.end - b.end);
+      const leadEnd = arr[0].end;
+      arr.forEach((e, i) => {
+        if (i === 0) return;
+        e.lap.gl = `+${((e.end - leadEnd) / 1000).toFixed(3)}`;
+        e.lap.iv = `+${((e.end - arr[i - 1].end) / 1000).toFixed(3)}`;
+      });
+    }
+
+    const starts = laps.map((l) => l.t);
+    const ends = laps
+      .filter((l) => l.d != null)
+      .map((l) => l.t + (l.d as number) * 1000);
+    const startMs = starts.length ? Math.min(...starts) : 0;
+    const endMs = ends.length ? Math.max(...ends) : 0;
+
+    return {
+      session,
+      startMs,
+      endMs,
+      drivers: drivers.map((d) => ({
+        num: d.driver_number,
+        code: d.name_acronym ?? String(d.driver_number),
+        name: d.full_name ?? d.name_acronym ?? String(d.driver_number),
+        colour: d.team_colour,
+      })),
+      laps,
+      pos: positions
+        .map((p) => ({
+          num: p.driver_number,
+          p: p.position,
+          t: Date.parse(p.date),
+        }))
+        .filter((p) => !Number.isNaN(p.t)),
+      stints: stints.map((s) => ({
+        num: s.driver_number,
+        compound: s.compound,
+        start: s.lap_start,
+        end: s.lap_end,
+        age: s.tyre_age_at_start,
+      })),
+    };
+  });
+}
+
+// Past race sessions available to replay (OpenF1 has data from 2023 on).
+export async function getRaceList(): Promise<
+  { sessionKey: number; year: number; location: string; date: string }[]
+> {
+  return cached("live:races", 3600, async () => {
+    const now = Date.now();
+    const out: {
+      sessionKey: number;
+      year: number;
+      location: string;
+      date: string;
+    }[] = [];
+    for (let year = new Date().getFullYear(); year >= 2023; year--) {
+      const sessions = await get<RawSession[]>(
+        `/sessions?year=${year}&session_name=Race`,
+      ).catch(() => [] as RawSession[]);
+      for (const s of sessions) {
+        if (new Date(s.date_start).getTime() < now) {
+          out.push({
+            sessionKey: s.session_key,
+            year: s.year,
+            location: s.location,
+            date: s.date_start,
+          });
+        }
+      }
+    }
+    return out.sort((a, b) => b.date.localeCompare(a.date));
   });
 }

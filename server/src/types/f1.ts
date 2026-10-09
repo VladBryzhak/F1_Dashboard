@@ -378,6 +378,42 @@ export interface LiveDriverDetail {
   pits: LivePit[];
 }
 
+// --- Session replay (time-based playback of a completed session) ---
+export interface ReplayLap {
+  num: number; // driver number
+  lap: number; // lap number
+  t: number; // lap start, epoch ms
+  d: number | null; // lap duration, seconds
+  s: (number | null)[]; // sector durations [s1, s2, s3]
+  sc: string[]; // sector colours ['p' | 'g' | 'y' | ''], baked server-side
+  seg: number[][]; // mini-sector codes per sector
+  sp: (number | null)[]; // speeds [i1, i2, speed-trap]
+  gl: string | null; // gap to leader at this lap ("+1.234")
+  iv: string | null; // interval to the car ahead at this lap
+}
+export interface ReplayDriver {
+  num: number;
+  code: string;
+  name: string;
+  colour: string | null;
+}
+export interface ReplayStint {
+  num: number;
+  compound: string | null;
+  start: number; // lap_start
+  end: number; // lap_end
+  age: number | null; // tyre age at stint start
+}
+export interface ReplayData {
+  session: LiveSessionMeta;
+  startMs: number;
+  endMs: number;
+  drivers: ReplayDriver[];
+  laps: ReplayLap[];
+  pos: { num: number; p: number; t: number }[]; // position changes over time
+  stints: ReplayStint[];
+}
+
 export interface LiveStatus {
   live: LiveSessionMeta | null; // a session in progress right now
   next: LiveSessionMeta | null; // the next upcoming session (for the countdown)

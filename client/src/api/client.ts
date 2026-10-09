@@ -49,6 +49,7 @@ import type {
   LiveDriverDetail,
   LiveSessionMeta,
   LiveStatus,
+  ReplayData,
   LapTelemetry,
   RaceResultResponse,
   RaceWeekend,
@@ -102,4 +103,10 @@ export const api = {
     getJson<LiveBoard>(`/live/${sessionKey}/board`),
   liveDriver: (sessionKey: number, driverNumber: number) =>
     getJson<LiveDriverDetail>(`/live/${sessionKey}/driver/${driverNumber}`),
+  replayRaces: () =>
+    getJson<
+      { sessionKey: number; year: number; location: string; date: string }[]
+    >('/live/races'),
+  replay: (sessionKey: number) =>
+    getJson<ReplayData>(`/live/${sessionKey}/replay`),
 }

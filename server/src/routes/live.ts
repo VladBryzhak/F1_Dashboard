@@ -4,6 +4,8 @@ import {
   getDriverDetail,
   getLatestSession,
   getLiveStatus,
+  getRaceList,
+  getReplay,
 } from "../services/live";
 
 const router = Router();
@@ -13,6 +15,28 @@ const router = Router();
 router.get("/status", async (_req, res, next) => {
   try {
     res.json(await getLiveStatus());
+  } catch (err) {
+    next(err);
+  }
+});
+
+// GET /api/live/races — past races available to replay.
+router.get("/races", async (_req, res, next) => {
+  try {
+    res.json(await getRaceList());
+  } catch (err) {
+    next(err);
+  }
+});
+
+// GET /api/live/:sessionKey/replay — full replay data for a completed session.
+router.get("/:sessionKey/replay", async (req, res, next) => {
+  try {
+    const key = Number(req.params.sessionKey);
+    if (!Number.isFinite(key)) {
+      return res.status(400).json({ error: "Invalid session key." });
+    }
+    res.json(await getReplay(key));
   } catch (err) {
     next(err);
   }

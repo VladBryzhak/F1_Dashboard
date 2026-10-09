@@ -534,6 +534,144 @@ nav.footer-col ul {
 .ds-stats {
   font-size: 0.78rem;
 }
+
+/* ---- Session replay player ---- */
+.rp-head {
+  margin: 1rem 0;
+}
+.rp-select {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text);
+  font: inherit;
+  font-weight: 600;
+  padding: 0.5rem 0.7rem;
+}
+.rp-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  flex-wrap: wrap;
+  margin-bottom: 1rem;
+  padding: 0.7rem 0.9rem;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+}
+.rp-play {
+  flex: none;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: none;
+  background: var(--accent);
+  color: #fff;
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+.rp-scrub {
+  flex: 1 1 180px;
+  min-width: 120px;
+  accent-color: var(--accent);
+}
+.rp-lap {
+  font-weight: 700;
+  font-size: 0.85rem;
+  white-space: nowrap;
+}
+.rp-speeds {
+  display: flex;
+  gap: 0.3rem;
+}
+.rp-speed {
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--muted);
+  font: inherit;
+  font-size: 0.78rem;
+  font-weight: 700;
+  padding: 0.3rem 0.5rem;
+  cursor: pointer;
+}
+.rp-speed.active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
+
+.rp-board {
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+}
+.rp-row {
+  display: grid;
+  grid-template-columns: 2rem minmax(80px, 1fr) 4.2rem 5rem 5rem 4.6rem 3.4rem;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0 0.9rem;
+  height: 44px;
+  border-top: 1px solid rgba(255, 255, 255, 0.04);
+}
+.rp-row:first-child {
+  border-top: none;
+}
+.rp-head-row {
+  height: 32px;
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--muted-2);
+  border-bottom: 1px solid var(--border);
+}
+.rp-pos {
+  font-weight: 800;
+  color: var(--muted);
+}
+.rp-drv {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.rp-num {
+  text-align: right;
+}
+.rp-tyre {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+/* Sector reveal dots. */
+.rp-sectors {
+  display: flex;
+  gap: 3px;
+}
+.rp-sec {
+  width: 14px;
+  height: 7px;
+  border-radius: 2px;
+  background: #33333c;
+}
+.rp-sec.sec-p {
+  background: #b14be8;
+}
+.rp-sec.sec-g {
+  background: #43b02a;
+}
+.rp-sec.sec-y {
+  background: #e0c04a;
+}
+
+@media (max-width: 680px) {
+  .rp-board {
+    overflow-x: auto;
+  }
+  .rp-row {
+    min-width: 480px;
+  }
+}
 .live-replay {
   margin-left: 0.5rem;
   font-size: 0.7rem;

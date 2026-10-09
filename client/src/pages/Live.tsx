@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { api } from '../api/client'
+import ReplayPlayer from '../components/ReplayPlayer'
 import { useLiveStatus } from '../hooks/useLiveStatus'
 import { useSeo } from '../hooks/useSeo'
 import {
@@ -136,6 +137,7 @@ export default function Live() {
 
   const status = useLiveStatus(30000)
   const now = useNow()
+  const [mode, setMode] = useState<'live' | 'replay'>('live')
   const sessionKey = status?.boardSessionKey ?? null
 
   const [board, setBoard] = useState<LiveBoard | null>(null)
@@ -189,7 +191,26 @@ export default function Live() {
         <h1>Live Timing</h1>
       </div>
 
-      {!status && <p className="muted">Loading…</p>}
+      <div className="tabs">
+        <button
+          className={mode === 'live' ? 'tab active' : 'tab'}
+          onClick={() => setMode('live')}
+        >
+          Live
+        </button>
+        <button
+          className={mode === 'replay' ? 'tab active' : 'tab'}
+          onClick={() => setMode('replay')}
+        >
+          Replay
+        </button>
+      </div>
+
+      {mode === 'replay' && <ReplayPlayer />}
+
+      {mode === 'live' && (
+        <>
+          {!status && <p className="muted">Loading…</p>}
 
       {status?.locked && (
         <p className="banner">
@@ -289,6 +310,8 @@ export default function Live() {
             )
           })}
         </div>
+      )}
+        </>
       )}
     </section>
   )
