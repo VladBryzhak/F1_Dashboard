@@ -71,13 +71,23 @@ function buildBoard(
   ix: Indexed,
   absT: number,
 ): { rows: Row[]; lap: number } {
+  let maxLap = 0
   const rows: Row[] = d.drivers.map((drv) => {
     const laps = ix.lapsByDriver.get(drv.num) ?? []
-    let current: ReplayLap | null = null
+
+    // The lap currently under way, and the one before it.
+    let curIdx = -1
+    for (let i = 0; i < laps.length; i++) {
+      if (laps[i].t <= absT) curIdx = i
+      else break
+    }
+    const current = curIdx >= 0 ? laps[curIdx] : null
+    const prev = curIdx >= 1 ? laps[curIdx - 1] : null
+    if (current) maxLap = Math.max(maxLap, current.lap)
+
     let lastDone: ReplayLap | null = null
     let best: number | null = null
     for (const lap of laps) {
-      if (lap.t <= absT) current = lap
       if (lap.d != null && lap.t + lap.d * 1000 <= absT) {
         lastDone = lap
         if (best == null || lap.d < best) best = lap.d
@@ -90,12 +100,26 @@ function buildBoard(
       else break
     }
 
+    // Keep the just-finished lap on screen through the new lap's sector 1, so
+    // its final sector doesn't vanish the instant the car crosses the line.
+    const s1Done =
+      !!current &&
+      current.s[0] != null &&
+      absT >= current.t + current.s[0] * 1000
+    const holdPrev = !!current && !s1Done && !!prev
+    const show = holdPrev ? prev! : current
+
     const sectors: Sector[] = [0, 1, 2].map((i) => {
-      if (!current) return { shown: false, time: null, color: '' }
-      let acc = 0
-      for (let k = 0; k <= i; k++) acc += current.s[k] ?? 0
-      const shown = current.s[i] != null && absT >= current.t + acc * 1000
-      return { shown, time: current.s[i], color: current.sc[i] ?? '' }
+      if (!show) return { shown: false, time: null, color: '' }
+      let shown: boolean
+      if (holdPrev) {
+        shown = show.s[i] != null
+      } else {
+        let acc = 0
+        for (let k = 0; k <= i; k++) acc += show.s[k] ?? 0
+        shown = show.s[i] != null && absT >= show.t + acc * 1000
+      }
+      return { shown, time: show.s[i], color: show.sc[i] ?? '' }
     })
 
     const lapNum = current?.lap ?? 0
@@ -122,13 +146,12 @@ function buildBoard(
       tyreAge: age,
       sectors,
       inPit,
-      lap: current,
+      lap: show,
     }
   })
 
   rows.sort((a, b) => (a.position ?? 99) - (b.position ?? 99))
-  const lap = rows.reduce((m, r) => Math.max(m, r.lap?.lap ?? 0), 0)
-  return { rows, lap }
+  return { rows, lap: maxLap }
 }
 
 function hhmmss(ms: number): string {
