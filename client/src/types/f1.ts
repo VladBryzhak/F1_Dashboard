@@ -382,4 +382,5 @@ export interface LiveStatus {
   next: LiveSessionMeta | null
   last: LiveSessionMeta | null
   boardSessionKey: number | null
+  locked: boolean
 }

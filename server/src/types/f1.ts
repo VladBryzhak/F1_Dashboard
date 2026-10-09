@@ -383,4 +383,7 @@ export interface LiveStatus {
   next: LiveSessionMeta | null; // the next upcoming session (for the countdown)
   last: LiveSessionMeta | null; // the most recent completed session
   boardSessionKey: number | null; // which session the board should show
+  // OpenF1 paywalls its whole API while a session is live; when that happens we
+  // can't read any data, but we know a session is on.
+  locked: boolean;
 }

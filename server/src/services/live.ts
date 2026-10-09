@@ -165,11 +165,26 @@ function endOf(s: RawSession): number {
 // Is a session happening right now? What's next? What was last? Drives the live
 // dot, the board source, and the countdown. Cached briefly so a session going
 // live (or ending) is picked up within ~30s.
+const LOCKED: LiveStatus = {
+  live: null,
+  next: null,
+  last: null,
+  boardSessionKey: null,
+  locked: true,
+};
+
 export async function getLiveStatus(): Promise<LiveStatus> {
   return cached("live:status", 30, async () => {
     const now = Date.now();
     const year = new Date().getFullYear();
-    let sessions = await get<RawSession[]>(`/sessions?year=${year}`);
+    let sessions: RawSession[];
+    try {
+      sessions = await get<RawSession[]>(`/sessions?year=${year}`);
+    } catch (err) {
+      // OpenF1 returns 401 for the whole API while a session is live (paid only).
+      if (err instanceof Error && err.message.includes("401")) return LOCKED;
+      throw err;
+    }
     // Near a season boundary this year may hold no upcoming session; peek ahead.
     if (!sessions.some((s) => new Date(s.date_start).getTime() > now)) {
       const nextYear = await get<RawSession[]>(
@@ -203,6 +218,7 @@ export async function getLiveStatus(): Promise<LiveStatus> {
       next: next ? toMeta(next) : null,
       last: last ? toMeta(last) : null,
       boardSessionKey: boardSource?.session_key ?? null,
+      locked: false,
     };
   });
 }

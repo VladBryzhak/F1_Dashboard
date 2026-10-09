@@ -145,7 +145,10 @@ export default function Live() {
 
   // Poll the board while a session is selected.
   useEffect(() => {
-    if (sessionKey == null) return
+    if (sessionKey == null) {
+      setBoard(null)
+      return
+    }
     let alive = true
     const load = () =>
       api
@@ -188,7 +191,16 @@ export default function Live() {
 
       {!status && <p className="muted">Loading…</p>}
 
-      {status?.live ? (
+      {status?.locked && (
+        <p className="banner">
+          <span className="live-dot on" /> A Formula 1 session is live right now.
+          Our data source (OpenF1) restricts its API to paid subscribers while a
+          session is in progress, so live timing here is paused — it returns
+          automatically once the session ends.
+        </p>
+      )}
+
+      {status && !status.locked && status.live ? (
         <p className="live-session">
           <span className="live-dot on" /> LIVE · {status.live.sessionName} ·{' '}
           {status.live.location}

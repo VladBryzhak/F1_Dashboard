@@ -15,7 +15,8 @@ const links = [
 
 export default function Layout() {
   const status = useLiveStatus(60000)
-  const isLive = !!status?.live
+  // A session is on whether we can read it (live) or OpenF1 has locked us out.
+  const isLive = !!status?.live || !!status?.locked
 
   return (
     <div className="app">
