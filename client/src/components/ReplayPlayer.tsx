@@ -1,11 +1,20 @@
 import { useEffect, useMemo, useState } from 'react'
 import { api } from '../api/client'
 import { useAsync } from '../hooks/useAsync'
-import { fmtTime, teamColor, tyre } from '../lib/live'
+import { fmtTime, segmentClass, teamColor, tyre } from '../lib/live'
 import type { ReplayData, ReplayLap } from '../types/f1'
 
 const SPEEDS = [5, 15, 30, 60]
 const TICK_MS = 200
+
+const STATUS: Record<string, { label: string; cls: string }> = {
+  green: { label: 'Green flag', cls: 'green' },
+  yellow: { label: 'Yellow flag', cls: 'yellow' },
+  sc: { label: 'Safety Car', cls: 'sc' },
+  vsc: { label: 'Virtual Safety Car', cls: 'vsc' },
+  red: { label: 'Red flag', cls: 'red' },
+  chequered: { label: 'Chequered flag', cls: 'chequered' },
+}
 
 interface Sector {
   shown: boolean
@@ -20,14 +29,13 @@ interface Row {
   last: number | null
   best: number | null
   gl: string | null
-  iv: string | null
   tyreCompound: string | null
   tyreAge: number | null
   sectors: Sector[]
+  inPit: boolean
   lap: ReplayLap | null
 }
 
-// Per-driver indexes, built once per session.
 function indexReplay(d: ReplayData) {
   const lapsByDriver = new Map<number, ReplayLap[]>()
   for (const l of d.laps) {
@@ -47,10 +55,17 @@ function indexReplay(d: ReplayData) {
 
   return { lapsByDriver, posByDriver }
 }
-
 type Indexed = ReturnType<typeof indexReplay>
 
-// Board state at absolute time `absT`.
+function statusAt(flags: { t: number; s: string }[], absT: number): string {
+  let s = 'green'
+  for (const f of flags) {
+    if (f.t <= absT) s = f.s
+    else break
+  }
+  return s
+}
+
 function buildBoard(
   d: ReplayData,
   ix: Indexed,
@@ -79,8 +94,7 @@ function buildBoard(
       if (!current) return { shown: false, time: null, color: '' }
       let acc = 0
       for (let k = 0; k <= i; k++) acc += current.s[k] ?? 0
-      const completion = current.t + acc * 1000
-      const shown = current.s[i] != null && absT >= completion
+      const shown = current.s[i] != null && absT >= current.t + acc * 1000
       return { shown, time: current.s[i], color: current.sc[i] ?? '' }
     })
 
@@ -90,9 +104,11 @@ function buildBoard(
       stints.find((s) => lapNum >= s.start && lapNum <= s.end) ??
       stints[stints.length - 1]
     const age =
-      st && lapNum
-        ? (st.age ?? 0) + (Math.min(lapNum, st.end) - st.start)
-        : null
+      st && lapNum ? (st.age ?? 0) + (Math.min(lapNum, st.end) - st.start) : null
+
+    const inPit = d.pits.some(
+      (p) => p.num === drv.num && absT >= p.from && absT <= p.to,
+    )
 
     return {
       num: drv.num,
@@ -102,10 +118,10 @@ function buildBoard(
       last: lastDone?.d ?? null,
       best,
       gl: lastDone?.gl ?? null,
-      iv: lastDone?.iv ?? null,
       tyreCompound: st?.compound ?? null,
       tyreAge: age,
       sectors,
+      inPit,
       lap: current,
     }
   })
@@ -117,8 +133,70 @@ function buildBoard(
 
 function hhmmss(ms: number): string {
   const s = Math.max(0, Math.floor(ms / 1000))
-  const m = Math.floor(s / 60)
-  return `${m}:${String(s % 60).padStart(2, '0')}`
+  return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`
+}
+
+// Expanded per-lap detail for the clicked driver.
+function RowDetail({ data, row }: { data: ReplayData; row: Row }) {
+  const lap = row.lap
+  const stints = data.stints.filter((s) => s.num === row.num)
+  return (
+    <div className="ld-detail">
+      {lap && (
+        <div className="ld-sectors">
+          {[0, 1, 2].map((i) => (
+            <div className="ld-sector" key={i}>
+              <div className="ld-sector-head">
+                <span>Sector {i + 1}</span>
+                <span
+                  className={`ld-sector-time${
+                    row.sectors[i].shown ? ` sector-${sectorLong(lap.sc[i])}` : ''
+                  }`}
+                >
+                  {row.sectors[i].shown ? fmtTime(lap.s[i]) : '—'}
+                </span>
+              </div>
+              <span className="seg-bar">
+                {(row.sectors[i].shown ? lap.seg[i] : []).map((code, k) => (
+                  <span key={k} className={`seg seg-${segmentClass(code)}`} />
+                ))}
+              </span>
+            </div>
+          ))}
+        </div>
+      )}
+      <div className="ld-cols">
+        <div className="ld-col">
+          <h4>Speeds</h4>
+          <div className="ld-kv">
+            <span>Speed trap</span>
+            <span className="mono">
+              {lap?.sp[2] != null ? `${lap.sp[2]} km/h` : '—'}
+            </span>
+          </div>
+        </div>
+        <div className="ld-col">
+          <h4>Tyres</h4>
+          {stints.map((s) => {
+            const t = tyre(s.compound)
+            return (
+              <div className="ld-kv" key={s.start}>
+                <span>
+                  <span className={`tyre tyre-${t.cls}`}>{t.label}</span> Laps{' '}
+                  {s.start}–{s.end}
+                </span>
+                <span className="muted">{s.compound ?? ''}</span>
+              </div>
+            )
+          })}
+        </div>
+      </div>
+    </div>
+  )
+}
+
+function sectorLong(c: string): string {
+  return c === 'p' ? 'purple' : c === 'g' ? 'green' : c === 'y' ? 'yellow' : ''
 }
 
 export default function ReplayPlayer() {
@@ -136,15 +214,17 @@ export default function ReplayPlayer() {
   )
   const data = replay.data ?? null
 
-  const [t, setT] = useState(0) // ms offset from startMs
+  const [t, setT] = useState(0)
   const [playing, setPlaying] = useState(false)
   const [speed, setSpeed] = useState(15)
+  const [expanded, setExpanded] = useState<number | null>(null)
 
   const span = data ? data.endMs - data.startMs : 0
 
   useEffect(() => {
     setT(0)
     setPlaying(false)
+    setExpanded(null)
   }, [sessionKey])
 
   useEffect(() => {
@@ -167,6 +247,11 @@ export default function ReplayPlayer() {
     () => (data && ix ? buildBoard(data, ix, data.startMs + t) : null),
     [data, ix, t],
   )
+  const status = useMemo(
+    () => (data ? statusAt(data.flags, data.startMs + t) : 'green'),
+    [data, t],
+  )
+  const st = STATUS[status] ?? STATUS.green
 
   return (
     <div className="replay">
@@ -192,6 +277,11 @@ export default function ReplayPlayer() {
 
       {data && board && (
         <>
+          <div className={`rp-status rp-status--${st.cls}`}>
+            <span className="rp-status-dot" />
+            {st.label}
+          </div>
+
           <div className="rp-controls">
             <button
               className="rp-play"
@@ -229,7 +319,7 @@ export default function ReplayPlayer() {
             <div className="rp-row rp-head-row">
               <span>#</span>
               <span>Driver</span>
-              <span className="rp-sectors-h">Sectors</span>
+              <span>Sectors</span>
               <span className="rp-num">Last</span>
               <span className="rp-num">Best</span>
               <span className="rp-num">Gap</span>
@@ -237,34 +327,42 @@ export default function ReplayPlayer() {
             </div>
             {board.rows.map((r) => {
               const ty = tyre(r.tyreCompound)
+              const open = expanded === r.num
               return (
-                <div className="rp-row" key={r.num}>
-                  <span className="rp-pos">{r.position ?? '–'}</span>
-                  <span className="rp-drv">
-                    <span
-                      className="lb-stripe"
-                      style={{ background: teamColor(r.colour) }}
-                    />
-                    <span className="lb-code">{r.code}</span>
-                  </span>
-                  <span className="rp-sectors">
-                    {r.sectors.map((s, i) => (
+                <div key={r.num}>
+                  <button
+                    className={`rp-row rp-row-btn${open ? ' open' : ''}`}
+                    onClick={() => setExpanded(open ? null : r.num)}
+                    aria-expanded={open}
+                  >
+                    <span className="rp-pos">{r.position ?? '–'}</span>
+                    <span className="rp-drv">
                       <span
-                        key={i}
-                        className={`rp-sec${s.shown ? ` sec-${s.color}` : ''}`}
-                        title={s.shown && s.time != null ? fmtTime(s.time) : ''}
+                        className="lb-stripe"
+                        style={{ background: teamColor(r.colour) }}
                       />
-                    ))}
-                  </span>
-                  <span className="rp-num mono">{fmtTime(r.last)}</span>
-                  <span className="rp-num mono">{fmtTime(r.best)}</span>
-                  <span className="rp-num mono">{r.gl ?? '—'}</span>
-                  <span className="rp-tyre">
-                    <span className={`tyre tyre-${ty.cls}`}>{ty.label}</span>
-                    {r.tyreAge != null && (
-                      <span className="tyre-age">{r.tyreAge}</span>
-                    )}
-                  </span>
+                      <span className="lb-code">{r.code}</span>
+                      {r.inPit && <span className="rp-pit">PIT</span>}
+                    </span>
+                    <span className="rp-sectors">
+                      {r.sectors.map((s, i) => (
+                        <span
+                          key={i}
+                          className={`rp-sec${s.shown ? ` sec-${s.color}` : ''}`}
+                        />
+                      ))}
+                    </span>
+                    <span className="rp-num mono">{fmtTime(r.last)}</span>
+                    <span className="rp-num mono">{fmtTime(r.best)}</span>
+                    <span className="rp-num mono">{r.gl ?? '—'}</span>
+                    <span className="rp-tyre">
+                      <span className={`tyre tyre-${ty.cls}`}>{ty.label}</span>
+                      {r.tyreAge != null && (
+                        <span className="tyre-age">{r.tyreAge}</span>
+                      )}
+                    </span>
+                  </button>
+                  {open && <RowDetail data={data} row={r} />}
                 </div>
               )
             })}

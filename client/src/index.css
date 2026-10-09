@@ -664,6 +664,86 @@ nav.footer-col ul {
   background: #e0c04a;
 }
 
+/* Rows are buttons (click to expand lap detail). */
+.rp-row-btn {
+  width: 100%;
+  background: none;
+  border: none;
+  border-top: 1px solid rgba(255, 255, 255, 0.04);
+  color: var(--text);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.rp-row-btn:hover {
+  background: rgba(255, 255, 255, 0.03);
+}
+.rp-row-btn.open {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+/* "PIT" badge next to a driver in the pit lane. */
+.rp-pit {
+  font-size: 0.6rem;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  background: #2a6df4;
+  color: #fff;
+  padding: 0.05rem 0.3rem;
+  border-radius: 3px;
+  margin-left: 0.35rem;
+}
+
+/* Track-status banner. */
+.rp-status {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-size: 0.8rem;
+  padding: 0.55rem 0.9rem;
+  border-radius: 10px;
+  margin-bottom: 0.8rem;
+  border: 1px solid var(--border);
+}
+.rp-status-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: currentColor;
+}
+.rp-status--green {
+  color: #43b02a;
+  background: rgba(67, 176, 42, 0.12);
+  border-color: rgba(67, 176, 42, 0.4);
+}
+.rp-status--yellow {
+  color: #e0c04a;
+  background: rgba(224, 192, 74, 0.12);
+  border-color: rgba(224, 192, 74, 0.4);
+}
+.rp-status--sc {
+  color: #ffb020;
+  background: rgba(255, 176, 32, 0.15);
+  border-color: rgba(255, 176, 32, 0.5);
+}
+.rp-status--vsc {
+  color: #ffb020;
+  background: rgba(255, 176, 32, 0.1);
+  border-color: rgba(255, 176, 32, 0.4);
+}
+.rp-status--red {
+  color: #ff4d4d;
+  background: rgba(225, 6, 0, 0.15);
+  border-color: rgba(225, 6, 0, 0.5);
+}
+.rp-status--chequered {
+  color: var(--muted);
+  background: var(--panel);
+}
+
 @media (max-width: 680px) {
   .rp-board {
     overflow-x: auto;

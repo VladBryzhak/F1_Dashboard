@@ -411,6 +411,8 @@ export interface ReplayData {
   laps: ReplayLap[]
   pos: { num: number; p: number; t: number }[]
   stints: ReplayStint[]
+  flags: { t: number; s: string }[]
+  pits: { num: number; from: number; to: number }[]
 }
 
 export interface LiveStatus {

@@ -98,6 +98,16 @@ interface RawPit {
   driver_number: number;
   lap_number: number | null;
   pit_duration: number | null;
+  lane_duration?: number | null;
+  date?: string | null;
+}
+interface RawRaceControl {
+  date: string;
+  category: string | null;
+  flag: string | null;
+  scope: string | null;
+  sector: number | null;
+  message: string | null;
 }
 
 // Keep only the newest row per driver from a dated time-series.
@@ -427,6 +437,14 @@ export async function getReplay(sessionKey: number): Promise<ReplayData> {
       get<RawPosition[]>(`/position?session_key=${sessionKey}`),
       get<RawLap[]>(`/laps?session_key=${sessionKey}`),
     ]);
+    const [rawRc, rawPit] = await Promise.all([
+      get<RawRaceControl[]>(`/race_control?session_key=${sessionKey}`).catch(
+        () => [] as RawRaceControl[],
+      ),
+      get<RawPit[]>(`/pit?session_key=${sessionKey}`).catch(
+        () => [] as RawPit[],
+      ),
+    ]);
 
     const session = sessions[0] ? toMeta(sessions[0]) : null;
     if (!session) throw new Error(`Session ${sessionKey} not found`);
@@ -515,6 +533,71 @@ export async function getReplay(sessionKey: number): Promise<ReplayData> {
     const startMs = starts.length ? Math.min(...starts) : 0;
     const endMs = ends.length ? Math.max(...ends) : 0;
 
+    // Track-status timeline from race control: green / yellow / sc / vsc / red.
+    const flags: { t: number; s: string }[] = [];
+    {
+      const rc = rawRc
+        .filter((m) => m.date)
+        .sort((a, b) => a.date.localeCompare(b.date));
+      let red = false;
+      let sc = false;
+      let vsc = false;
+      let chequered = false;
+      const yellow = new Set<number>();
+      let last = "";
+      const derive = () =>
+        chequered
+          ? "chequered"
+          : red
+            ? "red"
+            : sc
+              ? "sc"
+              : vsc
+                ? "vsc"
+                : yellow.size
+                  ? "yellow"
+                  : "green";
+      for (const m of rc) {
+        const msg = (m.message ?? "").toUpperCase();
+        const flag = (m.flag ?? "").toUpperCase();
+        if (msg.includes("VIRTUAL SAFETY CAR")) {
+          if (msg.includes("DEPLOY")) vsc = true;
+          else if (msg.includes("ENDING")) vsc = false;
+        } else if (m.category === "SafetyCar") {
+          if (msg.includes("DEPLOY")) sc = true;
+          else if (msg.includes("IN THIS LAP")) sc = false;
+        }
+        if (flag === "RED") red = true;
+        if (flag === "GREEN") {
+          red = false;
+          yellow.clear();
+        }
+        if (flag === "YELLOW" || flag === "DOUBLE YELLOW") {
+          if (m.sector != null) yellow.add(m.sector);
+        }
+        if (flag === "CLEAR") {
+          if (m.sector != null) yellow.delete(m.sector);
+          else yellow.clear();
+        }
+        if (flag === "CHEQUERED") chequered = true;
+        const s = derive();
+        if (s !== last) {
+          flags.push({ t: Date.parse(m.date), s });
+          last = s;
+        }
+      }
+    }
+
+    // In-pit windows: from the stop time for the pit-lane duration.
+    const pits = rawPit
+      .filter((p) => p.date)
+      .map((p) => {
+        const from = Date.parse(p.date as string);
+        const dur = (p.pit_duration ?? p.lane_duration ?? 25) * 1000;
+        return { num: p.driver_number, from, to: from + dur };
+      })
+      .filter((p) => !Number.isNaN(p.from));
+
     return {
       session,
       startMs,
@@ -540,6 +623,8 @@ export async function getReplay(sessionKey: number): Promise<ReplayData> {
         end: s.lap_end,
         age: s.tyre_age_at_start,
       })),
+      flags,
+      pits,
     };
   });
 }

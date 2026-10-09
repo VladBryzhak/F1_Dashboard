@@ -412,6 +412,8 @@ export interface ReplayData {
   laps: ReplayLap[];
   pos: { num: number; p: number; t: number }[]; // position changes over time
   stints: ReplayStint[];
+  flags: { t: number; s: string }[]; // track-status timeline (green/yellow/sc/vsc/red/chequered)
+  pits: { num: number; from: number; to: number }[]; // in-pit windows per driver
 }
 
 export interface LiveStatus {
