@@ -53,19 +53,26 @@ export function Headshot({
   alt?: string
   eager?: boolean
 }) {
-  const candidates = [portraitUrl, fallbackUrl, thirdUrl].filter(
-    (u): u is string => !!u,
-  )
-  const key = candidates.join('|')
+  // portraitUrl/fallbackUrl are transparent driver renders; thirdUrl is a
+  // rectangular photo (Wikimedia) that needs a different, bounded layout.
+  const candidates = [
+    { url: portraitUrl, photo: false },
+    { url: fallbackUrl ?? null, photo: false },
+    { url: thirdUrl ?? null, photo: true },
+  ].filter((c): c is { url: string; photo: boolean } => !!c.url)
+  const key = candidates.map((c) => c.url).join('|')
   const [idx, setIdx] = useState(0)
   useEffect(() => setIdx(0), [key])
-  const src = candidates[idx]
-  if (!src) return null
+  const cur = candidates[idx]
+  if (!cur) return null
   return (
-    <div className="head-wrap" style={{ background: `${color}22` }}>
+    <div
+      className={`head-wrap${cur.photo ? ' is-photo' : ''}`}
+      style={{ background: `${color}22` }}
+    >
       <img
         className="head-img"
-        src={src}
+        src={cur.url}
         alt={alt}
         loading={eager ? 'eager' : 'lazy'}
         onError={() => setIdx((i) => i + 1)}
