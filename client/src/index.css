@@ -1504,17 +1504,19 @@ table.standings {
     max-height: 300px;
     opacity: 0.85;
   }
-  /* On phones/tablets a rectangular photo becomes a faint background so the
-     full-width stat cards stay readable. */
+  /* Keep the full-colour photo on phones/tablets too (like desktop): bound it
+     to the right, name and stats on the left. Stats go single-column so they
+     stay readable in the narrower space. */
   .profile-hero:has(.head-wrap.is-photo) .profile-heading,
   .profile-hero:has(.head-wrap.is-photo) .stat-grid {
-    max-width: 100%;
+    max-width: 52%;
+  }
+  .profile-hero:has(.head-wrap.is-photo) .stat-grid {
+    grid-template-columns: 1fr;
+    gap: 0.6rem;
   }
   .profile-hero .head-wrap.is-photo {
-    width: 64%;
-  }
-  .profile-hero .head-wrap.is-photo .head-img {
-    opacity: 0.18;
+    width: 46%;
   }
   .profile-heading {
     max-width: 100%;
