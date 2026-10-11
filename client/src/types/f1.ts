@@ -95,6 +95,7 @@ export interface CalendarRace {
   winnerName: string | null
   winnerConstructorId: string | null
   winnerConstructorName: string | null
+  isSprint: boolean
 }
 
 export interface CalendarResponse {
@@ -268,6 +269,7 @@ export interface RaceWeekend {
   countryCode: string | null
   qualifying: QualifyingEntry[]
   results: WeekendResult[]
+  sprintResults: WeekendResult[]
   fastestLap: WeekendHighlight | null
   driverOfTheDay: WeekendHighlight | null
 }

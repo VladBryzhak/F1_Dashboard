@@ -74,6 +74,7 @@ export default function Calendar() {
                         <span className="name" style={{ marginLeft: '0.65rem' }}>
                           {r.name}
                         </span>
+                        {r.isSprint && <span className="sprint-badge">Sprint</span>}
                       </span>
                     </td>
                     <td className="muted">{formatDate(r.date)}</td>

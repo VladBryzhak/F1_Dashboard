@@ -629,6 +629,42 @@ nav.footer-col ul {
 .rp-pos {
   font-weight: 800;
   color: var(--muted);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+/* Position-change arrow + fading row highlight. */
+.rp-arrow {
+  font-size: 0.6rem;
+  line-height: 1;
+}
+.rp-arrow-up {
+  color: #52e252;
+}
+.rp-arrow-down {
+  color: #ff5a5a;
+}
+.rp-row-btn.rp-move-up {
+  animation: rpMoveUp 2.5s ease-out;
+}
+.rp-row-btn.rp-move-down {
+  animation: rpMoveDown 2.5s ease-out;
+}
+@keyframes rpMoveUp {
+  0% {
+    background: rgba(82, 226, 82, 0.28);
+  }
+  100% {
+    background: transparent;
+  }
+}
+@keyframes rpMoveDown {
+  0% {
+    background: rgba(255, 90, 90, 0.28);
+  }
+  100% {
+    background: transparent;
+  }
 }
 .rp-drv {
   display: flex;
@@ -2411,6 +2447,21 @@ table.standings {
   font-weight: 900;
   text-transform: uppercase;
   letter-spacing: 0.5px;
+}
+
+/* Sprint marker — on the calendar next to a GP name, and on the sprint table. */
+.sprint-badge {
+  display: inline-block;
+  margin-left: 0.5rem;
+  padding: 0.1rem 0.45rem;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #ff2d55, #ff6b00);
+  color: #fff;
+  font-size: 0.62rem;
+  font-weight: 800;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  vertical-align: middle;
 }
 
 .delta {

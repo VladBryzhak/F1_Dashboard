@@ -98,6 +98,13 @@ interface RawRace {
   grandPrixId: string;
   officialName: string;
   circuitId: string;
+  sprintRaceDate: string | null;
+}
+
+// Sprint results mirror race results, plus grid/gained already computed by f1db.
+interface RawSprintResult extends RawRaceResult {
+  gridPositionNumber: number | null;
+  positionsGained: number | null;
 }
 interface RawGrandPrix {
   id: string;
@@ -204,6 +211,8 @@ interface Dataset {
   winnerByRace: Map<string, RaceWinner>;
   // `${year}:${round}` -> full classification (all finishers/retirements)
   resultsByRace: Map<string, RawRaceResult[]>;
+  // `${year}:${round}` -> sprint-race classification (sprint weekends only)
+  sprintResultsByRace: Map<string, RawSprintResult[]>;
   // career totals for profile pages, keyed by driverId / constructorId
   driverCareer: Map<string, CareerAgg>;
   constructorCareer: Map<string, CareerAgg>;
@@ -357,6 +366,20 @@ async function loadDataset(): Promise<Dataset> {
     if (agg) agg.races = keys.size;
   }
 
+  // Sprint-race classification, keyed by race (sprint weekends only).
+  const sprintResultsByRace = new Map<string, RawSprintResult[]>();
+  for (const r of read<RawSprintResult>(
+    "f1db-races-sprint-race-results.json"
+  )) {
+    const raceKey = `${r.year}:${r.round}`;
+    let arr = sprintResultsByRace.get(raceKey);
+    if (!arr) {
+      arr = [];
+      sprintResultsByRace.set(raceKey, arr);
+    }
+    arr.push(r);
+  }
+
   // Race-weekend detail. We reduce each big table to a compact per-race shape
   // right away (the large parsed arrays are then free to GC) to keep the
   // retained footprint small; pit stops are intentionally not loaded.
@@ -426,6 +449,7 @@ async function loadDataset(): Promise<Dataset> {
     winsByYear,
     winnerByRace,
     resultsByRace,
+    sprintResultsByRace,
     driverCareer,
     constructorCareer,
     racesDriverStandings,
@@ -633,6 +657,7 @@ export async function getCalendar(season: string): Promise<CalendarResponse> {
           : null,
         winnerConstructorId: winner?.constructorId ?? null,
         winnerConstructorName: winnerTeam?.name ?? null,
+        isSprint: r.sprintRaceDate != null,
       };
     });
   return { season, races };
@@ -1011,6 +1036,26 @@ export async function getRaceWeekend(
     };
   });
 
+  // Sprint race (sprint weekends only). f1db already carries grid + gained.
+  const sprintResults: WeekendResult[] = (ds.sprintResultsByRace.get(key) ?? [])
+    .slice()
+    .sort((a, b) => a.positionDisplayOrder - b.positionDisplayOrder)
+    .map((r) => ({
+      positionText: r.positionText,
+      driverId: r.driverId,
+      driverName: nameOf(r.driverId),
+      driverCode: codeOf(r.driverId),
+      nationality: demonym(ds, ds.drivers.get(r.driverId)?.nationalityCountryId),
+      countryCode: alpha2(ds, ds.drivers.get(r.driverId)?.nationalityCountryId),
+      constructorId: r.constructorId,
+      constructorName: teamOf(r.constructorId),
+      timeDisplay: formatResultTime(r),
+      laps: r.laps ?? null,
+      points: r.points ?? 0,
+      gridPosition: r.gridPositionNumber ?? null,
+      positionsGained: r.positionsGained ?? null,
+    }));
+
   const toHighlight = (h: HighlightRow | undefined): WeekendHighlight | null =>
     h
       ? {
@@ -1031,6 +1076,7 @@ export async function getRaceWeekend(
     countryCode: alpha2(ds, gp?.countryId),
     qualifying,
     results,
+    sprintResults,
     fastestLap: toHighlight(ds.fastestLapByRace.get(key)),
     driverOfTheDay: toHighlight(ds.driverOfDayByRace.get(key)),
   };

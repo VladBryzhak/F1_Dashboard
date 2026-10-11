@@ -34,6 +34,9 @@ interface Row {
   sectors: Sector[]
   inPit: boolean
   lap: ReplayLap | null
+  // Direction of the driver's most recent position change, non-null only while
+  // that change is still "fresh" (so the arrow + row highlight fade out).
+  posMove: 'up' | 'down' | null
 }
 
 function indexReplay(d: ReplayData) {
@@ -70,6 +73,7 @@ function buildBoard(
   d: ReplayData,
   ix: Indexed,
   absT: number,
+  moveWindow: number,
 ): { rows: Row[]; lap: number } {
   let maxLap = 0
   const rows: Row[] = d.drivers.map((drv) => {
@@ -95,9 +99,22 @@ function buildBoard(
     }
 
     let position: number | null = null
-    for (const e of ix.posByDriver.get(drv.num) ?? []) {
-      if (e.t <= absT) position = e.p
+    let posMove: 'up' | 'down' | null = null
+    const posSeries = ix.posByDriver.get(drv.num) ?? []
+    let curPosIdx = -1
+    for (let i = 0; i < posSeries.length; i++) {
+      if (posSeries[i].t <= absT) curPosIdx = i
       else break
+    }
+    if (curPosIdx >= 0) {
+      position = posSeries[curPosIdx].p
+      // The latest change is still fresh if it landed within the window; its
+      // direction is relative to the position held just before it.
+      if (curPosIdx >= 1 && absT - posSeries[curPosIdx].t <= moveWindow) {
+        const prevP = posSeries[curPosIdx - 1].p
+        if (position < prevP) posMove = 'up'
+        else if (position > prevP) posMove = 'down'
+      }
     }
 
     // Keep the just-finished lap on screen through the new lap's sector 1, so
@@ -147,6 +164,7 @@ function buildBoard(
       sectors,
       inPit,
       lap: show,
+      posMove,
     }
   })
 
@@ -266,9 +284,13 @@ export default function ReplayPlayer() {
   }, [playing, speed, data, span])
 
   const ix = useMemo(() => (data ? indexReplay(data) : null), [data])
+  // Keep the position-change cue visible for ~2.5s of real time regardless of
+  // playback speed (virtual time advances by 1000·speed ms per real second).
+  const moveWindow = speed * 2500
   const board = useMemo(
-    () => (data && ix ? buildBoard(data, ix, data.startMs + t) : null),
-    [data, ix, t],
+    () =>
+      data && ix ? buildBoard(data, ix, data.startMs + t, moveWindow) : null,
+    [data, ix, t, moveWindow],
   )
   const status = useMemo(
     () => (data ? statusAt(data.flags, data.startMs + t) : 'green'),
@@ -354,11 +376,20 @@ export default function ReplayPlayer() {
               return (
                 <div key={r.num}>
                   <button
-                    className={`rp-row rp-row-btn${open ? ' open' : ''}`}
+                    className={`rp-row rp-row-btn${open ? ' open' : ''}${
+                      r.posMove ? ` rp-move-${r.posMove}` : ''
+                    }`}
                     onClick={() => setExpanded(open ? null : r.num)}
                     aria-expanded={open}
                   >
-                    <span className="rp-pos">{r.position ?? '–'}</span>
+                    <span className="rp-pos">
+                      {r.position ?? '–'}
+                      {r.posMove && (
+                        <span className={`rp-arrow rp-arrow-${r.posMove}`}>
+                          {r.posMove === 'up' ? '▲' : '▼'}
+                        </span>
+                      )}
+                    </span>
                     <span className="rp-drv">
                       <span
                         className="lb-stripe"

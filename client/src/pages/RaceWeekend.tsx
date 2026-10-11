@@ -208,6 +208,59 @@ export default function RaceWeekend() {
             </div>
           )}
 
+          {data.sprintResults.length > 0 && (
+            <div className="card" style={{ marginTop: '1rem' }}>
+              <h3 className="wknd-section">
+                Sprint result
+                <span className="sprint-badge">Sprint</span>
+              </h3>
+              <div className="table-scroll">
+                <table className="standings">
+                  <thead>
+                    <tr>
+                      <th className="pos">Pos</th>
+                      <th>Driver</th>
+                      <th>Team</th>
+                      <th className="num">Grid</th>
+                      <th className="num">+/−</th>
+                      <th>Time / Gap</th>
+                      <th className="num">Pts</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {data.sprintResults.map((r) => (
+                      <tr key={r.driverId}>
+                        <td className="pos">{r.positionText}</td>
+                        <td>
+                          <span className="country">
+                            <Flag code={r.countryCode} nationality={r.nationality} />
+                            <span className="name">{r.driverName}</span>
+                            {r.driverCode && <span className="code">{r.driverCode}</span>}
+                          </span>
+                        </td>
+                        <td>
+                          <span className="team">
+                            <span
+                              className="dot"
+                              style={{ background: teamColor(r.constructorId) }}
+                            />
+                            {r.constructorName}
+                          </span>
+                        </td>
+                        <td className="num muted">{r.gridPosition ?? '—'}</td>
+                        <td className="num">
+                          <Delta n={r.positionsGained} />
+                        </td>
+                        <td className="muted">{r.timeDisplay}</td>
+                        <td className="num points">{r.points || ''}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
+
           {data.qualifying.length > 0 && (
             <div className="card" style={{ marginTop: '1rem' }}>
               <h3 className="wknd-section">Qualifying</h3>
