@@ -10,6 +10,7 @@ import type {
   DriverStanding,
   DriverComparison,
   DriverListItem,
+  ConstructorListItem,
   HeadToHead,
   HomeHighlights,
   NotableRetirement,
@@ -928,6 +929,27 @@ export async function getAllDrivers(): Promise<DriverListItem[]> {
       name: driverName(ds, driverId),
       nationality: demonym(ds, d?.nationalityCountryId),
       countryCode: alpha2(ds, d?.nationalityCountryId),
+      firstSeason: career.firstSeason,
+      lastSeason: career.lastSeason,
+      races: career.races,
+      podiums: career.podiums,
+    });
+  }
+  return list.sort(
+    (a, b) => b.lastSeason - a.lastSeason || a.name.localeCompare(b.name),
+  );
+}
+
+export async function getAllConstructors(): Promise<ConstructorListItem[]> {
+  const ds = await dataset();
+  const list: ConstructorListItem[] = [];
+  for (const [constructorId, career] of ds.constructorCareer) {
+    const c = ds.constructors.get(constructorId);
+    list.push({
+      constructorId,
+      name: c?.name ?? constructorId,
+      nationality: demonym(ds, c?.countryId),
+      countryCode: alpha2(ds, c?.countryId),
       firstSeason: career.firstSeason,
       lastSeason: career.lastSeason,
       races: career.races,

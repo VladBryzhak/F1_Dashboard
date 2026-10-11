@@ -221,6 +221,17 @@ export interface DriverListItem {
   podiums: number;
 }
 
+export interface ConstructorListItem {
+  constructorId: string;
+  name: string;
+  nationality: string;
+  countryCode: string | null;
+  firstSeason: number;
+  lastSeason: number;
+  races: number;
+  podiums: number;
+}
+
 export interface HeadToHead {
   sharedSeasons: number[];
   racesTogether: number;

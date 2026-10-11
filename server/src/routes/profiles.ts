@@ -5,6 +5,7 @@ import {
 } from "../services/driverPhotos";
 import {
   getAllDrivers,
+  getAllConstructors,
   getConstructorProfile,
   getDriverComparison,
   getDriverProfile,
@@ -57,6 +58,16 @@ router.get("/drivers/:driverId", async (req, res, next) => {
       `${profile.givenName} ${profile.familyName}`,
     ).catch(() => null);
     res.json({ ...profile, photoUrl });
+  } catch (err) {
+    next(err);
+  }
+});
+
+// GET /api/constructors — lightweight list of all constructors (for search).
+// Registered before /constructors/:constructorId so "list" semantics win.
+router.get("/constructors", async (_req, res, next) => {
+  try {
+    res.json(await getAllConstructors());
   } catch (err) {
     next(err);
   }

@@ -37,6 +37,7 @@ async function postJson<T>(path: string, body: unknown): Promise<T> {
 
 import type {
   CalendarResponse,
+  ConstructorListItem,
   ConstructorProfile,
   ConstructorStanding,
   DriverComparison,
@@ -83,6 +84,7 @@ export const api = {
     getJson<DriverProfile>(`/drivers/${driverId}`),
   compareDrivers: (a: string, b: string) =>
     getJson<DriverComparison>(`/compare/drivers/${a}/${b}`),
+  constructors: () => getJson<ConstructorListItem[]>('/constructors'),
   constructorProfile: (constructorId: string) =>
     getJson<ConstructorProfile>(`/constructors/${constructorId}`),
   telemetrySessions: (season: string) =>
