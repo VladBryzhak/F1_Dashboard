@@ -66,9 +66,9 @@ export default function Footer() {
               Flag icons by <Ext href="https://flagcdn.com">flagcdn</Ext>
             </li>
             <li>
-              Driver photos via{' '}
+              Driver photos and team logos/photos via{' '}
               <Ext href="https://commons.wikimedia.org">Wikimedia Commons</Ext>{' '}
-              (CC BY-SA / public domain)
+              (CC BY-SA / public domain, by their respective authors)
             </li>
           </ul>
         </div>

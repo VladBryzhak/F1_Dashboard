@@ -63,6 +63,7 @@ interface RawDriver {
 interface RawConstructor {
   id: string;
   name: string;
+  fullName: string;
   countryId: string;
 }
 interface RawCountry {
@@ -959,6 +960,21 @@ export async function getAllConstructors(): Promise<ConstructorListItem[]> {
   return list.sort(
     (a, b) => b.lastSeason - a.lastSeason || a.name.localeCompare(b.name),
   );
+}
+
+// id/name/fullName for every constructor that has raced — fullName ("Scuderia
+// Ferrari") resolves to the right Wikipedia article far more reliably than the
+// short name. Used by the team-image lookup (logos/car photos).
+export async function getConstructorDirectory(): Promise<
+  { id: string; name: string; fullName: string }[]
+> {
+  const ds = await dataset();
+  const out: { id: string; name: string; fullName: string }[] = [];
+  for (const id of ds.constructorCareer.keys()) {
+    const c = ds.constructors.get(id);
+    out.push({ id, name: c?.name ?? id, fullName: c?.fullName || c?.name || id });
+  }
+  return out;
 }
 
 // Head-to-head: two drivers' career profiles plus their race-by-race record in

@@ -57,6 +57,7 @@ import type {
   SeasonProgression,
   SessionDriver,
   StandingsResponse,
+  TeamImage,
   TelemetrySession,
 } from '../types/f1'
 
@@ -85,6 +86,8 @@ export const api = {
   compareDrivers: (a: string, b: string) =>
     getJson<DriverComparison>(`/compare/drivers/${a}/${b}`),
   constructors: () => getJson<ConstructorListItem[]>('/constructors'),
+  teamImages: () =>
+    getJson<Record<string, TeamImage>>('/constructors/images'),
   constructorProfile: (constructorId: string) =>
     getJson<ConstructorProfile>(`/constructors/${constructorId}`),
   telemetrySessions: (season: string) =>

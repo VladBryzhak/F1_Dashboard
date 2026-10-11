@@ -525,6 +525,16 @@ nav.footer-col ul {
   color: #fff;
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.45);
 }
+/* Free logo: shown whole on a light tile (logos are often dark-on-transparent). */
+.ds-photo--logo {
+  object-fit: contain;
+  background: #fff;
+  padding: 5px;
+}
+/* Free photo (usually a car): fill the tile. */
+.ds-photo--car {
+  object-fit: cover;
+}
 .ds-info {
   display: flex;
   flex-direction: column;

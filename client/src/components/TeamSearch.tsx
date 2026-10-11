@@ -11,6 +11,10 @@ const DECADES = [2020, 2010, 2000, 1990, 1980, 1970, 1960, 1950]
 // era filters. The full list is small enough to filter in the browser.
 export default function TeamSearch() {
   const { data, loading, error } = useAsync(() => api.constructors(), [])
+  // Logos/photos load separately so the list renders instantly; they pop in
+  // after. Only teams with a free (PD/CC) image appear here; the rest keep the
+  // colour tile.
+  const images = useAsync(() => api.teamImages(), [])
   const [q, setQ] = useState('')
   const [nat, setNat] = useState('')
   const [decade, setDecade] = useState('')
@@ -87,19 +91,30 @@ export default function TeamSearch() {
             <p className="muted">No teams match those filters.</p>
           ) : (
             <div className="ds-results">
-              {shown.map((c) => (
+              {shown.map((c) => {
+                const img = images.data?.[c.constructorId]
+                return (
                 <Link
                   key={c.constructorId}
                   to={`/teams/${c.constructorId}`}
                   className="ds-card"
                 >
-                  <span
-                    className="ds-photo ds-photo--team"
-                    style={{ background: teamColor(c.constructorId) }}
-                    aria-hidden="true"
-                  >
-                    {c.name.charAt(0)}
-                  </span>
+                  {img ? (
+                    <img
+                      className={`ds-photo ds-photo--${img.type}`}
+                      src={img.url}
+                      alt={`${c.name} ${img.type === 'logo' ? 'logo' : 'car'}`}
+                      loading="lazy"
+                    />
+                  ) : (
+                    <span
+                      className="ds-photo ds-photo--team"
+                      style={{ background: teamColor(c.constructorId) }}
+                      aria-hidden="true"
+                    >
+                      {c.name.charAt(0)}
+                    </span>
+                  )}
                   <span className="ds-info">
                     <span className="ds-name">{c.name}</span>
                     <span className="ds-sub">
@@ -111,7 +126,8 @@ export default function TeamSearch() {
                     </span>
                   </span>
                 </Link>
-              ))}
+                )
+              })}
             </div>
           )}
         </>

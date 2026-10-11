@@ -232,6 +232,13 @@ export interface ConstructorListItem {
   podiums: number;
 }
 
+// A team's image: a free logo (transparent, shown contained) or a Creative
+// Commons photo (typically a car, shown cover-cropped). Keyed by constructorId.
+export interface TeamImage {
+  url: string;
+  type: "logo" | "car";
+}
+
 export interface HeadToHead {
   sharedSeasons: number[];
   racesTogether: number;

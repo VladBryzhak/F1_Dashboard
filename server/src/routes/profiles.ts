@@ -3,6 +3,7 @@ import {
   getDriverPhoto,
   getDriverPhotos,
 } from "../services/driverPhotos";
+import { getTeamImages } from "../services/teamImages";
 import {
   getAllDrivers,
   getAllConstructors,
@@ -68,6 +69,16 @@ router.get("/drivers/:driverId", async (req, res, next) => {
 router.get("/constructors", async (_req, res, next) => {
   try {
     res.json(await getAllConstructors());
+  } catch (err) {
+    next(err);
+  }
+});
+
+// GET /api/constructors/images — map of constructorId -> { url, type } for
+// teams with a free (PD/CC) logo or photo. Registered before /:constructorId.
+router.get("/constructors/images", async (_req, res, next) => {
+  try {
+    res.json(await getTeamImages());
   } catch (err) {
     next(err);
   }

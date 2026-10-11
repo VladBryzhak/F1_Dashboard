@@ -231,6 +231,11 @@ export interface ConstructorListItem {
   podiums: number
 }
 
+export interface TeamImage {
+  url: string
+  type: 'logo' | 'car'
+}
+
 export interface HeadToHead {
   sharedSeasons: number[]
   racesTogether: number
