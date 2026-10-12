@@ -110,7 +110,13 @@ export const api = {
     getJson<LiveDriverDetail>(`/live/${sessionKey}/driver/${driverNumber}`),
   replayRaces: () =>
     getJson<
-      { sessionKey: number; year: number; location: string; date: string }[]
+      {
+        sessionKey: number
+        year: number
+        location: string
+        date: string
+        isSprint: boolean
+      }[]
     >('/live/races'),
   replay: (sessionKey: number) =>
     getJson<ReplayData>(`/live/${sessionKey}/replay`),

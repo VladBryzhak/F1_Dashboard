@@ -310,6 +310,7 @@ export default function ReplayPlayer() {
           {races.data?.map((r) => (
             <option key={r.sessionKey} value={r.sessionKey}>
               {r.year} · {r.location}
+              {r.isSprint ? ' (Sprint)' : ''}
             </option>
           ))}
         </select>

@@ -631,7 +631,13 @@ export async function getReplay(sessionKey: number): Promise<ReplayData> {
 
 // Past race sessions available to replay (OpenF1 has data from 2023 on).
 export async function getRaceList(): Promise<
-  { sessionKey: number; year: number; location: string; date: string }[]
+  {
+    sessionKey: number;
+    year: number;
+    location: string;
+    date: string;
+    isSprint: boolean;
+  }[]
 > {
   return cached("live:races", 3600, async () => {
     const now = Date.now();
@@ -640,19 +646,25 @@ export async function getRaceList(): Promise<
       year: number;
       location: string;
       date: string;
+      isSprint: boolean;
     }[] = [];
     for (let year = new Date().getFullYear(); year >= 2023; year--) {
-      const sessions = await get<RawSession[]>(
-        `/sessions?year=${year}&session_name=Race`,
-      ).catch(() => [] as RawSession[]);
-      for (const s of sessions) {
-        if (new Date(s.date_start).getTime() < now) {
-          out.push({
-            sessionKey: s.session_key,
-            year: s.year,
-            location: s.location,
-            date: s.date_start,
-          });
+      // Both full races and sprint races are replayable (each has laps and
+      // positions); the client labels sprints as "(Sprint)".
+      for (const name of ["Race", "Sprint"] as const) {
+        const sessions = await get<RawSession[]>(
+          `/sessions?year=${year}&session_name=${name}`,
+        ).catch(() => [] as RawSession[]);
+        for (const s of sessions) {
+          if (new Date(s.date_start).getTime() < now) {
+            out.push({
+              sessionKey: s.session_key,
+              year: s.year,
+              location: s.location,
+              date: s.date_start,
+              isSprint: name === "Sprint",
+            });
+          }
         }
       }
     }
