@@ -258,15 +258,24 @@ export default function ReplayPlayer() {
   const [t, setT] = useState(0)
   const [playing, setPlaying] = useState(false)
   const [speed, setSpeed] = useState(15)
-  const [expanded, setExpanded] = useState<number | null>(null)
+  // Driver numbers whose lap detail is expanded — several can be open at once.
+  const [expanded, setExpanded] = useState<Set<number>>(new Set())
 
   const span = data ? data.endMs - data.startMs : 0
 
   useEffect(() => {
     setT(0)
     setPlaying(false)
-    setExpanded(null)
+    setExpanded(new Set())
   }, [sessionKey])
+
+  const toggleRow = (num: number) =>
+    setExpanded((prev) => {
+      const next = new Set(prev)
+      if (next.has(num)) next.delete(num)
+      else next.add(num)
+      return next
+    })
 
   useEffect(() => {
     if (!playing || !data) return
@@ -373,14 +382,14 @@ export default function ReplayPlayer() {
             </div>
             {board.rows.map((r) => {
               const ty = tyre(r.tyreCompound)
-              const open = expanded === r.num
+              const open = expanded.has(r.num)
               return (
                 <div key={r.num}>
                   <button
                     className={`rp-row rp-row-btn${open ? ' open' : ''}${
                       r.posMove ? ` rp-move-${r.posMove}` : ''
                     }`}
-                    onClick={() => setExpanded(open ? null : r.num)}
+                    onClick={() => toggleRow(r.num)}
                     aria-expanded={open}
                   >
                     <span className="rp-pos">
