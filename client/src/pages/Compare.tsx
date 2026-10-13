@@ -1,10 +1,12 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { api } from '../api/client'
 import Flag from '../components/Flag'
 import { useAsync } from '../hooks/useAsync'
 import { useSeo } from '../hooks/useSeo'
 import { teamColor } from '../lib/f1meta'
-import type { DriverProfile } from '../types/f1'
+import type { DriverProfile, SeasonComparison as SeasonCmp } from '../types/f1'
+
+type View = 'career' | 'season'
 
 const DEFAULT_A = 'lewis-hamilton'
 const DEFAULT_B = 'max-verstappen'
@@ -43,7 +45,7 @@ function Row({
   )
 }
 
-function Comparison({ a, b, h2h }: { a: DriverProfile; b: DriverProfile; h2h: { racesTogether: number; aheadA: number; aheadB: number; sharedSeasons: number[] } }) {
+function Comparison({ a, b, h2h, photoA, photoB }: { a: DriverProfile; b: DriverProfile; h2h: { racesTogether: number; aheadA: number; aheadB: number; sharedSeasons: number[] }; photoA?: string; photoB?: string }) {
   const colorA = teamColor(lastConstructor(a))
   const colorB = teamColor(lastConstructor(b))
   const winPct = (p: DriverProfile) => (p.races ? (p.wins / p.races) * 100 : 0)
@@ -59,6 +61,7 @@ function Comparison({ a, b, h2h }: { a: DriverProfile; b: DriverProfile; h2h: { 
       <div className="cmp-heads">
         <div className="cmp-head" style={{ borderColor: colorA }}>
           <span className="stripe" style={{ background: colorA }} />
+          {photoA && <img className="cmp-photo" src={photoA} alt="" loading="lazy" />}
           <h2>{a.givenName} {a.familyName}</h2>
           <div className="cmp-sub">
             <Flag code={a.countryCode} nationality={a.nationality} />
@@ -68,6 +71,7 @@ function Comparison({ a, b, h2h }: { a: DriverProfile; b: DriverProfile; h2h: { 
         <div className="cmp-vs">VS</div>
         <div className="cmp-head" style={{ borderColor: colorB }}>
           <span className="stripe" style={{ background: colorB }} />
+          {photoB && <img className="cmp-photo" src={photoB} alt="" loading="lazy" />}
           <h2>{b.givenName} {b.familyName}</h2>
           <div className="cmp-sub">
             <Flag code={b.countryCode} nationality={b.nationality} />
@@ -117,19 +121,120 @@ function Comparison({ a, b, h2h }: { a: DriverProfile; b: DriverProfile; h2h: { 
   )
 }
 
+// Side-by-side stats for one season, plus that season's head-to-head.
+function SeasonComparison({ data, photoA, photoB }: { data: SeasonCmp; photoA?: string; photoB?: string }) {
+  const { a, b } = data
+  const colorA = teamColor(a.constructorId)
+  const colorB = teamColor(b.constructorId)
+  const totalH2H = data.headToHead.aheadA + data.headToHead.aheadB || 1
+  const num = (n: number) => n.toLocaleString('en-GB', { maximumFractionDigits: 1 })
+  const pos = (n: number | null) => (n == null ? '—' : `P${n}`)
+  const sub = (s: typeof a) =>
+    s.raced ? s.constructorName || '—' : 'Did not race this season'
+
+  return (
+    <>
+      <div className="cmp-heads">
+        <div className="cmp-head" style={{ borderColor: colorA }}>
+          <span className="stripe" style={{ background: colorA }} />
+          {photoA && <img className="cmp-photo" src={photoA} alt="" loading="lazy" />}
+          <h2>{a.givenName} {a.familyName}</h2>
+          <div className="cmp-sub">
+            <Flag code={a.countryCode} nationality={a.nationality} />
+            {sub(a)}
+          </div>
+        </div>
+        <div className="cmp-vs">{data.season}</div>
+        <div className="cmp-head" style={{ borderColor: colorB }}>
+          <span className="stripe" style={{ background: colorB }} />
+          {photoB && <img className="cmp-photo" src={photoB} alt="" loading="lazy" />}
+          <h2>{b.givenName} {b.familyName}</h2>
+          <div className="cmp-sub">
+            <Flag code={b.countryCode} nationality={b.nationality} />
+            {sub(b)}
+          </div>
+        </div>
+      </div>
+
+      <div className="card cmp-table">
+        <Row label="Championship" a={pos(a.championshipPosition)} b={pos(b.championshipPosition)} aWins={(a.championshipPosition ?? Infinity) < (b.championshipPosition ?? Infinity)} bWins={(b.championshipPosition ?? Infinity) < (a.championshipPosition ?? Infinity)} />
+        <Row label="Points" a={a.raced ? num(a.points) : '—'} b={b.raced ? num(b.points) : '—'} aWins={a.points > b.points} bWins={b.points > a.points} />
+        <Row label="Wins" a={a.raced ? num(a.wins) : '—'} b={b.raced ? num(b.wins) : '—'} aWins={a.wins > b.wins} bWins={b.wins > a.wins} />
+        <Row label="Podiums" a={a.raced ? num(a.podiums) : '—'} b={b.raced ? num(b.podiums) : '—'} aWins={a.podiums > b.podiums} bWins={b.podiums > a.podiums} />
+        <Row label="Poles" a={a.raced ? num(a.poles) : '—'} b={b.raced ? num(b.poles) : '—'} aWins={a.poles > b.poles} bWins={b.poles > a.poles} />
+        <Row label="Fastest laps" a={a.raced ? num(a.fastestLaps) : '—'} b={b.raced ? num(b.fastestLaps) : '—'} aWins={a.fastestLaps > b.fastestLaps} bWins={b.fastestLaps > a.fastestLaps} />
+        <Row label="Best finish" a={pos(a.bestFinish)} b={pos(b.bestFinish)} aWins={(a.bestFinish ?? Infinity) < (b.bestFinish ?? Infinity)} bWins={(b.bestFinish ?? Infinity) < (a.bestFinish ?? Infinity)} />
+        <Row label="Races" a={a.raced ? num(a.races) : '—'} b={b.raced ? num(b.races) : '—'} aWins={false} bWins={false} />
+      </div>
+
+      {data.headToHead.racesTogether > 0 ? (
+        <div className="card cmp-h2h">
+          <div className="cmp-h2h-head">
+            <h3>Head-to-head · {data.season}</h3>
+            <span className="muted">{data.headToHead.racesTogether} races together</span>
+          </div>
+          <div className="cmp-h2h-tally">
+            <span className={data.headToHead.aheadA >= data.headToHead.aheadB ? 'win' : ''}>{data.headToHead.aheadA}</span>
+            <span className="muted">finished ahead</span>
+            <span className={data.headToHead.aheadB >= data.headToHead.aheadA ? 'win' : ''}>{data.headToHead.aheadB}</span>
+          </div>
+          <div className="cmp-h2h-bar">
+            <span style={{ width: `${(data.headToHead.aheadA / totalH2H) * 100}%`, background: colorA }} />
+            <span style={{ width: `${(data.headToHead.aheadB / totalH2H) * 100}%`, background: colorB }} />
+          </div>
+        </div>
+      ) : (
+        <p className="muted">These drivers didn't race together in {data.season}.</p>
+      )}
+    </>
+  )
+}
+
 export default function Compare() {
   useSeo({
     title: 'F1 Driver Comparison — Head to Head',
     description:
-      'Compare any two Formula 1 drivers head-to-head: championships, wins, podiums, points and their race-by-race record.',
+      'Compare any two Formula 1 drivers head-to-head: championships, wins, podiums, points and their race-by-race record — overall or in a single season.',
   })
   const drivers = useAsync(() => api.drivers(), [])
+  // Wikimedia driver photos (shared map, cached server-side). Optional — a
+  // driver with no photo simply shows none.
+  const photos = useAsync(() => api.driverPhotos(), [])
   const [idA, setIdA] = useState(DEFAULT_A)
   const [idB, setIdB] = useState(DEFAULT_B)
+  const [view, setView] = useState<View>('career')
+  const [season, setSeason] = useState<number | null>(null)
 
   const cmp = useAsync(
     () => api.compareDrivers(idA, idB),
     [idA, idB],
+  )
+
+  // Seasons offered in the Season tab: those either driver contested, newest
+  // first. Default to the most recent season they shared (else the newest).
+  const seasonOptions = useMemo(() => {
+    const set = new Set<number>()
+    for (const s of cmp.data?.a.seasons ?? []) set.add(s.season)
+    for (const s of cmp.data?.b.seasons ?? []) set.add(s.season)
+    return [...set].sort((x, y) => y - x)
+  }, [cmp.data])
+
+  useEffect(() => {
+    if (!cmp.data) return
+    const aYears = new Set((cmp.data.a.seasons ?? []).map((s) => s.season))
+    const shared = (cmp.data.b.seasons ?? [])
+      .map((s) => s.season)
+      .filter((y) => aYears.has(y))
+      .sort((x, y) => y - x)
+    setSeason(shared[0] ?? seasonOptions[0] ?? null)
+  }, [cmp.data, seasonOptions])
+
+  const seasonCmp = useAsync(
+    () =>
+      view === 'season' && season != null
+        ? api.compareDriversSeason(idA, idB, season)
+        : Promise.resolve(null),
+    [view, idA, idB, season],
   )
 
   // name → id for the datalist inputs
@@ -177,12 +282,65 @@ export default function Compare() {
         </datalist>
       </div>
 
-      {cmp.loading && <p className="muted">Loading…</p>}
-      {!cmp.loading && cmp.error && (
-        <p className="banner">Could not load comparison: {cmp.error}</p>
-      )}
-      {!cmp.loading && cmp.data && (
-        <Comparison a={cmp.data.a} b={cmp.data.b} h2h={cmp.data.headToHead} />
+      <div className="tabs">
+        <button
+          className={view === 'career' ? 'tab active' : 'tab'}
+          onClick={() => setView('career')}
+        >
+          Career
+        </button>
+        <button
+          className={view === 'season' ? 'tab active' : 'tab'}
+          onClick={() => setView('season')}
+        >
+          Season
+        </button>
+        {view === 'season' && seasonOptions.length > 0 && (
+          <select
+            className="cmp-season"
+            value={season ?? ''}
+            onChange={(e) => setSeason(Number(e.target.value))}
+            aria-label="Season"
+          >
+            {seasonOptions.map((y) => (
+              <option key={y} value={y}>
+                {y}
+              </option>
+            ))}
+          </select>
+        )}
+      </div>
+
+      {view === 'career' ? (
+        <>
+          {cmp.loading && <p className="muted">Loading…</p>}
+          {!cmp.loading && cmp.error && (
+            <p className="banner">Could not load comparison: {cmp.error}</p>
+          )}
+          {!cmp.loading && cmp.data && (
+            <Comparison
+              a={cmp.data.a}
+              b={cmp.data.b}
+              h2h={cmp.data.headToHead}
+              photoA={photos.data?.[idA]}
+              photoB={photos.data?.[idB]}
+            />
+          )}
+        </>
+      ) : (
+        <>
+          {seasonCmp.loading && <p className="muted">Loading…</p>}
+          {!seasonCmp.loading && seasonCmp.error && (
+            <p className="banner">Could not load comparison: {seasonCmp.error}</p>
+          )}
+          {!seasonCmp.loading && seasonCmp.data && (
+            <SeasonComparison
+              data={seasonCmp.data}
+              photoA={photos.data?.[idA]}
+              photoB={photos.data?.[idB]}
+            />
+          )}
+        </>
       )}
     </section>
   )

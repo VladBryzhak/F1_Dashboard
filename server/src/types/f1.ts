@@ -252,6 +252,34 @@ export interface DriverComparison {
   headToHead: HeadToHead;
 }
 
+// ----- Single-season driver comparison -----
+
+export interface SeasonDriverStats {
+  driverId: string;
+  givenName: string;
+  familyName: string;
+  nationality: string;
+  countryCode: string | null;
+  constructorId: string; // team that season (most rounds)
+  constructorName: string;
+  raced: boolean; // did the driver contest this season at all
+  championshipPosition: number | null;
+  points: number;
+  wins: number;
+  podiums: number;
+  poles: number;
+  fastestLaps: number;
+  bestFinish: number | null;
+  races: number;
+}
+
+export interface SeasonComparison {
+  season: number;
+  a: SeasonDriverStats;
+  b: SeasonDriverStats;
+  headToHead: { racesTogether: number; aheadA: number; aheadB: number };
+}
+
 // ----- Race weekend detail -----
 
 export interface QualifyingEntry {

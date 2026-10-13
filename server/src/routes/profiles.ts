@@ -9,6 +9,7 @@ import {
   getAllConstructors,
   getConstructorProfile,
   getDriverComparison,
+  getSeasonComparison,
   getDriverProfile,
 } from "../services/f1db";
 
@@ -37,6 +38,24 @@ router.get("/drivers/photos", async (_req, res, next) => {
 router.get("/compare/drivers/:a/:b", async (req, res, next) => {
   try {
     const cmp = await getDriverComparison(req.params.a, req.params.b);
+    if (!cmp) {
+      return res.status(404).json({ error: "One or both drivers not found" });
+    }
+    res.json(cmp);
+  } catch (err) {
+    next(err);
+  }
+});
+
+// GET /api/compare/drivers/:a/:b/season/:season — compare two drivers within
+// one season (season totals + that season's head-to-head).
+router.get("/compare/drivers/:a/:b/season/:season", async (req, res, next) => {
+  try {
+    const season = Number(req.params.season);
+    if (!Number.isInteger(season)) {
+      return res.status(400).json({ error: "Invalid season" });
+    }
+    const cmp = await getSeasonComparison(req.params.a, req.params.b, season);
     if (!cmp) {
       return res.status(404).json({ error: "One or both drivers not found" });
     }

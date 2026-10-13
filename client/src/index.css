@@ -1100,6 +1100,21 @@ select {
   background: var(--accent);
 }
 
+/* Season picker that sits in the Compare tab row. */
+.cmp-season {
+  margin-left: auto;
+  align-self: center;
+  margin-bottom: 0.5rem;
+  background: var(--card);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font: inherit;
+  font-weight: 700;
+  padding: 0.3rem 0.6rem;
+  cursor: pointer;
+}
+
 /* ---------- Results card ---------- */
 .card {
   background: var(--card);
@@ -2314,6 +2329,17 @@ table.standings {
   margin: 0.2rem 0 0.3rem;
   font-size: 1.15rem;
   font-weight: 900;
+}
+/* Driver avatar in the comparison header. */
+.cmp-photo {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  object-fit: cover;
+  object-position: top center;
+  background: var(--card);
+  display: block;
+  margin-bottom: 0.5rem;
 }
 .cmp-sub {
   display: flex;

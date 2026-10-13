@@ -20,6 +20,8 @@ import type {
   RaceResult,
   RaceResultResponse,
   RaceWeekend,
+  SeasonComparison,
+  SeasonDriverStats,
   SeasonProgression,
   StandingsResponse,
   WeekendHighlight,
@@ -1013,6 +1015,99 @@ export async function getDriverComparison(
     aheadB,
   };
   return { a, b, headToHead };
+}
+
+// Two drivers compared within a single season: each driver's season totals
+// (championship position, points, wins, podiums, poles, fastest laps, best
+// finish) plus their head-to-head record across that season's races.
+export async function getSeasonComparison(
+  idA: string,
+  idB: string,
+  season: number,
+): Promise<SeasonComparison | null> {
+  const ds = await dataset();
+  const dA = ds.drivers.get(idA);
+  const dB = ds.drivers.get(idB);
+  if (!dA || !dB) return null;
+
+  const inSeason = (raceKey: string) =>
+    Number(raceKey.split(":")[0]) === season;
+
+  const statsFor = (driverId: string): SeasonDriverStats => {
+    const d = ds.drivers.get(driverId);
+    const standing = ds.driverStandings.find(
+      (s) => s.year === season && s.driverId === driverId,
+    );
+    const constructorId = ds.teamByYearDriver.get(`${season}:${driverId}`) ?? "";
+
+    let wins = 0;
+    let podiums = 0;
+    let races = 0;
+    let bestFinish: number | null = null;
+    for (const [key, rows] of ds.resultsByRace) {
+      if (!inSeason(key)) continue;
+      const r = rows.find((x) => x.driverId === driverId);
+      if (!r) continue;
+      races += 1;
+      if (r.positionNumber === 1) wins += 1;
+      if (r.positionNumber !== null && r.positionNumber <= 3) podiums += 1;
+      if (r.positionNumber !== null) {
+        bestFinish =
+          bestFinish === null ? r.positionNumber : Math.min(bestFinish, r.positionNumber);
+      }
+    }
+
+    let poles = 0;
+    for (const [key, quali] of ds.qualifyingByRace) {
+      if (!inSeason(key)) continue;
+      if (quali.some((q) => q.driverId === driverId && q.position === 1)) poles += 1;
+    }
+
+    let fastestLaps = 0;
+    for (const [key, h] of ds.fastestLapByRace) {
+      if (!inSeason(key)) continue;
+      if (h.driverId === driverId) fastestLaps += 1;
+    }
+
+    return {
+      driverId,
+      givenName: d?.firstName ?? "",
+      familyName: d?.lastName ?? driverId,
+      nationality: demonym(ds, d?.nationalityCountryId),
+      countryCode: alpha2(ds, d?.nationalityCountryId),
+      constructorId,
+      constructorName: ds.constructors.get(constructorId)?.name ?? "",
+      raced: races > 0 || standing != null,
+      championshipPosition: standing?.positionNumber ?? null,
+      points: standing?.points ?? 0,
+      wins,
+      podiums,
+      poles,
+      fastestLaps,
+      bestFinish,
+      races,
+    };
+  };
+
+  let racesTogether = 0;
+  let aheadA = 0;
+  let aheadB = 0;
+  for (const [key, rows] of ds.resultsByRace) {
+    if (!inSeason(key)) continue;
+    const ra = rows.find((r) => r.driverId === idA);
+    const rb = rows.find((r) => r.driverId === idB);
+    if (!ra || !rb) continue;
+    racesTogether += 1;
+    if (ra.positionDisplayOrder < rb.positionDisplayOrder) aheadA += 1;
+    else if (rb.positionDisplayOrder < ra.positionDisplayOrder) aheadB += 1;
+  }
+
+  return {
+    season,
+    a: statsFor(idA),
+    b: statsFor(idB),
+    headToHead: { racesTogether, aheadA, aheadB },
+  };
 }
 
 // Full race-weekend detail: qualifying, race (with grid → finish delta),

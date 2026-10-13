@@ -249,6 +249,32 @@ export interface DriverComparison {
   headToHead: HeadToHead
 }
 
+export interface SeasonDriverStats {
+  driverId: string
+  givenName: string
+  familyName: string
+  nationality: string
+  countryCode: string | null
+  constructorId: string
+  constructorName: string
+  raced: boolean
+  championshipPosition: number | null
+  points: number
+  wins: number
+  podiums: number
+  poles: number
+  fastestLaps: number
+  bestFinish: number | null
+  races: number
+}
+
+export interface SeasonComparison {
+  season: number
+  a: SeasonDriverStats
+  b: SeasonDriverStats
+  headToHead: { racesTogether: number; aheadA: number; aheadB: number }
+}
+
 // ----- Race weekend detail -----
 
 export interface QualifyingEntry {

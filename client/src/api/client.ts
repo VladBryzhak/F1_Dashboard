@@ -54,6 +54,7 @@ import type {
   LapTelemetry,
   RaceResultResponse,
   RaceWeekend,
+  SeasonComparison,
   SeasonProgression,
   SessionDriver,
   StandingsResponse,
@@ -85,6 +86,8 @@ export const api = {
     getJson<DriverProfile>(`/drivers/${driverId}`),
   compareDrivers: (a: string, b: string) =>
     getJson<DriverComparison>(`/compare/drivers/${a}/${b}`),
+  compareDriversSeason: (a: string, b: string, season: number) =>
+    getJson<SeasonComparison>(`/compare/drivers/${a}/${b}/season/${season}`),
   constructors: () => getJson<ConstructorListItem[]>('/constructors'),
   teamImages: () =>
     getJson<Record<string, TeamImage>>('/constructors/images'),
