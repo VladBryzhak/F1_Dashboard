@@ -66,7 +66,7 @@ function WinnerHero({ highlights }: { highlights: HomeHighlights }) {
 
   return (
     <div className="hero hero-winner" style={{ '--team': color } as CSSProperties}>
-      <Headshot portraitUrl={portrait} color={color} />
+      <Headshot portraitUrl={portrait} color={color} eager />
       <div className="hero-content hero-content--winner">
         <p className="hero-kicker">
           {race.season} · Round {race.round} · {race.grandPrixName} GP

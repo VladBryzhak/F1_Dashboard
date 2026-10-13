@@ -75,6 +75,7 @@ export function Headshot({
         src={cur.url}
         alt={alt}
         loading={eager ? 'eager' : 'lazy'}
+        fetchPriority={eager ? 'high' : undefined}
         onError={() => setIdx((i) => i + 1)}
       />
     </div>
