@@ -2127,6 +2127,7 @@ table.standings {
   display: flex;
   flex-direction: column;
   gap: 0.4rem;
+  min-height: 84px;
   background: var(--panel);
   border: 1px solid var(--border);
   border-radius: 12px;
@@ -2134,6 +2135,10 @@ table.standings {
   text-decoration: none;
   color: var(--text);
   transition: border-color 0.15s ease, transform 0.15s ease;
+}
+/* Empty placeholder card shown while headlines load (reserves the space). */
+.news-item--skeleton {
+  opacity: 0.4;
 }
 .news-item:hover {
   border-color: var(--accent);

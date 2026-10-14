@@ -155,6 +155,23 @@ function TitleFightHero() {
   )
 }
 
+// Reserves the news-strip's space while /api/home loads, so the links below
+// don't jump down when the real headlines arrive (keeps CLS low).
+function NewsStripSkeleton() {
+  return (
+    <section className="news-strip" aria-hidden="true">
+      <div className="news-head">
+        <h2>Latest F1 news</h2>
+      </div>
+      <div className="news-list">
+        {Array.from({ length: 6 }).map((_, i) => (
+          <span key={i} className="news-item news-item--skeleton" />
+        ))}
+      </div>
+    </section>
+  )
+}
+
 function NewsStrip({ news }: { news: NewsItem[] }) {
   if (!news.length) return null
   return (
@@ -209,7 +226,7 @@ export default function Home() {
         <TitleFightHero />
       )}
 
-      {data && <NewsStrip news={data.news} />}
+      {loading ? <NewsStripSkeleton /> : data && <NewsStrip news={data.news} />}
 
       <div className="home-links">
         {SECTIONS.map((s) => (

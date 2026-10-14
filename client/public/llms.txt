@@ -1,0 +1,19 @@
+# F1 Dashboard
+
+> An unofficial Formula 1 statistics app: championship standings, race calendar
+> and results, driver & team career profiles, head-to-head comparisons, past-race
+> telemetry and lap-by-lap session replays. Data from f1db (CC-BY 4.0) and OpenF1.
+
+## Pages
+
+- [Standings](https://f1-dashboard-bryzhak.onrender.com/standings): drivers' and constructors' championship tables for any season (1950–present)
+- [Calendar](https://f1-dashboard-bryzhak.onrender.com/calendar): race calendar, winners and full weekend results, including sprints
+- [Drivers](https://f1-dashboard-bryzhak.onrender.com/drivers): driver profiles with full career stats, plus a searchable index since 1950
+- [Teams](https://f1-dashboard-bryzhak.onrender.com/teams): constructor profiles and a searchable index of every team since 1950
+- [Compare](https://f1-dashboard-bryzhak.onrender.com/compare): head-to-head driver comparison, overall or for a single season
+- [Live](https://f1-dashboard-bryzhak.onrender.com/live): live timing and lap-by-lap replays of past races and sprints (2023+)
+- [Telemetry](https://f1-dashboard-bryzhak.onrender.com/telemetry): speed, throttle, brake and DRS traces from past races
+
+## Notes
+
+- F1, FORMULA 1 and related marks are trademarks of Formula One Licensing B.V. This is an unofficial, non-commercial fan project.

@@ -45,10 +45,20 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <!-- Warm the connection to the F1 image CDN that serves the hero (LCP) image. -->
     <link rel="preconnect" href="https://media.formula1.com" crossorigin />
+    <!-- Load the font stylesheet without blocking render: fetch as a preload,
+         then flip it to a stylesheet once ready (display=swap avoids FOIT). -->
     <link
+      rel="preload"
+      as="style"
       href="https://fonts.googleapis.com/css2?family=Titillium+Web:wght@400;600;700;900&display=swap"
-      rel="stylesheet"
+      onload="this.onload=null;this.rel='stylesheet'"
     />
+    <noscript>
+      <link
+        href="https://fonts.googleapis.com/css2?family=Titillium+Web:wght@400;600;700;900&display=swap"
+        rel="stylesheet"
+      />
+    </noscript>
     <title>F1 Dashboard — Formula 1 Standings, Calendar & Stats</title>
   </head>
   <body>
