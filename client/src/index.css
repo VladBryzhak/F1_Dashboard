@@ -1224,6 +1224,7 @@ select {
 /* ---------- Results card ---------- */
 .card {
   background: var(--card);
+  border: 1px solid var(--border);
   border-radius: 14px;
   padding: 1.25rem 1.5rem;
   position: relative;
@@ -1237,10 +1238,10 @@ table.standings {
 
 .standings th {
   text-align: left;
-  font-size: 0.72rem;
+  font-size: 0.68rem;
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.8px;
+  letter-spacing: 1.2px;
   color: var(--muted-2);
   padding: 0.5rem 0.75rem 0.9rem;
   border-bottom: 1px solid var(--border);
@@ -1264,6 +1265,19 @@ table.standings {
 .standings .pos {
   color: var(--muted);
   width: 36px;
+}
+.standings td.pos {
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: var(--text);
+}
+/* Ranking tables (standings, race results): the leader's position in red. */
+.standings--rank tbody tr:first-child td.pos {
+  color: var(--accent);
+}
+.standings tbody tr:hover td {
+  background: rgba(255, 255, 255, 0.025);
 }
 
 /* circular flag badge */
@@ -1349,7 +1363,9 @@ table.standings {
 }
 
 .points {
-  font-weight: 900;
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  font-weight: 800;
 }
 
 /* decorative circular arrow, like the F1 results card */

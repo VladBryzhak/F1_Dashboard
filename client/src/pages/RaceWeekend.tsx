@@ -162,7 +162,7 @@ export default function RaceWeekend() {
             <div className="card">
               <h3 className="wknd-section">Race result</h3>
               <div className="table-scroll">
-                <table className="standings">
+                <table className="standings standings--rank">
                   <thead>
                     <tr>
                       <th className="pos">Pos</th>
@@ -215,7 +215,7 @@ export default function RaceWeekend() {
                 <span className="sprint-badge">Sprint</span>
               </h3>
               <div className="table-scroll">
-                <table className="standings">
+                <table className="standings standings--rank">
                   <thead>
                     <tr>
                       <th className="pos">Pos</th>
@@ -265,7 +265,7 @@ export default function RaceWeekend() {
             <div className="card" style={{ marginTop: '1rem' }}>
               <h3 className="wknd-section">Qualifying</h3>
               <div className="table-scroll">
-                <table className="standings">
+                <table className="standings standings--rank">
                   <thead>
                     <tr>
                       <th className="pos">Pos</th>

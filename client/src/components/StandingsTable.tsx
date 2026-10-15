@@ -52,7 +52,7 @@ export function DriverStandingsTable({
   const leaderPoints = rows[0]?.points ?? 0
   return (
     <div className="card">
-      <table className="standings">
+      <table className="standings standings--rank">
         <thead>
           <tr>
             <th className="pos">Pos</th>
@@ -119,7 +119,7 @@ export function ConstructorStandingsTable({
   const leaderPoints = rows[0]?.points ?? 0
   return (
     <div className="card">
-      <table className="standings">
+      <table className="standings standings--rank">
         <thead>
           <tr>
             <th className="pos">Pos</th>
