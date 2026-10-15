@@ -114,6 +114,8 @@ function ChampionshipCard({
   season?: number
 }) {
   if (!rows.length) return null
+  // Bars are scaled to the leader's points.
+  const top = Math.max(rows[0].points, 1)
   return (
     <div className="champ-card">
       <div className="champ-head">
@@ -121,16 +123,27 @@ function ChampionshipCard({
         <span className="champ-season">{season}</span>
       </div>
       <ol className="champ-list">
-        {rows.map((d) => (
-          <li key={d.driverId}>
-            <span className="champ-pos">{d.position}</span>
-            <span className="dot" style={{ background: teamColor(d.constructorId) }} />
-            <Link to={`/drivers/${d.driverId}`} className="champ-name">
-              {initialName(d.givenName, d.familyName)}
-            </Link>
-            <span className="champ-pts">{d.points}</span>
-          </li>
-        ))}
+        {rows.map((d) => {
+          const color = teamColor(d.constructorId)
+          const pct = Math.max(2, Math.min(100, (d.points / top) * 100))
+          return (
+            <li key={d.driverId}>
+              <span className="champ-pos">{d.position}</span>
+              <div className="champ-main">
+                <div className="champ-line">
+                  <span className="champ-dot" style={{ background: color }} />
+                  <Link to={`/drivers/${d.driverId}`} className="champ-name">
+                    {initialName(d.givenName, d.familyName)}
+                  </Link>
+                </div>
+                <span className="champ-bar" aria-hidden="true">
+                  <span style={{ width: `${pct}%`, background: color }} />
+                </span>
+              </div>
+              <span className="champ-pts">{d.points}</span>
+            </li>
+          )
+        })}
       </ol>
     </div>
   )

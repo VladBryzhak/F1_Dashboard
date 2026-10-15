@@ -2471,6 +2471,38 @@ table.standings {
 .champ-list li:first-child .champ-pos {
   color: var(--accent);
 }
+/* Name line + team-colour progress bar (scaled to the leader's points). */
+.champ-main {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+.champ-line {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: 0;
+}
+.champ-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 2px;
+  flex: none;
+}
+.champ-bar {
+  display: block;
+  height: 3px;
+  border-radius: 2px;
+  background: rgba(255, 255, 255, 0.08);
+  overflow: hidden;
+}
+.champ-bar > span {
+  display: block;
+  height: 100%;
+  border-radius: 2px;
+}
 .champ-name {
   flex: 1;
   min-width: 0;
