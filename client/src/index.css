@@ -2070,11 +2070,17 @@ table.standings {
   max-width: 62%;
 }
 .hero-content--winner .hero-title {
-  font-size: 2.9rem;
+  font-size: 3rem;
+  font-style: normal;
+  text-transform: uppercase;
+  letter-spacing: -0.5px;
 }
 .hero-content--winner .hero-kicker {
-  color: #fff;
-  opacity: 0.85;
+  color: var(--muted);
+  opacity: 1;
+  font-weight: 600;
+  font-size: 0.78rem;
+  letter-spacing: 1.6px;
 }
 
 .podium-row {
@@ -2123,13 +2129,19 @@ table.standings {
 }
 
 .hero-next {
-  margin: 0.9rem 0 0;
+  display: inline-block;
+  margin: 1rem 0 0;
+  padding: 0.4rem 0.85rem;
   font-weight: 700;
-  font-size: 0.82rem;
+  font-size: 0.78rem;
   text-transform: uppercase;
-  letter-spacing: 0.6px;
-  color: var(--muted);
-  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.8);
+  letter-spacing: 0.8px;
+  color: var(--text);
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
 }
 
 /* ---------- News strip ---------- */
@@ -2219,7 +2231,9 @@ table.standings {
 }
 
 .hl-label {
+  font-family: var(--font-display);
   font-weight: 800;
+  font-size: 1.1rem;
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
