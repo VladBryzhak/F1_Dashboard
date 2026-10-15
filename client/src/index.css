@@ -1158,14 +1158,23 @@ h1 {
 
 /* ---------- Season selector (pill) ---------- */
 select {
-  background: transparent;
+  background: var(--card);
   color: var(--text);
-  border: 1px solid var(--border);
+  border: 1px solid rgba(255, 255, 255, 0.14);
   border-radius: 999px;
   padding: 0.45rem 1rem;
   font-family: inherit;
   font-weight: 600;
   cursor: pointer;
+}
+select:hover,
+select:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+select option {
+  background: var(--card);
+  color: var(--text);
 }
 
 /* ---------- Tabs ---------- */
@@ -1811,11 +1820,11 @@ table.standings {
 }
 
 .controls .lbl {
-  font-size: 0.72rem;
-  font-weight: 700;
+  font-size: 0.7rem;
+  font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: 0.6px;
-  color: var(--muted-2);
+  letter-spacing: 1.2px;
+  color: var(--muted);
 }
 
 .controls select {
@@ -1824,26 +1833,28 @@ table.standings {
 }
 
 .chart-card {
-  background: var(--panel);
+  background: var(--card);
   border: 1px solid var(--border);
-  border-radius: 12px;
+  border-radius: 14px;
   padding: 1.1rem 1.25rem 1.4rem;
   margin-bottom: 1.25rem;
 }
 
 .chart-title {
-  font-size: 1rem;
+  font-family: var(--font-display);
+  font-size: 1.1rem;
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: 1.2px;
   margin: 0 0 1rem;
 }
 
 .chart-subtitle {
-  font-size: 0.85rem;
+  font-family: var(--font-display);
+  font-size: 0.9rem;
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: 1.2px;
   color: var(--muted);
   margin: 1.25rem 0 0.5rem;
 }
