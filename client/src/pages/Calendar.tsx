@@ -28,6 +28,9 @@ export default function Calendar() {
   })
   const { data, loading, error } = useAsync(() => api.calendar(season), [season])
 
+  // The first race without a result is the next one to run.
+  const nextRound = data?.races.find((r) => !r.winnerName)?.round
+
   if (badSeason) return <Navigate to="/calendar" replace />
 
   return (
@@ -57,10 +60,11 @@ export default function Calendar() {
             <tbody>
               {data.races.map((r) => {
                 const done = !!r.winnerName
+                const isNext = r.round === nextRound
                 return (
                   <tr
                     key={r.round}
-                    className={done ? 'row-clickable' : undefined}
+                    className={done ? 'row-clickable' : isNext ? 'row-next' : undefined}
                     onClick={
                       done
                         ? () => navigate(`/calendar/${season}/${r.round}`)
@@ -81,6 +85,8 @@ export default function Calendar() {
                     <td>
                       {r.winnerName ? (
                         <span className="name">{r.winnerName}</span>
+                      ) : isNext ? (
+                        <span className="next-tag">Next</span>
                       ) : (
                         <span className="muted">Upcoming</span>
                       )}

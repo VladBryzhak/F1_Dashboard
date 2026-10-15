@@ -2808,15 +2808,32 @@ table.standings {
 .sprint-badge {
   display: inline-block;
   margin-left: 0.5rem;
-  padding: 0.1rem 0.45rem;
+  padding: 0.08rem 0.45rem;
   border-radius: 999px;
-  background: linear-gradient(90deg, #ff2d55, #ff6b00);
-  color: #fff;
+  background: rgba(225, 6, 0, 0.1);
+  border: 1px solid rgba(225, 6, 0, 0.45);
+  color: #ff6a66;
   font-size: 0.62rem;
   font-weight: 800;
   letter-spacing: 0.6px;
   text-transform: uppercase;
   vertical-align: middle;
+}
+
+/* Calendar: the next race to run gets a red edge and a NEXT tag. */
+.row-next td:first-child {
+  box-shadow: inset 3px 0 0 var(--accent);
+}
+.next-tag {
+  display: inline-block;
+  padding: 0.08rem 0.5rem;
+  border-radius: 999px;
+  background: var(--accent);
+  color: #fff;
+  font-size: 0.66rem;
+  font-weight: 800;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
 }
 
 .delta {
