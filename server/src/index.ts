@@ -1,3 +1,4 @@
+import compression from "compression";
 import cors from "cors";
 import express, { NextFunction, Request, Response } from "express";
 import fs from "fs";
@@ -19,6 +20,9 @@ const PORT = process.env.PORT ?? 3001;
 // step (it must allow our external sources: Google Fonts, formula1.com images,
 // flagcdn, OpenF1). CORP is cross-origin because the API is consumed by other
 // origins (the mobile app on capacitor://localhost).
+// gzip/deflate text responses (HTML, JS, CSS, JSON) so they aren't sent
+// uncompressed over the wire — cuts transfer size and document latency.
+app.use(compression());
 app.use(
   helmet({
     contentSecurityPolicy: false,
@@ -49,6 +53,16 @@ app.use("/api", profilesRouter);
 const clientDist = path.resolve(__dirname, "../../client/dist");
 if (fs.existsSync(clientDist)) {
   app.use(express.static(clientDist));
+  // Agent-discovery manifest. express.static serves /ai-catalog.json from the
+  // build, but ignores dotfolders, so serve the well-known path explicitly
+  // (both return the same file) instead of letting it fall to the SPA shell.
+  app.get(
+    ["/.well-known/ai-catalog.json", "/ai-catalog.json"],
+    (_req, res) => {
+      res.type("application/json");
+      res.sendFile(path.join(clientDist, "ai-catalog.json"));
+    }
+  );
   // SPA fallback: any non-API route returns index.html so client-side routing
   // (react-router) works on deep links / refreshes.
   app.get("*", (req, res, next) => {
