@@ -1,15 +1,19 @@
 :root {
-  /* F1.com-inspired palette */
-  --bg: #15151e;
-  --panel: #1f1f27;
-  --card: #0c0c11;
-  --border: #38383f;
-  --text: #ffffff;
-  --muted: #b3b3bd;
-  --muted-2: #6f6f78;
+  /* "Pit Wall" palette — near-black ground, lifted surfaces, F1 red accent */
+  --bg: #0e0e13;
+  --panel: #16161f;
+  --card: #15151d;
+  --border: rgba(255, 255, 255, 0.08);
+  --text: #f4f4f6;
+  --muted: #9a9aa7;
+  --muted-2: #6f6f7a;
   --accent: #e10600; /* F1 red */
 
-  font-family: 'Titillium Web', system-ui, Arial, sans-serif;
+  /* Condensed technical display face for headings; Saira for body/UI. */
+  --font-body: 'Saira', system-ui, Arial, sans-serif;
+  --font-display: 'Saira Condensed', 'Saira', system-ui, sans-serif;
+
+  font-family: var(--font-body);
   color-scheme: dark;
 }
 
@@ -22,6 +26,26 @@ body {
   background: var(--bg);
   color: var(--text);
   font-weight: 400;
+}
+
+/* Pit Wall: big headings use the condensed display face; body stays Saira. */
+.brand,
+.footer-logo,
+h1,
+h2,
+.hero-title,
+.ename,
+.cmp-head h2 {
+  font-family: var(--font-display);
+}
+
+/* Timing-style numerals line up across stat tables and standings. */
+.standings,
+.cmp-val,
+.big-num,
+.pts,
+.efoot {
+  font-variant-numeric: tabular-nums;
 }
 
 /* ---------- Top bar ---------- */
