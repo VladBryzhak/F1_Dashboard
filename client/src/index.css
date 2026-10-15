@@ -623,6 +623,7 @@ nav.footer-col ul {
   font-weight: 700;
   font-size: 0.85rem;
   white-space: nowrap;
+  font-variant-numeric: tabular-nums;
 }
 .rp-speeds {
   display: flex;
@@ -671,11 +672,14 @@ nav.footer-col ul {
   border-bottom: 1px solid var(--border);
 }
 .rp-pos {
+  font-family: var(--font-display);
   font-weight: 800;
-  color: var(--muted);
+  font-size: 1.05rem;
+  color: var(--text);
   display: inline-flex;
   align-items: center;
   gap: 0.25rem;
+  font-variant-numeric: tabular-nums;
 }
 /* Position-change arrow + fading row highlight. */
 .rp-arrow {
@@ -717,31 +721,35 @@ nav.footer-col ul {
 }
 .rp-num {
   text-align: right;
+  font-variant-numeric: tabular-nums;
 }
 .rp-tyre {
   display: flex;
   align-items: center;
   gap: 0.25rem;
 }
-/* Sector reveal dots. */
+/* Sector segments — three bars that fill the column and reveal sector-by-sector
+   (HUD style), coloured by timing: purple = session best, green, yellow. */
 .rp-sectors {
   display: flex;
-  gap: 3px;
+  gap: 4px;
+  width: 100%;
 }
 .rp-sec {
-  width: 14px;
-  height: 7px;
+  flex: 1;
+  min-width: 0;
+  height: 5px;
   border-radius: 2px;
-  background: #33333c;
+  background: #2a2a33;
 }
 .rp-sec.sec-p {
   background: #b14be8;
 }
 .rp-sec.sec-g {
-  background: #43b02a;
+  background: #38d66b;
 }
 .rp-sec.sec-y {
-  background: #e0c04a;
+  background: #ffd12e;
 }
 
 /* Rows are buttons (click to expand lap detail). */
@@ -767,11 +775,16 @@ nav.footer-col ul {
   font-size: 0.6rem;
   font-weight: 800;
   letter-spacing: 0.5px;
-  background: #2a6df4;
-  color: #fff;
+  background: #ffd12e;
+  color: #0e0e13;
   padding: 0.05rem 0.3rem;
   border-radius: 3px;
   margin-left: 0.35rem;
+}
+
+/* Leader row — subtle red edge accent (the first data row on the board). */
+.rp-board > div:nth-child(2) > .rp-row-btn {
+  box-shadow: inset 3px 0 0 var(--accent);
 }
 
 /* Track-status banner. */
