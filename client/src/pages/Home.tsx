@@ -140,14 +140,14 @@ function NextRaceCard({ race }: { race: NextRace }) {
   const d = new Date(race.date)
   const valid = !Number.isNaN(d.getTime())
   return (
-    <Link to="/calendar" className="next-card">
-      <span className="next-date">
+    <Link to="/calendar" className="home-next">
+      <span className="home-next-date">
         <b>{valid ? d.toLocaleDateString('en-GB', { day: '2-digit' }) : '—'}</b>
         <em>{valid ? d.toLocaleDateString('en-GB', { month: 'short' }).toUpperCase() : ''}</em>
       </span>
-      <span className="next-info">
-        <span className="next-label">Next race</span>
-        <span className="next-gp">{race.grandPrixName} GP</span>
+      <span className="home-next-info">
+        <span className="home-next-label">Next race</span>
+        <span className="home-next-gp">{race.grandPrixName} GP</span>
       </span>
     </Link>
   )

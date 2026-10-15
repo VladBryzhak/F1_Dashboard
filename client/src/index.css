@@ -2419,7 +2419,7 @@ table.standings {
   font-size: 1.05rem;
 }
 
-.next-card {
+.home-next {
   display: flex;
   align-items: center;
   gap: 0.9rem;
@@ -2430,10 +2430,10 @@ table.standings {
   color: var(--text);
   text-decoration: none;
 }
-.next-card:hover {
+.home-next:hover {
   border-color: var(--accent);
 }
-.next-date {
+.home-next-date {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -2445,19 +2445,19 @@ table.standings {
   border-radius: 10px;
   font-variant-numeric: tabular-nums;
 }
-.next-date b {
+.home-next-date b {
   font-family: var(--font-display);
   font-weight: 800;
   font-size: 1.15rem;
   line-height: 1;
 }
-.next-date em {
+.home-next-date em {
   font-style: normal;
   font-size: 0.6rem;
   letter-spacing: 1px;
   color: var(--muted);
 }
-.next-label {
+.home-next-label {
   display: block;
   font-size: 0.65rem;
   letter-spacing: 1.4px;
@@ -2465,7 +2465,7 @@ table.standings {
   color: var(--muted);
   font-weight: 600;
 }
-.next-gp {
+.home-next-gp {
   font-family: var(--font-display);
   font-weight: 700;
   font-size: 1.1rem;

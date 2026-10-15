@@ -261,6 +261,8 @@ export default function Live() {
       )}
 
       {board && (
+        <div className="rp-layout">
+        <div className="rp-main">
         <div className="live-board">
           <div className="lb-head">
             <span className="lb-pos">#</span>
@@ -309,6 +311,25 @@ export default function Live() {
               </div>
             )
           })}
+        </div>
+        </div>
+        <aside className="rp-side">
+          <div className="rp-side-card">
+            <h4 className="rp-side-title">Session</h4>
+            <div className="rp-kv"><span>Session</span><span>{board.session.sessionName}</span></div>
+            <div className="rp-kv"><span>Circuit</span><span>{board.session.location}</span></div>
+            <div className="rp-kv">
+              <span>Status</span>
+              <span className={`rp-side-status rp-side-status--${status?.live ? 'red' : 'chequered'}`}>
+                {status?.live ? 'Live' : 'Finished'}
+              </span>
+            </div>
+            <div className="rp-kv"><span>Fastest lap</span><span className="mono">{fmtTime(board.sessionBest.lap)}</span></div>
+            {board.sessionBest.sectors.map((s, i) => (
+              <div className="rp-kv" key={i}><span>Best S{i + 1}</span><span className="mono">{fmtTime(s)}</span></div>
+            ))}
+          </div>
+        </aside>
         </div>
       )}
         </>
