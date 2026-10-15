@@ -1540,14 +1540,13 @@ table.standings {
   display: flex;
   flex-direction: column;
   margin-bottom: 1.5rem;
+  border: 1px solid var(--border);
+  /* Same treatment as the home winner hero: dark ground with a team-colour
+     glow behind the driver / car on the right. */
   background:
-    linear-gradient(
-      115deg,
-      #1f1f27 0%,
-      #1f1f27 40%,
-      rgba(31, 31, 39, 0.6) 100%
-    ),
-    linear-gradient(115deg, transparent 42%, var(--team, #2a2a33) 155%);
+    radial-gradient(46% 78% at 80% 58%, var(--team, #2a2a33) -35%, rgba(13, 13, 21, 0) 72%),
+    linear-gradient(100deg, #0d0d15 34%, rgba(13, 13, 21, 0.15) 100%),
+    #0d0d15;
 }
 
 /* Driver portrait: full-height, anchored bottom-right, behind the content. */
@@ -1635,6 +1634,9 @@ table.standings {
 
 .profile-name {
   margin-bottom: 0.5rem;
+  font-size: 3rem;
+  line-height: 0.95;
+  text-transform: uppercase;
   text-shadow: 0 2px 14px rgba(0, 0, 0, 0.65);
 }
 
@@ -1649,6 +1651,8 @@ table.standings {
 
 .profile-num {
   margin-left: 0.4rem;
+  font-family: var(--font-display);
+  font-size: 1.15rem;
   color: var(--muted);
   font-weight: 800;
 }
@@ -1668,9 +1672,9 @@ table.standings {
 }
 
 .stat-card {
-  background: var(--panel);
+  background: var(--card);
   border: 1px solid var(--border);
-  border-radius: 12px;
+  border-radius: 14px;
   padding: 1rem 1.1rem;
 }
 
@@ -1683,17 +1687,20 @@ table.standings {
 }
 
 .stat-num {
-  font-size: 1.45rem;
-  font-weight: 900;
+  font-family: var(--font-display);
+  font-size: 1.75rem;
+  font-weight: 800;
+  line-height: 1.05;
   white-space: nowrap;
+  font-variant-numeric: tabular-nums;
 }
 
 .stat-lbl {
-  color: var(--muted-2);
-  font-size: 0.72rem;
-  font-weight: 700;
+  color: var(--muted);
+  font-size: 0.7rem;
+  font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: 0.6px;
+  letter-spacing: 1.2px;
   margin-top: 0.2rem;
 }
 
@@ -2759,10 +2766,17 @@ table.standings {
 }
 .wknd-title h1 {
   margin: 0;
+  font-size: 2.4rem;
+  line-height: 1;
+  text-transform: uppercase;
 }
 .wknd-title p {
-  margin: 0.25rem 0 0;
+  margin: 0.4rem 0 0;
   font-weight: 600;
+  font-size: 0.78rem;
+  letter-spacing: 1.4px;
+  text-transform: uppercase;
+  color: var(--muted);
 }
 
 .wknd-highlights {
@@ -2774,34 +2788,48 @@ table.standings {
 .wknd-hl {
   position: relative;
   overflow: hidden;
-  background: var(--panel);
+  background: var(--card);
   border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 0.9rem 1.1rem;
+  border-radius: 14px;
+  padding: 0.95rem 1.1rem 0.95rem 1.25rem;
+}
+/* team-colour edge on each highlight card */
+.wknd-hl .stripe {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 4px;
 }
 .wknd-hl-label {
-  color: var(--muted-2);
-  font-size: 0.7rem;
+  font-family: var(--font-display);
+  color: var(--muted);
+  font-size: 0.8rem;
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.6px;
+  letter-spacing: 1.2px;
 }
 .wknd-hl-name {
-  font-weight: 900;
-  font-size: 1.1rem;
-  margin: 0.25rem 0 0.15rem;
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 1.3rem;
+  text-transform: uppercase;
+  margin: 0.3rem 0 0.15rem;
 }
 .wknd-hl-detail {
   font-size: 0.82rem;
   font-weight: 600;
+  font-variant-numeric: tabular-nums;
 }
 
 .wknd-section {
   margin: 0 0 0.75rem;
-  font-size: 0.95rem;
-  font-weight: 900;
+  font-family: var(--font-display);
+  font-size: 1rem;
+  font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: 1.2px;
+  color: var(--muted);
 }
 
 /* Sprint marker — on the calendar next to a GP name, and on the sprint table. */
