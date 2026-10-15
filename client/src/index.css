@@ -651,6 +651,75 @@ nav.footer-col ul {
   border-radius: 12px;
   overflow: hidden;
 }
+
+/* Replay 2-column: board (left) + session side panel (right); stacks narrow. */
+.rp-layout {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 1rem;
+}
+.rp-main {
+  flex: 999 1 520px;
+  min-width: 0;
+}
+.rp-side {
+  flex: 1 1 240px;
+  min-width: 0;
+}
+.rp-side-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 1rem 1.1rem;
+}
+.rp-side-title {
+  margin: 0 0 0.6rem;
+  font-family: var(--font-display);
+  font-weight: 700;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  font-size: 0.9rem;
+  color: var(--muted);
+}
+.rp-kv {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.45rem 0;
+  font-size: 0.85rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+.rp-kv:first-of-type {
+  border-top: none;
+}
+.rp-kv > span:first-child {
+  color: var(--muted);
+}
+.rp-kv > span:last-child {
+  font-weight: 600;
+}
+.rp-side-status {
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-size: 0.78rem;
+}
+.rp-side-status--green {
+  color: #38d66b;
+}
+.rp-side-status--yellow,
+.rp-side-status--sc,
+.rp-side-status--vsc {
+  color: #ffd12e;
+}
+.rp-side-status--red {
+  color: #ff5a5a;
+}
+.rp-side-status--chequered {
+  color: var(--text);
+}
 .rp-row {
   display: grid;
   grid-template-columns: 2rem minmax(80px, 1fr) 4.2rem 5rem 5rem 4.6rem 3.4rem;

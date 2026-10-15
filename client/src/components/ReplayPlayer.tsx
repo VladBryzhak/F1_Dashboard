@@ -306,6 +306,14 @@ export default function ReplayPlayer() {
     [data, t],
   )
   const st = STATUS[status] ?? STATUS.green
+  // Session-fastest lap so far, for the side panel.
+  const fastest = useMemo(() => {
+    let m: number | null = null
+    for (const r of board?.rows ?? []) {
+      if (r.best != null && (m == null || r.best < m)) m = r.best
+    }
+    return m
+  }, [board])
 
   return (
     <div className="replay">
@@ -370,6 +378,8 @@ export default function ReplayPlayer() {
             </span>
           </div>
 
+          <div className="rp-layout">
+          <div className="rp-main">
           <div className="rp-board">
             <div className="rp-row rp-head-row">
               <span>#</span>
@@ -430,6 +440,17 @@ export default function ReplayPlayer() {
                 </div>
               )
             })}
+          </div>
+          </div>
+          <aside className="rp-side">
+            <div className="rp-side-card">
+              <h4 className="rp-side-title">Session</h4>
+              <div className="rp-kv"><span>Circuit</span><span>{data.session.location}</span></div>
+              <div className="rp-kv"><span>Lap</span><span className="mono">{board.lap}</span></div>
+              <div className="rp-kv"><span>Fastest lap</span><span className="mono">{fmtTime(fastest)}</span></div>
+              <div className="rp-kv"><span>Status</span><span className={`rp-side-status rp-side-status--${st.cls}`}>{st.label}</span></div>
+            </div>
+          </aside>
           </div>
         </>
       )}
