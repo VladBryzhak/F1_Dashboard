@@ -59,7 +59,7 @@ function Comparison({ a, b, h2h, photoA, photoB }: { a: DriverProfile; b: Driver
   return (
     <>
       <div className="cmp-heads">
-        <div className="cmp-head" style={{ borderColor: colorA }}>
+        <div className="cmp-head" style={{ borderTopColor: colorA }}>
           <span className="stripe" style={{ background: colorA }} />
           {photoA && <img className="cmp-photo" src={photoA} alt="" loading="lazy" />}
           <h2>{a.givenName} {a.familyName}</h2>
@@ -69,7 +69,7 @@ function Comparison({ a, b, h2h, photoA, photoB }: { a: DriverProfile; b: Driver
           </div>
         </div>
         <div className="cmp-vs">VS</div>
-        <div className="cmp-head" style={{ borderColor: colorB }}>
+        <div className="cmp-head" style={{ borderTopColor: colorB }}>
           <span className="stripe" style={{ background: colorB }} />
           {photoB && <img className="cmp-photo" src={photoB} alt="" loading="lazy" />}
           <h2>{b.givenName} {b.familyName}</h2>
@@ -135,7 +135,7 @@ function SeasonComparison({ data, photoA, photoB }: { data: SeasonCmp; photoA?: 
   return (
     <>
       <div className="cmp-heads">
-        <div className="cmp-head" style={{ borderColor: colorA }}>
+        <div className="cmp-head" style={{ borderTopColor: colorA }}>
           <span className="stripe" style={{ background: colorA }} />
           {photoA && <img className="cmp-photo" src={photoA} alt="" loading="lazy" />}
           <h2>{a.givenName} {a.familyName}</h2>
@@ -145,7 +145,7 @@ function SeasonComparison({ data, photoA, photoB }: { data: SeasonCmp; photoA?: 
           </div>
         </div>
         <div className="cmp-vs">{data.season}</div>
-        <div className="cmp-head" style={{ borderColor: colorB }}>
+        <div className="cmp-head" style={{ borderTopColor: colorB }}>
           <span className="stripe" style={{ background: colorB }} />
           {photoB && <img className="cmp-photo" src={photoB} alt="" loading="lazy" />}
           <h2>{b.givenName} {b.familyName}</h2>

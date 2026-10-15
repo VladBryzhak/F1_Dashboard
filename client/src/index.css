@@ -2611,7 +2611,7 @@ table.standings {
 }
 .cmp-input {
   min-width: 0; /* let the input shrink into its grid cell (native size=20) */
-  background: var(--panel);
+  background: var(--card);
   color: var(--text);
   border: 1px solid var(--border);
   border-radius: 10px;
@@ -2635,16 +2635,18 @@ table.standings {
 .cmp-head {
   position: relative;
   overflow: hidden;
-  background: var(--panel);
+  background: var(--card);
   border: 1px solid var(--border);
   border-top: 3px solid var(--border);
-  border-radius: 12px;
+  border-radius: 14px;
   padding: 0.9rem 1.1rem;
 }
 .cmp-head h2 {
   margin: 0.2rem 0 0.3rem;
-  font-size: 1.15rem;
-  font-weight: 900;
+  font-size: 1.45rem;
+  font-weight: 800;
+  line-height: 1;
+  text-transform: uppercase;
 }
 /* Driver avatar in the comparison header. */
 .cmp-photo {
@@ -2666,8 +2668,9 @@ table.standings {
   font-size: 0.85rem;
 }
 .cmp-vs {
-  font-weight: 900;
-  font-style: italic;
+  font-family: var(--font-display);
+  font-size: 1.2rem;
+  font-weight: 800;
   color: var(--muted-2);
 }
 
@@ -2688,8 +2691,9 @@ table.standings {
   border-bottom: none;
 }
 .cmp-val {
+  font-family: var(--font-display);
   font-weight: 800;
-  font-size: 1.15rem;
+  font-size: 1.35rem;
   font-variant-numeric: tabular-nums;
   color: var(--muted);
 }
@@ -2700,11 +2704,11 @@ table.standings {
   color: var(--text);
 }
 .cmp-label {
-  color: var(--muted-2);
-  font-size: 0.72rem;
-  font-weight: 700;
+  color: var(--muted);
+  font-size: 0.7rem;
+  font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: 0.6px;
+  letter-spacing: 1.2px;
   text-align: center;
   min-width: 96px;
 }
@@ -2721,10 +2725,12 @@ table.standings {
 }
 .cmp-h2h-head h3 {
   margin: 0;
+  font-family: var(--font-display);
   font-size: 1rem;
-  font-weight: 900;
+  font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: 1.2px;
+  color: var(--muted);
 }
 .cmp-h2h-tally {
   display: flex;
@@ -2735,8 +2741,9 @@ table.standings {
 }
 .cmp-h2h-tally > span:first-child,
 .cmp-h2h-tally > span:last-child {
-  font-size: 1.6rem;
-  font-weight: 900;
+  font-family: var(--font-display);
+  font-size: 1.9rem;
+  font-weight: 800;
   color: var(--muted);
   font-variant-numeric: tabular-nums;
 }
