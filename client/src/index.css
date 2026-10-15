@@ -1753,15 +1753,17 @@ table.standings {
     max-width: 100%;
   }
 
-  /* Winner hero: photo shrinks and fades behind full-width content. */
-  .hero-content--winner {
+  /* Winner hero: photo shrinks and fades behind full-width content. The
+     selectors are one class heavier than the base hero rules, which come later
+     in this file and would otherwise win. */
+  .hero .hero-content--winner {
     max-width: 100%;
     padding: 0 1.1rem;
   }
-  .hero-content--winner .hero-title {
-    font-size: 2rem;
+  .hero .hero-content--winner .hero-title {
+    font-size: 2.5rem;
   }
-  .hero-winner .head-img {
+  .hero.hero-winner .head-img {
     max-height: 300px;
     opacity: 0.35;
   }
