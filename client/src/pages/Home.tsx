@@ -6,7 +6,13 @@ import { useSeo } from '../hooks/useSeo'
 import { siteLd } from '../lib/jsonld'
 import { api } from '../api/client'
 import { driverPortraitUrl, teamColor } from '../lib/f1meta'
-import type { HomeHighlights, NewsItem, RaceHighlight } from '../types/f1'
+import type {
+  DriverStanding,
+  HomeHighlights,
+  NewsItem,
+  NextRace,
+  RaceHighlight,
+} from '../types/f1'
 
 const F1 = 'https://media.formula1.com/image/upload/c_lfill,w_600/q_auto/v1740000001/common/f1'
 
@@ -23,24 +29,13 @@ function fallbackTo(url: string) {
   }
 }
 
-const SECTIONS = [
-  { to: '/standings', label: 'Standings', desc: 'Drivers & constructors' },
-  { to: '/calendar', label: 'Calendar', desc: 'Races & results' },
-  { to: '/drivers', label: 'Drivers', desc: 'Grid profiles' },
-  { to: '/teams', label: 'Teams', desc: 'Constructor line-up' },
-  { to: '/compare', label: 'Compare', desc: 'Driver head-to-head' },
-  { to: '/telemetry', label: 'Telemetry', desc: 'Speed & lap traces' },
-]
-
 function lastName(full: string): string {
   const parts = full.trim().split(' ')
   return parts.length > 1 ? parts.slice(1).join(' ') : full
 }
 
-function formatDate(iso: string): string {
-  const d = new Date(iso)
-  if (Number.isNaN(d.getTime())) return iso
-  return d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short' })
+function initialName(given: string, family: string): string {
+  return given ? `${given[0]}. ${family}` : family
 }
 
 function timeAgo(iso: string): string {
@@ -96,14 +91,65 @@ function WinnerHero({ highlights }: { highlights: HomeHighlights }) {
           </p>
         )}
 
-        {highlights.nextRace && (
-          <p className="hero-next">
-            Next up · {highlights.nextRace.grandPrixName} GP ·{' '}
-            {formatDate(highlights.nextRace.date)}
-          </p>
-        )}
+        <Link
+          to={`/calendar/${race.season}/${race.round}`}
+          className="hero-cta"
+        >
+          View weekend
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+        </Link>
       </div>
     </div>
+  )
+}
+
+// Championship top 5 — sits beside the hero on desktop, under it on mobile.
+function ChampionshipCard({
+  rows,
+  season,
+}: {
+  rows: DriverStanding[]
+  season?: number
+}) {
+  if (!rows.length) return null
+  return (
+    <div className="champ-card">
+      <div className="champ-head">
+        <span>Championship</span>
+        <span className="champ-season">{season}</span>
+      </div>
+      <ol className="champ-list">
+        {rows.map((d) => (
+          <li key={d.driverId}>
+            <span className="champ-pos">{d.position}</span>
+            <span className="dot" style={{ background: teamColor(d.constructorId) }} />
+            <Link to={`/drivers/${d.driverId}`} className="champ-name">
+              {initialName(d.givenName, d.familyName)}
+            </Link>
+            <span className="champ-pts">{d.points}</span>
+          </li>
+        ))}
+      </ol>
+    </div>
+  )
+}
+
+function NextRaceCard({ race }: { race: NextRace }) {
+  const d = new Date(race.date)
+  const valid = !Number.isNaN(d.getTime())
+  return (
+    <Link to="/calendar" className="next-card">
+      <span className="next-date">
+        <b>{valid ? d.toLocaleDateString('en-GB', { day: '2-digit' }) : '—'}</b>
+        <em>{valid ? d.toLocaleDateString('en-GB', { month: 'short' }).toUpperCase() : ''}</em>
+      </span>
+      <span className="next-info">
+        <span className="next-label">Next race</span>
+        <span className="next-gp">{race.grandPrixName} GP</span>
+      </span>
+    </Link>
   )
 }
 
@@ -214,28 +260,35 @@ function HeroSkeleton() {
 export default function Home() {
   useSeo({ jsonLd: siteLd() })
   const { data, loading } = useAsync(() => api.home(), [])
+  const season = data?.highlights.season
+  // Top-5 championship for the hero sidebar; loads once the season is known.
+  const standings = useAsync(
+    () => (season ? api.driverStandings(String(season)) : Promise.resolve(null)),
+    [season],
+  )
   const hasRace = !!data?.highlights.latestRace
+  const top5 = standings.data?.standings.slice(0, 5) ?? []
 
   return (
     <section>
-      {loading ? (
-        <HeroSkeleton />
-      ) : hasRace ? (
-        <WinnerHero highlights={data!.highlights} />
-      ) : (
-        <TitleFightHero />
-      )}
+      <div className="home-top">
+        {loading ? (
+          <HeroSkeleton />
+        ) : hasRace ? (
+          <WinnerHero highlights={data!.highlights} />
+        ) : (
+          <TitleFightHero />
+        )}
+
+        <aside className="home-aside">
+          <ChampionshipCard rows={top5} season={season} />
+          {data?.highlights.nextRace && (
+            <NextRaceCard race={data.highlights.nextRace} />
+          )}
+        </aside>
+      </div>
 
       {loading ? <NewsStripSkeleton /> : data && <NewsStrip news={data.news} />}
-
-      <div className="home-links">
-        {SECTIONS.map((s) => (
-          <Link key={s.to} to={s.to} className="home-link">
-            <span className="hl-label">{s.label}</span>
-            <span className="hl-desc">{s.desc}</span>
-          </Link>
-        ))}
-      </div>
     </section>
   )
 }
