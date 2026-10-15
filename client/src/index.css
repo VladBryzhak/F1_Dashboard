@@ -122,6 +122,37 @@ h2,
   background: var(--accent);
 }
 
+/* Burger button — only shown on phones (see the 768px media query). */
+.nav-toggle {
+  display: none;
+  position: relative;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  margin-left: auto;
+  background: transparent;
+  color: var(--text);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 10px;
+  cursor: pointer;
+}
+.nav-toggle:hover,
+.nav-toggle:focus-visible {
+  outline: none;
+  border-color: var(--accent);
+}
+.nav-toggle-dot {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 0 2px #000;
+}
+
 /* ---------- Layout ---------- */
 .content {
   max-width: 1080px;
@@ -1782,32 +1813,60 @@ table.standings {
     opacity: 0.35;
   }
 
-  /* Header: brand on its own row, nav a full-width scrollable tab bar below,
-     so the links never push the page wider than the screen. */
+  /* Header: logo + burger. The nav is a dropdown panel under the header,
+     opened by the burger (Layout.tsx), so there is no sideways-scrolling bar. */
   .topbar {
-    flex-wrap: wrap;
+    position: relative;
     height: auto;
+    justify-content: space-between;
     /* Add the iOS status-bar / notch inset to the top padding in standalone. */
     padding: calc(0.55rem + env(safe-area-inset-top)) max(1rem, env(safe-area-inset-right))
       0.55rem max(1rem, env(safe-area-inset-left));
-    gap: 0.5rem 1rem;
+    gap: 1rem;
+  }
+  .nav-toggle {
+    display: inline-flex;
   }
   .nav {
-    width: 100%;
-    height: auto;
-    gap: 0.9rem;
-    justify-content: space-between;
-    overflow-x: auto;
-    scrollbar-width: none;
-  }
-  .nav::-webkit-scrollbar {
     display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    z-index: 40;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.15rem;
+    height: auto;
+    padding: 0.5rem max(0.75rem, env(safe-area-inset-right)) 0.9rem
+      max(0.75rem, env(safe-area-inset-left));
+    background: #000;
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    box-shadow: 0 18px 40px rgba(0, 0, 0, 0.6);
+  }
+  .topbar.menu-open .nav {
+    display: flex;
   }
   .nav-link {
     height: auto;
-    padding: 0.3rem 0;
-    font-size: 0.88rem;
-    white-space: nowrap;
+    min-height: 48px;
+    padding: 0 0.9rem;
+    font-size: 1.05rem;
+    border-radius: 10px;
+  }
+  .nav-link.active {
+    background: rgba(255, 255, 255, 0.06);
+  }
+  /* Active marker becomes a red bar on the left of the row. */
+  .nav-link.active::after {
+    top: 10px;
+    bottom: 10px;
+    left: 0;
+    right: auto;
+    width: 3px;
+    height: auto;
+    border-radius: 2px;
   }
 
   /* Tighter gutters and smaller headings on small screens. */
@@ -2957,6 +3016,52 @@ table.standings {
 /* Phones (not tablets): stack the photo hero vertically — name + nationality,
    then the full-colour photo, then the stats. Only the arrangement changes. */
 @media (max-width: 600px) {
+  /* Phone profile hero: name, then the full picture, then the stat tiles —
+     nothing sits on top of the driver / car. (Wikimedia photos get their own
+     rules below.) */
+  .profile-hero {
+    min-height: 0;
+    background:
+      radial-gradient(70% 42% at 50% 50%, var(--team, #2a2a33) -35%, rgba(13, 13, 21, 0) 72%),
+      linear-gradient(100deg, #0d0d15 34%, rgba(13, 13, 21, 0.15) 100%),
+      #0d0d15;
+  }
+  .profile-hero .profile-heading {
+    order: 1;
+    max-width: 100%;
+  }
+  .profile-hero .head-wrap:not(.is-photo) {
+    position: static;
+    order: 2;
+    width: 100%;
+    height: 340px;
+    margin: 0.75rem 0 0;
+    justify-content: center;
+  }
+  .profile-hero .head-wrap:not(.is-photo) .head-img {
+    height: 100%;
+    max-height: none;
+    opacity: 1;
+  }
+  .profile-hero--team .car-wrap {
+    position: static;
+    order: 2;
+    width: 100%;
+    max-width: 100%;
+    margin: 1rem 0 0;
+  }
+  .profile-hero--team .car-img {
+    max-height: 220px;
+  }
+  .profile-hero .stat-grid {
+    order: 3;
+    max-width: 100%;
+    margin-top: 1.1rem;
+    padding-top: 0;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.6rem;
+  }
+
   .profile-hero:has(.head-wrap.is-photo) {
     min-height: 0;
   }
