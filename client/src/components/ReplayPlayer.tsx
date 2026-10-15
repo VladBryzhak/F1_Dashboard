@@ -207,6 +207,18 @@ function RowDetail({ data, row }: { data: ReplayData; row: Row }) {
         </div>
       )}
       <div className="ld-cols">
+        {/* Phone-only: the board drops its Last/Best columns there. */}
+        <div className="ld-col ld-col--phone">
+          <h4>Lap</h4>
+          <div className="ld-kv">
+            <span>Last</span>
+            <span className="mono">{fmtTime(row.last)}</span>
+          </div>
+          <div className="ld-kv">
+            <span>Best</span>
+            <span className="mono">{fmtTime(row.best)}</span>
+          </div>
+        </div>
         <div className="ld-col">
           <h4>Speeds</h4>
           <div className="ld-kv">
@@ -385,9 +397,9 @@ export default function ReplayPlayer() {
               <span>#</span>
               <span>Driver</span>
               <span>Sectors</span>
-              <span className="rp-num">Last</span>
-              <span className="rp-num">Best</span>
-              <span className="rp-num">Gap</span>
+              <span className="rp-num rp-last">Last</span>
+              <span className="rp-num rp-best">Best</span>
+              <span className="rp-num rp-gap">Gap</span>
               <span>Tyre</span>
             </div>
             {board.rows.map((r) => {
@@ -426,9 +438,9 @@ export default function ReplayPlayer() {
                         />
                       ))}
                     </span>
-                    <span className="rp-num mono">{fmtTime(r.last)}</span>
-                    <span className="rp-num mono">{fmtTime(r.best)}</span>
-                    <span className="rp-num mono">{r.gl ?? '—'}</span>
+                    <span className="rp-num rp-last mono">{fmtTime(r.last)}</span>
+                    <span className="rp-num rp-best mono">{fmtTime(r.best)}</span>
+                    <span className="rp-num rp-gap mono">{r.gl ?? '—'}</span>
                     <span className="rp-tyre">
                       <span className={`tyre tyre-${ty.cls}`}>{ty.label}</span>
                       {r.tyreAge != null && (

@@ -919,12 +919,26 @@ nav.footer-col ul {
   background: var(--panel);
 }
 
+/* Last/Best inside the expanded replay detail: phone only (the board shows
+   them as columns on wider screens). */
+.ld-col--phone {
+  display: none;
+}
+
+/* Phone replay board, as in the mockup: P · driver · sectors · gap · tyre,
+   fitting the screen with no sideways scroll. */
 @media (max-width: 680px) {
-  .rp-board {
-    overflow-x: auto;
-  }
   .rp-row {
-    min-width: 480px;
+    grid-template-columns: 1.8rem minmax(52px, 1fr) 4.4rem 4.3rem 2.9rem;
+    gap: 0.4rem;
+    padding: 0 0.6rem;
+  }
+  .rp-last,
+  .rp-best {
+    display: none;
+  }
+  .ld-col--phone {
+    display: block;
   }
 }
 .live-replay {
