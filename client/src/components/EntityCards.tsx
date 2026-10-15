@@ -75,7 +75,10 @@ export function Headshot({
         src={cur.url}
         alt={alt}
         loading={eager ? 'eager' : 'lazy'}
-        fetchPriority={eager ? 'high' : undefined}
+        // Set fetchpriority via the DOM so React 18.3 doesn't warn on the prop.
+        ref={(el) => {
+          if (el && eager) el.setAttribute('fetchpriority', 'high')
+        }}
         onError={() => setIdx((i) => i + 1)}
       />
     </div>
