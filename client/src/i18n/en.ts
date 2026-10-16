@@ -389,6 +389,15 @@ const en = {
   'flag.chequered': 'Chequered flag',
   'plural.lapsN_one': '{n} lap',
   'plural.lapsN_other': '{n} laps',
+
+  // Replay sessions
+  'rp.weekend': 'Race weekend',
+  'rp.fp1': 'FP1',
+  'rp.fp2': 'FP2',
+  'rp.fp3': 'FP3',
+  'rp.sq': 'SQ',
+  'rp.q': 'Quali',
+  'rp.timedNote': 'Practice and qualifying: drivers are ordered by their best lap so far, and the gap is to the fastest lap.',
 }
 
 export type Dict = Record<keyof typeof en, string>

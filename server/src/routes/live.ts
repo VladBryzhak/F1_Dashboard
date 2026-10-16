@@ -4,7 +4,7 @@ import {
   getDriverDetail,
   getLatestSession,
   getLiveStatus,
-  getRaceList,
+  getReplaySessions,
   getReplay,
 } from "../services/live";
 
@@ -20,10 +20,11 @@ router.get("/status", async (_req, res, next) => {
   }
 });
 
-// GET /api/live/races — past races available to replay.
-router.get("/races", async (_req, res, next) => {
+// GET /api/live/replays — past sessions (practice, qualifying, sprint, race)
+// available to replay, newest first.
+router.get("/replays", async (_req, res, next) => {
   try {
-    res.json(await getRaceList());
+    res.json(await getReplaySessions());
   } catch (err) {
     next(err);
   }

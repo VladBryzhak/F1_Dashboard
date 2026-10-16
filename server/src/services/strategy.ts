@@ -1,7 +1,7 @@
 import { cached } from "../cache/cache";
 import type { RaceStrategy, StrategyDriver } from "../types/f1";
 import { getRaceDates } from "./f1db";
-import { getRaceList, getReplay } from "./live";
+import { getReplay, getReplaySessions } from "./live";
 
 const DAY = 86_400_000;
 
@@ -20,8 +20,9 @@ export async function getRaceStrategy(
     // Match the f1db round to an OpenF1 session by date. f1db stores the
     // local race day, OpenF1 a UTC start, so allow a day either side.
     const target = Date.parse(`${day}T12:00:00Z`);
-    const candidates = (await getRaceList()).filter(
-      (r) => r.year === Number(season) && r.isSprint === (kind === "sprint")
+    const wanted = kind === "sprint" ? "Sprint" : "Race";
+    const candidates = (await getReplaySessions()).filter(
+      (r) => r.year === Number(season) && r.sessionName === wanted
     );
     let best: (typeof candidates)[number] | null = null;
     for (const c of candidates) {

@@ -10,6 +10,7 @@ import type {
   LiveStint,
   ReplayData,
   ReplayLap,
+  ReplaySession,
   WeatherSample,
 } from "../types/f1";
 
@@ -46,6 +47,7 @@ async function get<T>(path: string, attempt = 0): Promise<T> {
 
 interface RawSession {
   session_key: number;
+  meeting_key?: number;
   session_name: string;
   location: string;
   country_name: string;
@@ -671,43 +673,40 @@ export async function getReplay(sessionKey: number): Promise<ReplayData> {
   });
 }
 
-// Past race sessions available to replay (OpenF1 has data from 2023 on).
-export async function getRaceList(): Promise<
-  {
-    sessionKey: number;
-    year: number;
-    location: string;
-    date: string;
-    isSprint: boolean;
-  }[]
-> {
-  return cached("live:races", 3600, async () => {
+// Sessions we can replay, in weekend order. Testing days are left out.
+const REPLAYABLE = new Set([
+  "Practice 1",
+  "Practice 2",
+  "Practice 3",
+  "Sprint Qualifying",
+  "Sprint Shootout",
+  "Sprint",
+  "Qualifying",
+  "Race",
+]);
+
+// Past sessions available to replay (OpenF1 has data from 2023 on): every
+// practice, qualifying, sprint and race. One request per season.
+export async function getReplaySessions(): Promise<ReplaySession[]> {
+  return cached("live:replay-sessions", 3600, async () => {
     const now = Date.now();
-    const out: {
-      sessionKey: number;
-      year: number;
-      location: string;
-      date: string;
-      isSprint: boolean;
-    }[] = [];
+    const out: ReplaySession[] = [];
     for (let year = new Date().getFullYear(); year >= 2023; year--) {
-      // Both full races and sprint races are replayable (each has laps and
-      // positions); the client labels sprints as "(Sprint)".
-      for (const name of ["Race", "Sprint"] as const) {
-        const sessions = await get<RawSession[]>(
-          `/sessions?year=${year}&session_name=${name}`,
-        ).catch(() => [] as RawSession[]);
-        for (const s of sessions) {
-          if (new Date(s.date_start).getTime() < now) {
-            out.push({
-              sessionKey: s.session_key,
-              year: s.year,
-              location: s.location,
-              date: s.date_start,
-              isSprint: name === "Sprint",
-            });
-          }
-        }
+      const sessions = await get<RawSession[]>(`/sessions?year=${year}`).catch(
+        () => [] as RawSession[],
+      );
+      for (const s of sessions) {
+        if (!REPLAYABLE.has(s.session_name)) continue;
+        if (new Date(s.date_start).getTime() >= now) continue;
+        out.push({
+          sessionKey: s.session_key,
+          meetingKey: s.meeting_key ?? s.session_key,
+          year: s.year,
+          location: s.location,
+          date: s.date_start,
+          sessionName: s.session_name,
+          isSprint: s.session_name === "Sprint",
+        });
       }
     }
     return out.sort((a, b) => b.date.localeCompare(a.date));

@@ -1,7 +1,12 @@
 /* Live → Replay: race picker, playback controls and the replay board. */
 
 /* ---------- Race picker and playback controls ---------- */
+/* Weekend picker + session switch (FP1 … Race) side by side; wraps on phones. */
 .rp-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.6rem 0.8rem;
   margin: 1rem 0;
 }
 
@@ -318,4 +323,12 @@
   .ld-col--phone {
     display: block;
   }
+}
+
+.rp-sessions button {
+  min-width: 52px;
+}
+.rp-note {
+  margin: 0.6rem 0 0;
+  font-size: 0.8rem;
 }

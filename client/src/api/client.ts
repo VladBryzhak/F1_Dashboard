@@ -56,6 +56,7 @@ import type {
   LapTelemetry,
   RaceResultResponse,
   RaceStrategy,
+  ReplaySession,
   SearchIndex,
   RaceWeekend,
   SeasonComparison,
@@ -121,16 +122,7 @@ export const api = {
     getJson<LiveBoard>(`/live/${sessionKey}/board`),
   liveDriver: (sessionKey: number, driverNumber: number) =>
     getJson<LiveDriverDetail>(`/live/${sessionKey}/driver/${driverNumber}`),
-  replayRaces: () =>
-    getJson<
-      {
-        sessionKey: number
-        year: number
-        location: string
-        date: string
-        isSprint: boolean
-      }[]
-    >('/live/races'),
+  replaySessions: () => getJson<ReplaySession[]>('/live/replays'),
   replay: (sessionKey: number) =>
     getJson<ReplayData>(`/live/${sessionKey}/replay`),
 }

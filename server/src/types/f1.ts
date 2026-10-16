@@ -673,3 +673,14 @@ export interface CircuitOutline {
   start: [number, number];
   rotation: number;
 }
+
+// A past session available in the replay player.
+export interface ReplaySession {
+  sessionKey: number;
+  meetingKey: number; // groups the sessions of one race weekend
+  year: number;
+  location: string;
+  date: string; // session start, ISO
+  sessionName: string; // "Practice 1" … "Qualifying", "Sprint", "Race"
+  isSprint: boolean;
+}

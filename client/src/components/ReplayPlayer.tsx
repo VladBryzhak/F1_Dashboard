@@ -1,13 +1,25 @@
 import { useEffect, useMemo, useState } from 'react'
 import { api } from '../api/client'
 import { useAsync } from '../hooks/useAsync'
-import { fmtTime, segmentClass, teamColor, tyre } from '../lib/live'
-import type { ReplayData, ReplayLap } from '../types/f1'
+import { fmtTime, segmentClass, sessionLabel, teamColor, tyre } from '../lib/live'
+import type { ReplayData, ReplayLap, ReplaySession } from '../types/f1'
 import WeatherCard, { weatherAt } from './WeatherCard'
 import { useI18n, type TKey } from '../i18n/core'
 import './ReplayPlayer.css'
 
 const SPEEDS = [5, 15, 30, 60]
+
+// Compact session labels for the session switch.
+const SESSION_SHORT: Record<string, TKey> = {
+  'Practice 1': 'rp.fp1',
+  'Practice 2': 'rp.fp2',
+  'Practice 3': 'rp.fp3',
+  'Sprint Qualifying': 'rp.sq',
+  'Sprint Shootout': 'rp.sq',
+  Sprint: 'session.sprint',
+  Qualifying: 'rp.q',
+  Race: 'session.race',
+}
 const TICK_MS = 200
 
 const STATUS: Record<string, { label: TKey; cls: string }> = {
@@ -72,11 +84,32 @@ function statusAt(flags: { t: number; s: string }[], absT: number): string {
   return s
 }
 
+// Best completed lap at time `at` (practice / qualifying order by this).
+function bestUpTo(laps: ReplayLap[], at: number): number | null {
+  let best: number | null = null
+  for (const lap of laps) {
+    if (lap.d != null && lap.t + lap.d * 1000 <= at && (best == null || lap.d < best)) best = lap.d
+  }
+  return best
+}
+
+// Order by best lap so far: rank per driver (0-based), drivers without a time last.
+function rankByBest(d: ReplayData, ix: Indexed, at: number): Map<number, number> {
+  const bests = d.drivers
+    .map((drv) => ({ num: drv.num, best: bestUpTo(ix.lapsByDriver.get(drv.num) ?? [], at) }))
+    .filter((x) => x.best != null)
+    .sort((a, b) => a.best! - b.best!)
+  return new Map(bests.map((x, i) => [x.num, i]))
+}
+
+// `timed`: practice and qualifying, where the order is by best lap and the gap
+// is to the fastest lap — not the race order from line crossings.
 function buildBoard(
   d: ReplayData,
   ix: Indexed,
   absT: number,
   moveWindow: number,
+  timed: boolean,
 ): { rows: Row[]; lap: number } {
   let maxLap = 0
   const rows: Row[] = d.drivers.map((drv) => {
@@ -171,6 +204,22 @@ function buildBoard(
     }
   })
 
+  if (timed) {
+    const now = rankByBest(d, ix, absT)
+    const before = rankByBest(d, ix, absT - moveWindow)
+    const leaderBest = rows.reduce<number | null>(
+      (m, r) => (r.best != null && (m == null || r.best < m) ? r.best : m),
+      null,
+    )
+    for (const r of rows) {
+      const rank = now.get(r.num)
+      r.position = rank == null ? null : rank + 1
+      r.gl = rank && r.best != null && leaderBest != null ? `+${(r.best - leaderBest).toFixed(3)}` : null
+      const prev = before.get(r.num)
+      r.posMove = rank == null || prev == null || prev === rank ? null : rank < prev ? 'up' : 'down'
+    }
+  }
+
   rows.sort((a, b) => (a.position ?? 99) - (b.position ?? 99))
   return { rows, lap: maxLap }
 }
@@ -259,13 +308,35 @@ function sectorLong(c: string): string {
 export default function ReplayPlayer() {
   // `t` is the playback clock below, so the translator is `tr` here.
   const { t: tr } = useI18n()
-  const races = useAsync(() => api.replayRaces(), [])
-  const [sessionKey, setSessionKey] = useState<number | null>(null)
-  useEffect(() => {
-    if (sessionKey == null && races.data?.length) {
-      setSessionKey(races.data[0].sessionKey)
+  const sessions = useAsync(() => api.replaySessions(), [])
+  // Weekends (newest first), each with its sessions in running order.
+  const weekends = useMemo(() => {
+    const byMeeting = new Map<number, ReplaySession[]>()
+    for (const s of sessions.data ?? []) {
+      const arr = byMeeting.get(s.meetingKey) ?? []
+      arr.push(s)
+      byMeeting.set(s.meetingKey, arr)
     }
-  }, [races.data, sessionKey])
+    return [...byMeeting.values()].map((list) =>
+      list.slice().sort((a, b) => a.date.localeCompare(b.date)),
+    )
+  }, [sessions.data])
+  const [sessionKey, setSessionKey] = useState<number | null>(null)
+  // Default: the latest weekend's race (or its last session so far).
+  useEffect(() => {
+    if (sessionKey == null && weekends.length) {
+      const w = weekends[0]
+      setSessionKey((w.find((s) => s.sessionName === 'Race') ?? w[w.length - 1]).sessionKey)
+    }
+  }, [weekends, sessionKey])
+  const weekend = weekends.find((w) => w.some((s) => s.sessionKey === sessionKey)) ?? null
+  const current = weekend?.find((s) => s.sessionKey === sessionKey) ?? null
+  const timed = !!current && current.sessionName !== 'Race' && current.sessionName !== 'Sprint'
+
+  function pickWeekend(meetingKey: number) {
+    const w = weekends.find((x) => x[0].meetingKey === meetingKey)
+    if (w) setSessionKey((w.find((s) => s.sessionName === 'Race') ?? w[w.length - 1]).sessionKey)
+  }
 
   const replay = useAsync(
     () => (sessionKey ? api.replay(sessionKey) : Promise.resolve(null)),
@@ -316,8 +387,8 @@ export default function ReplayPlayer() {
   const moveWindow = speed * 2500
   const board = useMemo(
     () =>
-      data && ix ? buildBoard(data, ix, data.startMs + t, moveWindow) : null,
-    [data, ix, t, moveWindow],
+      data && ix ? buildBoard(data, ix, data.startMs + t, moveWindow, timed) : null,
+    [data, ix, t, moveWindow, timed],
   )
   const status = useMemo(
     () => (data ? statusAt(data.flags, data.startMs + t) : 'green'),
@@ -342,18 +413,34 @@ export default function ReplayPlayer() {
       <div className="rp-head">
         <select
           className="rp-select"
-          value={sessionKey ?? ''}
-          onChange={(e) => setSessionKey(Number(e.target.value))}
-          aria-label={tr('session.race')}
+          value={weekend?.[0].meetingKey ?? ''}
+          onChange={(e) => pickWeekend(Number(e.target.value))}
+          aria-label={tr('rp.weekend')}
         >
-          {races.data?.map((r) => (
-            <option key={r.sessionKey} value={r.sessionKey}>
-              {r.year} · {r.location}
-              {r.isSprint ? ` (${tr('session.sprint')})` : ''}
+          {weekends.map((w) => (
+            <option key={w[0].meetingKey} value={w[0].meetingKey}>
+              {w[0].year} · {w[0].location}
             </option>
           ))}
         </select>
+        {weekend && (
+          <div className="seg-switch rp-sessions" role="group" aria-label={tr('rp.session')}>
+            {weekend.map((s) => (
+              <button
+                key={s.sessionKey}
+                type="button"
+                className={s.sessionKey === sessionKey ? 'on' : undefined}
+                aria-pressed={s.sessionKey === sessionKey}
+                title={sessionLabel(s.sessionName, tr)}
+                onClick={() => setSessionKey(s.sessionKey)}
+              >
+                {tr(SESSION_SHORT[s.sessionName] ?? 'session.race')}
+              </button>
+            ))}
+          </div>
+        )}
       </div>
+      {timed && <p className="rp-note muted">{tr('rp.timedNote')}</p>}
 
       {replay.loading && <p className="muted">{tr('common.loading')}</p>}
       {replay.error && (
@@ -385,7 +472,8 @@ export default function ReplayPlayer() {
               aria-label={tr('rp.timeline')}
             />
             <span className="rp-lap mono">
-              {tr('tel.lapN', { n: board.lap })} · {hhmmss(t)} / {hhmmss(span)}
+              {timed ? '' : `${tr('tel.lapN', { n: board.lap })} · `}
+              {hhmmss(t)} / {hhmmss(span)}
             </span>
             <span className="rp-speeds">
               {SPEEDS.map((s) => (
@@ -468,7 +556,12 @@ export default function ReplayPlayer() {
             <div className="rp-side-card">
               <h4 className="rp-side-title">{tr('rp.session')}</h4>
               <div className="rp-kv"><span>{tr('rp.circuit')}</span><span>{data.session.location}</span></div>
-              <div className="rp-kv"><span>{tr('tel.lap')}</span><span className="mono">{board.lap}</span></div>
+              {current && (
+                <div className="rp-kv"><span>{tr('rp.session')}</span><span>{sessionLabel(current.sessionName, tr)}</span></div>
+              )}
+              {!timed && (
+                <div className="rp-kv"><span>{tr('tel.lap')}</span><span className="mono">{board.lap}</span></div>
+              )}
               <div className="rp-kv"><span>{tr('wk.fastestLap')}</span><span className="mono">{fmtTime(fastest)}</span></div>
               <div className="rp-kv"><span>{tr('rp.status')}</span><span className={`rp-side-status rp-side-status--${st.cls}`}>{tr(st.label)}</span></div>
             </div>

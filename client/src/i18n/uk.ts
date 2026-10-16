@@ -439,6 +439,15 @@ const uk: Dict & Record<string, string> = {
   'plural.lapsN_few': '{n} кола',
   'plural.lapsN_many': '{n} кіл',
   'plural.lapsN_other': '{n} кола',
+
+  // Replay sessions
+  'rp.weekend': 'Гоночний вікенд',
+  'rp.fp1': 'П1',
+  'rp.fp2': 'П2',
+  'rp.fp3': 'П3',
+  'rp.sq': 'СК',
+  'rp.q': 'Квал.',
+  'rp.timedNote': 'Практика й кваліфікація: пілоти впорядковані за найкращим колом на цей момент, відставання — від найшвидшого кола.',
 }
 
 export default uk
