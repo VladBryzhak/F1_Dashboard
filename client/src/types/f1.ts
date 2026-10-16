@@ -96,6 +96,15 @@ export interface CalendarRace {
   winnerConstructorId: string | null
   winnerConstructorName: string | null
   isSprint: boolean
+  sessions: CalendarSession[]
+}
+
+// One session of a race weekend. Practice, sprint qualifying, sprint,
+// qualifying, race.
+export interface CalendarSession {
+  kind: 'FP1' | 'FP2' | 'FP3' | 'SQ' | 'SPRINT' | 'Q' | 'RACE'
+  start: string // UTC ISO timestamp, or yyyy-mm-dd when timeKnown is false
+  timeKnown: boolean
 }
 
 export interface CalendarResponse {

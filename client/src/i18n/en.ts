@@ -45,6 +45,43 @@ const en = {
   'common.season': 'Season',
   'common.round': 'Round',
   'common.next': 'Next',
+
+  // Sessions
+  'session.fp1': 'Practice 1',
+  'session.fp2': 'Practice 2',
+  'session.fp3': 'Practice 3',
+  'session.sq': 'Sprint Qualifying',
+  'session.sprint': 'Sprint',
+  'session.q': 'Qualifying',
+  'session.race': 'Race',
+
+  // Weekend schedule
+  'sched.gp': '{name} GP',
+  'sched.none': 'The session schedule has not been published yet.',
+  'sched.nextSession': 'Next session',
+  'sched.liveNow': 'Live now',
+  'sched.live': 'LIVE',
+  'sched.finished': 'Weekend finished',
+  'sched.addToCalendar': 'Add to calendar',
+  'sched.localTime': 'Times in your timezone · {tz}',
+  'sched.tbc': 'TBC',
+  'sched.dayShort': 'd',
+
+  // Calendar page
+  'cal.title': '{season} Race Results',
+  'cal.loadError': 'Could not load the calendar: {error}',
+  'cal.colGp': 'Grand Prix',
+  'cal.colDate': 'Date',
+  'cal.colWinner': 'Winner',
+  'cal.colTeam': 'Team',
+  'cal.upcoming': 'Upcoming',
+  'cal.sprint': 'Sprint',
+  'cal.viewWeekend': 'View {name} weekend',
+  'cal.showSchedule': 'Show the weekend schedule',
+  'cal.hideSchedule': 'Hide the weekend schedule',
+
+  // Home
+  'home.nextRace': 'Next race',
 }
 
 export type Dict = Record<keyof typeof en, string>

@@ -6,6 +6,7 @@ import { useSeo } from '../hooks/useSeo'
 import { siteLd } from '../lib/jsonld'
 import { api } from '../api/client'
 import { driverPortraitUrl, teamColor } from '../lib/f1meta'
+import { useI18n } from '../i18n/core'
 import type {
   DriverStanding,
   HomeHighlights,
@@ -97,7 +98,7 @@ function WinnerHero({ highlights }: { highlights: HomeHighlights }) {
         >
           View weekend
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-            <path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" />
+            <path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
           </svg>
         </Link>
       </div>
@@ -150,16 +151,18 @@ function ChampionshipCard({
 }
 
 function NextRaceCard({ race }: { race: NextRace }) {
-  const d = new Date(race.date)
-  const valid = !Number.isNaN(d.getTime())
+  const { t, fmtDate } = useI18n()
+  const day = fmtDate(race.date, { day: '2-digit' })
+  const month = fmtDate(race.date, { month: 'short' }).replace('.', '').toUpperCase()
+  // Opens the calendar with this race's weekend schedule expanded.
   return (
-    <Link to="/calendar" className="home-next">
+    <Link to={`/calendar?schedule=${race.round}`} className="home-next">
       <span className="home-next-date">
-        <b>{valid ? d.toLocaleDateString('en-GB', { day: '2-digit' }) : '—'}</b>
-        <em>{valid ? d.toLocaleDateString('en-GB', { month: 'short' }).toUpperCase() : ''}</em>
+        <b>{day || '—'}</b>
+        <em>{month}</em>
       </span>
       <span className="home-next-info">
-        <span className="home-next-label">Next race</span>
+        <span className="home-next-label">{t('home.nextRace')}</span>
         <span className="home-next-gp">{race.grandPrixName} GP</span>
       </span>
     </Link>

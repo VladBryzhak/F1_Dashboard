@@ -46,6 +46,43 @@ const uk: Dict = {
   'common.season': 'Сезон',
   'common.round': 'Етап',
   'common.next': 'Наступна',
+
+  // Sessions
+  'session.fp1': 'Практика 1',
+  'session.fp2': 'Практика 2',
+  'session.fp3': 'Практика 3',
+  'session.sq': 'Спринт-кваліфікація',
+  'session.sprint': 'Спринт',
+  'session.q': 'Кваліфікація',
+  'session.race': 'Гонка',
+
+  // Weekend schedule
+  'sched.gp': 'Гран-прі {name}',
+  'sched.none': 'Розклад сесій ще не опубліковано.',
+  'sched.nextSession': 'Наступна сесія',
+  'sched.liveNow': 'Зараз наживо',
+  'sched.live': 'НАЖИВО',
+  'sched.finished': 'Вікенд завершено',
+  'sched.addToCalendar': 'Додати в календар',
+  'sched.localTime': 'Час у вашому часовому поясі · {tz}',
+  'sched.tbc': 'Уточнюється',
+  'sched.dayShort': 'д',
+
+  // Calendar page
+  'cal.title': 'Результати сезону {season}',
+  'cal.loadError': 'Не вдалося завантажити календар: {error}',
+  'cal.colGp': 'Гран-прі',
+  'cal.colDate': 'Дата',
+  'cal.colWinner': 'Переможець',
+  'cal.colTeam': 'Команда',
+  'cal.upcoming': 'Попереду',
+  'cal.sprint': 'Спринт',
+  'cal.viewWeekend': 'Відкрити вікенд: {name}',
+  'cal.showSchedule': 'Показати розклад вікенду',
+  'cal.hideSchedule': 'Сховати розклад вікенду',
+
+  // Home
+  'home.nextRace': 'Наступна гонка',
 }
 
 export default uk

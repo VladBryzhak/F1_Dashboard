@@ -1,6 +1,7 @@
 import AdmZip from "adm-zip";
 import type {
   CalendarRace,
+  CalendarSession,
   CalendarResponse,
   ConstructorProfile,
   ConstructorSeasonEntry,
@@ -103,6 +104,42 @@ interface RawRace {
   officialName: string;
   circuitId: string;
   sprintRaceDate: string | null;
+  // Session dates (yyyy-mm-dd) and UTC start times (HH:mm); null when the
+  // session didn't run or the time isn't known (most older seasons).
+  time?: string | null;
+  freePractice1Date?: string | null;
+  freePractice1Time?: string | null;
+  freePractice2Date?: string | null;
+  freePractice2Time?: string | null;
+  freePractice3Date?: string | null;
+  freePractice3Time?: string | null;
+  sprintQualifyingDate?: string | null;
+  sprintQualifyingTime?: string | null;
+  sprintRaceTime?: string | null;
+  qualifyingDate?: string | null;
+  qualifyingTime?: string | null;
+}
+
+// A race weekend's sessions in running order. `start` is a UTC ISO timestamp
+// when the time is known, else just the date.
+function raceSessions(r: RawRace): CalendarSession[] {
+  const pairs: [CalendarSession["kind"], string | null | undefined, string | null | undefined][] = [
+    ["FP1", r.freePractice1Date, r.freePractice1Time],
+    ["FP2", r.freePractice2Date, r.freePractice2Time],
+    ["FP3", r.freePractice3Date, r.freePractice3Time],
+    ["SQ", r.sprintQualifyingDate, r.sprintQualifyingTime],
+    ["SPRINT", r.sprintRaceDate, r.sprintRaceTime],
+    ["Q", r.qualifyingDate, r.qualifyingTime],
+    ["RACE", r.date, r.time],
+  ];
+  return pairs
+    .filter(([, date]) => !!date)
+    .map(([kind, date, time]) => ({
+      kind,
+      start: time ? `${date}T${time}:00Z` : (date as string),
+      timeKnown: !!time,
+    }))
+    .sort((a, b) => a.start.localeCompare(b.start));
 }
 
 // Sprint results mirror race results, plus grid/gained already computed by f1db.
@@ -662,6 +699,7 @@ export async function getCalendar(season: string): Promise<CalendarResponse> {
         winnerConstructorId: winner?.constructorId ?? null,
         winnerConstructorName: winnerTeam?.name ?? null,
         isSprint: r.sprintRaceDate != null,
+        sessions: raceSessions(r),
       };
     });
   return { season, races };
