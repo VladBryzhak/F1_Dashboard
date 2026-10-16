@@ -10,7 +10,8 @@ import type {
   DriverStanding,
   RaceWeekend,
 } from '../types/f1'
-import { getLang, type Lang } from '../i18n/core'
+import { getLang, plural, type Lang } from '../i18n/core'
+import { countryName } from './countries'
 import { gpTitle } from './gpNames'
 import { CURRENT_SEASON } from './seasons'
 
@@ -49,7 +50,35 @@ function formatDate(iso: string): string {
   })
 }
 
-export function driverSummary(p: DriverProfile): string {
+// Ukrainian driver summary. Gender-neutral wording (we don't know drivers'
+// genders), counts with proper Ukrainian plural forms.
+function driverSummaryUk(p: DriverProfile): string {
+  const active = p.lastSeason >= CURRENT_SEASON
+  const country = countryName(p.countryCode, 'uk-UA')
+  const span = active
+    ? `з ${p.firstSeason} року`
+    : p.firstSeason === p.lastSeason
+      ? `у ${p.firstSeason} році`
+      : `у ${p.firstSeason}–${p.lastSeason} роках`
+  const teams = [...new Set(p.seasons.map((s) => s.constructorName))].filter(Boolean)
+
+  let text = `${p.givenName} ${p.familyName}${country ? ` (${country})` : ''} — ${active ? 'учасник' : 'колишній учасник'} чемпіонату світу FIA Формули-1 ${span}.`
+  if (teams.length) text += ` ${teams.length === 1 ? 'Команда' : 'Команди'}: ${teams.join(', ')}.`
+
+  const feats: string[] = []
+  if (p.championships > 0) feats.push(plural('plural.titles', p.championships, undefined, 'uk'))
+  if (p.wins > 0) feats.push(plural('plural.wins', p.wins, undefined, 'uk'))
+  if (p.podiums > 0) feats.push(plural('plural.podiums', p.podiums, undefined, 'uk'))
+  const starts = plural('plural.starts', p.races, undefined, 'uk')
+  const points = plural('plural.points', p.points, undefined, 'uk')
+  text += feats.length
+    ? ` За ${starts}: ${feats.join(', ')} і ${points} у кар’єрі.`
+    : ` У кар’єрі ${starts} і ${points}.`
+  return text
+}
+
+export function driverSummary(p: DriverProfile, lang: Lang = getLang()): string {
+  if (lang === 'uk') return driverSummaryUk(p)
   const surname = p.familyName
   const active = p.lastSeason >= CURRENT_SEASON
   const role = active

@@ -58,6 +58,30 @@ export interface DriverProfile {
   races: number;
   photoUrl?: string | null; // Wikimedia Commons photo, when found
   seasons: DriverSeasonEntry[]; // ascending by season
+  fullName: string | null;
+  dateOfBirth: string | null; // yyyy-mm-dd
+  dateOfDeath: string | null;
+  placeOfBirth: string | null;
+  birthCountryCode: string | null;
+  poles: number;
+  fastestLaps: number;
+  sprintWins: number;
+  grandSlams: number;
+  driverOfTheDay: number;
+  bestResult: number | null;
+  bestGrid: number | null;
+  bestChampionship: number | null;
+  family: { driverId: string; name: string; relation: string }[]; // relation: f1db type (CHILD, SIBLING…)
+  recentRaces: DriverRecentRace[]; // newest first
+}
+
+export interface DriverRecentRace {
+  season: number;
+  round: number;
+  grandPrixName: string;
+  positionText: string;
+  constructorId: string;
+  points: number;
 }
 
 export interface ConstructorSeasonEntry {

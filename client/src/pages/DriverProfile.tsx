@@ -6,12 +6,67 @@ import Flag from '../components/Flag'
 import { Headshot } from '../components/EntityCards'
 import { useAsync } from '../hooks/useAsync'
 import { useSeo } from '../hooks/useSeo'
+import { useI18n, type TKey } from '../i18n/core'
+import { countryName } from '../lib/countries'
 import { breadcrumbLd, driverLd } from '../lib/jsonld'
 import { driverPortraitUrl, teamColor } from '../lib/f1meta'
+import { gpShort } from '../lib/gpNames'
 import { driverSummary } from '../lib/summaries'
+import type { DriverProfile as Profile } from '../types/f1'
+
+// Whole years between two yyyy-mm-dd dates (to today when `to` is null).
+function yearsBetween(from: string, to: string | null): number | null {
+  const a = new Date(from)
+  const b = to ? new Date(to) : new Date()
+  if (Number.isNaN(a.getTime()) || Number.isNaN(b.getTime())) return null
+  let y = b.getFullYear() - a.getFullYear()
+  if (b.getMonth() < a.getMonth() || (b.getMonth() === a.getMonth() && b.getDate() < a.getDate())) y -= 1
+  return y
+}
+
+// "Born 30 September 1997 (age 29) · Hasselt, Belgium"
+function BioLine({ p }: { p: Profile }) {
+  const { t, tn, fmtDate, locale } = useI18n()
+  if (!p.dateOfBirth && !p.placeOfBirth) return null
+  const long = { day: 'numeric', month: 'long', year: 'numeric' } as const
+  const age = p.dateOfBirth ? yearsBetween(p.dateOfBirth, p.dateOfDeath) : null
+  const place = [p.placeOfBirth, countryName(p.birthCountryCode, locale)].filter(Boolean).join(', ')
+  const parts: string[] = []
+  if (p.dateOfBirth) {
+    let born = t('drv.born', { date: fmtDate(p.dateOfBirth, long) })
+    if (age != null && !p.dateOfDeath) born += ` (${t('drv.age', { n: age, years: tn('plural.years', age) })})`
+    parts.push(born)
+  }
+  if (p.dateOfDeath) {
+    let died = t('drv.died', { date: fmtDate(p.dateOfDeath, long) })
+    if (age != null) died += ` (${t('drv.age', { n: age, years: tn('plural.years', age) })})`
+    parts.push(died)
+  }
+  if (place) parts.push(place)
+  return <p className="profile-bio">{parts.join(' · ')}</p>
+}
+
+// Finishing position chip: P1 red, podium bright, DNF etc. muted.
+function FormChip({
+  r,
+}: {
+  r: Profile['recentRaces'][number]
+}) {
+  const { lang } = useI18n()
+  const n = Number(r.positionText)
+  const cls = !Number.isFinite(n) ? 'form-chip out' : n === 1 ? 'form-chip win' : n <= 3 ? 'form-chip podium' : n <= 10 ? 'form-chip points' : 'form-chip'
+  return (
+    <Link to={`/calendar/${r.season}/${r.round}`} className="form-item">
+      <span className={cls}>{Number.isFinite(n) ? `P${n}` : r.positionText}</span>
+      <span className="form-gp">{gpShort(r.grandPrixName, lang)}</span>
+      <span className="form-year">{r.season}</span>
+    </Link>
+  )
+}
 
 export default function DriverProfile() {
   const { slug: driverId } = useParams<{ slug: string }>()
+  const { t, lang } = useI18n()
   const {
     data: profile,
     loading,
@@ -55,13 +110,13 @@ export default function DriverProfile() {
 
   return (
     <section>
-      {loading && <p className="muted">Loading…</p>}
+      {loading && <p className="muted">{t('common.loading')}</p>}
 
       {!loading && error && (
         <div>
-          <p className="banner">Could not load this driver: {error}</p>
+          <p className="banner">{t('drv.loadError', { error })}</p>
           <Link to="/drivers" className="back-link">
-            ← Back to Drivers
+            {t('drv.back')}
           </Link>
         </div>
       )}
@@ -70,8 +125,8 @@ export default function DriverProfile() {
         <>
           <Breadcrumbs
             trail={[
-              { name: 'Home', path: '/' },
-              { name: 'Drivers', path: '/drivers' },
+              { name: t('nav.home'), path: '/' },
+              { name: t('nav.drivers'), path: '/drivers' },
               {
                 name: `${profile.givenName} ${profile.familyName}`,
                 path: `/drivers/${profile.driverId}`,
@@ -101,11 +156,14 @@ export default function DriverProfile() {
               </h1>
               <div className="profile-meta">
                 <Flag code={profile.countryCode} nationality={profile.nationality} />
-                {profile.nationality}
+                {lang === 'uk' && profile.countryCode
+                  ? countryName(profile.countryCode, 'uk-UA')
+                  : profile.nationality}
                 {profile.permanentNumber && (
                   <span className="profile-num">#{profile.permanentNumber}</span>
                 )}
               </div>
+              <BioLine p={profile} />
             </div>
 
             <div className="stat-grid">
@@ -113,42 +171,99 @@ export default function DriverProfile() {
                 <div className="stat-num">
                   {profile.firstSeason}–{profile.lastSeason}
                 </div>
-                <div className="stat-lbl">Seasons</div>
+                <div className="stat-lbl">{t('drv.seasons')}</div>
               </div>
               <div className="stat-card">
                 <div className="stat-num">{profile.championships}</div>
-                <div className="stat-lbl">Championships</div>
+                <div className="stat-lbl">{t('drv.titles')}</div>
               </div>
               <div className="stat-card">
                 <div className="stat-num">{profile.wins}</div>
-                <div className="stat-lbl">Wins</div>
+                <div className="stat-lbl">{t('drv.wins')}</div>
               </div>
               <div className="stat-card">
                 <div className="stat-num">{profile.podiums}</div>
-                <div className="stat-lbl">Podiums</div>
+                <div className="stat-lbl">{t('drv.podiums')}</div>
               </div>
               <div className="stat-card">
                 <div className="stat-num">{profile.points}</div>
-                <div className="stat-lbl">Points</div>
+                <div className="stat-lbl">{t('drv.points')}</div>
               </div>
               <div className="stat-card">
                 <div className="stat-num">{profile.races}</div>
-                <div className="stat-lbl">Races</div>
+                <div className="stat-lbl">{t('drv.races')}</div>
               </div>
             </div>
           </div>
 
-          <p className="profile-summary">{driverSummary(profile)}</p>
+          <p className="profile-summary">{driverSummary(profile, lang)}</p>
+
+          <div className="stat-grid profile-extra">
+            {(
+              [
+                ['drv.poles', profile.poles],
+                ['drv.fastestLaps', profile.fastestLaps],
+                ['drv.sprintWins', profile.sprintWins],
+                ['drv.grandSlams', profile.grandSlams],
+                ['drv.dotd', profile.driverOfTheDay],
+                ['drv.bestFinish', profile.bestResult != null ? `P${profile.bestResult}` : null],
+                ['drv.bestGrid', profile.bestGrid != null ? `P${profile.bestGrid}` : null],
+                ['drv.bestChamp', profile.bestChampionship != null ? `P${profile.bestChampionship}` : null],
+              ] as [TKey, number | string | null][]
+            )
+              // Hide empty extras (e.g. sprint wins for pre-2021 drivers).
+              .filter(([, v]) => v != null && v !== 0)
+              .map(([k, v]) => (
+                <div className="stat-card" key={k}>
+                  <div className="stat-num">{v}</div>
+                  <div className="stat-lbl">{t(k)}</div>
+                </div>
+              ))}
+          </div>
+
+          {(profile.recentRaces.length > 0 || profile.family.length > 0) && (
+            <div className="profile-cols">
+              {profile.recentRaces.length > 0 && (
+                <div className="card">
+                  <h3 className="wknd-section">
+                    {t('drv.form')}
+                    <span className="wknd-when">
+                      {t('drv.formHint', { n: profile.recentRaces.length })}
+                    </span>
+                  </h3>
+                  <div className="form-row">
+                    {profile.recentRaces.map((r) => (
+                      <FormChip key={`${r.season}-${r.round}`} r={r} />
+                    ))}
+                  </div>
+                </div>
+              )}
+              {profile.family.length > 0 && (
+                <div className="card">
+                  <h3 className="wknd-section">{t('drv.family')}</h3>
+                  <ul className="family-list">
+                    {profile.family.map((f) => (
+                      <li key={f.driverId}>
+                        <Link to={`/drivers/${f.driverId}`}>{f.name}</Link>
+                        <span className="muted">{t(`rel.${f.relation}` as TKey)}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+            </div>
+          )}
 
           <div className="card">
+            <h3 className="wknd-section">{t('drv.career')}</h3>
             <table className="standings">
               <thead>
                 <tr>
-                  <th>Year</th>
-                  <th>Team</th>
-                  <th className="num">Pos</th>
-                  <th className="num">Points</th>
-                  <th className="num">Wins</th>
+                  <th>{t('drv.colYear')}</th>
+                  <th>{t('drv.colTeam')}</th>
+                  <th className="num">{t('drv.colPos')}</th>
+                  <th className="num">{t('drv.colPoints')}</th>
+                  <th className="num">{t('drv.colWins')}</th>
                 </tr>
               </thead>
               <tbody>

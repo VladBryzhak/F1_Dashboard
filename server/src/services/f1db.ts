@@ -6,6 +6,7 @@ import type {
   CircuitRace,
   CircuitSummary,
   CircuitTally,
+  DriverRecentRace,
   PracticeSession,
   CalendarResponse,
   ConstructorProfile,
@@ -67,6 +68,27 @@ interface RawDriver {
   abbreviation: string | null;
   permanentNumber: string | null;
   nationalityCountryId: string;
+  fullName?: string | null;
+  dateOfBirth?: string | null;
+  dateOfDeath?: string | null;
+  placeOfBirth?: string | null;
+  countryOfBirthCountryId?: string | null;
+  bestChampionshipPosition?: number | null;
+  bestStartingGridPosition?: number | null;
+  bestRaceResult?: number | null;
+  totalPolePositions?: number;
+  totalFastestLaps?: number;
+  totalSprintRaceWins?: number;
+  totalGrandSlams?: number;
+  totalDriverOfTheDay?: number;
+}
+// One row per relative: `parentDriverId`'s relative `driverId` is their `type`
+// (e.g. jos-verstappen → max-verstappen: CHILD).
+interface RawFamily {
+  parentDriverId: string;
+  driverId: string;
+  type: string;
+  positionDisplayOrder: number;
 }
 interface RawConstructor {
   id: string;
@@ -312,6 +334,7 @@ interface Dataset {
   gridByRace: Map<string, Map<string, number>>; // driverId → grid position
   fastestLapByRace: Map<string, HighlightRow>;
   driverOfDayByRace: Map<string, HighlightRow>;
+  familyByDriver: Map<string, RawFamily[]>;
 }
 
 let datasetPromise: Promise<Dataset> | null = null;
@@ -545,6 +568,13 @@ async function loadDataset(): Promise<Dataset> {
     });
   }
 
+  const familyByDriver = new Map<string, RawFamily[]>();
+  for (const f of read<RawFamily>("f1db-drivers-family-relationships.json")) {
+    const arr = familyByDriver.get(f.parentDriverId) ?? [];
+    arr.push(f);
+    familyByDriver.set(f.parentDriverId, arr);
+  }
+
   const driverOfDayByRace = new Map<string, HighlightRow>();
   for (const d of read<RawDriverOfTheDay>(
     "f1db-races-driver-of-the-day-results.json"
@@ -582,6 +612,7 @@ async function loadDataset(): Promise<Dataset> {
     gridByRace,
     fastestLapByRace,
     driverOfDayByRace,
+    familyByDriver,
   };
 }
 
@@ -836,7 +867,53 @@ export async function getDriverProfile(
     points: rawSeasons.reduce((sum, s) => sum + s.points, 0),
     races: career.races,
     seasons,
+    fullName: d?.fullName ?? null,
+    dateOfBirth: d?.dateOfBirth ?? null,
+    dateOfDeath: d?.dateOfDeath ?? null,
+    placeOfBirth: d?.placeOfBirth ?? null,
+    birthCountryCode: alpha2(ds, d?.countryOfBirthCountryId ?? undefined),
+    poles: d?.totalPolePositions ?? 0,
+    fastestLaps: d?.totalFastestLaps ?? 0,
+    sprintWins: d?.totalSprintRaceWins ?? 0,
+    grandSlams: d?.totalGrandSlams ?? 0,
+    driverOfTheDay: d?.totalDriverOfTheDay ?? 0,
+    bestResult: d?.bestRaceResult ?? null,
+    bestGrid: d?.bestStartingGridPosition ?? null,
+    bestChampionship: d?.bestChampionshipPosition ?? null,
+    family: (ds.familyByDriver.get(driverId) ?? [])
+      .slice()
+      .sort((a, b) => a.positionDisplayOrder - b.positionDisplayOrder)
+      .map((f) => ({
+        driverId: f.driverId,
+        name: driverName(ds, f.driverId),
+        relation: f.type,
+      })),
+    recentRaces: recentRaces(ds, driverId, 5),
   };
+}
+
+// A driver's last `n` Grands Prix, newest first.
+function recentRaces(ds: Dataset, driverId: string, n: number): DriverRecentRace[] {
+  const out: DriverRecentRace[] = [];
+  const races = ds.races
+    .filter((r) => ds.resultsByRace.has(`${r.year}:${r.round}`))
+    .sort((a, b) => b.year - a.year || b.round - a.round);
+  for (const r of races) {
+    const row = ds.resultsByRace
+      .get(`${r.year}:${r.round}`)!
+      .find((x) => x.driverId === driverId);
+    if (!row) continue;
+    out.push({
+      season: r.year,
+      round: r.round,
+      grandPrixName: ds.grandsPrix.get(r.grandPrixId)?.name ?? r.grandPrixId,
+      positionText: row.positionText,
+      constructorId: row.constructorId,
+      points: row.points ?? 0,
+    });
+    if (out.length >= n) break;
+  }
+  return out;
 }
 
 export async function getConstructorProfile(
