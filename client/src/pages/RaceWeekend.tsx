@@ -1,23 +1,24 @@
-import { Link, useParams } from 'react-router-dom'
+import { useState } from 'react'
+import { Link, useParams, useSearchParams } from 'react-router-dom'
 import { api } from '../api/client'
 import Breadcrumbs from '../components/Breadcrumbs'
 import Flag from '../components/Flag'
 import { useAsync } from '../hooks/useAsync'
 import { useSeo } from '../hooks/useSeo'
+import { useI18n } from '../i18n/core'
 import { breadcrumbLd, raceLd } from '../lib/jsonld'
 import { teamColor } from '../lib/f1meta'
 import { raceSummary } from '../lib/summaries'
-import type { WeekendHighlight } from '../types/f1'
+import type {
+  CalendarSession,
+  PracticeSession,
+  QualifyingEntry,
+  WeekendHighlight,
+  WeekendResult,
+} from '../types/f1'
+import { gpTitle } from '../lib/gpNames'
 
-function formatDate(iso: string): string {
-  const d = new Date(iso)
-  if (Number.isNaN(d.getTime())) return iso
-  return d.toLocaleDateString('en-GB', {
-    day: '2-digit',
-    month: 'short',
-    year: 'numeric',
-  })
-}
+type Tab = 'race' | 'sprint' | 'quali' | 'practice'
 
 function Highlight({
   label,
@@ -51,19 +52,168 @@ function Delta({ n }: { n: number | null }) {
   )
 }
 
+function TeamCell({ id, name }: { id: string; name: string }) {
+  return (
+    <span className="team">
+      <span className="dot" style={{ background: teamColor(id) }} />
+      {name}
+    </span>
+  )
+}
+
+function DriverCell({
+  name,
+  code,
+  countryCode,
+  nationality,
+}: {
+  name: string
+  code: string | null
+  countryCode?: string | null
+  nationality?: string
+}) {
+  return (
+    <span className="country">
+      {countryCode !== undefined && <Flag code={countryCode} nationality={nationality ?? ''} />}
+      <span className="name">{name}</span>
+      {code && <span className="code">{code}</span>}
+    </span>
+  )
+}
+
+function ResultTable({ rows }: { rows: WeekendResult[] }) {
+  const { t } = useI18n()
+  return (
+    <div className="table-scroll">
+      <table className="standings standings--rank">
+        <thead>
+          <tr>
+            <th className="pos">{t('wk.colPos')}</th>
+            <th>{t('wk.colDriver')}</th>
+            <th>{t('wk.colTeam')}</th>
+            <th className="num">{t('wk.colGrid')}</th>
+            <th className="num">+/−</th>
+            <th>{t('wk.colTime')}</th>
+            <th className="num">{t('wk.colPts')}</th>
+          </tr>
+        </thead>
+        <tbody>
+          {rows.map((r) => (
+            <tr key={r.driverId}>
+              <td className="pos">{r.positionText}</td>
+              <td>
+                <DriverCell
+                  name={r.driverName}
+                  code={r.driverCode}
+                  countryCode={r.countryCode}
+                  nationality={r.nationality}
+                />
+              </td>
+              <td>
+                <TeamCell id={r.constructorId} name={r.constructorName} />
+              </td>
+              <td className="num muted">{r.gridPosition ?? '—'}</td>
+              <td className="num">
+                <Delta n={r.positionsGained} />
+              </td>
+              <td className="muted">{r.timeDisplay}</td>
+              <td className="num points">{r.points || ''}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  )
+}
+
+function QualiTable({ rows, prefix }: { rows: QualifyingEntry[]; prefix: string }) {
+  const { t } = useI18n()
+  return (
+    <div className="table-scroll">
+      <table className="standings standings--rank">
+        <thead>
+          <tr>
+            <th className="pos">{t('wk.colPos')}</th>
+            <th>{t('wk.colDriver')}</th>
+            <th>{t('wk.colTeam')}</th>
+            <th>{prefix}1</th>
+            <th>{prefix}2</th>
+            <th>{prefix}3</th>
+          </tr>
+        </thead>
+        <tbody>
+          {rows.map((q) => (
+            <tr key={q.driverId}>
+              <td className="pos">{q.position ?? '—'}</td>
+              <td>
+                <DriverCell name={q.driverName} code={q.driverCode} />
+              </td>
+              <td>
+                <TeamCell id={q.constructorId} name={q.constructorName} />
+              </td>
+              <td className="muted mono">{q.q1 ?? '—'}</td>
+              <td className="muted mono">{q.q2 ?? '—'}</td>
+              <td className="mono">{q.q3 ?? '—'}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  )
+}
+
+function PracticeTable({ session }: { session: PracticeSession }) {
+  const { t } = useI18n()
+  return (
+    <div className="table-scroll">
+      <table className="standings standings--rank">
+        <thead>
+          <tr>
+            <th className="pos">{t('wk.colPos')}</th>
+            <th>{t('wk.colDriver')}</th>
+            <th>{t('wk.colTeam')}</th>
+            <th>{t('wk.colBest')}</th>
+            <th>{t('wk.colGap')}</th>
+            <th className="num">{t('wk.colLaps')}</th>
+          </tr>
+        </thead>
+        <tbody>
+          {session.results.map((p) => (
+            <tr key={p.driverId}>
+              <td className="pos">{p.positionText}</td>
+              <td>
+                <DriverCell name={p.driverName} code={p.driverCode} />
+              </td>
+              <td>
+                <TeamCell id={p.constructorId} name={p.constructorName} />
+              </td>
+              <td className="mono">{p.time ?? '—'}</td>
+              <td className="muted mono">{p.gap ?? (p.time ? '' : '—')}</td>
+              <td className="num muted">{p.laps ?? '—'}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  )
+}
+
 export default function RaceWeekend() {
   const { season = '', round = '' } = useParams()
+  const { t, lang, fmtDate } = useI18n()
+  const [params, setParams] = useSearchParams()
   const { data, loading, error } = useAsync(
     () => api.raceWeekend(season, Number(round)),
     [season, round],
   )
+  const [practiceN, setPracticeN] = useState<number | null>(null)
 
   useSeo({
     title: data
-      ? `${data.grandPrixName} GP ${data.season} — Results & Qualifying`
+      ? `${data.grandPrixName} GP ${data.season} — Results, Qualifying & Practice`
       : undefined,
     description: data
-      ? `${data.grandPrixName} Grand Prix ${data.season}: full race result, starting grid, qualifying times, fastest lap and Driver of the Day.`
+      ? `${data.grandPrixName} Grand Prix ${data.season}: full race result, starting grid, qualifying times, practice sessions${data.sprintResults.length ? ', sprint' : ''}, fastest lap and Driver of the Day.`
       : undefined,
     jsonLd: data
       ? [
@@ -80,52 +230,84 @@ export default function RaceWeekend() {
       : undefined,
   })
 
-  const pole =
-    data?.qualifying.find((q) => q.position === 1) ?? data?.qualifying[0]
+  // Which session tabs this weekend has, in running order.
+  const available: Tab[] = data
+    ? (
+        [
+          ['race', data.results.length > 0],
+          ['sprint', data.sprintResults.length > 0 || data.sprintQualifying.length > 0],
+          ['quali', data.qualifying.length > 0],
+          ['practice', data.practices.length > 0],
+        ] as [Tab, boolean][]
+      )
+        .filter(([, has]) => has)
+        .map(([tab]) => tab)
+    : []
+  const asked = params.get('tab') as Tab | null
+  const tab: Tab | undefined = asked && available.includes(asked) ? asked : available[0]
 
-  const highlights: { label: string; h: WeekendHighlight | null; detail?: string }[] =
-    data
-      ? [
-          {
-            label: 'Pole position',
-            h: pole
-              ? {
-                  driverId: pole.driverId,
-                  driverName: pole.driverName,
-                  constructorId: pole.constructorId,
-                  constructorName: pole.constructorName,
-                  detail: pole.q3 ?? pole.q2 ?? pole.q1 ?? '',
-                }
-              : null,
-          },
-          { label: 'Fastest lap', h: data.fastestLap },
-          { label: 'Driver of the Day', h: data.driverOfTheDay },
-        ]
-      : []
+  function chooseTab(next: Tab) {
+    setParams(next === available[0] ? {} : { tab: next }, {
+      replace: true,
+      preventScrollReset: true,
+    })
+  }
+
+  const pole = data?.qualifying.find((q) => q.position === 1) ?? data?.qualifying[0]
+  const lapWord = (detail: string) =>
+    detail
+      .replace(/\(lap (\d+)\)/, (_, n: string) => t('wk.lapN', { n }))
+      .replace('of the vote', t('wk.ofVote'))
+
+  const highlights: { label: string; h: WeekendHighlight | null }[] = data
+    ? [
+        {
+          label: t('wk.pole'),
+          h: pole
+            ? {
+                driverId: pole.driverId,
+                driverName: pole.driverName,
+                constructorId: pole.constructorId,
+                constructorName: pole.constructorName,
+                detail: pole.q3 ?? pole.q2 ?? pole.q1 ?? '',
+              }
+            : null,
+        },
+        { label: t('wk.fastestLap'), h: data.fastestLap },
+        { label: t('wk.dotd'), h: data.driverOfTheDay },
+      ]
+    : []
+
+  // Session date line under each table title ("Sat 10 Oct").
+  const sessionDate = (kind: CalendarSession['kind']) => {
+    const s = data?.sessions.find((x) => x.kind === kind)
+    return s ? fmtDate(s.start, { weekday: 'short', day: 'numeric', month: 'short' }) : ''
+  }
+
+  const practice =
+    data?.practices.find((p) => p.number === practiceN) ?? data?.practices[0] ?? null
 
   return (
     <section>
       {!data && (
         <div className="page-head">
           <Link to="/calendar" className="back-link">
-            ← Calendar
+            ← {t('nav.calendar')}
           </Link>
         </div>
       )}
 
-      {loading && <p className="muted">Loading…</p>}
-      {!loading && error && (
-        <p className="banner">Could not load the race weekend: {error}</p>
-      )}
+      {loading && <p className="muted">{t('common.loading')}</p>}
+      {!loading && error && <p className="banner">{t('wk.loadError', { error })}</p>}
 
       {!loading && data && (
         <>
           <Breadcrumbs
             trail={[
-              { name: 'Home', path: '/' },
-              { name: 'Calendar', path: '/calendar' },
+              { name: t('nav.home'), path: '/' },
+              { name: t('nav.calendar'), path: '/calendar' },
               {
-                name: `${data.grandPrixName} GP ${data.season}`,
+                name: `${gpTitle(data.grandPrixName, lang)} ${data.season}`,
                 path: `/calendar/${data.season}/${data.round}`,
               },
             ]}
@@ -134,9 +316,10 @@ export default function RaceWeekend() {
           <div className="wknd-title">
             <Flag code={data.countryCode} nationality="" />
             <div>
-              <h1>{data.grandPrixName} GP</h1>
+              <h1>{gpTitle(data.grandPrixName, lang)}</h1>
               <p className="muted">
-                {data.season} · Round {data.round} · {formatDate(data.date)} ·{' '}
+                {data.season} · {t('common.round')} {data.round} ·{' '}
+                {fmtDate(data.date, { day: '2-digit', month: 'short', year: 'numeric' })} ·{' '}
                 <Link to={`/circuits/${data.circuitId}`} className="wknd-circuit">
                   {data.circuitName}
                 </Link>
@@ -144,7 +327,7 @@ export default function RaceWeekend() {
             </div>
           </div>
 
-          <p className="profile-summary">{raceSummary(data)}</p>
+          <p className="profile-summary">{raceSummary(data, lang)}</p>
 
           <div className="wknd-highlights">
             {highlights.map(
@@ -155,155 +338,97 @@ export default function RaceWeekend() {
                     label={label}
                     name={h.driverName}
                     constructorId={h.constructorId}
-                    detail={h.detail}
+                    detail={lapWord(h.detail)}
                   />
                 ),
             )}
           </div>
 
-          {data.results.length > 0 && (
+          {available.length > 1 && (
+            <div className="tabs wknd-tabs" role="tablist">
+              {available.map((id) => (
+                <button
+                  key={id}
+                  role="tab"
+                  aria-selected={tab === id}
+                  className={tab === id ? 'tab active' : 'tab'}
+                  onClick={() => chooseTab(id)}
+                >
+                  {t(`wk.tab.${id}`)}
+                </button>
+              ))}
+            </div>
+          )}
+
+          {tab === 'race' && (
             <div className="card">
-              <h3 className="wknd-section">Race result</h3>
-              <div className="table-scroll">
-                <table className="standings standings--rank">
-                  <thead>
-                    <tr>
-                      <th className="pos">Pos</th>
-                      <th>Driver</th>
-                      <th>Team</th>
-                      <th className="num">Grid</th>
-                      <th className="num">+/−</th>
-                      <th>Time / Gap</th>
-                      <th className="num">Pts</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {data.results.map((r) => (
-                      <tr key={r.driverId}>
-                        <td className="pos">{r.positionText}</td>
-                        <td>
-                          <span className="country">
-                            <Flag code={r.countryCode} nationality={r.nationality} />
-                            <span className="name">{r.driverName}</span>
-                            {r.driverCode && <span className="code">{r.driverCode}</span>}
-                          </span>
-                        </td>
-                        <td>
-                          <span className="team">
-                            <span
-                              className="dot"
-                              style={{ background: teamColor(r.constructorId) }}
-                            />
-                            {r.constructorName}
-                          </span>
-                        </td>
-                        <td className="num muted">{r.gridPosition ?? '—'}</td>
-                        <td className="num">
-                          <Delta n={r.positionsGained} />
-                        </td>
-                        <td className="muted">{r.timeDisplay}</td>
-                        <td className="num points">{r.points || ''}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          )}
-
-          {data.sprintResults.length > 0 && (
-            <div className="card" style={{ marginTop: '1rem' }}>
               <h3 className="wknd-section">
-                Sprint result
-                <span className="sprint-badge">Sprint</span>
+                {t('wk.raceResult')}
+                <span className="wknd-when">{sessionDate('RACE')}</span>
               </h3>
-              <div className="table-scroll">
-                <table className="standings standings--rank">
-                  <thead>
-                    <tr>
-                      <th className="pos">Pos</th>
-                      <th>Driver</th>
-                      <th>Team</th>
-                      <th className="num">Grid</th>
-                      <th className="num">+/−</th>
-                      <th>Time / Gap</th>
-                      <th className="num">Pts</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {data.sprintResults.map((r) => (
-                      <tr key={r.driverId}>
-                        <td className="pos">{r.positionText}</td>
-                        <td>
-                          <span className="country">
-                            <Flag code={r.countryCode} nationality={r.nationality} />
-                            <span className="name">{r.driverName}</span>
-                            {r.driverCode && <span className="code">{r.driverCode}</span>}
-                          </span>
-                        </td>
-                        <td>
-                          <span className="team">
-                            <span
-                              className="dot"
-                              style={{ background: teamColor(r.constructorId) }}
-                            />
-                            {r.constructorName}
-                          </span>
-                        </td>
-                        <td className="num muted">{r.gridPosition ?? '—'}</td>
-                        <td className="num">
-                          <Delta n={r.positionsGained} />
-                        </td>
-                        <td className="muted">{r.timeDisplay}</td>
-                        <td className="num points">{r.points || ''}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
+              <ResultTable rows={data.results} />
             </div>
           )}
 
-          {data.qualifying.length > 0 && (
-            <div className="card" style={{ marginTop: '1rem' }}>
-              <h3 className="wknd-section">Qualifying</h3>
-              <div className="table-scroll">
-                <table className="standings standings--rank">
-                  <thead>
-                    <tr>
-                      <th className="pos">Pos</th>
-                      <th>Driver</th>
-                      <th>Team</th>
-                      <th>Q1</th>
-                      <th>Q2</th>
-                      <th>Q3</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {data.qualifying.map((q) => (
-                      <tr key={q.driverId}>
-                        <td className="pos">{q.position ?? '—'}</td>
-                        <td>
-                          <span className="name">{q.driverName}</span>
-                          {q.driverCode && <span className="code">{q.driverCode}</span>}
-                        </td>
-                        <td>
-                          <span className="team">
-                            <span
-                              className="dot"
-                              style={{ background: teamColor(q.constructorId) }}
-                            />
-                            {q.constructorName}
-                          </span>
-                        </td>
-                        <td className="muted">{q.q1 ?? '—'}</td>
-                        <td className="muted">{q.q2 ?? '—'}</td>
-                        <td className="muted">{q.q3 ?? '—'}</td>
-                      </tr>
+          {tab === 'sprint' && (
+            <>
+              {data.sprintResults.length > 0 && (
+                <div className="card">
+                  <h3 className="wknd-section">
+                    {t('wk.sprintResult')}
+                    <span className="wknd-when">{sessionDate('SPRINT')}</span>
+                  </h3>
+                  <ResultTable rows={data.sprintResults} />
+                </div>
+              )}
+              {data.sprintQualifying.length > 0 && (
+                <div className="card" style={{ marginTop: '1rem' }}>
+                  <h3 className="wknd-section">
+                    {t('session.sq')}
+                    <span className="wknd-when">{sessionDate('SQ')}</span>
+                  </h3>
+                  <QualiTable rows={data.sprintQualifying} prefix="SQ" />
+                </div>
+              )}
+            </>
+          )}
+
+          {tab === 'quali' && (
+            <div className="card">
+              <h3 className="wknd-section">
+                {t('session.q')}
+                <span className="wknd-when">{sessionDate('Q')}</span>
+              </h3>
+              <QualiTable rows={data.qualifying} prefix="Q" />
+            </div>
+          )}
+
+          {tab === 'practice' && practice && (
+            <div className="card">
+              <div className="wknd-practice-head">
+                <h3 className="wknd-section">
+                  {t('wk.practiceN', { n: practice.number })}
+                  <span className="wknd-when">
+                    {sessionDate(`FP${practice.number}` as CalendarSession['kind'])}
+                  </span>
+                </h3>
+                {data.practices.length > 1 && (
+                  <div className="seg-switch" role="group" aria-label={t('wk.tab.practice')}>
+                    {data.practices.map((p) => (
+                      <button
+                        key={p.number}
+                        type="button"
+                        className={p.number === practice.number ? 'on' : undefined}
+                        aria-pressed={p.number === practice.number}
+                        onClick={() => setPracticeN(p.number)}
+                      >
+                        FP{p.number}
+                      </button>
                     ))}
-                  </tbody>
-                </table>
+                  </div>
+                )}
               </div>
+              <PracticeTable session={practice} />
             </div>
           )}
         </>

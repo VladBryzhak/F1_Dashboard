@@ -9,6 +9,7 @@ import { useSeasonRoute } from '../hooks/useSeasonRoute'
 import { useSeo } from '../hooks/useSeo'
 import { useI18n } from '../i18n/core'
 import { teamColor } from '../lib/f1meta'
+import { gpShort, gpTitle } from '../lib/gpNames'
 
 export default function Calendar() {
   const { season: seasonParam } = useParams()
@@ -17,7 +18,7 @@ export default function Calendar() {
     seasonParam,
   )
   const navigate = useNavigate()
-  const { t, fmtDate } = useI18n()
+  const { t, lang, fmtDate } = useI18n()
 
   // Upcoming races expand in place to show their session schedule. The open
   // round lives in ?schedule=N so the home page's "Next race" card can link
@@ -107,7 +108,7 @@ export default function Calendar() {
                       }
                       title={
                         done
-                          ? t('cal.viewWeekend', { name: r.name })
+                          ? t('cal.viewWeekend', { name: gpTitle(r.name, lang) })
                           : t(open ? 'cal.hideSchedule' : 'cal.showSchedule')
                       }
                       aria-expanded={done ? undefined : open}
@@ -116,7 +117,7 @@ export default function Calendar() {
                         <span className="entity">
                           <Flag code={r.countryCode} nationality={r.nationality} />
                           <span className="name" style={{ marginLeft: '0.65rem' }}>
-                            {r.name}
+                            {gpShort(r.name, lang)}
                           </span>
                           {r.isSprint && <span className="sprint-badge">{t('cal.sprint')}</span>}
                         </span>

@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { useI18n, type TKey } from '../i18n/core'
 import { downloadText, sessionStart, sessionState, weekendIcs } from '../lib/schedule'
 import type { CalendarRace, CalendarSession } from '../types/f1'
+import { gpTitle } from '../lib/gpNames'
 
 const SESSION_KEY: Record<CalendarSession['kind'], TKey> = {
   FP1: 'session.fp1',
@@ -32,10 +33,10 @@ export default function WeekendSchedule({
   season: string
   race: CalendarRace
 }) {
-  const { t, fmtDate, fmtTime } = useI18n()
+  const { t, lang, fmtDate, fmtTime } = useI18n()
   const now = useNow(1000)
   const name = (kind: CalendarSession['kind']) => t(SESSION_KEY[kind])
-  const gpName = t('sched.gp', { name: race.name })
+  const gpName = gpTitle(race.name, lang)
 
   if (race.sessions.length === 0) {
     return <p className="muted sched-empty">{t('sched.none')}</p>

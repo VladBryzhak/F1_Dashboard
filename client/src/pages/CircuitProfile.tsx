@@ -9,6 +9,7 @@ import { countryName } from '../lib/countries'
 import { teamColor } from '../lib/f1meta'
 import { breadcrumbLd } from '../lib/jsonld'
 import type { CircuitTally } from '../types/f1'
+import { gpShort, gpTitle } from '../lib/gpNames'
 
 function Tally({
   title,
@@ -44,7 +45,7 @@ function Tally({
 export default function CircuitProfile() {
   const { circuitId = '' } = useParams<{ circuitId: string }>()
   const navigate = useNavigate()
-  const { t, fmtDate, fmtNum, locale } = useI18n()
+  const { t, lang, fmtDate, fmtNum, locale } = useI18n()
   const { data: c, loading, error } = useAsync(() => api.circuitProfile(circuitId), [circuitId])
 
   useSeo({
@@ -121,7 +122,7 @@ export default function CircuitProfile() {
           >
             <span className="next-tag">{t('common.next')}</span>
             {t('circ.next', {
-              gp: t('sched.gp', { name: c.nextRace.grandPrixName }),
+              gp: gpTitle(c.nextRace.grandPrixName, lang),
               date: fmtDate(c.nextRace.date, { day: 'numeric', month: 'long' }),
             })}
           </Link>
@@ -245,7 +246,7 @@ export default function CircuitProfile() {
                     onClick={() => navigate(`/calendar/${r.year}/${r.round}`)}
                   >
                     <td className="mono">{r.year}</td>
-                    {c.grandsPrix.length > 1 && <td className="muted">{r.grandPrixName}</td>}
+                    {c.grandsPrix.length > 1 && <td className="muted">{gpShort(r.grandPrixName, lang)}</td>}
                     <td>
                       <span className="name">{r.winnerName ?? '—'}</span>
                     </td>

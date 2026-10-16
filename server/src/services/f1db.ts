@@ -6,6 +6,7 @@ import type {
   CircuitRace,
   CircuitSummary,
   CircuitTally,
+  PracticeSession,
   CalendarResponse,
   ConstructorProfile,
   ConstructorSeasonEntry,
@@ -211,6 +212,24 @@ interface RawQualifying {
   q2: string | null;
   q3: string | null;
 }
+interface RawPractice {
+  year: number;
+  round: number;
+  positionText: string;
+  driverId: string;
+  constructorId: string;
+  time: string | null;
+  gap: string | null;
+  laps: number | null;
+}
+interface PracticeRow {
+  position: string;
+  driverId: string;
+  constructorId: string;
+  time: string | null;
+  gap: string | null;
+  laps: number | null;
+}
 interface RawGrid {
   year: number;
   round: number;
@@ -287,6 +306,9 @@ interface Dataset {
   racesDriverStandings: RawRaceDriverStanding[];
   // race-weekend detail, keyed by `${year}:${round}` (compact)
   qualifyingByRace: Map<string, QualiRow[]>;
+  sprintQualifyingByRace: Map<string, QualiRow[]>;
+  // `${year}:${round}:${n}` -> free practice n classification
+  practiceByRace: Map<string, PracticeRow[]>;
   gridByRace: Map<string, Map<string, number>>; // driverId → grid position
   fastestLapByRace: Map<string, HighlightRow>;
   driverOfDayByRace: Map<string, HighlightRow>;
@@ -453,22 +475,50 @@ async function loadDataset(): Promise<Dataset> {
   // Race-weekend detail. We reduce each big table to a compact per-race shape
   // right away (the large parsed arrays are then free to GC) to keep the
   // retained footprint small; pit stops are intentionally not loaded.
-  const qualifyingByRace = new Map<string, QualiRow[]>();
-  for (const q of read<RawQualifying>("f1db-races-qualifying-results.json")) {
-    const key = `${q.year}:${q.round}`;
-    let arr = qualifyingByRace.get(key);
-    if (!arr) {
-      arr = [];
-      qualifyingByRace.set(key, arr);
+  const readQualifying = (file: string) => {
+    const byRace = new Map<string, QualiRow[]>();
+    for (const q of read<RawQualifying>(file)) {
+      const key = `${q.year}:${q.round}`;
+      let arr = byRace.get(key);
+      if (!arr) {
+        arr = [];
+        byRace.set(key, arr);
+      }
+      arr.push({
+        position: q.positionNumber,
+        driverId: q.driverId,
+        constructorId: q.constructorId,
+        q1: q.q1,
+        q2: q.q2,
+        q3: q.q3,
+      });
     }
-    arr.push({
-      position: q.positionNumber,
-      driverId: q.driverId,
-      constructorId: q.constructorId,
-      q1: q.q1,
-      q2: q.q2,
-      q3: q.q3,
-    });
+    return byRace;
+  };
+  const qualifyingByRace = readQualifying("f1db-races-qualifying-results.json");
+  const sprintQualifyingByRace = readQualifying(
+    "f1db-races-sprint-qualifying-results.json"
+  );
+
+  // Free practice 1-4, compact rows keyed `${year}:${round}:${n}`.
+  const practiceByRace = new Map<string, PracticeRow[]>();
+  for (const n of [1, 2, 3, 4]) {
+    for (const p of read<RawPractice>(`f1db-races-free-practice-${n}-results.json`)) {
+      const key = `${p.year}:${p.round}:${n}`;
+      let arr = practiceByRace.get(key);
+      if (!arr) {
+        arr = [];
+        practiceByRace.set(key, arr);
+      }
+      arr.push({
+        position: p.positionText,
+        driverId: p.driverId,
+        constructorId: p.constructorId,
+        time: p.time,
+        gap: p.gap,
+        laps: p.laps,
+      });
+    }
   }
 
   const gridByRace = new Map<string, Map<string, number>>();
@@ -527,6 +577,8 @@ async function loadDataset(): Promise<Dataset> {
     constructorCareer,
     racesDriverStandings,
     qualifyingByRace,
+    sprintQualifyingByRace,
+    practiceByRace,
     gridByRace,
     fastestLapByRace,
     driverOfDayByRace,
@@ -1199,8 +1251,8 @@ export async function getRaceWeekend(
   const teamOf = (id: string) => ds.constructors.get(id)?.name ?? id;
   const codeOf = (id: string) => ds.drivers.get(id)?.abbreviation ?? null;
 
-  const qualifying: QualifyingEntry[] = (ds.qualifyingByRace.get(key) ?? []).map(
-    (q) => ({
+  const toQualifying = (rows: QualiRow[] | undefined): QualifyingEntry[] =>
+    (rows ?? []).map((q) => ({
       position: q.position,
       driverId: q.driverId,
       driverName: nameOf(q.driverId),
@@ -1210,8 +1262,26 @@ export async function getRaceWeekend(
       q1: q.q1,
       q2: q.q2,
       q3: q.q3,
-    }),
-  );
+    }));
+  const qualifying = toQualifying(ds.qualifyingByRace.get(key));
+  const sprintQualifying = toQualifying(ds.sprintQualifyingByRace.get(key));
+
+  const practices: PracticeSession[] = [1, 2, 3, 4]
+    .map((n) => ({
+      number: n,
+      results: (ds.practiceByRace.get(`${key}:${n}`) ?? []).map((p) => ({
+        positionText: p.position,
+        driverId: p.driverId,
+        driverName: nameOf(p.driverId),
+        driverCode: codeOf(p.driverId),
+        constructorId: p.constructorId,
+        constructorName: teamOf(p.constructorId),
+        time: p.time,
+        gap: p.gap,
+        laps: p.laps,
+      })),
+    }))
+    .filter((p) => p.results.length > 0);
 
   const grid = ds.gridByRace.get(key);
   const rows = (ds.resultsByRace.get(key) ?? [])
@@ -1283,6 +1353,9 @@ export async function getRaceWeekend(
     qualifying,
     results,
     sprintResults,
+    sprintQualifying,
+    practices,
+    sessions: raceSessions(race),
     fastestLap: toHighlight(ds.fastestLapByRace.get(key)),
     driverOfTheDay: toHighlight(ds.driverOfDayByRace.get(key)),
   };

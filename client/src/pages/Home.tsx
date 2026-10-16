@@ -14,6 +14,7 @@ import type {
   NextRace,
   RaceHighlight,
 } from '../types/f1'
+import { gpTitle } from '../lib/gpNames'
 
 const F1 = 'https://media.formula1.com/image/upload/c_lfill,w_600/q_auto/v1740000001/common/f1'
 
@@ -151,7 +152,7 @@ function ChampionshipCard({
 }
 
 function NextRaceCard({ race }: { race: NextRace }) {
-  const { t, fmtDate } = useI18n()
+  const { t, lang, fmtDate } = useI18n()
   const day = fmtDate(race.date, { day: '2-digit' })
   const month = fmtDate(race.date, { month: 'short' }).replace('.', '').toUpperCase()
   // Opens the calendar with this race's weekend schedule expanded.
@@ -163,7 +164,7 @@ function NextRaceCard({ race }: { race: NextRace }) {
       </span>
       <span className="home-next-info">
         <span className="home-next-label">{t('home.nextRace')}</span>
-        <span className="home-next-gp">{race.grandPrixName} GP</span>
+        <span className="home-next-gp">{gpTitle(race.grandPrixName, lang)}</span>
       </span>
     </Link>
   )

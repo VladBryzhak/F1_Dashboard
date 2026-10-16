@@ -58,7 +58,6 @@ const uk: Dict & Record<string, string> = {
   'session.race': 'Гонка',
 
   // Weekend schedule
-  'sched.gp': 'Гран-прі {name}',
   'sched.none': 'Розклад сесій ще не опубліковано.',
   'sched.nextSession': 'Наступна сесія',
   'sched.liveNow': 'Зараз наживо',
@@ -131,6 +130,30 @@ const uk: Dict & Record<string, string> = {
   'plural.races_few': '{n} гонки',
   'plural.races_many': '{n} гонок',
   'plural.races_other': '{n} гонки',
+
+  // Race weekend page
+  'wk.loadError': 'Не вдалося завантажити вікенд: {error}',
+  'wk.ofVote': 'голосів',
+  'wk.pole': 'Поул-позиція',
+  'wk.fastestLap': 'Найшвидше коло',
+  'wk.dotd': 'Пілот дня',
+  'wk.lapN': '(коло {n})',
+  'wk.tab.race': 'Гонка',
+  'wk.tab.sprint': 'Спринт',
+  'wk.tab.quali': 'Кваліфікація',
+  'wk.tab.practice': 'Практики',
+  'wk.raceResult': 'Результат гонки',
+  'wk.sprintResult': 'Результат спринту',
+  'wk.practiceN': 'Практика {n}',
+  'wk.colPos': 'Поз.',
+  'wk.colDriver': 'Пілот',
+  'wk.colTeam': 'Команда',
+  'wk.colGrid': 'Старт',
+  'wk.colTime': 'Час / Відрив',
+  'wk.colPts': 'Очки',
+  'wk.colBest': 'Найкраще коло',
+  'wk.colGap': 'Відрив',
+  'wk.colLaps': 'Кола',
 }
 
 export default uk

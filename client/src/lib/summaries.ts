@@ -10,6 +10,8 @@ import type {
   DriverStanding,
   RaceWeekend,
 } from '../types/f1'
+import { getLang, type Lang } from '../i18n/core'
+import { gpTitle } from './gpNames'
 import { CURRENT_SEASON } from './seasons'
 
 // "a, b and c" from a de-duplicated, non-empty list.
@@ -100,16 +102,38 @@ export function teamSummary(p: ConstructorProfile): string {
   return text
 }
 
-export function raceSummary(w: RaceWeekend): string {
+export function raceSummary(w: RaceWeekend, lang: Lang = getLang()): string {
   const winner = w.results.find((r) => r.positionText === '1')
   const pole =
     w.qualifying.find((q) => q.position === 1) ?? w.qualifying[0] ?? null
+  const grid = winner
+    ? w.results.find((r) => r.driverId === winner.driverId)?.gridPosition
+    : null
+
+  if (lang === 'uk') {
+    // Gender-neutral phrasing: "Перемога — X" rather than a gendered verb.
+    const date = new Date(w.date).toLocaleDateString('uk-UA', {
+      day: 'numeric',
+      month: 'long',
+    })
+    let text = `${gpTitle(w.grandPrixName, 'uk')} ${w.season} року відбулося ${date}.`
+    if (winner) {
+      text += ` Перемога — ${winner.driverName} (${winner.constructorName})`
+      if (grid === 1) text += ', старт із поул-позиції'
+      else if (grid) text += `, старт із P${grid}`
+      text += '.'
+    }
+    if (pole && (!winner || pole.driverId !== winner.driverId)) {
+      text += ` Поул-позиція — ${pole.driverName}.`
+    }
+    if (w.fastestLap) text += ` Найшвидше коло гонки — ${w.fastestLap.driverName}.`
+    return text
+  }
 
   let text = `The ${w.season} ${w.grandPrixName} Grand Prix was held on ${formatDate(w.date)}.`
 
   if (winner) {
     text += ` ${winner.driverName} won the race for ${winner.constructorName}`
-    const grid = w.results.find((r) => r.driverId === winner.driverId)?.gridPosition
     if (grid === 1) text += ' from pole position'
     else if (grid) text += ` from P${grid} on the grid`
     text += '.'

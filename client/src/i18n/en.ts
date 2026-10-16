@@ -56,7 +56,6 @@ const en = {
   'session.race': 'Race',
 
   // Weekend schedule
-  'sched.gp': '{name} GP',
   'sched.none': 'The session schedule has not been published yet.',
   'sched.nextSession': 'Next session',
   'sched.liveNow': 'Live now',
@@ -127,6 +126,30 @@ const en = {
   'circ.viewCircuit': 'Circuit guide',
   'plural.races_one': '{n} race',
   'plural.races_other': '{n} races',
+
+  // Race weekend page
+  'wk.loadError': 'Could not load the race weekend: {error}',
+  'wk.ofVote': 'of the vote',
+  'wk.pole': 'Pole position',
+  'wk.fastestLap': 'Fastest lap',
+  'wk.dotd': 'Driver of the Day',
+  'wk.lapN': '(lap {n})',
+  'wk.tab.race': 'Race',
+  'wk.tab.sprint': 'Sprint',
+  'wk.tab.quali': 'Qualifying',
+  'wk.tab.practice': 'Practice',
+  'wk.raceResult': 'Race result',
+  'wk.sprintResult': 'Sprint result',
+  'wk.practiceN': 'Practice {n}',
+  'wk.colPos': 'Pos',
+  'wk.colDriver': 'Driver',
+  'wk.colTeam': 'Team',
+  'wk.colGrid': 'Grid',
+  'wk.colTime': 'Time / Gap',
+  'wk.colPts': 'Pts',
+  'wk.colBest': 'Best lap',
+  'wk.colGap': 'Gap',
+  'wk.colLaps': 'Laps',
 }
 
 export type Dict = Record<keyof typeof en, string>

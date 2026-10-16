@@ -329,6 +329,9 @@ export interface RaceWeekend {
   qualifying: QualifyingEntry[];
   results: WeekendResult[];
   sprintResults: WeekendResult[];
+  sprintQualifying: QualifyingEntry[];
+  practices: PracticeSession[];
+  sessions: CalendarSession[]; // weekend schedule, for session order/dates
   fastestLap: WeekendHighlight | null;
   driverOfTheDay: WeekendHighlight | null;
 }
@@ -552,4 +555,21 @@ export interface CircuitProfile extends CircuitSummary {
   topPoles: CircuitTally[];
   races: CircuitRace[]; // newest first, completed races only
   nextRace: { season: number; round: number; date: string; grandPrixName: string } | null;
+}
+
+export interface PracticeEntry {
+  positionText: string;
+  driverId: string;
+  driverName: string;
+  driverCode: string | null;
+  constructorId: string;
+  constructorName: string;
+  time: string | null;
+  gap: string | null;
+  laps: number | null;
+}
+
+export interface PracticeSession {
+  number: number; // 1..4
+  results: PracticeEntry[];
 }
