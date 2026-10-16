@@ -28,6 +28,7 @@ const uk: Dict & Record<string, string> = {
   'footer.dataBy': 'Дані:',
   'footer.telemetryBy': 'Телеметрія:',
   'footer.flagsBy': 'Іконки прапорів:',
+  'footer.outlinesBy': 'Схеми трас намальовано за даними',
   'footer.photosVia': 'Фото пілотів і логотипи/фото команд з',
   'footer.photosLicense': '(CC BY-SA / суспільне надбання, автори — відповідні правовласники)',
   'footer.legal': 'Правова інформація',
@@ -88,6 +89,7 @@ const uk: Dict & Record<string, string> = {
 
   // Circuits
   'nav.circuits': 'Траси',
+  'circ.outlineOf': 'Схема траси {name}',
   'circ.listTitle': 'Траси Формули-1',
   'circ.current': 'У календарі {season}',
   'circ.historic': 'Історичні траси',

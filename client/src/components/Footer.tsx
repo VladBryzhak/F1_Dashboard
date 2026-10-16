@@ -70,6 +70,11 @@ export default function Footer() {
               {t('footer.flagsBy')} <Ext href="https://flagcdn.com">flagcdn</Ext>
             </li>
             <li>
+              {t('footer.outlinesBy')}{' '}
+              <Ext href="https://github.com/bacinger/f1-circuits">f1-circuits</Ext> (MIT, © Tomislav
+              Bacinger)
+            </li>
+            <li>
               {t('footer.photosVia')}{' '}
               <Ext href="https://commons.wikimedia.org">Wikimedia Commons</Ext>{' '}
               {t('footer.photosLicense')}

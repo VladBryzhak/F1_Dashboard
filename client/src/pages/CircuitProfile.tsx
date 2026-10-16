@@ -1,6 +1,7 @@
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { api } from '../api/client'
 import Breadcrumbs from '../components/Breadcrumbs'
+import CircuitOutline from '../components/CircuitOutline'
 import Flag from '../components/Flag'
 import { useAsync } from '../hooks/useAsync'
 import { useSeo } from '../hooks/useSeo'
@@ -103,63 +104,76 @@ export default function CircuitProfile() {
         ]}
       />
 
-      <div className="wknd-title">
-        <Flag code={c.countryCode} nationality={c.nationality} />
-        <div>
-          <h1>{c.name}</h1>
-          <p>
-            {c.placeName}
-            {country ? ` · ${country}` : ''} · {t(`circ.type.${c.type}` as TKey)}
-            {c.direction ? ` · ${t(`circ.dir.${c.direction}` as TKey)}` : ''}
-          </p>
-        </div>
-      </div>
+      <div className={`circ-hero${c.outline ? ' has-map' : ''}`}>
+        <div className="circ-hero-main">
+          <div className="wknd-title">
+            <Flag code={c.countryCode} nationality={c.nationality} />
+            <div>
+              <h1>{c.name}</h1>
+              <p>
+                {c.placeName}
+                {country ? ` · ${country}` : ''} · {t(`circ.type.${c.type}` as TKey)}
+                {c.direction ? ` · ${t(`circ.dir.${c.direction}` as TKey)}` : ''}
+              </p>
+            </div>
+          </div>
 
-      <div className="circ-actions">
-        {c.nextRace && (
-          <Link
-            className="circ-next"
-            to={`/calendar/${c.nextRace.season}?schedule=${c.nextRace.round}`}
-          >
-            <span className="next-tag">{t('common.next')}</span>
-            {t('circ.next', {
-              gp: gpTitle(c.nextRace.grandPrixName, lang),
-              date: fmtDate(c.nextRace.date, { day: 'numeric', month: 'long' }),
-            })}
-          </Link>
-        )}
-        {mapUrl && (
-          <a className="sched-ics" href={mapUrl} target="_blank" rel="noopener noreferrer">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-              <path
-                d="M12 21s-6.5-5.6-6.5-11a6.5 6.5 0 0 1 13 0c0 5.4-6.5 11-6.5 11z"
-                stroke="currentColor"
-                strokeWidth="1.8"
-              />
-              <circle cx="12" cy="10" r="2.3" stroke="currentColor" strokeWidth="1.8" />
-            </svg>
-            {t('circ.map')}
-          </a>
-        )}
-      </div>
+          <div className="circ-actions">
+            {c.nextRace && (
+              <Link
+                className="circ-next"
+                to={`/calendar/${c.nextRace.season}?schedule=${c.nextRace.round}`}
+              >
+                <span className="next-tag">{t('common.next')}</span>
+                {t('circ.next', {
+                  gp: gpTitle(c.nextRace.grandPrixName, lang),
+                  date: fmtDate(c.nextRace.date, { day: 'numeric', month: 'long' }),
+                })}
+              </Link>
+            )}
+            {mapUrl && (
+              <a className="sched-ics" href={mapUrl} target="_blank" rel="noopener noreferrer">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                  <path
+                    d="M12 21s-6.5-5.6-6.5-11a6.5 6.5 0 0 1 13 0c0 5.4-6.5 11-6.5 11z"
+                    stroke="currentColor"
+                    strokeWidth="1.8"
+                  />
+                  <circle cx="12" cy="10" r="2.3" stroke="currentColor" strokeWidth="1.8" />
+                </svg>
+                {t('circ.map')}
+              </a>
+            )}
+          </div>
 
-      <div className="wknd-highlights circ-stats">
-        <div className="wknd-hl">
-          <div className="wknd-hl-label">{t('circ.length')}</div>
-          <div className="wknd-hl-name">{km(c.length)}</div>
+          <div className="wknd-highlights circ-stats">
+            <div className="wknd-hl">
+              <div className="wknd-hl-label">{t('circ.length')}</div>
+              <div className="wknd-hl-name">{km(c.length)}</div>
+            </div>
+            <div className="wknd-hl">
+              <div className="wknd-hl-label">{t('circ.turns')}</div>
+              <div className="wknd-hl-name">{c.turns ?? '—'}</div>
+            </div>
+            <div className="wknd-hl">
+              <div className="wknd-hl-label">{t('circ.racesHeld')}</div>
+              <div className="wknd-hl-name">{c.racesHeld}</div>
+            </div>
+            <div className="wknd-hl">
+              <div className="wknd-hl-label">{t('circ.firstGp')}</div>
+              <div className="wknd-hl-name">{c.firstYear ?? '—'}</div>
+            </div>
+          </div>
         </div>
-        <div className="wknd-hl">
-          <div className="wknd-hl-label">{t('circ.turns')}</div>
-          <div className="wknd-hl-name">{c.turns ?? '—'}</div>
-        </div>
-        <div className="wknd-hl">
-          <div className="wknd-hl-label">{t('circ.racesHeld')}</div>
-          <div className="wknd-hl-name">{c.racesHeld}</div>
-        </div>
-        <div className="wknd-hl">
-          <div className="wknd-hl-label">{t('circ.firstGp')}</div>
-          <div className="wknd-hl-name">{c.firstYear ?? '—'}</div>
-        </div>
+        {c.outline && (
+          <div className="circ-map">
+            <CircuitOutline
+              outline={c.outline}
+              label={t('circ.outlineOf', { name: c.name })}
+              strokeWidth={3.6}
+            />
+          </div>
+        )}
       </div>
 
       <div className="card circ-record">

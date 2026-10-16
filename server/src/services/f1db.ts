@@ -1,4 +1,5 @@
 import AdmZip from "adm-zip";
+import { circuitOutline } from "./circuitOutlines";
 import type {
   CalendarRace,
   CalendarSession,
@@ -1144,11 +1145,15 @@ export async function getHomeHighlights(): Promise<HomeHighlights> {
   let nextRace: HomeHighlights["nextRace"] = null;
   if (upcoming) {
     const gp = ds.grandsPrix.get(upcoming.grandPrixId);
+    const circuit = ds.circuits.get(upcoming.circuitId);
     nextRace = {
       round: upcoming.round,
       grandPrixName: gp?.name ?? upcoming.grandPrixId,
       date: upcoming.date,
       countryCode: alpha2(ds, gp?.countryId),
+      circuitId: upcoming.circuitId,
+      placeName: circuit?.placeName ?? "",
+      outline: circuitOutline(upcoming.circuitId),
     };
   }
 
@@ -1559,6 +1564,7 @@ function circuitSummary(ds: Dataset, c: RawCircuit): CircuitSummary {
     firstYear: years.length ? Math.min(...years) : null,
     lastYear: years.length ? Math.max(...years) : null,
     onCurrentCalendar: held.some((r) => r.year === current),
+    outline: circuitOutline(c.id),
   };
 }
 

@@ -204,6 +204,9 @@ export interface NextRace {
   grandPrixName: string;
   date: string;
   countryCode: string | null;
+  circuitId: string;
+  placeName: string;
+  outline: CircuitOutline | null;
 }
 
 export interface LeaderSummary {
@@ -538,6 +541,7 @@ export interface CircuitSummary {
   firstYear: number | null;
   lastYear: number | null;
   onCurrentCalendar: boolean;
+  outline: CircuitOutline | null;
 }
 
 export interface CircuitLayoutInfo {
@@ -658,4 +662,14 @@ export interface SearchIndex {
   circuits: [string, string, string, string | null][];
   // [season, round, grandPrixName, countryCode] — completed races, newest first
   races: [number, number, string, string | null][];
+}
+
+// A circuit drawn as one SVG path (viewBox 0..w × 0..h, longest side 100),
+// rotated to suit a landscape card. `start` is the first point of the line.
+export interface CircuitOutline {
+  d: string;
+  w: number;
+  h: number;
+  start: [number, number];
+  rotation: number;
 }

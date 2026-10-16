@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { api } from '../api/client'
+import CircuitOutline from '../components/CircuitOutline'
 import Flag from '../components/Flag'
 import { useAsync } from '../hooks/useAsync'
 import { useSeo } from '../hooks/useSeo'
@@ -17,15 +18,19 @@ function CircuitTile({ c }: { c: CircuitSummary }) {
       : c.onCurrentCalendar
         ? t('circ.since', { year: c.firstYear })
         : t('circ.years', { from: c.firstYear, to: c.lastYear ?? c.firstYear })
+  const country = countryName(c.countryCode, locale)
   return (
     <Link to={`/circuits/${c.circuitId}`} className="circuit-tile">
-      <span className="circuit-tile-top">
-        <Flag code={c.countryCode} nationality={c.nationality} />
-        <span className="circuit-tile-place">
-          {c.placeName}
-          {c.countryCode ? ` · ${countryName(c.countryCode, locale)}` : ''}
+      {c.outline && (
+        <span className="circuit-tile-art">
+          <CircuitOutline outline={c.outline} label={t('circ.outlineOf', { name: c.name })} />
         </span>
+      )}
+      <span className="circuit-tile-country">
+        <Flag code={c.countryCode} nationality={c.nationality} />
+        <span>{country || c.nationality}</span>
       </span>
+      <span className="circuit-tile-place">{c.placeName}</span>
       <span className="circuit-tile-name">{c.name}</span>
       <span className="circuit-tile-meta">
         <span>{t(`circ.type.${c.type}` as TKey)}</span>

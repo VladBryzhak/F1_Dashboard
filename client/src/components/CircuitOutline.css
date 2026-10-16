@@ -1,0 +1,17 @@
+/* Track outline: red line on whatever card it sits in, white start dot. */
+.circuit-outline {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+.circuit-outline .co-track {
+  fill: none;
+  stroke: var(--accent);
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+.circuit-outline .co-start {
+  stroke: #fff;
+  stroke-linecap: round;
+}

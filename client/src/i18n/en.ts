@@ -26,6 +26,7 @@ const en = {
   'footer.dataBy': 'Data by',
   'footer.telemetryBy': 'Telemetry by',
   'footer.flagsBy': 'Flag icons by',
+  'footer.outlinesBy': 'Track outlines drawn from',
   'footer.photosVia': 'Driver photos and team logos/photos via',
   'footer.photosLicense': '(CC BY-SA / public domain, by their respective authors)',
   'footer.legal': 'Legal',
@@ -86,6 +87,7 @@ const en = {
 
   // Circuits
   'nav.circuits': 'Circuits',
+  'circ.outlineOf': 'Track map of {name}',
   'circ.listTitle': 'F1 Circuits',
   'circ.current': 'On the {season} calendar',
   'circ.historic': 'Historic circuits',

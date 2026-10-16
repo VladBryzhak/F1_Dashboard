@@ -1,5 +1,6 @@
 import type { CSSProperties, SyntheticEvent } from 'react'
 import { Link } from 'react-router-dom'
+import CircuitOutline from '../components/CircuitOutline'
 import { Headshot } from '../components/EntityCards'
 import { useAsync } from '../hooks/useAsync'
 import { useSeo } from '../hooks/useSeo'
@@ -162,15 +163,29 @@ function NextRaceCard({ race }: { race: NextRace }) {
   const month = fmtDate(race.date, { month: 'short' }).replace('.', '').toUpperCase()
   // Opens the calendar with this race's weekend schedule expanded.
   return (
-    <Link to={`/calendar?schedule=${race.round}`} className="home-next">
-      <span className="home-next-date">
-        <b>{day || '—'}</b>
-        <em>{month}</em>
+    <Link
+      to={`/calendar?schedule=${race.round}`}
+      className={`home-next${race.outline ? ' has-map' : ''}`}
+    >
+      <span className="home-next-row">
+        <span className="home-next-date">
+          <b>{day || '—'}</b>
+          <em>{month}</em>
+        </span>
+        <span className="home-next-info">
+          <span className="home-next-label">{t('home.nextRace')}</span>
+          <span className="home-next-gp">{gpTitle(race.grandPrixName, lang)}</span>
+          {race.placeName && <span className="home-next-place">{race.placeName}</span>}
+        </span>
       </span>
-      <span className="home-next-info">
-        <span className="home-next-label">{t('home.nextRace')}</span>
-        <span className="home-next-gp">{gpTitle(race.grandPrixName, lang)}</span>
-      </span>
+      {race.outline && (
+        <span className="home-next-map">
+          <CircuitOutline
+            outline={race.outline}
+            label={t('circ.outlineOf', { name: race.placeName || race.grandPrixName })}
+          />
+        </span>
+      )}
     </Link>
   )
 }

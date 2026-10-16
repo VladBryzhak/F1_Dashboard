@@ -1,5 +1,51 @@
 /* Circuit page: stats, lap record, most wins/poles, actions. */
 
+/* Title, actions and stat tiles on the left; the track outline on the right. */
+.circ-hero.has-map {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(260px, 0.8fr);
+  gap: 1.25rem;
+  align-items: start;
+  margin-bottom: 1.25rem;
+}
+.circ-hero.has-map .wknd-highlights {
+  margin-bottom: 0;
+  grid-template-columns: 1fr 1fr;
+}
+.circ-map {
+  aspect-ratio: 16 / 10;
+  padding: 1.4rem 1.6rem;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+}
+@media (max-width: 860px) {
+  .circ-hero.has-map {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+  /* Title, then the map, then actions and stats. */
+  .circ-hero.has-map .circ-hero-main {
+    display: contents;
+  }
+  .circ-hero.has-map .wknd-title {
+    order: 1;
+  }
+  .circ-map {
+    order: 2;
+    margin-bottom: 1.1rem;
+    padding: 1rem 1.2rem;
+  }
+  .circ-hero.has-map .circ-actions {
+    order: 3;
+  }
+  .circ-hero.has-map .wknd-highlights {
+    order: 4;
+    margin-bottom: 1.25rem;
+  }
+}
+
 .circ-stats {
   grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
 }

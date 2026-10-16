@@ -43,6 +43,10 @@ function AboutEn() {
           <Ext href="https://flagcdn.com">flagcdn</Ext> — flag icons.
         </li>
         <li>
+          <Ext href="https://github.com/bacinger/f1-circuits">f1-circuits</Ext> (MIT, © Tomislav
+          Bacinger) — circuit geodata; the track outlines are drawn from it.
+        </li>
+        <li>
           News headlines on the home page come from the Motorsport.com RSS feed and link to the
           original articles.
         </li>
@@ -107,6 +111,10 @@ function AboutUk() {
         </li>
         <li>
           <Ext href="https://flagcdn.com">flagcdn</Ext> — іконки прапорів.
+        </li>
+        <li>
+          <Ext href="https://github.com/bacinger/f1-circuits">f1-circuits</Ext> (MIT, © Tomislav
+          Bacinger) — геодані трас, за якими намальовано схеми трас.
         </li>
         <li>
           Заголовки новин на головній беруться з RSS Motorsport.com і ведуть на оригінальні статті.
