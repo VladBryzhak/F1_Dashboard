@@ -783,7 +783,10 @@ export async function getCalendar(season: string): Promise<CalendarResponse> {
           : null,
         winnerConstructorId: winner?.constructorId ?? null,
         winnerConstructorName: winnerTeam?.name ?? null,
-        isSprint: r.sprintRaceDate != null,
+        // f1db has no sprint dates for some seasons (e.g. 2023) but does have
+        // the sprint results, so either marks a sprint weekend.
+        isSprint:
+          r.sprintRaceDate != null || ds.sprintResultsByRace.has(`${year}:${r.round}`),
         sessions: raceSessions(r),
       };
     });
@@ -1523,5 +1526,13 @@ export async function getRaceDates(
 ): Promise<{ date: string; sprintDate: string | null } | null> {
   const ds = await dataset();
   const r = ds.races.find((x) => x.year === Number(season) && x.round === Number(round));
-  return r ? { date: r.date, sprintDate: r.sprintRaceDate } : null;
+  if (!r) return null;
+  // Without a stored sprint date, a sprint that ran was on the Saturday.
+  let sprintDate = r.sprintRaceDate;
+  if (!sprintDate && ds.sprintResultsByRace.has(`${r.year}:${r.round}`)) {
+    sprintDate = new Date(Date.parse(`${r.date}T00:00:00Z`) - 86_400_000)
+      .toISOString()
+      .slice(0, 10);
+  }
+  return { date: r.date, sprintDate };
 }
