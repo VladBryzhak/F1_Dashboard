@@ -44,15 +44,17 @@ function CircuitTile({ c }: { c: CircuitSummary }) {
 export default function Circuits() {
   const { t, locale } = useI18n()
   useSeo({
-    title: 'F1 Circuits — Every Formula 1 Track',
+    title: 'F1 Circuits — Track Maps, Lap Records & Winners',
     description:
-      'Every Formula 1 circuit since 1950: track length, turns, race lap records, layouts and the full list of winners at each venue.',
+      'Formula 1 circuits on the current calendar and classic tracks: track maps, length, turns, race lap records, layouts and every winner at each venue.',
   })
   const { data, loading, error } = useAsync(() => api.circuits(), [])
   const [q, setQ] = useState('')
 
   const filtered = useMemo(() => {
-    const list = data ?? []
+    // Only circuits we can draw are listed; the rest keep their own pages
+    // (linked from race weekends and the search).
+    const list = (data ?? []).filter((c) => c.outline)
     const needle = q.trim().toLowerCase()
     if (!needle) return list
     return list.filter((c) =>
