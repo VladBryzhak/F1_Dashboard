@@ -1,0 +1,194 @@
+/* Head-to-head driver comparison. */
+
+/* Season picker that sits in the Compare tab row. */
+.cmp-season {
+  margin-left: auto;
+  align-self: center;
+  margin-bottom: 0.5rem;
+  background: var(--card);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font: inherit;
+  font-weight: 700;
+  padding: 0.3rem 0.6rem;
+  cursor: pointer;
+}
+
+.cmp-pickers {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+  margin-bottom: 1.25rem;
+}
+
+.cmp-input {
+  min-width: 0; /* let the input shrink into its grid cell (native size=20) */
+  background: var(--card);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 0.6rem 0.9rem;
+  font-family: inherit;
+  font-weight: 700;
+  font-size: 0.95rem;
+}
+
+.cmp-input:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+.cmp-heads {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.cmp-head {
+  position: relative;
+  overflow: hidden;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-top: 3px solid var(--border);
+  border-radius: 14px;
+  padding: 0.9rem 1.1rem;
+}
+
+.cmp-head h2 {
+  margin: 0.2rem 0 0.3rem;
+  font-size: 1.45rem;
+  font-weight: 800;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+/* Driver avatar in the comparison header. */
+.cmp-photo {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  object-fit: cover;
+  object-position: top center;
+  background: var(--card);
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+.cmp-sub {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  color: var(--muted);
+  font-weight: 600;
+  font-size: 0.85rem;
+}
+
+.cmp-vs {
+  font-family: var(--font-display);
+  font-size: 1.2rem;
+  font-weight: 800;
+  color: var(--muted-2);
+}
+
+.cmp-table {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+}
+
+.cmp-row {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.6rem 0.4rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.cmp-row:last-child {
+  border-bottom: none;
+}
+
+.cmp-val {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 1.35rem;
+  font-variant-numeric: tabular-nums;
+  color: var(--muted);
+}
+
+.cmp-val:first-child {
+  text-align: right;
+}
+
+.cmp-val.win {
+  color: var(--text);
+}
+
+.cmp-label {
+  color: var(--muted);
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  text-align: center;
+  min-width: 96px;
+}
+
+.cmp-h2h {
+  margin-top: 1rem;
+}
+
+.cmp-h2h-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 0.8rem;
+}
+
+.cmp-h2h-head h3 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 1rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  color: var(--muted);
+}
+
+.cmp-h2h-tally {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 0.6rem;
+}
+
+.cmp-h2h-tally > span:first-child,
+.cmp-h2h-tally > span:last-child {
+  font-family: var(--font-display);
+  font-size: 1.9rem;
+  font-weight: 800;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.cmp-h2h-tally .win {
+  color: var(--text);
+}
+
+.cmp-h2h-bar {
+  display: flex;
+  height: 10px;
+  border-radius: 999px;
+  overflow: hidden;
+  background: var(--panel);
+}
+
+.cmp-h2h-bar > span {
+  height: 100%;
+}

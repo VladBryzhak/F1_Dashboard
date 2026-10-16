@@ -2,6 +2,7 @@ import { useState, type FormEvent } from 'react'
 import { api } from '../api/client'
 import { useSeo } from '../hooks/useSeo'
 import { useI18n } from '../i18n/core'
+import './Feedback.css'
 
 type Status = 'idle' | 'sending' | 'sent' | 'error'
 

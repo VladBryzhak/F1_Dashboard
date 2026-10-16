@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom'
 import Breadcrumbs from '../components/Breadcrumbs'
 import { useSeo } from '../hooks/useSeo'
 import { useI18n } from '../i18n/core'
+import './Doc.css'
 
 // Bump when the text below changes.
 const UPDATED = '2026-10-16'

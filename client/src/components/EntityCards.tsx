@@ -5,6 +5,7 @@ import type { ConstructorStanding, DriverStanding } from '../types/f1'
 import Flag from './Flag'
 import { useI18n } from '../i18n/core'
 import { countryName } from '../lib/countries'
+import './EntityCards.css'
 
 // Official car render; hides itself if the image is missing (e.g. older seasons).
 // Exported so profile pages can reuse the same season-accurate art + fallback.

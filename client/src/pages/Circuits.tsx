@@ -7,6 +7,7 @@ import { useSeo } from '../hooks/useSeo'
 import { useI18n, type TKey } from '../i18n/core'
 import { countryName } from '../lib/countries'
 import type { CircuitSummary } from '../types/f1'
+import './Circuits.css'
 
 function CircuitTile({ c }: { c: CircuitSummary }) {
   const { t, tn, locale } = useI18n()

@@ -1,0 +1,162 @@
+/* Race weekend → Strategy tab: lap chart and tyre stints. */
+
+.strat-kind {
+  margin-bottom: 1rem;
+}
+
+.strat-chart-wrap {
+  overflow-x: auto;
+}
+
+.strat-chart {
+  display: block;
+  width: 100%;
+  min-width: 640px;
+  height: auto;
+}
+
+.strat-grid {
+  stroke: rgba(255, 255, 255, 0.05);
+  stroke-width: 1;
+}
+
+.strat-axis {
+  fill: var(--muted-2);
+  font: 600 12px var(--font-body);
+}
+
+.strat-line path {
+  fill: none;
+  stroke-width: 2;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+  opacity: 0.14;
+  cursor: pointer;
+  transition: opacity 0.12s ease;
+}
+
+.strat-line circle {
+  opacity: 0.14;
+}
+
+.strat-line.on path {
+  opacity: 1;
+  stroke-width: 2.6;
+}
+
+.strat-line.on circle {
+  opacity: 1;
+}
+
+.strat-code {
+  fill: var(--muted-2);
+  font: 700 12px var(--font-body);
+  letter-spacing: 0.5px;
+  cursor: pointer;
+}
+
+.strat-code.on {
+  fill: var(--text);
+}
+
+.strat-chart-foot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-top: 0.6rem;
+  font-size: 0.75rem;
+  color: var(--muted-2);
+}
+
+.strat-clear {
+  background: transparent;
+  color: var(--text);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 6px;
+  padding: 0.25rem 0.6rem;
+  font: 600 0.75rem var(--font-body);
+  cursor: pointer;
+}
+
+.strat-clear:hover {
+  border-color: var(--accent);
+}
+
+.strat-tyres {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.strat-tyre-row {
+  display: grid;
+  grid-template-columns: 5.2rem 1fr;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.strat-tyre-code {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-weight: 700;
+  font-size: 0.85rem;
+}
+
+.strat-tyre-pos {
+  width: 1.4rem;
+  text-align: right;
+  color: var(--muted-2);
+  font-variant-numeric: tabular-nums;
+}
+
+.strat-tyre-stripe {
+  width: 3px;
+  height: 14px;
+  border-radius: 2px;
+}
+
+.strat-tyre-track {
+  position: relative;
+  height: 18px;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.strat-stint {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-right: 2px solid var(--card);
+  border-radius: 4px;
+  box-sizing: border-box;
+  font-size: 0.68rem;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  overflow: hidden;
+}
+
+.strat-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1.1rem;
+  margin-top: 0.9rem;
+  font-size: 0.78rem;
+  color: var(--muted);
+}
+
+.strat-legend > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.strat-source {
+  margin-top: 0.75rem;
+  font-size: 0.75rem;
+}

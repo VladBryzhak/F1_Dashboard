@@ -5,6 +5,7 @@ import { fmtTime, segmentClass, teamColor, tyre } from '../lib/live'
 import type { ReplayData, ReplayLap } from '../types/f1'
 import WeatherCard, { weatherAt } from './WeatherCard'
 import { useI18n, type TKey } from '../i18n/core'
+import './ReplayPlayer.css'
 
 const SPEEDS = [5, 15, 30, 60]
 const TICK_MS = 200

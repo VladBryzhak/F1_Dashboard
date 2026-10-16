@@ -1,0 +1,291 @@
+/* Site header: logo, navigation, search button, EN | UA switch, burger menu. */
+
+/* ---------- Header bar, logo and nav ---------- */
+.topbar {
+  display: flex;
+  align-items: center;
+  gap: 2.5rem;
+  padding: 0 1.75rem;
+  height: 56px;
+  background: #000;
+  /* In an installed PWA (iOS standalone) content runs under the status bar /
+     notch; pad the black bar down by the safe-area inset so the logo and nav
+     clear it. env() is 0 on non-notch devices and desktop. */
+  padding-top: env(safe-area-inset-top);
+  padding-left: max(1.75rem, env(safe-area-inset-left));
+  padding-right: max(1.75rem, env(safe-area-inset-right));
+  box-sizing: content-box;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-weight: 900;
+  font-style: italic;
+  letter-spacing: 0.5px;
+  color: #fff;
+  text-decoration: none;
+}
+
+.brand .mark {
+  background: var(--accent);
+  color: #fff;
+  font-style: italic;
+  font-weight: 900;
+  padding: 2px 7px;
+  border-radius: 3px;
+  font-size: 0.95rem;
+}
+
+.nav {
+  display: flex;
+  gap: 1.75rem;
+  height: 100%;
+  align-items: center;
+}
+
+.nav-link {
+  position: relative;
+  color: var(--muted);
+  text-decoration: none;
+  font-size: 0.95rem;
+  font-weight: 600;
+  height: 100%;
+  display: flex;
+  align-items: center;
+}
+
+.nav-link:hover {
+  color: #fff;
+}
+
+.nav-link.active {
+  color: #fff;
+}
+
+.nav-link.active::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 3px;
+  background: var(--accent);
+}
+
+/* EN | UA interface-language switch, right end of the header. The nav comes
+   first visually on desktop; on phones the switch sits next to the burger. */
+.nav {
+  order: 1;
+}
+
+/* Header search button: icon + shortcut hint (hint hidden on small screens). */
+.search-btn {
+  order: 2;
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  height: 32px;
+  padding: 0 0.55rem;
+  background: transparent;
+  color: var(--muted);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 8px;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.search-btn:hover,
+.search-btn:focus-visible {
+  outline: none;
+  color: #fff;
+  border-color: var(--accent);
+}
+
+.search-kbd {
+  font: 600 0.68rem var(--font-body);
+  letter-spacing: 0.04em;
+  color: var(--muted-2);
+}
+
+.lang-switch {
+  order: 3;
+  display: inline-flex;
+  flex-shrink: 0;
+  padding: 2px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 8px;
+}
+
+.lang-switch button {
+  min-width: 34px;
+  height: 26px;
+  padding: 0 0.45rem;
+  background: transparent;
+  color: var(--muted);
+  border: 0;
+  border-radius: 6px;
+  font: 600 0.75rem/1 var(--font-body);
+  letter-spacing: 0.06em;
+  cursor: pointer;
+}
+
+.lang-switch button:hover {
+  color: #fff;
+}
+
+.lang-switch button.on {
+  background: var(--accent);
+  color: #fff;
+}
+
+.lang-switch button:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+
+/* ---------- Burger button (tablets and phones) ---------- */
+/* Burger button — shown up to 1024px (see "Responsive header" below). */
+.nav-toggle {
+  display: none;
+  position: relative;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  margin-left: auto;
+  background: transparent;
+  color: var(--text);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+.nav-toggle:hover,
+.nav-toggle:focus-visible {
+  outline: none;
+  border-color: var(--accent);
+}
+
+.nav-toggle-dot {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 0 2px #000;
+}
+
+/* ---------- Responsive header ---------- */
+/* Mid-width desktops: tighten the header so all links fit on one line. */
+@media (max-width: 1180px) {
+  .topbar {
+    gap: 1.5rem;
+  }
+  .nav {
+    gap: 1.1rem;
+  }
+}
+
+/* Tablets and phones: logo + language switch + burger; the nav becomes a
+   dropdown panel (Layout.tsx). */
+@media (max-width: 1024px) {
+  .topbar {
+    position: relative;
+    height: auto;
+    justify-content: space-between;
+    /* Add the iOS status-bar / notch inset to the top padding in standalone. */
+    padding: calc(0.55rem + env(safe-area-inset-top)) max(1rem, env(safe-area-inset-right))
+      0.55rem max(1rem, env(safe-area-inset-left));
+    gap: 1rem;
+  }
+  .nav-toggle {
+    display: inline-flex;
+    margin-left: 0;
+  }
+  .lang-switch {
+    order: 0;
+  }
+  .search-btn {
+    order: 0;
+    height: 38px;
+    width: 40px;
+    justify-content: center;
+    padding: 0;
+  }
+  .search-kbd {
+    display: none;
+  }
+  .lang-switch button {
+    height: 32px;
+    min-width: 38px;
+  }
+  .nav {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    z-index: 40;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.15rem;
+    height: auto;
+    padding: 0.5rem max(0.75rem, env(safe-area-inset-right)) 0.9rem
+      max(0.75rem, env(safe-area-inset-left));
+    background: #000;
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    box-shadow: 0 18px 40px rgba(0, 0, 0, 0.6);
+  }
+  .topbar.menu-open .nav {
+    display: flex;
+  }
+  .nav-link {
+    height: auto;
+    min-height: 48px;
+    padding: 0 0.9rem;
+    font-size: 1.05rem;
+    border-radius: 10px;
+  }
+  .nav-link.active {
+    background: rgba(255, 255, 255, 0.06);
+  }
+  /* Active marker becomes a red bar on the left of the row. */
+  .nav-link.active::after {
+    top: 10px;
+    bottom: 10px;
+    left: 0;
+    right: auto;
+    width: 3px;
+    height: auto;
+    border-radius: 2px;
+  }
+}
+
+/* ---------- Live dot on the nav link ---------- */
+/* "Live" nav-link status dot (grey = nothing, red = session live). */
+.nav-live-dot {
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--muted-2);
+  margin-right: 0.4rem;
+  vertical-align: middle;
+}
+
+.nav-live-dot.on {
+  background: #e10600;
+  box-shadow: 0 0 0 0 rgba(225, 6, 0, 0.6);
+  animation: livePulse 1.6s infinite;
+}
+
+/* Header gap tweaks so search + language sit together at the right. */
+.search-btn + .lang-switch {
+  margin-left: 0.6rem;
+}

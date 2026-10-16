@@ -1,5 +1,6 @@
 import { useI18n } from '../i18n/core'
 import type { WeatherSample } from '../types/f1'
+import './WeatherCard.css'
 
 // The latest sample at or before `time` (OpenF1 posts about one a minute).
 // eslint-disable-next-line react-refresh/only-export-components

@@ -1,0 +1,51 @@
+/* Calendar table: next-race marker, sprint badge, expandable schedule rows. */
+
+/* Sprint marker next to a Grand Prix name. */
+.sprint-badge {
+  display: inline-block;
+  margin-left: 0.5rem;
+  padding: 0.08rem 0.45rem;
+  border-radius: 999px;
+  background: rgba(225, 6, 0, 0.1);
+  border: 1px solid rgba(225, 6, 0, 0.45);
+  color: #ff6a66;
+  font-size: 0.62rem;
+  font-weight: 800;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  vertical-align: middle;
+}
+
+/* The next race to run gets a red edge (its NEXT tag is in shared.css). */
+.row-next td:first-child {
+  box-shadow: inset 3px 0 0 var(--accent);
+}
+
+.sched-caret {
+  display: inline-block;
+  transition: transform 0.15s ease;
+}
+
+.sched-caret.open {
+  transform: rotate(90deg);
+  color: var(--accent);
+}
+
+.row-open td {
+  border-bottom-color: transparent;
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.standings .sched-row td {
+  padding: 0 0.75rem 1rem;
+  background: rgba(255, 255, 255, 0.03);
+  font-weight: 500;
+}
+
+@media (max-width: 768px) {
+  /* The calendar table scrolls sideways on phones; keep the open schedule
+     pinned to the visible width so it never needs scrolling itself. */
+  .standings .sched-row td {
+    padding: 0 0 0.75rem;
+  }
+}

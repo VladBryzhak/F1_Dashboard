@@ -10,6 +10,7 @@ import { useSeo } from '../hooks/useSeo'
 import { useI18n } from '../i18n/core'
 import { teamColor } from '../lib/f1meta'
 import { gpShort, gpTitle } from '../lib/gpNames'
+import './Calendar.css'
 
 export default function Calendar() {
   const { season: seasonParam } = useParams()

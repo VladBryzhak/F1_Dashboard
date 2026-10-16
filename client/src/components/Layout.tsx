@@ -5,6 +5,7 @@ import { useI18n, type Lang, type TKey } from '../i18n/core'
 import CookieBanner from './CookieBanner'
 import SearchPalette from './SearchPalette'
 import Footer from './Footer'
+import './Layout.css'
 
 const links: { to: string; label: TKey }[] = [
   { to: '/live', label: 'nav.live' },

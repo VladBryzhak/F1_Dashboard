@@ -10,6 +10,7 @@ import { teamColor } from '../lib/f1meta'
 import { breadcrumbLd } from '../lib/jsonld'
 import type { CircuitTally } from '../types/f1'
 import { gpShort, gpTitle } from '../lib/gpNames'
+import './CircuitProfile.css'
 
 function Tally({
   title,

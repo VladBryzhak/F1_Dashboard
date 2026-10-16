@@ -5,6 +5,7 @@ import { useAsync } from '../hooks/useAsync'
 import Flag from './Flag'
 import { useI18n } from '../i18n/core'
 import { countryName } from '../lib/countries'
+import './EntitySearch.css'
 
 const DECADES = [2020, 2010, 2000, 1990, 1980, 1970, 1960, 1950]
 

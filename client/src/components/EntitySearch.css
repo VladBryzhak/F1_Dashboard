@@ -1,0 +1,135 @@
+/* Search tab on Drivers and Teams: filters and result cards. */
+
+/* Driver search (Drivers → Search tab). */
+.ds-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  margin: 1.1rem 0 1.25rem;
+}
+
+.ds-input {
+  flex: 1 1 220px;
+  min-width: 0;
+}
+
+.ds-input,
+.ds-controls select {
+  background: var(--card);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 10px;
+  color: var(--text);
+  font: inherit;
+  padding: 0.6rem 0.75rem;
+}
+
+.ds-input:focus,
+.ds-controls select:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+.ds-count {
+  margin: 0 0 0.8rem;
+  font-size: 0.78rem;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  font-variant-numeric: tabular-nums;
+}
+
+.ds-results {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(215px, 1fr));
+  gap: 0.7rem;
+}
+
+.ds-card {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  padding: 0.75rem 0.85rem;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  text-decoration: none;
+  color: var(--text);
+  transition: border-color 0.15s ease, transform 0.15s ease;
+}
+
+.ds-card:hover {
+  border-color: var(--accent);
+  transform: translateY(-2px);
+}
+
+.ds-photo {
+  width: 52px;
+  height: 52px;
+  border-radius: 10px;
+  object-fit: cover;
+  object-position: top center;
+  background: var(--panel);
+  flex: none;
+}
+
+.ds-photo--none {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 1.3rem;
+  color: var(--muted-2);
+}
+
+/* Team swatch: constructor-coloured tile with the team's initial. */
+.ds-photo--team {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 1.3rem;
+  color: #fff;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.45);
+}
+
+/* Free logo: shown whole on a light tile (logos are often dark-on-transparent). */
+.ds-photo--logo {
+  object-fit: contain;
+  background: #fff;
+  padding: 5px;
+}
+
+/* Free photo (usually a car): fill the tile. */
+.ds-photo--car {
+  object-fit: cover;
+}
+
+.ds-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  min-width: 0;
+}
+
+.ds-name {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 1.05rem;
+  text-transform: uppercase;
+  letter-spacing: 0.2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ds-sub {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.82rem;
+  color: var(--muted);
+}
+
+.ds-stats {
+  font-size: 0.78rem;
+  font-variant-numeric: tabular-nums;
+}

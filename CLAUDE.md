@@ -13,6 +13,14 @@ F1 Dashboard — a web app showing Formula 1 standings, race calendar, driver/te
 
 The **client only talks to our backend** (`/api/*`). The **server** talks to the upstream F1 APIs, normalizes their verbose shapes into the flat types in `server/src/types/f1.ts` (mirrored in `client/src/types/f1.ts`), and caches responses.
 
+## Styles (client)
+
+Plain CSS, split by area (no CSS-in-JS, no CSS Modules):
+
+- `client/src/styles/base.css` — design tokens (`:root` colours, fonts) and element defaults; `styles/shared.css` — building blocks used by several pages (page frame, cards and `table.standings`, tabs, tyre badges, banners, detail-page title/highlight tiles). Both are imported first in `main.tsx`.
+- Every page/component that owns styles imports its own file next to it (`pages/Home.tsx` → `./Home.css`, `components/ReplayPlayer.tsx` → `./ReplayPlayer.css`). Driver + team profiles share `styles/profile.css`; About/Privacy share `pages/Doc.css`; driver/team search share `components/EntitySearch.css`.
+- Vite splits page CSS into the lazy route chunks, so it only loads with its page — but once loaded it stays in the document. Therefore: a class that is used by more than one page goes in `shared.css`; page files only hold classes unique to that page (prefixes like `circ-`, `sched-`, `rp-`, `cmp-`, `strat-`). Keep each `@media` rule in the same file, right after the rules it adjusts.
+
 ## Commands
 
 Client (`cd client`):

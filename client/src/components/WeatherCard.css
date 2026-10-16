@@ -1,0 +1,10 @@
+/* Weather card under the SESSION panel (Live and Replay). */
+
+/* Weather card under the SESSION panel (Live + Replay). */
+.rp-weather {
+  margin-top: 0.9rem;
+}
+
+.rp-wx-rain {
+  color: #5aa9ff;
+}

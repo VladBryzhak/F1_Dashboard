@@ -13,6 +13,7 @@ import { driverPortraitUrl, teamColor } from '../lib/f1meta'
 import { gpShort } from '../lib/gpNames'
 import { driverSummary } from '../lib/summaries'
 import type { DriverProfile as Profile } from '../types/f1'
+import '../styles/profile.css'
 
 // Whole years between two yyyy-mm-dd dates (to today when `to` is null).
 function yearsBetween(from: string, to: string | null): number | null {

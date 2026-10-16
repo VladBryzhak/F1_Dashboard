@@ -1,0 +1,321 @@
+/* Live → Replay: race picker, playback controls and the replay board. */
+
+/* ---------- Race picker and playback controls ---------- */
+.rp-head {
+  margin: 1rem 0;
+}
+
+.rp-select {
+  background: var(--card);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 10px;
+  color: var(--text);
+  font: inherit;
+  font-weight: 600;
+  padding: 0.5rem 0.7rem;
+}
+
+.rp-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  flex-wrap: wrap;
+  margin-bottom: 1rem;
+  padding: 0.7rem 0.9rem;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+}
+
+.rp-play {
+  flex: none;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: none;
+  background: var(--accent);
+  color: #fff;
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+
+.rp-scrub {
+  flex: 1 1 180px;
+  min-width: 120px;
+  accent-color: var(--accent);
+}
+
+.rp-lap {
+  font-weight: 700;
+  font-size: 0.85rem;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+.rp-speeds {
+  display: flex;
+  gap: 0.3rem;
+}
+
+.rp-speed {
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--muted);
+  font: inherit;
+  font-size: 0.78rem;
+  font-weight: 700;
+  padding: 0.3rem 0.5rem;
+  cursor: pointer;
+}
+
+.rp-speed.active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
+
+/* ---------- Replay board ---------- */
+.rp-board {
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.rp-row {
+  display: grid;
+  grid-template-columns: 2rem minmax(80px, 1fr) 4.2rem 5rem 5rem 4.6rem 3.4rem;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0 0.9rem;
+  height: 44px;
+  border-top: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.rp-row:first-child {
+  border-top: none;
+}
+
+.rp-head-row {
+  height: 32px;
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--muted-2);
+  border-bottom: 1px solid var(--border);
+}
+
+.rp-pos {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 1.05rem;
+  color: var(--text);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Position-change arrow + fading row highlight. */
+.rp-arrow {
+  font-size: 0.6rem;
+  line-height: 1;
+}
+
+.rp-arrow-up {
+  color: #52e252;
+}
+
+.rp-arrow-down {
+  color: #ff5a5a;
+}
+
+.rp-row-btn.rp-move-up {
+  animation: rpMoveUp 2.5s ease-out;
+}
+
+.rp-row-btn.rp-move-down {
+  animation: rpMoveDown 2.5s ease-out;
+}
+
+@keyframes rpMoveUp {
+  0% {
+    background: rgba(82, 226, 82, 0.28);
+  }
+  100% {
+    background: transparent;
+  }
+}
+
+@keyframes rpMoveDown {
+  0% {
+    background: rgba(255, 90, 90, 0.28);
+  }
+  100% {
+    background: transparent;
+  }
+}
+
+.rp-drv {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.rp-num {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.rp-tyre {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+/* Sector segments — three bars that fill the column and reveal sector-by-sector
+   (HUD style), coloured by timing: purple = session best, green, yellow. */
+.rp-sectors {
+  display: flex;
+  gap: 4px;
+  width: 100%;
+}
+
+.rp-sec {
+  flex: 1;
+  min-width: 0;
+  height: 5px;
+  border-radius: 2px;
+  background: #2a2a33;
+}
+
+.rp-sec.sec-p {
+  background: #b14be8;
+}
+
+.rp-sec.sec-g {
+  background: #38d66b;
+}
+
+.rp-sec.sec-y {
+  background: #ffd12e;
+}
+
+/* Rows are buttons (click to expand lap detail). */
+.rp-row-btn {
+  width: 100%;
+  background: none;
+  border: none;
+  border-top: 1px solid rgba(255, 255, 255, 0.04);
+  color: var(--text);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.rp-row-btn:hover {
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.rp-row-btn.open {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+/* "PIT" badge next to a driver in the pit lane. */
+.rp-pit {
+  font-size: 0.6rem;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  background: #ffd12e;
+  color: #0e0e13;
+  padding: 0.05rem 0.3rem;
+  border-radius: 3px;
+  margin-left: 0.35rem;
+}
+
+/* Leader row — subtle red edge accent (the first data row on the board). */
+.rp-board > div:nth-child(2) > .rp-row-btn {
+  box-shadow: inset 3px 0 0 var(--accent);
+}
+
+/* ---------- Track-status banner ---------- */
+/* Track-status banner. */
+.rp-status {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-size: 0.8rem;
+  padding: 0.55rem 0.9rem;
+  border-radius: 10px;
+  margin-bottom: 0.8rem;
+  border: 1px solid var(--border);
+}
+
+.rp-status-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.rp-status--green {
+  color: #43b02a;
+  background: rgba(67, 176, 42, 0.12);
+  border-color: rgba(67, 176, 42, 0.4);
+}
+
+.rp-status--yellow {
+  color: #e0c04a;
+  background: rgba(224, 192, 74, 0.12);
+  border-color: rgba(224, 192, 74, 0.4);
+}
+
+.rp-status--sc {
+  color: #ffb020;
+  background: rgba(255, 176, 32, 0.15);
+  border-color: rgba(255, 176, 32, 0.5);
+}
+
+.rp-status--vsc {
+  color: #ffb020;
+  background: rgba(255, 176, 32, 0.1);
+  border-color: rgba(255, 176, 32, 0.4);
+}
+
+.rp-status--red {
+  color: #ff4d4d;
+  background: rgba(225, 6, 0, 0.15);
+  border-color: rgba(225, 6, 0, 0.5);
+}
+
+.rp-status--chequered {
+  color: var(--muted);
+  background: var(--panel);
+}
+
+/* ---------- Phones ---------- */
+/* Last/Best inside the expanded replay detail: phone only (the board shows
+   them as columns on wider screens). */
+.ld-col--phone {
+  display: none;
+}
+
+/* Phone replay board, as in the mockup: P · driver · sectors · gap · tyre,
+   fitting the screen with no sideways scroll. */
+@media (max-width: 680px) {
+  .rp-row {
+    grid-template-columns: 1.8rem minmax(52px, 1fr) 4.4rem 4.3rem 2.9rem;
+    gap: 0.4rem;
+    padding: 0 0.6rem;
+  }
+  .rp-last,
+  .rp-best {
+    display: none;
+  }
+  .ld-col--phone {
+    display: block;
+  }
+}

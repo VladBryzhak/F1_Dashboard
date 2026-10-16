@@ -1,0 +1,62 @@
+/* Race weekend page: session tabs, practice switch, grid → finish deltas. */
+
+.delta {
+  font-weight: 800;
+  font-size: 0.85rem;
+}
+
+.delta.up {
+  color: #52e252;
+}
+
+.delta.down {
+  color: #ff6b6b;
+}
+
+.wknd-circuit {
+  color: inherit;
+  text-decoration: underline;
+  text-decoration-color: rgba(255, 255, 255, 0.3);
+  text-underline-offset: 3px;
+}
+
+.wknd-circuit:hover {
+  color: #fff;
+  text-decoration-color: var(--accent);
+}
+
+/* Race weekend: session tabs, session date next to each table title, and the
+   FP1/FP2/FP3 switch. */
+.wknd-tabs {
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.wknd-tabs .tab {
+  white-space: nowrap;
+}
+
+.wknd-practice-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem 1rem;
+  margin-bottom: 0.75rem;
+}
+
+.wknd-practice-head .wknd-section {
+  margin: 0;
+}
+
+@media (max-width: 768px) {
+  /* Wrap instead of scrolling sideways so every session tab stays visible. */
+  .wknd-tabs {
+    flex-wrap: wrap;
+    gap: 0.75rem 1.1rem;
+    overflow: visible;
+  }
+  .wknd-tabs .tab {
+    font-size: 0.95rem;
+  }
+}

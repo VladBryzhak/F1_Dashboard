@@ -15,6 +15,7 @@ import {
   tyre,
 } from '../lib/live'
 import type { LiveBoard, LiveDriverDetail, LiveLap } from '../types/f1'
+import './Live.css'
 
 const REFRESH_MS = 7000
 

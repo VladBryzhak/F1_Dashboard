@@ -1,0 +1,171 @@
+/* Weekend schedule that expands under an upcoming race in the calendar. */
+
+.sched {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--panel);
+  padding: 1rem 1.1rem 0.85rem;
+}
+
+.sched-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem 1rem;
+  margin-bottom: 0.85rem;
+}
+
+.sched-next {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.35rem 0.75rem;
+}
+
+.sched-label {
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  color: var(--muted-2);
+}
+
+.sched-label--live {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  color: var(--accent);
+}
+
+.sched-next b {
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.sched-count {
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--accent);
+  font-variant-numeric: tabular-nums;
+}
+
+.sched-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  max-width: 560px;
+}
+
+.sched-item {
+  display: grid;
+  grid-template-columns: 4.5rem 1fr auto;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.55rem 0.6rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.sched-item:first-child {
+  border-top: 0;
+}
+
+.sched-day {
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+.sched-name {
+  font-weight: 600;
+  color: var(--text);
+}
+
+.sched-time {
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--text);
+}
+
+.sched-item--race {
+  box-shadow: inset 3px 0 0 var(--accent);
+  background: rgba(225, 6, 0, 0.06);
+  border-radius: 4px;
+}
+
+.sched-item--race .sched-name {
+  color: #fff;
+}
+
+.sched-item--done .sched-name,
+.sched-item--done .sched-time,
+.sched-item--done .sched-day {
+  color: var(--muted-2);
+}
+
+.sched-item--done .sched-time {
+  text-decoration: line-through;
+}
+
+.sched-live {
+  padding: 0.08rem 0.5rem;
+  border-radius: 999px;
+  background: var(--accent);
+  color: #fff;
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.8px;
+}
+
+.sched-tz {
+  margin: 0.7rem 0 0;
+  font-size: 0.75rem;
+  color: var(--muted-2);
+}
+
+.sched-empty {
+  margin: 0;
+  padding: 0.5rem 0;
+}
+
+@media (max-width: 768px) {
+  .sched {
+    position: sticky;
+    left: 0;
+    /* viewport − page gutters (2 × 1rem) − card padding (2 × 1.5rem) − border */
+    width: calc(100vw - 5rem - 2px);
+    box-sizing: border-box;
+    padding: 0.85rem 0.8rem 0.7rem;
+  }
+  .sched-item {
+    grid-template-columns: 3.4rem 1fr auto;
+    gap: 0.5rem;
+    padding: 0.55rem 0.4rem;
+  }
+  .sched-day {
+    font-size: 0.8rem;
+  }
+}
+
+/* Schedule footer: timezone note + link to the circuit guide. */
+.sched-foot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.4rem 1rem;
+}
+
+.sched-circuit {
+  margin-top: 0.7rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--muted);
+  text-decoration: none;
+}
+
+.sched-circuit:hover {
+  color: var(--accent);
+}

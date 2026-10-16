@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom'
 import Breadcrumbs from '../components/Breadcrumbs'
 import { useSeo } from '../hooks/useSeo'
 import { useI18n } from '../i18n/core'
+import './Doc.css'
 
 function Ext({ href, children }: { href: string; children: React.ReactNode }) {
   return (

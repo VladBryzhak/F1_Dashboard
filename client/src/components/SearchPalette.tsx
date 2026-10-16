@@ -6,6 +6,7 @@ import { countryName } from '../lib/countries'
 import { gpShort, gpTitle } from '../lib/gpNames'
 import type { SearchIndex } from '../types/f1'
 import Flag from './Flag'
+import './SearchPalette.css'
 
 type Hit = {
   kind: 'driver' | 'team' | 'circuit' | 'race'

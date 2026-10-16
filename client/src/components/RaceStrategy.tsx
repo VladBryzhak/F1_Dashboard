@@ -4,6 +4,7 @@ import { useAsync } from '../hooks/useAsync'
 import { useI18n, type TKey } from '../i18n/core'
 import { teamColor, tyre } from '../lib/live'
 import type { RaceStrategy as Strategy, StrategyDriver } from '../types/f1'
+import './RaceStrategy.css'
 
 const COMPOUNDS = ['SOFT', 'MEDIUM', 'HARD', 'INTERMEDIATE', 'WET'] as const
 

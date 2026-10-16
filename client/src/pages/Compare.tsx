@@ -6,6 +6,7 @@ import { useSeo } from '../hooks/useSeo'
 import { teamColor } from '../lib/f1meta'
 import type { DriverProfile, SeasonComparison as SeasonCmp } from '../types/f1'
 import { useI18n } from '../i18n/core'
+import './Compare.css'
 
 type View = 'career' | 'season'
 

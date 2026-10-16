@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom'
 import { useI18n, type TKey } from '../i18n/core'
+import './Footer.css'
 
 // Global site footer. Carries the data/image attributions we're obliged to show
 // (f1db is CC-BY 4.0), an independence + trademark disclaimer so we don't imply

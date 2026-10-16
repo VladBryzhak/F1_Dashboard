@@ -15,6 +15,7 @@ import type {
   RaceHighlight,
 } from '../types/f1'
 import { gpTitle } from '../lib/gpNames'
+import './Home.css'
 
 const F1 = 'https://media.formula1.com/image/upload/c_lfill,w_600/q_auto/v1740000001/common/f1'
 

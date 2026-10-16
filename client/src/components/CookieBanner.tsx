@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useI18n } from '../i18n/core'
+import './CookieBanner.css'
 
 // Cookie-consent notice. Flip ENABLED to false to hide it everywhere (the code
 // stays in place); flip it back to true to render it again when we actually

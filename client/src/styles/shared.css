@@ -1,0 +1,567 @@
+/* Building blocks used across pages: page head, cards, tables, tabs, badges, banners. */
+
+/* ---------- Page frame: content column, page heading, intro text, breadcrumbs ---------- */
+.content {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 2.5rem 1.75rem 2rem;
+}
+
+.page-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+}
+
+/* Data-driven intro paragraph on profile / standings / race pages. */
+.profile-summary {
+  max-width: 68ch;
+  margin: 0 0 1.25rem;
+  color: var(--muted, #b7b7c0);
+  font-size: 1rem;
+  line-height: 1.6;
+}
+
+/* Breadcrumb trail on profile / race pages. */
+.breadcrumbs {
+  font-size: 0.85rem;
+  margin-bottom: 1rem;
+  color: var(--muted, #b7b7c0);
+}
+
+.breadcrumbs a {
+  color: var(--muted, #b7b7c0);
+  text-decoration: none;
+}
+
+.breadcrumbs a:hover {
+  text-decoration: underline;
+}
+
+.breadcrumbs .sep {
+  margin: 0 0.5rem;
+  opacity: 0.6;
+}
+
+.breadcrumbs [aria-current='page'] {
+  color: var(--text, #f4f4f6);
+  font-weight: 600;
+}
+
+/* ---------- Live dot (header, live board, weekend schedule) ---------- */
+.live-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--muted-2);
+  flex: none;
+}
+
+.live-dot.on {
+  background: #e10600;
+  box-shadow: 0 0 0 0 rgba(225, 6, 0, 0.6);
+  animation: livePulse 1.6s infinite;
+}
+
+@keyframes livePulse {
+  70% {
+    box-shadow: 0 0 0 7px rgba(225, 6, 0, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(225, 6, 0, 0);
+  }
+}
+
+/* ---------- Timing text and tyre compound badges ---------- */
+.mono {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Tyre compound badge. */
+.tyre {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  font-size: 0.72rem;
+  font-weight: 800;
+  flex: none;
+}
+
+.tyre-soft {
+  background: #e10600;
+  color: #fff;
+}
+
+.tyre-medium {
+  background: #f5c518;
+  color: #111;
+}
+
+.tyre-hard {
+  background: #eaeaea;
+  color: #111;
+}
+
+.tyre-inter {
+  background: #43b02a;
+  color: #fff;
+}
+
+.tyre-wet {
+  background: #2a6df4;
+  color: #fff;
+}
+
+.tyre-unknown {
+  background: #3a3a44;
+  color: var(--muted);
+}
+
+/* ---------- Selects ---------- */
+select {
+  background: var(--card);
+  color: var(--text);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 999px;
+  padding: 0.45rem 1rem;
+  font-family: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+select:hover,
+select:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+select option {
+  background: var(--card);
+  color: var(--text);
+}
+
+/* ---------- Tabs ---------- */
+.tabs {
+  display: flex;
+  gap: 1.75rem;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 1.5rem;
+}
+
+.tab {
+  position: relative;
+  background: none;
+  border: none;
+  color: var(--muted);
+  font-family: inherit;
+  font-size: 1rem;
+  font-weight: 700;
+  padding: 0 0 0.75rem;
+  cursor: pointer;
+}
+
+.tab:hover {
+  color: #fff;
+}
+
+.tab.active {
+  color: #fff;
+}
+
+.tab.active::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -1px;
+  height: 3px;
+  background: var(--accent);
+}
+
+/* ---------- Cards and data tables ---------- */
+.card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 1.25rem 1.5rem;
+  position: relative;
+  overflow: hidden;
+}
+
+table.standings {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.standings th {
+  text-align: left;
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  color: var(--muted-2);
+  padding: 0.5rem 0.75rem 0.9rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.standings td {
+  text-align: left;
+  padding: 0.75rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  font-weight: 600;
+}
+
+.standings tr:last-child td {
+  border-bottom: none;
+}
+
+.standings .num {
+  text-align: right;
+}
+
+.standings .pos {
+  color: var(--muted);
+  width: 36px;
+}
+
+.standings td.pos {
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: var(--text);
+}
+
+/* Ranking tables (standings, race results): the leader's position in red. */
+.standings--rank tbody tr:first-child td.pos {
+  color: var(--accent);
+}
+
+.standings tbody tr:hover td {
+  background: rgba(255, 255, 255, 0.025);
+}
+
+/* circular flag badge */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: #23232c;
+  font-size: 1rem;
+  margin-right: 0.65rem;
+  vertical-align: middle;
+}
+
+.entity {
+  display: flex;
+  align-items: center;
+}
+
+.entity .name {
+  font-weight: 700;
+}
+
+/* driver photo avatar in standings rows */
+.avatar {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  margin-right: 0.7rem;
+  object-fit: cover;
+  object-position: top center;
+  background: #23232c;
+  flex-shrink: 0;
+}
+
+.avatar-fallback {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.72rem;
+  font-weight: 800;
+}
+
+/* country cell: flag + demonym */
+.country {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+}
+
+.flag {
+  border-radius: 3px;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.12);
+  flex-shrink: 0;
+}
+
+.flag-emoji {
+  box-shadow: none;
+  font-size: 1.1rem;
+}
+
+.entity .code {
+  color: var(--muted-2);
+  font-weight: 600;
+  margin-left: 0.4rem;
+  font-size: 0.85em;
+}
+
+/* team colour bar */
+.team {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.team .dot {
+  width: 4px;
+  height: 18px;
+  border-radius: 2px;
+  display: inline-block;
+}
+
+.points {
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  font-weight: 800;
+}
+
+/* ---------- Back link ---------- */
+.back-link {
+  color: var(--muted);
+  font-weight: 700;
+  text-decoration: none;
+  font-size: 0.9rem;
+}
+
+.back-link:hover {
+  color: var(--accent);
+}
+
+/* ---------- Small screens: page frame and tables ---------- */
+@media (max-width: 768px) {
+  /* Tighter gutters and smaller headings on small screens. */
+  .content {
+    padding: 1.5rem 1rem 1.5rem;
+  }
+  .page-head {
+    gap: 0.75rem;
+  }
+  /* Wide data tables scroll inside their own card instead of overflowing the
+     page body. */
+  .card {
+    overflow-x: auto;
+  }
+  table.standings {
+    min-width: 540px;
+  }
+}
+
+/* ---------- Clickable table rows ---------- */
+.row-clickable {
+  cursor: pointer;
+  transition: background 0.12s ease;
+}
+
+.row-clickable:hover {
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.row-clickable .chevron {
+  text-align: right;
+  font-size: 1.2rem;
+  color: var(--muted-2);
+}
+
+.row-clickable:hover .chevron {
+  color: var(--accent);
+}
+
+/* ---------- Text states and banners ---------- */
+.muted {
+  color: var(--muted);
+}
+
+.error {
+  color: #ff6b6b;
+}
+
+.banner {
+  background: rgba(225, 6, 0, 0.12);
+  border: 1px solid rgba(225, 6, 0, 0.4);
+  color: #ffb3b0;
+  border-radius: 8px;
+  padding: 0.6rem 0.9rem;
+  margin-bottom: 1rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+/* ---------- Detail pages: title row, highlight tiles, section headings ---------- */
+.table-scroll {
+  overflow-x: auto;
+}
+
+.wknd-title {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+  margin-bottom: 1.25rem;
+}
+
+.wknd-title h1 {
+  margin: 0;
+  font-size: 2.4rem;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.wknd-title p {
+  margin: 0.4rem 0 0;
+  font-weight: 600;
+  font-size: 0.78rem;
+  letter-spacing: 1.4px;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.wknd-highlights {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: 0.9rem;
+  margin-bottom: 1.5rem;
+}
+
+.wknd-hl {
+  position: relative;
+  overflow: hidden;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 0.95rem 1.1rem 0.95rem 1.25rem;
+}
+
+/* team-colour edge on each highlight card */
+.wknd-hl .stripe {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 4px;
+}
+
+.wknd-hl-label {
+  font-family: var(--font-display);
+  color: var(--muted);
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+}
+
+.wknd-hl-name {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 1.3rem;
+  text-transform: uppercase;
+  margin: 0.3rem 0 0.15rem;
+}
+
+.wknd-hl-detail {
+  font-size: 0.82rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.wknd-section {
+  margin: 0 0 0.75rem;
+  font-family: var(--font-display);
+  font-size: 1rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  color: var(--muted);
+}
+
+/* Muted note after a section heading (session date, "last 5 races"…). */
+.wknd-when {
+  margin-left: 0.7rem;
+  font-family: var(--font-body);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.4px;
+  text-transform: none;
+  color: var(--muted-2);
+}
+
+/* ---------- Small badges and outline buttons ---------- */
+.next-tag {
+  display: inline-block;
+  padding: 0.08rem 0.5rem;
+  border-radius: 999px;
+  background: var(--accent);
+  color: #fff;
+  font-size: 0.66rem;
+  font-weight: 800;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+}
+
+.sched-ics {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  min-height: 36px;
+  padding: 0 0.85rem;
+  background: transparent;
+  color: var(--text);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 8px;
+  font: 600 0.85rem var(--font-body);
+  cursor: pointer;
+}
+
+.sched-ics:hover,
+.sched-ics:focus-visible {
+  outline: none;
+  border-color: var(--accent);
+}
+
+a.sched-ics {
+  text-decoration: none;
+}
+
+.seg-switch {
+  display: inline-flex;
+  padding: 2px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 8px;
+}
+
+.seg-switch button {
+  min-width: 46px;
+  height: 30px;
+  padding: 0 0.6rem;
+  background: transparent;
+  color: var(--muted);
+  border: 0;
+  border-radius: 6px;
+  font: 700 0.8rem var(--font-body);
+  cursor: pointer;
+}
+
+.seg-switch button:hover {
+  color: #fff;
+}
+
+.seg-switch button.on {
+  background: var(--accent);
+  color: #fff;
+}

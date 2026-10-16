@@ -18,6 +18,7 @@ import type {
   WeekendResult,
 } from '../types/f1'
 import { gpTitle } from '../lib/gpNames'
+import './RaceWeekend.css'
 
 type Tab = 'race' | 'sprint' | 'quali' | 'practice' | 'strategy'
 

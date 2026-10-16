@@ -13,6 +13,7 @@ import { api } from '../api/client'
 import { useAsync } from '../hooks/useAsync'
 import { useSeo } from '../hooks/useSeo'
 import { useI18n } from '../i18n/core'
+import './Telemetry.css'
 
 // OpenF1 telemetry is available from 2023 onward.
 const TELEMETRY_SEASONS = ['2026', '2025', '2024', '2023']

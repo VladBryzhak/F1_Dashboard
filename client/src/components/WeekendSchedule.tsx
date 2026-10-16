@@ -4,6 +4,7 @@ import { useI18n, type TKey } from '../i18n/core'
 import { downloadText, sessionStart, sessionState, weekendIcs } from '../lib/schedule'
 import type { CalendarRace, CalendarSession } from '../types/f1'
 import { gpTitle } from '../lib/gpNames'
+import './WeekendSchedule.css'
 
 const SESSION_KEY: Record<CalendarSession['kind'], TKey> = {
   FP1: 'session.fp1',

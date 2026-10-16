@@ -11,6 +11,7 @@ import { countryName } from '../lib/countries'
 import { breadcrumbLd, teamLd } from '../lib/jsonld'
 import { teamColor } from '../lib/f1meta'
 import { teamSummary } from '../lib/summaries'
+import '../styles/profile.css'
 
 export default function TeamProfile() {
   const { slug: constructorId } = useParams<{ slug: string }>()

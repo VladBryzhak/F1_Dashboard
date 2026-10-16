@@ -11,6 +11,7 @@ import { useI18n } from '../i18n/core'
 import { teamColor } from '../lib/f1meta'
 import { gpShort } from '../lib/gpNames'
 import type { SeasonProgression } from '../types/f1'
+import './TitleRaceChart.css'
 
 interface SeriesMeta {
   driverId: string
