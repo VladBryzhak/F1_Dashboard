@@ -181,4 +181,7 @@
   <url><loc>https://f1-dashboard-bryzhak.onrender.com/circuits/silverstone</loc><priority>0.5</priority></url>
   <url><loc>https://f1-dashboard-bryzhak.onrender.com/circuits/suzuka</loc><priority>0.5</priority></url>
   <url><loc>https://f1-dashboard-bryzhak.onrender.com/circuits/yas-marina</loc><priority>0.5</priority></url>
+  <!-- About & legal -->
+  <url><loc>https://f1-dashboard-bryzhak.onrender.com/about</loc><changefreq>yearly</changefreq><priority>0.3</priority></url>
+  <url><loc>https://f1-dashboard-bryzhak.onrender.com/privacy</loc><changefreq>yearly</changefreq><priority>0.2</priority></url>
 </urlset>

@@ -81,6 +81,10 @@ export default function Footer() {
           <p>{t('footer.trademark')}</p>
           <p>{t('footer.independent')}</p>
           <p>{t('footer.analytics')}</p>
+          <p className="footer-links">
+            <Link to="/about">{t('nav.about')}</Link>
+            <Link to="/privacy">{t('nav.privacy')}</Link>
+          </p>
         </div>
       </div>
     </footer>

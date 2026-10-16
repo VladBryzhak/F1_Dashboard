@@ -11,6 +11,8 @@ const en = {
   'nav.compare': 'Compare',
   'nav.telemetry': 'Telemetry',
   'nav.feedback': 'Feedback',
+  'nav.about': 'About',
+  'nav.privacy': 'Privacy policy',
   'nav.openMenu': 'Open menu',
   'nav.closeMenu': 'Close menu',
   'nav.liveOn': 'Session live now',

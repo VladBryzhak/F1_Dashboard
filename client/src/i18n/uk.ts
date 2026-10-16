@@ -13,6 +13,8 @@ const uk: Dict & Record<string, string> = {
   'nav.compare': 'Порівняння',
   'nav.telemetry': 'Телеметрія',
   'nav.feedback': 'Відгук',
+  'nav.about': 'Про проєкт',
+  'nav.privacy': 'Конфіденційність',
   'nav.openMenu': 'Відкрити меню',
   'nav.closeMenu': 'Закрити меню',
   'nav.liveOn': 'Сесія триває зараз',
