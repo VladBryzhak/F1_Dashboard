@@ -3778,3 +3778,11 @@ a.sched-ics {
   margin-top: 0.75rem;
   font-size: 0.75rem;
 }
+
+/* Weather card under the SESSION panel (Live + Replay). */
+.rp-weather {
+  margin-top: 0.9rem;
+}
+.rp-wx-rain {
+  color: #5aa9ff;
+}

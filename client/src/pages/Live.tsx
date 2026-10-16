@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { api } from '../api/client'
 import ReplayPlayer from '../components/ReplayPlayer'
+import WeatherCard from '../components/WeatherCard'
 import { useLiveStatus } from '../hooks/useLiveStatus'
 import { useSeo } from '../hooks/useSeo'
 import {
@@ -329,6 +330,7 @@ export default function Live() {
               <div className="rp-kv" key={i}><span>Best S{i + 1}</span><span className="mono">{fmtTime(s)}</span></div>
             ))}
           </div>
+          <WeatherCard sample={board.weather} />
         </aside>
         </div>
       )}

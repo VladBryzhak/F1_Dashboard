@@ -3,6 +3,7 @@ import { api } from '../api/client'
 import { useAsync } from '../hooks/useAsync'
 import { fmtTime, segmentClass, teamColor, tyre } from '../lib/live'
 import type { ReplayData, ReplayLap } from '../types/f1'
+import WeatherCard, { weatherAt } from './WeatherCard'
 
 const SPEEDS = [5, 15, 30, 60]
 const TICK_MS = 200
@@ -318,6 +319,10 @@ export default function ReplayPlayer() {
     [data, t],
   )
   const st = STATUS[status] ?? STATUS.green
+  const weather = useMemo(
+    () => (data?.weather ? weatherAt(data.weather, data.startMs + t) : null),
+    [data, t],
+  )
   // Session-fastest lap so far, for the side panel.
   const fastest = useMemo(() => {
     let m: number | null = null
@@ -462,6 +467,7 @@ export default function ReplayPlayer() {
               <div className="rp-kv"><span>Fastest lap</span><span className="mono">{fmtTime(fastest)}</span></div>
               <div className="rp-kv"><span>Status</span><span className={`rp-side-status rp-side-status--${st.cls}`}>{st.label}</span></div>
             </div>
+            <WeatherCard sample={weather} />
           </aside>
           </div>
         </>

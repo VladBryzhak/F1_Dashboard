@@ -408,6 +408,7 @@ export interface LiveBoard {
   session: LiveSessionMeta;
   rows: LiveBoardRow[];
   sessionBest: { lap: number | null; sectors: (number | null)[] };
+  weather: WeatherSample | null;
 }
 
 export interface LiveLap {
@@ -476,7 +477,8 @@ export interface ReplayData {
   pos: { num: number; p: number; t: number }[]; // position changes over time
   stints: ReplayStint[];
   flags: { t: number; s: string }[]; // track-status timeline (green/yellow/sc/vsc/red/chequered)
-  pits: { num: number; from: number; to: number }[]; // in-pit windows per driver
+  pits: { num: number; from: number; to: number }[];
+  weather: WeatherSample[]; // in-pit windows per driver
 }
 
 export interface LiveStatus {
@@ -599,4 +601,15 @@ export interface RaceStrategy {
   totalLaps: number;
   drivers: StrategyDriver[]; // ordered by finish
   stints: StrategyStint[];
+}
+
+// One OpenF1 weather sample (about one a minute through a session).
+export interface WeatherSample {
+  t: number; // epoch ms
+  air: number | null; // °C
+  track: number | null; // °C
+  humidity: number | null; // %
+  rain: boolean;
+  wind: number | null; // m/s
+  windDir: number | null; // degrees
 }

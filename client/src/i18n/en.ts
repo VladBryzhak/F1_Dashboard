@@ -166,6 +166,17 @@ const en = {
   'tyre.HARD': 'Hard',
   'tyre.INTERMEDIATE': 'Intermediate',
   'tyre.WET': 'Wet',
+
+  // Weather
+  'wx.title': 'Weather',
+  'wx.air': 'Air',
+  'wx.track': 'Track',
+  'wx.humidity': 'Humidity',
+  'wx.wind': 'Wind',
+  'wx.ms': 'm/s',
+  'wx.rain': 'Rain',
+  'wx.rainYes': 'Raining',
+  'wx.rainNo': 'Dry',
 }
 
 export type Dict = Record<keyof typeof en, string>

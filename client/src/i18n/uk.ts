@@ -170,6 +170,17 @@ const uk: Dict & Record<string, string> = {
   'tyre.HARD': 'Жорсткі',
   'tyre.INTERMEDIATE': 'Проміжні',
   'tyre.WET': 'Дощові',
+
+  // Weather
+  'wx.title': 'Погода',
+  'wx.air': 'Повітря',
+  'wx.track': 'Траса',
+  'wx.humidity': 'Вологість',
+  'wx.wind': 'Вітер',
+  'wx.ms': 'м/с',
+  'wx.rain': 'Дощ',
+  'wx.rainYes': 'Іде дощ',
+  'wx.rainNo': 'Сухо',
 }
 
 export default uk

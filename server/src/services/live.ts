@@ -10,6 +10,7 @@ import type {
   LiveStint,
   ReplayData,
   ReplayLap,
+  WeatherSample,
 } from "../types/f1";
 
 // Live timing from OpenF1 (https://openf1.org). For the prototype this reads a
@@ -145,6 +146,32 @@ function gapText(v: number | string | null): string | null {
 
 // The most recent completed session OpenF1 has (prefers a Race). Cached for an
 // hour — Phase 2 will swap this for "the session happening right now".
+interface RawWeather {
+  date: string;
+  air_temperature: number | null;
+  track_temperature: number | null;
+  humidity: number | null;
+  rainfall: number | null;
+  wind_speed: number | null;
+  wind_direction: number | null;
+}
+
+// OpenF1 posts a weather sample about once a minute.
+function toWeather(raw: RawWeather[]): WeatherSample[] {
+  return raw
+    .map((w) => ({
+      t: Date.parse(w.date),
+      air: w.air_temperature,
+      track: w.track_temperature,
+      humidity: w.humidity,
+      rain: (w.rainfall ?? 0) > 0,
+      wind: w.wind_speed,
+      windDir: w.wind_direction,
+    }))
+    .filter((w) => !Number.isNaN(w.t))
+    .sort((a, b) => a.t - b.t);
+}
+
 export async function getLatestSession(): Promise<LiveSessionMeta | null> {
   return cached("live:session", 3600, async () => {
     const now = Date.now();
@@ -252,6 +279,12 @@ export async function getBoard(sessionKey: number): Promise<LiveBoard> {
       get<RawLap[]>(`/laps?session_key=${sessionKey}`),
     ]);
 
+    const weather = toWeather(
+      await get<RawWeather[]>(`/weather?session_key=${sessionKey}`).catch(
+        () => [] as RawWeather[],
+      ),
+    );
+
     const session = sessions[0] ? toMeta(sessions[0]) : null;
     if (!session) throw new Error(`Session ${sessionKey} not found`);
 
@@ -350,7 +383,12 @@ export async function getBoard(sessionKey: number): Promise<LiveBoard> {
       });
     }
 
-    return { session, rows, sessionBest: { lap: sbLap, sectors: sbSectors } };
+    return {
+      session,
+      rows,
+      sessionBest: { lap: sbLap, sectors: sbSectors },
+      weather: weather[weather.length - 1] ?? null,
+    };
   });
 }
 
@@ -437,12 +475,15 @@ export async function getReplay(sessionKey: number): Promise<ReplayData> {
       get<RawPosition[]>(`/position?session_key=${sessionKey}`),
       get<RawLap[]>(`/laps?session_key=${sessionKey}`),
     ]);
-    const [rawRc, rawPit] = await Promise.all([
+    const [rawRc, rawPit, rawWeather] = await Promise.all([
       get<RawRaceControl[]>(`/race_control?session_key=${sessionKey}`).catch(
         () => [] as RawRaceControl[],
       ),
       get<RawPit[]>(`/pit?session_key=${sessionKey}`).catch(
         () => [] as RawPit[],
+      ),
+      get<RawWeather[]>(`/weather?session_key=${sessionKey}`).catch(
+        () => [] as RawWeather[],
       ),
     ]);
 
@@ -625,6 +666,7 @@ export async function getReplay(sessionKey: number): Promise<ReplayData> {
       })),
       flags,
       pits,
+      weather: toWeather(rawWeather),
     };
   });
 }
