@@ -136,7 +136,10 @@ export default function RaceWeekend() {
             <div>
               <h1>{data.grandPrixName} GP</h1>
               <p className="muted">
-                {data.season} · Round {data.round} · {formatDate(data.date)}
+                {data.season} · Round {data.round} · {formatDate(data.date)} ·{' '}
+                <Link to={`/circuits/${data.circuitId}`} className="wknd-circuit">
+                  {data.circuitName}
+                </Link>
               </p>
             </div>
           </div>

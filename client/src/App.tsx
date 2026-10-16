@@ -27,6 +27,8 @@ const Home = lazyPage(() => import('./pages/Home'))
 const Standings = lazyPage(() => import('./pages/Standings'))
 const Calendar = lazyPage(() => import('./pages/Calendar'))
 const RaceWeekend = lazyPage(() => import('./pages/RaceWeekend'))
+const Circuits = lazyPage(() => import('./pages/Circuits'))
+const CircuitProfile = lazyPage(() => import('./pages/CircuitProfile'))
 const Drivers = lazyPage(() => import('./pages/Drivers'))
 const DriverProfile = lazyPage(() => import('./pages/DriverProfile'))
 const Teams = lazyPage(() => import('./pages/Teams'))
@@ -82,6 +84,8 @@ export default function App() {
           <Route path="calendar" element={<Calendar />} />
           <Route path="calendar/:season" element={<Calendar />} />
           <Route path="calendar/:season/:round" element={<RaceWeekend />} />
+          <Route path="circuits" element={<Circuits />} />
+          <Route path="circuits/:circuitId" element={<CircuitProfile />} />
           <Route path="drivers" element={<Drivers />} />
           <Route path="drivers/:slug" element={<DriversOrProfile />} />
           <Route path="teams" element={<Teams />} />

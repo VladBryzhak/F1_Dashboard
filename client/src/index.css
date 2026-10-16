@@ -191,6 +191,82 @@ h2,
   box-shadow: 0 0 0 2px #000;
 }
 
+/* Mid-width desktops: tighten the header so all links fit on one line. */
+@media (max-width: 1180px) {
+  .topbar {
+    gap: 1.5rem;
+  }
+  .nav {
+    gap: 1.1rem;
+  }
+}
+
+/* Tablets and phones: logo + language switch + burger; the nav becomes a
+   dropdown panel (Layout.tsx). */
+@media (max-width: 1024px) {
+  .topbar {
+    position: relative;
+    height: auto;
+    justify-content: space-between;
+    /* Add the iOS status-bar / notch inset to the top padding in standalone. */
+    padding: calc(0.55rem + env(safe-area-inset-top)) max(1rem, env(safe-area-inset-right))
+      0.55rem max(1rem, env(safe-area-inset-left));
+    gap: 1rem;
+  }
+  .nav-toggle {
+    display: inline-flex;
+    margin-left: 0;
+  }
+  .lang-switch {
+    order: 0;
+  }
+  .lang-switch button {
+    height: 32px;
+    min-width: 38px;
+  }
+  .nav {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    z-index: 40;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.15rem;
+    height: auto;
+    padding: 0.5rem max(0.75rem, env(safe-area-inset-right)) 0.9rem
+      max(0.75rem, env(safe-area-inset-left));
+    background: #000;
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    box-shadow: 0 18px 40px rgba(0, 0, 0, 0.6);
+  }
+  .topbar.menu-open .nav {
+    display: flex;
+  }
+  .nav-link {
+    height: auto;
+    min-height: 48px;
+    padding: 0 0.9rem;
+    font-size: 1.05rem;
+    border-radius: 10px;
+  }
+  .nav-link.active {
+    background: rgba(255, 255, 255, 0.06);
+  }
+  /* Active marker becomes a red bar on the left of the row. */
+  .nav-link.active::after {
+    top: 10px;
+    bottom: 10px;
+    left: 0;
+    right: auto;
+    width: 3px;
+    height: auto;
+    border-radius: 2px;
+  }
+}
+
 /* ---------- Layout ---------- */
 .content {
   max-width: 1080px;
@@ -1851,69 +1927,6 @@ table.standings {
     opacity: 0.35;
   }
 
-  /* Header: logo + burger. The nav is a dropdown panel under the header,
-     opened by the burger (Layout.tsx), so there is no sideways-scrolling bar. */
-  .topbar {
-    position: relative;
-    height: auto;
-    justify-content: space-between;
-    /* Add the iOS status-bar / notch inset to the top padding in standalone. */
-    padding: calc(0.55rem + env(safe-area-inset-top)) max(1rem, env(safe-area-inset-right))
-      0.55rem max(1rem, env(safe-area-inset-left));
-    gap: 1rem;
-  }
-  .nav-toggle {
-    display: inline-flex;
-    margin-left: 0;
-  }
-  .lang-switch {
-    order: 0;
-  }
-  .lang-switch button {
-    height: 32px;
-    min-width: 38px;
-  }
-  .nav {
-    display: none;
-    position: absolute;
-    top: 100%;
-    left: 0;
-    right: 0;
-    z-index: 40;
-    flex-direction: column;
-    align-items: stretch;
-    gap: 0.15rem;
-    height: auto;
-    padding: 0.5rem max(0.75rem, env(safe-area-inset-right)) 0.9rem
-      max(0.75rem, env(safe-area-inset-left));
-    background: #000;
-    border-top: 1px solid var(--border);
-    border-bottom: 1px solid var(--border);
-    box-shadow: 0 18px 40px rgba(0, 0, 0, 0.6);
-  }
-  .topbar.menu-open .nav {
-    display: flex;
-  }
-  .nav-link {
-    height: auto;
-    min-height: 48px;
-    padding: 0 0.9rem;
-    font-size: 1.05rem;
-    border-radius: 10px;
-  }
-  .nav-link.active {
-    background: rgba(255, 255, 255, 0.06);
-  }
-  /* Active marker becomes a red bar on the left of the row. */
-  .nav-link.active::after {
-    top: 10px;
-    bottom: 10px;
-    left: 0;
-    right: auto;
-    width: 3px;
-    height: auto;
-    border-radius: 2px;
-  }
 
   /* Tighter gutters and smaller headings on small screens. */
   .content {
@@ -3313,5 +3326,251 @@ table.standings {
   }
   .sched-day {
     font-size: 0.8rem;
+  }
+}
+
+/* Schedule footer: timezone note + link to the circuit guide. */
+.sched-foot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.4rem 1rem;
+}
+.sched-circuit {
+  margin-top: 0.7rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--muted);
+  text-decoration: none;
+}
+.sched-circuit:hover {
+  color: var(--accent);
+}
+.wknd-circuit {
+  color: inherit;
+  text-decoration: underline;
+  text-decoration-color: rgba(255, 255, 255, 0.3);
+  text-underline-offset: 3px;
+}
+.wknd-circuit:hover {
+  color: #fff;
+  text-decoration-color: var(--accent);
+}
+
+/* ---------- Circuits ---------- */
+.circuit-search {
+  width: 100%;
+  max-width: 460px;
+  box-sizing: border-box;
+  margin: 0.25rem 0 1.5rem;
+  background: var(--card);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 10px;
+  color: var(--text);
+  font: inherit;
+  padding: 0.65rem 0.8rem;
+}
+.circuit-search:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+.section-title {
+  margin: 1.75rem 0 0.9rem;
+  font-family: var(--font-display);
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.circuit-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 0.8rem;
+}
+.circuit-tile {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  padding: 0.95rem 1.05rem;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  color: var(--text);
+  text-decoration: none;
+  transition: border-color 0.15s ease, transform 0.15s ease;
+}
+.circuit-tile:hover {
+  border-color: rgba(225, 6, 0, 0.6);
+  transform: translateY(-1px);
+}
+.circuit-tile-top {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--muted);
+  min-width: 0;
+}
+.circuit-tile-place {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.circuit-tile-name {
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+  font-weight: 700;
+  line-height: 1.15;
+}
+.circuit-tile-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 0.6rem;
+  font-size: 0.75rem;
+  color: var(--muted-2);
+}
+.circuit-tile-meta span + span::before {
+  content: '·';
+  margin-right: 0.6rem;
+}
+
+.circ-stats {
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+}
+.circ-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.6rem 0.8rem;
+  margin: -0.25rem 0 1.25rem;
+}
+a.sched-ics {
+  text-decoration: none;
+}
+.circ-next {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  min-height: 36px;
+  padding: 0 0.85rem 0 0.45rem;
+  border: 1px solid rgba(225, 6, 0, 0.45);
+  border-radius: 8px;
+  background: rgba(225, 6, 0, 0.08);
+  color: var(--text);
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-decoration: none;
+}
+.circ-next:hover {
+  border-color: var(--accent);
+}
+.circ-record {
+  margin-bottom: 1rem;
+  padding-left: 1.6rem;
+}
+.circ-record .stripe {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 4px;
+  background: var(--accent);
+}
+.circ-record-body {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.3rem 1rem;
+}
+.circ-record-time {
+  font-family: var(--font-display);
+  font-size: 2.4rem;
+  font-weight: 800;
+  line-height: 1;
+  color: #fff;
+  font-variant-numeric: tabular-nums;
+}
+.circ-record-who {
+  font-weight: 600;
+}
+.circ-record-who a {
+  color: var(--text);
+}
+.circ-record-note {
+  flex-basis: 100%;
+  font-size: 0.75rem;
+  color: var(--muted-2);
+}
+.circ-cols {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1rem;
+}
+.circ-tally ol {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.circ-tally li {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.5rem 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+.circ-tally li:first-child {
+  border-top: 0;
+}
+.circ-tally .dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.circ-tally-pos {
+  width: 1.2rem;
+  font-family: var(--font-display);
+  font-weight: 800;
+  color: var(--muted-2);
+}
+.circ-tally li:first-child .circ-tally-pos {
+  color: var(--accent);
+}
+.circ-tally-name {
+  flex: 1;
+  min-width: 0;
+  color: var(--text);
+  font-weight: 600;
+  text-decoration: none;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.circ-tally-name:hover {
+  color: var(--accent);
+}
+.circ-tally-num {
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+.circ-prev {
+  margin-top: 1rem;
+  font-size: 0.85rem;
+}
+@media (max-width: 768px) {
+  .circ-record-time {
+    font-size: 2rem;
+  }
+  .circ-stats {
+    grid-template-columns: 1fr 1fr;
+    gap: 0.6rem;
+  }
+  .circ-stats .wknd-hl {
+    padding: 0.8rem 0.9rem;
   }
 }

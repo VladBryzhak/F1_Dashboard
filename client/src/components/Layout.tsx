@@ -9,6 +9,7 @@ const links: { to: string; label: TKey }[] = [
   { to: '/live', label: 'nav.live' },
   { to: '/standings', label: 'nav.standings' },
   { to: '/calendar', label: 'nav.calendar' },
+  { to: '/circuits', label: 'nav.circuits' },
   { to: '/drivers', label: 'nav.drivers' },
   { to: '/teams', label: 'nav.teams' },
   { to: '/compare', label: 'nav.compare' },

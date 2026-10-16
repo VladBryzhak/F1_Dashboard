@@ -5,6 +5,7 @@ import fs from "fs";
 import helmet from "helmet";
 import path from "path";
 import calendarRouter from "./routes/calendar";
+import circuitsRouter from "./routes/circuits";
 import feedbackRouter from "./routes/feedback";
 import homeRouter from "./routes/home";
 import liveRouter from "./routes/live";
@@ -43,6 +44,7 @@ app.use("/api/feedback", feedbackRouter);
 app.use("/api/live", liveRouter);
 app.use("/api/standings", standingsRouter);
 app.use("/api/calendar", calendarRouter);
+app.use("/api/circuits", circuitsRouter);
 app.use("/api/telemetry", telemetryRouter);
 // Owns two top-level paths directly: /api/drivers/:id and /api/constructors/:id
 app.use("/api", profilesRouter);

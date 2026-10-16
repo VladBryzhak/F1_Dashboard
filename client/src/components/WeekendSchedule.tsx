@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { Link } from 'react-router-dom'
 import { useI18n, type TKey } from '../i18n/core'
 import { downloadText, sessionStart, sessionState, weekendIcs } from '../lib/schedule'
 import type { CalendarRace, CalendarSession } from '../types/f1'
@@ -129,7 +130,12 @@ export default function WeekendSchedule({
         })}
       </ol>
 
-      {hasTimes && <p className="sched-tz">{t('sched.localTime', { tz })}</p>}
+      <div className="sched-foot">
+        {hasTimes && <p className="sched-tz">{t('sched.localTime', { tz })}</p>}
+        <Link to={`/circuits/${race.circuitId}`} className="sched-circuit">
+          {race.circuitName} · {t('circ.viewCircuit')} ›
+        </Link>
+      </div>
     </div>
   )
 }

@@ -2,6 +2,10 @@ import AdmZip from "adm-zip";
 import type {
   CalendarRace,
   CalendarSession,
+  CircuitProfile,
+  CircuitRace,
+  CircuitSummary,
+  CircuitTally,
   CalendarResponse,
   ConstructorProfile,
   ConstructorSeasonEntry,
@@ -103,6 +107,7 @@ interface RawRace {
   grandPrixId: string;
   officialName: string;
   circuitId: string;
+  circuitLayoutId?: string | null;
   sprintRaceDate: string | null;
   // Session dates (yyyy-mm-dd) and UTC start times (HH:mm); null when the
   // session didn't run or the time isn't known (most older seasons).
@@ -156,6 +161,22 @@ interface RawCircuit {
   id: string;
   name: string;
   placeName: string;
+  fullName?: string;
+  previousNames?: string | null;
+  type?: string; // RACE | ROAD | STREET
+  direction?: string; // CLOCKWISE | ANTI_CLOCKWISE
+  countryId?: string;
+  latitude?: number;
+  longitude?: number;
+  length?: number;
+  turns?: number;
+  totalRacesHeld?: number;
+}
+interface RawCircuitLayout {
+  id: string;
+  circuitId: string;
+  length: number | null;
+  turns: number | null;
 }
 
 interface WinCounts {
@@ -204,6 +225,7 @@ interface RawFastestLap {
   constructorId: string;
   lap: number | null;
   time: string | null;
+  timeMillis?: number | null;
 }
 interface RawDriverOfTheDay {
   year: number;
@@ -226,6 +248,9 @@ interface HighlightRow {
   driverId: string;
   constructorId: string;
   detail: string;
+  // Fastest lap only: the lap time, for circuit lap records.
+  time?: string | null;
+  timeMillis?: number | null;
 }
 
 interface CareerAgg {
@@ -245,6 +270,7 @@ interface Dataset {
   races: RawRace[];
   grandsPrix: Map<string, RawGrandPrix>;
   circuits: Map<string, RawCircuit>;
+  circuitLayouts: Map<string, RawCircuitLayout>;
   // `${year}:${driverId}` -> constructorId the driver raced most rounds for
   teamByYearDriver: Map<string, string>;
   winsByYear: Map<number, WinCounts>;
@@ -314,6 +340,9 @@ async function loadDataset(): Promise<Dataset> {
   );
   const circuits = new Map(
     read<RawCircuit>("f1db-circuits.json").map((c) => [c.id, c])
+  );
+  const circuitLayouts = new Map(
+    read<RawCircuitLayout>("f1db-circuits-layouts.json").map((l) => [l.id, l])
   );
 
   // Resolve each driver's constructor for a season (most rounds wins, to handle
@@ -461,6 +490,8 @@ async function loadDataset(): Promise<Dataset> {
       driverId: f.driverId,
       constructorId: f.constructorId,
       detail: f.time ? `${f.time}${f.lap ? ` (lap ${f.lap})` : ""}` : "",
+      time: f.time,
+      timeMillis: f.timeMillis ?? null,
     });
   }
 
@@ -486,6 +517,7 @@ async function loadDataset(): Promise<Dataset> {
     races,
     grandsPrix,
     circuits,
+    circuitLayouts,
     teamByYearDriver,
     winsByYear,
     winnerByRace,
@@ -688,6 +720,7 @@ export async function getCalendar(season: string): Promise<CalendarResponse> {
         name: gp?.name ?? r.grandPrixId,
         officialName: r.officialName,
         date: r.date,
+        circuitId: r.circuitId,
         circuitName: circuit?.name ?? r.circuitId,
         placeName: circuit?.placeName ?? "",
         nationality: demonym(ds, gp?.countryId),
@@ -1245,10 +1278,167 @@ export async function getRaceWeekend(
     officialName: race.officialName,
     date: race.date,
     countryCode: alpha2(ds, gp?.countryId),
+    circuitId: race.circuitId,
+    circuitName: ds.circuits.get(race.circuitId)?.fullName ?? race.circuitId,
     qualifying,
     results,
     sprintResults,
     fastestLap: toHighlight(ds.fastestLapByRace.get(key)),
     driverOfTheDay: toHighlight(ds.driverOfDayByRace.get(key)),
+  };
+}
+
+// ---------- Circuits ----------
+
+// The newest season present in the race table (the current calendar).
+function latestSeason(ds: Dataset): number {
+  return ds.races.reduce((m, r) => Math.max(m, r.year), 0);
+}
+
+function circuitSummary(ds: Dataset, c: RawCircuit): CircuitSummary {
+  const held = ds.races.filter((r) => r.circuitId === c.id);
+  const years = held.map((r) => r.year);
+  const current = latestSeason(ds);
+  return {
+    circuitId: c.id,
+    name: c.fullName ?? c.name,
+    placeName: c.placeName,
+    countryCode: alpha2(ds, c.countryId),
+    nationality: demonym(ds, c.countryId),
+    type: c.type ?? "RACE",
+    racesHeld: c.totalRacesHeld ?? held.length,
+    firstYear: years.length ? Math.min(...years) : null,
+    lastYear: years.length ? Math.max(...years) : null,
+    onCurrentCalendar: held.some((r) => r.year === current),
+  };
+}
+
+export async function getCircuits(): Promise<CircuitSummary[]> {
+  const ds = await dataset();
+  return [...ds.circuits.values()]
+    .map((c) => circuitSummary(ds, c))
+    .sort(
+      (a, b) =>
+        Number(b.onCurrentCalendar) - Number(a.onCurrentCalendar) ||
+        (b.lastYear ?? 0) - (a.lastYear ?? 0) ||
+        a.name.localeCompare(b.name)
+    );
+}
+
+function tally(counts: Map<string, number>, nameOf: (id: string) => string, n = 5): CircuitTally[] {
+  return [...counts.entries()]
+    .sort((a, b) => b[1] - a[1] || nameOf(a[0]).localeCompare(nameOf(b[0])))
+    .slice(0, n)
+    .map(([id, count]) => ({ id, name: nameOf(id), count }));
+}
+
+const bump = (m: Map<string, number>, k: string) => m.set(k, (m.get(k) ?? 0) + 1);
+
+export async function getCircuitProfile(circuitId: string): Promise<CircuitProfile | null> {
+  const ds = await dataset();
+  const c = ds.circuits.get(circuitId);
+  if (!c) return null;
+
+  const driverName = (id: string) => {
+    const d = ds.drivers.get(id);
+    return d ? `${d.firstName} ${d.lastName}` : id;
+  };
+  const teamName = (id: string) => ds.constructors.get(id)?.name ?? id;
+  const gpName = (id: string) => ds.grandsPrix.get(id)?.name ?? id;
+
+  const held = ds.races
+    .filter((r) => r.circuitId === circuitId)
+    .sort((a, b) => a.year - b.year || a.round - b.round);
+  const done = held.filter((r) => ds.winnerByRace.has(`${r.year}:${r.round}`));
+
+  // Layouts in the order they were used.
+  const layoutMap = new Map<string, { firstYear: number; lastYear: number; races: number }>();
+  for (const r of held) {
+    if (!r.circuitLayoutId) continue;
+    const l = layoutMap.get(r.circuitLayoutId);
+    if (l) {
+      l.lastYear = r.year;
+      l.races += 1;
+    } else {
+      layoutMap.set(r.circuitLayoutId, { firstYear: r.year, lastYear: r.year, races: 1 });
+    }
+  }
+  const layouts = [...layoutMap.entries()].map(([layoutId, l]) => {
+    const raw = ds.circuitLayouts.get(layoutId);
+    return { layoutId, length: raw?.length ?? null, turns: raw?.turns ?? null, ...l };
+  });
+  const currentLayoutId = held.length ? held[held.length - 1].circuitLayoutId : null;
+
+  // Race lap record: the fastest race lap set on the current layout.
+  let lapRecord: CircuitProfile["lapRecord"] = null;
+  let bestMs = Infinity;
+  for (const r of done) {
+    if (currentLayoutId && r.circuitLayoutId !== currentLayoutId) continue;
+    const f = ds.fastestLapByRace.get(`${r.year}:${r.round}`);
+    if (!f?.timeMillis || !f.time || f.timeMillis >= bestMs) continue;
+    bestMs = f.timeMillis;
+    lapRecord = {
+      time: f.time,
+      year: r.year,
+      driverId: f.driverId,
+      driverName: driverName(f.driverId),
+      constructorId: f.constructorId,
+      constructorName: teamName(f.constructorId),
+    };
+  }
+
+  const driverWins = new Map<string, number>();
+  const teamWins = new Map<string, number>();
+  const poles = new Map<string, number>();
+  const races: CircuitRace[] = [];
+  for (const r of done) {
+    const key = `${r.year}:${r.round}`;
+    const w = ds.winnerByRace.get(key);
+    const pole = ds.qualifyingByRace.get(key)?.find((q) => q.position === 1);
+    if (w) {
+      bump(driverWins, w.driverId);
+      bump(teamWins, w.constructorId);
+    }
+    if (pole) bump(poles, pole.driverId);
+    races.push({
+      year: r.year,
+      round: r.round,
+      grandPrixName: gpName(r.grandPrixId),
+      winnerDriverId: w?.driverId ?? null,
+      winnerName: w ? driverName(w.driverId) : null,
+      winnerConstructorId: w?.constructorId ?? null,
+      winnerConstructorName: w ? teamName(w.constructorId) : null,
+      poleDriverName: pole ? driverName(pole.driverId) : null,
+    });
+  }
+  races.reverse();
+
+  const upcoming = held.find((r) => !ds.winnerByRace.has(`${r.year}:${r.round}`));
+  const current = layouts.find((l) => l.layoutId === currentLayoutId);
+
+  return {
+    ...circuitSummary(ds, c),
+    shortName: c.name,
+    previousNames: c.previousNames ?? null,
+    direction: c.direction ?? null,
+    latitude: c.latitude ?? null,
+    longitude: c.longitude ?? null,
+    length: current?.length ?? c.length ?? null,
+    turns: current?.turns ?? c.turns ?? null,
+    grandsPrix: [...new Set(held.map((r) => gpName(r.grandPrixId)))],
+    layouts,
+    lapRecord,
+    topDrivers: tally(driverWins, driverName),
+    topConstructors: tally(teamWins, teamName),
+    topPoles: tally(poles, driverName),
+    races,
+    nextRace: upcoming
+      ? {
+          season: upcoming.year,
+          round: upcoming.round,
+          date: upcoming.date,
+          grandPrixName: gpName(upcoming.grandPrixId),
+        }
+      : null,
   };
 }

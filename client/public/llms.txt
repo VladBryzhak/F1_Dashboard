@@ -8,6 +8,7 @@
 
 - [Standings](https://f1-dashboard-bryzhak.onrender.com/standings): drivers' and constructors' championship tables for any season (1950–present)
 - [Calendar](https://f1-dashboard-bryzhak.onrender.com/calendar): race calendar, winners and full weekend results, including sprints
+- [Circuits](https://f1-dashboard-bryzhak.onrender.com/circuits): every F1 circuit with track length, turns, race lap record, layouts and winners
 - [Drivers](https://f1-dashboard-bryzhak.onrender.com/drivers): driver profiles with full career stats, plus a searchable index since 1950
 - [Teams](https://f1-dashboard-bryzhak.onrender.com/teams): constructor profiles and a searchable index of every team since 1950
 - [Compare](https://f1-dashboard-bryzhak.onrender.com/compare): head-to-head driver comparison, overall or for a single season

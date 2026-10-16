@@ -88,6 +88,7 @@ export interface CalendarRace {
   name: string;
   officialName: string;
   date: string; // ISO yyyy-mm-dd
+  circuitId: string;
   circuitName: string;
   placeName: string;
   nationality: string; // GP country demonym (for flag lookup)
@@ -323,6 +324,8 @@ export interface RaceWeekend {
   officialName: string;
   date: string;
   countryCode: string | null;
+  circuitId: string;
+  circuitName: string;
   qualifying: QualifyingEntry[];
   results: WeekendResult[];
   sprintResults: WeekendResult[];
@@ -481,4 +484,72 @@ export interface LiveStatus {
   // OpenF1 paywalls its whole API while a session is live; when that happens we
   // can't read any data, but we know a session is on.
   locked: boolean;
+}
+
+// ---------- Circuits ----------
+
+export interface CircuitSummary {
+  circuitId: string;
+  name: string; // full name, e.g. "Circuit of the Americas"
+  placeName: string;
+  countryCode: string | null;
+  nationality: string;
+  type: string; // RACE | ROAD | STREET
+  racesHeld: number;
+  firstYear: number | null;
+  lastYear: number | null;
+  onCurrentCalendar: boolean;
+}
+
+export interface CircuitLayoutInfo {
+  layoutId: string;
+  length: number | null; // km
+  turns: number | null;
+  firstYear: number;
+  lastYear: number;
+  races: number;
+}
+
+export interface CircuitLapRecord {
+  time: string;
+  year: number;
+  driverId: string;
+  driverName: string;
+  constructorId: string;
+  constructorName: string;
+}
+
+export interface CircuitTally {
+  id: string; // driverId or constructorId
+  name: string;
+  count: number;
+}
+
+export interface CircuitRace {
+  year: number;
+  round: number;
+  grandPrixName: string;
+  winnerDriverId: string | null;
+  winnerName: string | null;
+  winnerConstructorId: string | null;
+  winnerConstructorName: string | null;
+  poleDriverName: string | null;
+}
+
+export interface CircuitProfile extends CircuitSummary {
+  shortName: string;
+  previousNames: string | null;
+  direction: string | null;
+  latitude: number | null;
+  longitude: number | null;
+  length: number | null; // current layout, km
+  turns: number | null;
+  grandsPrix: string[];
+  layouts: CircuitLayoutInfo[];
+  lapRecord: CircuitLapRecord | null; // race lap record on the current layout
+  topDrivers: CircuitTally[];
+  topConstructors: CircuitTally[];
+  topPoles: CircuitTally[];
+  races: CircuitRace[]; // newest first, completed races only
+  nextRace: { season: number; round: number; date: string; grandPrixName: string } | null;
 }

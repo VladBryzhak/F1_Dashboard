@@ -1,7 +1,8 @@
 import type { Dict } from './en'
 
-// Ukrainian strings. Keys mirror en.ts.
-const uk: Dict = {
+// Ukrainian strings. Keys mirror en.ts; plural keys may add Ukrainian-only
+// forms (`_few`, `_many`).
+const uk: Dict & Record<string, string> = {
   // Navigation
   'nav.home': 'Головна',
   'nav.live': 'Наживо',
@@ -83,6 +84,53 @@ const uk: Dict = {
 
   // Home
   'home.nextRace': 'Наступна гонка',
+
+  // Circuits
+  'nav.circuits': 'Траси',
+  'circ.listTitle': 'Траси Формули-1',
+  'circ.current': 'У календарі {season}',
+  'circ.historic': 'Історичні траси',
+  'circ.search': 'Пошук траси, міста чи країни…',
+  'circ.noMatch': 'Немає трас за запитом «{q}».',
+  'circ.loadError': 'Не вдалося завантажити траси: {error}',
+  'circ.loadOneError': 'Не вдалося завантажити трасу: {error}',
+  'circ.back': '← До списку трас',
+  'circ.since': 'з {year}',
+  'circ.years': '{from}–{to}',
+  'circ.type.RACE': 'Гоночна траса',
+  'circ.type.ROAD': 'Дорожня траса',
+  'circ.type.STREET': 'Міська траса',
+  'circ.dir.CLOCKWISE': 'За годинниковою стрілкою',
+  'circ.dir.ANTI_CLOCKWISE': 'Проти годинникової стрілки',
+  'circ.length': 'Довжина',
+  'circ.km': '{n} км',
+  'circ.turns': 'Повороти',
+  'circ.racesHeld': 'Проведено Гран-прі',
+  'circ.firstGp': 'Перше Гран-прі',
+  'circ.lapRecord': 'Рекорд кола в гонці',
+  'circ.lapRecordNote': 'Найшвидше коло в гонці на поточній конфігурації',
+  'circ.noLapRecord': 'На поточній конфігурації рекорду ще немає.',
+  'circ.mostWins': 'Найбільше перемог',
+  'circ.mostTeamWins': 'Найбільше перемог · команди',
+  'circ.mostPoles': 'Найбільше поулів',
+  'circ.layouts': 'Конфігурації траси',
+  'circ.layoutYears': 'Роки',
+  'circ.layoutRaces': 'Гонки',
+  'circ.winners': 'Переможці',
+  'circ.colYear': 'Рік',
+  'circ.colGp': 'Гран-прі',
+  'circ.colWinner': 'Переможець',
+  'circ.colTeam': 'Команда',
+  'circ.colPole': 'Поул',
+  'circ.previousNames': 'Попередні назви: {names}.',
+  'circ.map': 'Відкрити мапу',
+  'circ.next': 'Наступна гонка тут: {gp} · {date}',
+  'circ.hostedGps': 'Гран-прі: {list}',
+  'circ.viewCircuit': 'Про трасу',
+  'plural.races_one': '{n} гонка',
+  'plural.races_few': '{n} гонки',
+  'plural.races_many': '{n} гонок',
+  'plural.races_other': '{n} гонки',
 }
 
 export default uk

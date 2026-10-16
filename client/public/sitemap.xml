@@ -156,4 +156,29 @@
   <url><loc>https://f1-dashboard-bryzhak.onrender.com/teams/benetton</loc><priority>0.5</priority></url>
   <url><loc>https://f1-dashboard-bryzhak.onrender.com/teams/sauber</loc><priority>0.5</priority></url>
   <url><loc>https://f1-dashboard-bryzhak.onrender.com/teams/haas</loc><priority>0.5</priority></url>
+  <!-- Circuits -->
+  <url><loc>https://f1-dashboard-bryzhak.onrender.com/circuits</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://f1-dashboard-bryzhak.onrender.com/circuits/melbourne</loc><priority>0.5</priority></url>
+  <url><loc>https://f1-dashboard-bryzhak.onrender.com/circuits/mexico-city</loc><priority>0.5</priority></url>
+  <url><loc>https://f1-dashboard-bryzhak.onrender.com/circuits/interlagos</loc><priority>0.5</priority></url>
+  <url><loc>https://f1-dashboard-bryzhak.onrender.com/circuits/monza</loc><priority>0.5</priority></url>
+  <url><loc>https://f1-dashboard-bryzhak.onrender.com/circuits/baku</loc><priority>0.5</priority></url>
+  <url><loc>https://f1-dashboard-bryzhak.onrender.com/circuits/catalunya</loc><priority>0.5</priority></url>
+  <url><loc>https://f1-dashboard-bryzhak.onrender.com/circuits/monaco</loc><priority>0.5</priority></url>
+  <url><loc>https://f1-dashboard-bryzhak.onrender.com/circuits/spa-francorchamps</loc><priority>0.5</priority></url>
+  <url><loc>https://f1-dashboard-bryzhak.onrender.com/circuits/montreal</loc><priority>0.5</priority></url>
+  <url><loc>https://f1-dashboard-bryzhak.onrender.com/circuits/austin</loc><priority>0.5</priority></url>
+  <url><loc>https://f1-dashboard-bryzhak.onrender.com/circuits/zandvoort</loc><priority>0.5</priority></url>
+  <url><loc>https://f1-dashboard-bryzhak.onrender.com/circuits/madring</loc><priority>0.5</priority></url>
+  <url><loc>https://f1-dashboard-bryzhak.onrender.com/circuits/hungaroring</loc><priority>0.5</priority></url>
+  <url><loc>https://f1-dashboard-bryzhak.onrender.com/circuits/las-vegas</loc><priority>0.5</priority></url>
+  <url><loc>https://f1-dashboard-bryzhak.onrender.com/circuits/lusail</loc><priority>0.5</priority></url>
+  <url><loc>https://f1-dashboard-bryzhak.onrender.com/circuits/marina-bay</loc><priority>0.5</priority></url>
+  <url><loc>https://f1-dashboard-bryzhak.onrender.com/circuits/miami</loc><priority>0.5</priority></url>
+  <url><loc>https://f1-dashboard-bryzhak.onrender.com/circuits/spielberg</loc><priority>0.5</priority></url>
+  <url><loc>https://f1-dashboard-bryzhak.onrender.com/circuits/sepang</loc><priority>0.5</priority></url>
+  <url><loc>https://f1-dashboard-bryzhak.onrender.com/circuits/shanghai</loc><priority>0.5</priority></url>
+  <url><loc>https://f1-dashboard-bryzhak.onrender.com/circuits/silverstone</loc><priority>0.5</priority></url>
+  <url><loc>https://f1-dashboard-bryzhak.onrender.com/circuits/suzuka</loc><priority>0.5</priority></url>
+  <url><loc>https://f1-dashboard-bryzhak.onrender.com/circuits/yas-marina</loc><priority>0.5</priority></url>
 </urlset>

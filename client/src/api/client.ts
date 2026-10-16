@@ -37,6 +37,8 @@ async function postJson<T>(path: string, body: unknown): Promise<T> {
 
 import type {
   CalendarResponse,
+  CircuitProfile,
+  CircuitSummary,
   ConstructorListItem,
   ConstructorProfile,
   ConstructorStanding,
@@ -89,6 +91,9 @@ export const api = {
   compareDriversSeason: (a: string, b: string, season: number) =>
     getJson<SeasonComparison>(`/compare/drivers/${a}/${b}/season/${season}`),
   constructors: () => getJson<ConstructorListItem[]>('/constructors'),
+  circuits: () => getJson<CircuitSummary[]>('/circuits'),
+  circuitProfile: (circuitId: string) =>
+    getJson<CircuitProfile>(`/circuits/${circuitId}`),
   teamImages: () =>
     getJson<Record<string, TeamImage>>('/constructors/images'),
   constructorProfile: (constructorId: string) =>
