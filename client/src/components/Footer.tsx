@@ -1,20 +1,21 @@
 import { Link } from 'react-router-dom'
+import { useI18n, type TKey } from '../i18n/core'
 
 // Global site footer. Carries the data/image attributions we're obliged to show
 // (f1db is CC-BY 4.0), an independence + trademark disclaimer so we don't imply
 // any official tie to Formula 1, an analytics disclosure (we run GA4), and a set
 // of quick links that double as internal linking for search engines. Laid out as
 // columns spread across the full content width.
-const quickLinks = [
-  { to: '/', label: 'Home' },
-  { to: '/live', label: 'Live' },
-  { to: '/standings', label: 'Standings' },
-  { to: '/calendar', label: 'Calendar' },
-  { to: '/drivers', label: 'Drivers' },
-  { to: '/teams', label: 'Teams' },
-  { to: '/compare', label: 'Compare' },
-  { to: '/telemetry', label: 'Telemetry' },
-  { to: '/feedback', label: 'Feedback' },
+const quickLinks: { to: string; label: TKey }[] = [
+  { to: '/', label: 'nav.home' },
+  { to: '/live', label: 'nav.live' },
+  { to: '/standings', label: 'nav.standings' },
+  { to: '/calendar', label: 'nav.calendar' },
+  { to: '/drivers', label: 'nav.drivers' },
+  { to: '/teams', label: 'nav.teams' },
+  { to: '/compare', label: 'nav.compare' },
+  { to: '/telemetry', label: 'nav.telemetry' },
+  { to: '/feedback', label: 'nav.feedback' },
 ]
 
 function Ext({ href, children }: { href: string; children: React.ReactNode }) {
@@ -26,6 +27,7 @@ function Ext({ href, children }: { href: string; children: React.ReactNode }) {
 }
 
 export default function Footer() {
+  const { t } = useI18n()
   const year = new Date().getFullYear()
   return (
     <footer className="site-footer">
@@ -34,56 +36,50 @@ export default function Footer() {
           <div className="footer-logo">
             <span className="mark">F1</span> DASHBOARD
           </div>
-          <p>Formula 1 standings, calendars and career stats — 1950 to today.</p>
+          <p>{t('footer.tagline')}</p>
           <p className="footer-copy">© {year} F1 Dashboard</p>
         </div>
 
         <nav className="footer-col" aria-label="Footer">
-          <h4>Explore</h4>
+          <h4>{t('footer.explore')}</h4>
           <ul>
             {quickLinks.map((l) => (
               <li key={l.to}>
-                <Link to={l.to}>{l.label}</Link>
+                <Link to={l.to}>{t(l.label)}</Link>
               </li>
             ))}
           </ul>
         </nav>
 
         <div className="footer-col">
-          <h4>Data &amp; credits</h4>
+          <h4>{t('footer.credits')}</h4>
           <ul>
             <li>
-              Data by <Ext href="https://github.com/f1db/f1db">f1db</Ext> (
+              {t('footer.dataBy')} <Ext href="https://github.com/f1db/f1db">f1db</Ext> (
               <Ext href="https://creativecommons.org/licenses/by/4.0/">
                 CC BY 4.0
               </Ext>
               )
             </li>
             <li>
-              Telemetry by <Ext href="https://openf1.org">OpenF1</Ext>
+              {t('footer.telemetryBy')} <Ext href="https://openf1.org">OpenF1</Ext>
             </li>
             <li>
-              Flag icons by <Ext href="https://flagcdn.com">flagcdn</Ext>
+              {t('footer.flagsBy')} <Ext href="https://flagcdn.com">flagcdn</Ext>
             </li>
             <li>
-              Driver photos and team logos/photos via{' '}
+              {t('footer.photosVia')}{' '}
               <Ext href="https://commons.wikimedia.org">Wikimedia Commons</Ext>{' '}
-              (CC BY-SA / public domain, by their respective authors)
+              {t('footer.photosLicense')}
             </li>
           </ul>
         </div>
 
         <div className="footer-col footer-legal">
-          <h4>Legal</h4>
-          <p>
-            Driver and car images are © Formula 1. F1, FORMULA 1 and related
-            marks are trademarks of Formula One Licensing B.V.
-          </p>
-          <p>
-            An independent, fan-made project — not affiliated with, endorsed by,
-            or associated with Formula 1, Formula One Management or the FIA.
-          </p>
-          <p>This site uses Google Analytics to measure site traffic.</p>
+          <h4>{t('footer.legal')}</h4>
+          <p>{t('footer.trademark')}</p>
+          <p>{t('footer.independent')}</p>
+          <p>{t('footer.analytics')}</p>
         </div>
       </div>
     </footer>

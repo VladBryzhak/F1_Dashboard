@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { useI18n } from '../i18n/core'
 
 // Cookie-consent notice. Flip ENABLED to false to hide it everywhere (the code
 // stays in place); flip it back to true to render it again when we actually
@@ -11,6 +12,7 @@ const ENABLED = true
 const STORAGE_KEY = 'cookieConsent' // 'accepted' | 'declined'
 
 export default function CookieBanner() {
+  const { t } = useI18n()
   const [visible, setVisible] = useState(false)
 
   useEffect(() => {
@@ -35,10 +37,9 @@ export default function CookieBanner() {
   }
 
   return (
-    <div className="cookie-banner" role="dialog" aria-label="Cookie notice">
+    <div className="cookie-banner" role="dialog" aria-label={t('cookie.label')}>
       <p className="cookie-text">
-        F1 Dashboard uses cookies for analytics to understand how the site is
-        used. You can accept or decline.
+        {t('cookie.text')}
       </p>
       <div className="cookie-actions">
         <button
@@ -46,14 +47,14 @@ export default function CookieBanner() {
           className="cookie-btn cookie-decline"
           onClick={() => choose('declined')}
         >
-          Decline
+          {t('cookie.decline')}
         </button>
         <button
           type="button"
           className="cookie-btn cookie-accept"
           onClick={() => choose('accepted')}
         >
-          Accept
+          {t('cookie.accept')}
         </button>
       </div>
     </div>

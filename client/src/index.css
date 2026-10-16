@@ -122,6 +122,44 @@ h2,
   background: var(--accent);
 }
 
+/* EN | UA interface-language switch, right end of the header. The nav comes
+   first visually on desktop; on phones the switch sits next to the burger. */
+.nav {
+  order: 1;
+}
+.lang-switch {
+  order: 2;
+  margin-left: auto;
+  display: inline-flex;
+  flex-shrink: 0;
+  padding: 2px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 8px;
+}
+.lang-switch button {
+  min-width: 34px;
+  height: 26px;
+  padding: 0 0.45rem;
+  background: transparent;
+  color: var(--muted);
+  border: 0;
+  border-radius: 6px;
+  font: 600 0.75rem/1 var(--font-body);
+  letter-spacing: 0.06em;
+  cursor: pointer;
+}
+.lang-switch button:hover {
+  color: #fff;
+}
+.lang-switch button.on {
+  background: var(--accent);
+  color: #fff;
+}
+.lang-switch button:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+
 /* Burger button — only shown on phones (see the 768px media query). */
 .nav-toggle {
   display: none;
@@ -1826,6 +1864,14 @@ table.standings {
   }
   .nav-toggle {
     display: inline-flex;
+    margin-left: 0;
+  }
+  .lang-switch {
+    order: 0;
+  }
+  .lang-switch button {
+    height: 32px;
+    min-width: 38px;
   }
   .nav {
     display: none;
