@@ -3,6 +3,7 @@ import { Link, NavLink, Outlet, useLocation } from 'react-router-dom'
 import { useLiveStatus } from '../hooks/useLiveStatus'
 import { useI18n, type Lang, type TKey } from '../i18n/core'
 import CookieBanner from './CookieBanner'
+import SearchPalette from './SearchPalette'
 import Footer from './Footer'
 
 const links: { to: string; label: TKey }[] = [
@@ -52,6 +53,24 @@ export default function Layout() {
 
   // Phone menu: the nav becomes a dropdown opened by a burger button.
   const [menuOpen, setMenuOpen] = useState(false)
+  const [searchOpen, setSearchOpen] = useState(false)
+
+  // ⌘K / Ctrl+K anywhere, or "/" when not typing, opens the search.
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      const typing = (e.target as HTMLElement | null)?.closest?.('input, textarea, select, [contenteditable]')
+      if ((e.key === 'k' || e.key === 'K') && (e.metaKey || e.ctrlKey)) {
+        e.preventDefault()
+        setSearchOpen((o) => !o)
+      } else if (e.key === '/' && !typing) {
+        e.preventDefault()
+        setSearchOpen(true)
+      }
+    }
+    document.addEventListener('keydown', onKey)
+    return () => document.removeEventListener('keydown', onKey)
+  }, [])
+  const isMac = typeof navigator !== 'undefined' && /Mac|iPhone|iPad/.test(navigator.platform)
   const topbarRef = useRef<HTMLElement>(null)
   const { pathname } = useLocation()
 
@@ -84,6 +103,22 @@ export default function Layout() {
         <Link to="/" className="brand" title={t('nav.home')}>
           <span className="mark">F1</span> DASHBOARD
         </Link>
+        <button
+          type="button"
+          className="search-btn"
+          onClick={() => {
+            setMenuOpen(false)
+            setSearchOpen(true)
+          }}
+          aria-label={t('search.label')}
+          title={`${t('search.label')} (${isMac ? '⌘' : 'Ctrl+'}K)`}
+        >
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <circle cx="11" cy="11" r="6.5" stroke="currentColor" strokeWidth="2" />
+            <path d="M16 16l4.5 4.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+          </svg>
+          <kbd className="search-kbd">{isMac ? '⌘K' : 'Ctrl K'}</kbd>
+        </button>
         <LangSwitch />
         <button
           type="button"
@@ -125,6 +160,7 @@ export default function Layout() {
       </main>
       <Footer />
       <CookieBanner />
+      <SearchPalette open={searchOpen} onClose={() => setSearchOpen(false)} />
     </div>
   )
 }

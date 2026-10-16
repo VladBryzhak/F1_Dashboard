@@ -56,6 +56,7 @@ import type {
   LapTelemetry,
   RaceResultResponse,
   RaceStrategy,
+  SearchIndex,
   RaceWeekend,
   SeasonComparison,
   SeasonProgression,
@@ -94,6 +95,7 @@ export const api = {
   compareDriversSeason: (a: string, b: string, season: number) =>
     getJson<SeasonComparison>(`/compare/drivers/${a}/${b}/season/${season}`),
   constructors: () => getJson<ConstructorListItem[]>('/constructors'),
+  searchIndex: () => getJson<SearchIndex>('/search-index'),
   circuits: () => getJson<CircuitSummary[]>('/circuits'),
   circuitProfile: (circuitId: string) =>
     getJson<CircuitProfile>(`/circuits/${circuitId}`),

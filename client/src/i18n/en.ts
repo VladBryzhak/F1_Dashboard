@@ -236,6 +236,20 @@ const en = {
   'team.engines': 'Engines',
   'team.colDrivers': 'Drivers',
   'team.colEngine': 'Engine',
+
+  // Global search
+  'search.label': 'Search',
+  'search.placeholder': 'Drivers, teams, circuits, races — e.g. “Monaco 2021”',
+  'search.hint': 'Type a name. Add a year to find a race, e.g. “Silverstone 2024”.',
+  'search.none': 'Nothing found for “{q}”.',
+  'search.error': 'Search is unavailable right now. Please try again.',
+  'search.drivers': 'Drivers',
+  'search.teams': 'Teams',
+  'search.circuits': 'Circuits',
+  'search.races': 'Races',
+  'search.move': 'to move',
+  'search.open': 'to open',
+  'search.close': 'to close',
 }
 
 export type Dict = Record<keyof typeof en, string>

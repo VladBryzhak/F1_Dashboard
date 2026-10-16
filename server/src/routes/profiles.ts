@@ -11,9 +11,21 @@ import {
   getDriverComparison,
   getSeasonComparison,
   getDriverProfile,
+  getSearchIndex,
 } from "../services/f1db";
 
 const router = Router();
+
+// GET /api/search-index — compact drivers/teams/circuits/races for the
+// header search. Changes only with the dataset, so let browsers cache it.
+router.get("/search-index", async (_req, res, next) => {
+  try {
+    res.set("Cache-Control", "public, max-age=3600");
+    res.json(await getSearchIndex());
+  } catch (err) {
+    next(err);
+  }
+});
 
 // GET /api/drivers — lightweight list of all drivers (for comparison pickers)
 router.get("/drivers", async (_req, res, next) => {

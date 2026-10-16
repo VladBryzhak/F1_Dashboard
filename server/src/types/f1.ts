@@ -647,3 +647,15 @@ export interface WeatherSample {
   wind: number | null; // m/s
   windDir: number | null; // degrees
 }
+
+// Global search index (compact tuples).
+export interface SearchIndex {
+  // [driverId, name, firstSeason, lastSeason, races, countryCode]
+  drivers: [string, string, number, number, number, string | null][];
+  // [constructorId, name, firstSeason, lastSeason, races, countryCode]
+  teams: [string, string, number, number, number, string | null][];
+  // [circuitId, name, placeName, countryCode]
+  circuits: [string, string, string, string | null][];
+  // [season, round, grandPrixName, countryCode] — completed races, newest first
+  races: [number, number, string, string | null][];
+}

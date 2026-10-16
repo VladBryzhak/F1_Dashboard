@@ -6,6 +6,7 @@ import type {
   CircuitRace,
   CircuitSummary,
   CircuitTally,
+  SearchIndex,
   DriverRecentRace,
   PracticeSession,
   CalendarResponse,
@@ -1707,4 +1708,40 @@ export async function getRaceDates(
       .slice(0, 10);
   }
   return { date: r.date, sprintDate };
+}
+
+// Compact index for the global search box: tuples keep the payload small.
+export async function getSearchIndex(): Promise<SearchIndex> {
+  const ds = await dataset();
+  const drivers: SearchIndex["drivers"] = [];
+  for (const [id, career] of ds.driverCareer) {
+    const d = ds.drivers.get(id);
+    drivers.push([
+      id,
+      d ? `${d.firstName} ${d.lastName}` : id,
+      career.firstSeason,
+      career.lastSeason,
+      career.races,
+      alpha2(ds, d?.nationalityCountryId),
+    ]);
+  }
+  const teams: SearchIndex["teams"] = [];
+  for (const [id, career] of ds.constructorCareer) {
+    const c = ds.constructors.get(id);
+    teams.push([id, c?.name ?? id, career.firstSeason, career.lastSeason, career.races, alpha2(ds, c?.countryId)]);
+  }
+  const circuits: SearchIndex["circuits"] = [...ds.circuits.values()].map((c) => [
+    c.id,
+    c.fullName ?? c.name,
+    c.placeName,
+    alpha2(ds, c.countryId),
+  ]);
+  const races: SearchIndex["races"] = ds.races
+    .filter((r) => ds.winnerByRace.has(`${r.year}:${r.round}`))
+    .sort((a, b) => b.year - a.year || b.round - a.round)
+    .map((r) => {
+      const gp = ds.grandsPrix.get(r.grandPrixId);
+      return [r.year, r.round, gp?.name ?? r.grandPrixId, alpha2(ds, gp?.countryId)];
+    });
+  return { drivers, teams, circuits, races };
 }

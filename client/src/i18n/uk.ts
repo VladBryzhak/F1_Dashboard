@@ -268,6 +268,20 @@ const uk: Dict & Record<string, string> = {
   'plural.ctitles_few': '{n} Кубки конструкторів',
   'plural.ctitles_many': '{n} Кубків конструкторів',
   'plural.ctitles_other': '{n} Кубка конструкторів',
+
+  // Global search
+  'search.label': 'Пошук',
+  'search.placeholder': 'Пілоти, команди, траси, гонки — напр. «Monaco 2021»',
+  'search.hint': 'Введіть назву. Додайте рік, щоб знайти гонку, напр. «Італія 2024».',
+  'search.none': 'Нічого не знайдено за запитом «{q}».',
+  'search.error': 'Пошук зараз недоступний. Спробуйте ще раз.',
+  'search.drivers': 'Пілоти',
+  'search.teams': 'Команди',
+  'search.circuits': 'Траси',
+  'search.races': 'Гонки',
+  'search.move': 'вибір',
+  'search.open': 'відкрити',
+  'search.close': 'закрити',
 }
 
 export default uk
