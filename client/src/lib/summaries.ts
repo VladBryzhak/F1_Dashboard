@@ -106,7 +106,29 @@ export function driverSummary(p: DriverProfile, lang: Lang = getLang()): string 
   return text
 }
 
-export function teamSummary(p: ConstructorProfile): string {
+function teamSummaryUk(p: ConstructorProfile): string {
+  const active = p.lastSeason >= CURRENT_SEASON
+  const country = countryName(p.countryCode, 'uk-UA')
+  const span = active
+    ? `з ${p.firstSeason} року`
+    : p.firstSeason === p.lastSeason
+      ? `у ${p.firstSeason} році`
+      : `у ${p.firstSeason}–${p.lastSeason} роках`
+  let text = `${p.name}${country ? ` (${country})` : ''} — ${active ? 'команда' : 'колишня команда'} чемпіонату світу FIA Формули-1 ${span}.`
+  const feats: string[] = []
+  if (p.championships > 0) feats.push(plural('plural.ctitles', p.championships, undefined, 'uk'))
+  if (p.wins > 0) feats.push(plural('plural.wins', p.wins, undefined, 'uk'))
+  if (p.podiums > 0) feats.push(plural('plural.podiums', p.podiums, undefined, 'uk'))
+  const starts = plural('plural.starts', p.races, undefined, 'uk')
+  const points = plural('plural.points', p.points, undefined, 'uk')
+  text += feats.length
+    ? ` За ${starts}: ${feats.join(', ')} і ${points}.`
+    : ` За ${starts} — ${points}.`
+  return text
+}
+
+export function teamSummary(p: ConstructorProfile, lang: Lang = getLang()): string {
+  if (lang === 'uk') return teamSummaryUk(p)
   const active = p.lastSeason >= CURRENT_SEASON
   const span = `${active ? 'has competed' : 'competed'} in the FIA Formula One World Championship ${yearSpan(p.firstSeason, p.lastSeason, active)}`
   const lead = active

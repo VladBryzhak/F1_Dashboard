@@ -88,6 +88,8 @@ export interface ConstructorSeasonEntry {
   position: number
   points: number
   wins: number
+  drivers: { driverId: string; name: string }[] // race drivers that season
+  engine: string | null
 }
 
 export interface ConstructorProfile {
@@ -103,6 +105,14 @@ export interface ConstructorProfile {
   points: number
   races: number
   seasons: ConstructorSeasonEntry[]
+  fullName: string | null
+  poles: number
+  fastestLaps: number
+  oneTwos: number
+  sprintWins: number
+  // Names the team raced under, oldest first (empty if it never changed).
+  lineage: { constructorId: string; name: string; yearFrom: number; yearTo: number | null }[]
+  engines: { name: string; yearFrom: number; yearTo: number }[]
 }
 
 export interface CalendarRace {

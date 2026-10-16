@@ -222,6 +222,20 @@ const en = {
   'rel.PARENT_IN_LAW': 'Parent-in-law',
   'rel.SIBLING_IN_LAW': 'Sibling-in-law',
   'rel.SIBLINGS_CHILD_IN_LAW': 'Nephew- / niece-in-law',
+
+  // Team profile
+  'team.loadError': 'Could not load this team: {error}',
+  'team.back': '← Back to Teams',
+  'team.poles': 'Pole positions',
+  'team.fastestLaps': 'Fastest laps',
+  'team.oneTwos': '1–2 finishes',
+  'team.sprintWins': 'Sprint wins',
+  'team.lineage': 'Team history',
+  'team.lineageHint': 'Names this team has raced under',
+  'team.present': 'present',
+  'team.engines': 'Engines',
+  'team.colDrivers': 'Drivers',
+  'team.colEngine': 'Engine',
 }
 
 export type Dict = Record<keyof typeof en, string>

@@ -95,6 +95,28 @@ interface RawConstructor {
   name: string;
   fullName: string;
   countryId: string;
+  totalPolePositions?: number;
+  totalFastestLaps?: number;
+  total1And2Finishes?: number;
+  totalSprintRaceWins?: number;
+}
+// Team lineages: `parentConstructorId` is the current identity, each row one
+// name it raced under (Stewart → Jaguar → Red Bull).
+interface RawChronology {
+  parentConstructorId: string;
+  constructorId: string;
+  positionDisplayOrder: number;
+  yearFrom: number;
+  yearTo: number | null;
+}
+interface RawEntrantEngine {
+  year: number;
+  constructorId: string;
+  engineManufacturerId: string;
+}
+interface RawEngineManufacturer {
+  id: string;
+  name: string;
 }
 interface RawCountry {
   id: string;
@@ -335,6 +357,10 @@ interface Dataset {
   fastestLapByRace: Map<string, HighlightRow>;
   driverOfDayByRace: Map<string, HighlightRow>;
   familyByDriver: Map<string, RawFamily[]>;
+  chronology: RawChronology[];
+  // `${year}:${constructorId}` -> engine manufacturer names / race drivers
+  enginesByYearTeam: Map<string, string[]>;
+  driversByYearTeam: Map<string, string[]>;
 }
 
 let datasetPromise: Promise<Dataset> | null = null;
@@ -394,10 +420,15 @@ async function loadDataset(): Promise<Dataset> {
   // mid-season swaps).
   const teamByYearDriver = new Map<string, string>();
   const roundsSeen = new Map<string, number>();
+  const driversByYearTeam = new Map<string, string[]>();
   for (const e of read<RawEntrantDriver>(
     "f1db-seasons-entrants-drivers.json"
   )) {
     if (e.testDriver) continue;
+    const teamKey = `${e.year}:${e.constructorId}`;
+    const list = driversByYearTeam.get(teamKey) ?? [];
+    if (!list.includes(e.driverId)) list.push(e.driverId);
+    driversByYearTeam.set(teamKey, list);
     const key = `${e.year}:${e.driverId}`;
     const rounds = e.rounds?.length ?? 0;
     if (rounds >= (roundsSeen.get(key) ?? -1)) {
@@ -568,6 +599,19 @@ async function loadDataset(): Promise<Dataset> {
     });
   }
 
+  const chronology = read<RawChronology>("f1db-constructors-chronology.json");
+  const engineNames = new Map(
+    read<RawEngineManufacturer>("f1db-engine-manufacturers.json").map((m) => [m.id, m.name])
+  );
+  const enginesByYearTeam = new Map<string, string[]>();
+  for (const e of read<RawEntrantEngine>("f1db-seasons-entrants-engines.json")) {
+    const key = `${e.year}:${e.constructorId}`;
+    const name = engineNames.get(e.engineManufacturerId) ?? e.engineManufacturerId;
+    const list = enginesByYearTeam.get(key) ?? [];
+    if (!list.includes(name)) list.push(name);
+    enginesByYearTeam.set(key, list);
+  }
+
   const familyByDriver = new Map<string, RawFamily[]>();
   for (const f of read<RawFamily>("f1db-drivers-family-relationships.json")) {
     const arr = familyByDriver.get(f.parentDriverId) ?? [];
@@ -613,6 +657,9 @@ async function loadDataset(): Promise<Dataset> {
     fastestLapByRace,
     driverOfDayByRace,
     familyByDriver,
+    chronology,
+    enginesByYearTeam,
+    driversByYearTeam,
   };
 }
 
@@ -933,6 +980,11 @@ export async function getConstructorProfile(
     position: s.positionNumber ?? s.positionDisplayOrder,
     points: s.points,
     wins: ds.winsByYear.get(s.year)?.constructors.get(constructorId) ?? 0,
+    drivers: (ds.driversByYearTeam.get(`${s.year}:${constructorId}`) ?? []).map((id) => ({
+      driverId: id,
+      name: driverName(ds, id),
+    })),
+    engine: (ds.enginesByYearTeam.get(`${s.year}:${constructorId}`) ?? []).join(" / ") || null,
   }));
 
   return {
@@ -948,7 +1000,50 @@ export async function getConstructorProfile(
     points: rawSeasons.reduce((sum, s) => sum + s.points, 0),
     races: career.races,
     seasons,
+    fullName: c?.fullName ?? null,
+    poles: c?.totalPolePositions ?? 0,
+    fastestLaps: c?.totalFastestLaps ?? 0,
+    oneTwos: c?.total1And2Finishes ?? 0,
+    sprintWins: c?.totalSprintRaceWins ?? 0,
+    lineage: teamLineage(ds, constructorId),
+    engines: engineSpans(ds, constructorId, career.firstSeason, career.lastSeason),
   };
+}
+
+// The names this team raced under, oldest first (empty when it never changed).
+function teamLineage(ds: Dataset, constructorId: string): ConstructorProfile["lineage"] {
+  const parent =
+    ds.chronology.find((r) => r.constructorId === constructorId)?.parentConstructorId ??
+    (ds.chronology.some((r) => r.parentConstructorId === constructorId) ? constructorId : null);
+  if (!parent) return [];
+  return ds.chronology
+    .filter((r) => r.parentConstructorId === parent)
+    .sort((a, b) => a.positionDisplayOrder - b.positionDisplayOrder)
+    .map((r) => ({
+      constructorId: r.constructorId,
+      name: ds.constructors.get(r.constructorId)?.name ?? r.constructorId,
+      yearFrom: r.yearFrom,
+      yearTo: r.yearTo,
+    }));
+}
+
+// Engine suppliers as year ranges ("Renault 2007–2018").
+function engineSpans(
+  ds: Dataset,
+  constructorId: string,
+  first: number,
+  last: number
+): ConstructorProfile["engines"] {
+  const spans: ConstructorProfile["engines"] = [];
+  for (let y = first; y <= last; y++) {
+    const names = ds.enginesByYearTeam.get(`${y}:${constructorId}`);
+    if (!names) continue;
+    const label = names.join(" / ");
+    const prev = spans[spans.length - 1];
+    if (prev && prev.name === label && prev.yearTo === y - 1) prev.yearTo = y;
+    else spans.push({ name: label, yearFrom: y, yearTo: y });
+  }
+  return spans;
 }
 
 // Retirement reasons that read as an on-track incident (for the "notable crash"

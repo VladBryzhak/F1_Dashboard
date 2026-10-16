@@ -250,6 +250,24 @@ const uk: Dict & Record<string, string> = {
   'plural.years_few': '{n} роки',
   'plural.years_many': '{n} років',
   'plural.years_other': '{n} року',
+
+  // Team profile
+  'team.loadError': 'Не вдалося завантажити команду: {error}',
+  'team.back': '← До списку команд',
+  'team.poles': 'Поул-позиції',
+  'team.fastestLaps': 'Найшвидші кола',
+  'team.oneTwos': 'Дублі 1–2',
+  'team.sprintWins': 'Перемоги у спринтах',
+  'team.lineage': 'Історія команди',
+  'team.lineageHint': 'Назви, під якими виступала команда',
+  'team.present': 'тепер',
+  'team.engines': 'Двигуни',
+  'team.colDrivers': 'Пілоти',
+  'team.colEngine': 'Двигун',
+  'plural.ctitles_one': '{n} Кубок конструкторів',
+  'plural.ctitles_few': '{n} Кубки конструкторів',
+  'plural.ctitles_many': '{n} Кубків конструкторів',
+  'plural.ctitles_other': '{n} Кубка конструкторів',
 }
 
 export default uk

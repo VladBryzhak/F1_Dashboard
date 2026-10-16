@@ -3914,3 +3914,58 @@ a.sched-ics {
     padding: 0.8rem 0.9rem;
   }
 }
+
+/* ---------- Team profile extras ---------- */
+.lineage {
+  list-style: none;
+  margin: 0;
+  padding: 0 0 0 0.35rem;
+}
+.lineage li {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.45rem 0;
+}
+/* Vertical connector between the dots. */
+.lineage li + li::before {
+  content: '';
+  position: absolute;
+  left: 4px;
+  top: -0.55rem;
+  height: 1.1rem;
+  width: 2px;
+  background: rgba(255, 255, 255, 0.12);
+}
+.lineage-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.lineage-name {
+  flex: 1;
+  font-weight: 600;
+  color: var(--text);
+}
+.lineage li.here .lineage-name {
+  color: #fff;
+  font-weight: 800;
+}
+.lineage-years {
+  font-size: 0.85rem;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+.team-drivers {
+  font-weight: 500;
+  min-width: 14rem;
+}
+.team-drivers a {
+  color: var(--text);
+  text-decoration: none;
+}
+.team-drivers a:hover {
+  color: var(--accent);
+}
