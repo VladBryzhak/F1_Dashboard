@@ -4,6 +4,7 @@ import {
   getRaceResults,
   getRaceWeekend,
 } from "../services/f1db";
+import { getRaceStrategy } from "../services/strategy";
 
 const router = Router();
 
@@ -34,6 +35,21 @@ router.get("/:season/:round/weekend", async (req, res, next) => {
       return res.status(404).json({ error: "Race not found" });
     }
     res.json(weekend);
+  } catch (err) {
+    next(err);
+  }
+});
+
+// GET /api/calendar/:season/:round/strategy?kind=race|sprint -> lap chart and
+// tyre strategy (OpenF1, 2023+)
+router.get("/:season/:round/strategy", async (req, res, next) => {
+  try {
+    const kind = req.query.kind === "sprint" ? "sprint" : "race";
+    const data = await getRaceStrategy(req.params.season, req.params.round, kind);
+    if (!data) {
+      return res.status(404).json({ error: "No lap data for this race" });
+    }
+    res.json(data);
   } catch (err) {
     next(err);
   }

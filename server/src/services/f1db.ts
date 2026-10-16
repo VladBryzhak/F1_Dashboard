@@ -1515,3 +1515,13 @@ export async function getCircuitProfile(circuitId: string): Promise<CircuitProfi
       : null,
   };
 }
+
+// Race-day and sprint-day dates for one round (for matching OpenF1 sessions).
+export async function getRaceDates(
+  season: string,
+  round: string
+): Promise<{ date: string; sprintDate: string | null } | null> {
+  const ds = await dataset();
+  const r = ds.races.find((x) => x.year === Number(season) && x.round === Number(round));
+  return r ? { date: r.date, sprintDate: r.sprintRaceDate } : null;
+}

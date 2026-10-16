@@ -154,6 +154,22 @@ const uk: Dict & Record<string, string> = {
   'wk.colBest': 'Найкраще коло',
   'wk.colGap': 'Відрив',
   'wk.colLaps': 'Кола',
+
+  // Lap chart & tyre strategy
+  'wk.tab.strategy': 'Стратегія',
+  'strat.lapChart': 'Позиції по колах',
+  'strat.lapChartHint': 'Торкніться пілота, щоб виділити. Зліва — стартова решітка, справа — фініш.',
+  'strat.clear': 'Скинути',
+  'strat.tyres': 'Шинна стратегія',
+  'strat.laps': 'кола {from}–{to}',
+  'strat.loading': 'Завантажуємо дані кіл з OpenF1…',
+  'strat.error': 'Дані кіл зараз недоступні ({error}). OpenF1 може бути перевантажений — спробуйте за хвилину.',
+  'strat.source': 'Дані кіл і шин: OpenF1 (з 2023 року). Позиції — порядок на трасі, без урахування штрафів.',
+  'tyre.SOFT': 'М’які',
+  'tyre.MEDIUM': 'Середні',
+  'tyre.HARD': 'Жорсткі',
+  'tyre.INTERMEDIATE': 'Проміжні',
+  'tyre.WET': 'Дощові',
 }
 
 export default uk

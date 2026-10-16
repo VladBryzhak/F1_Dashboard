@@ -573,3 +573,30 @@ export interface PracticeSession {
   number: number; // 1..4
   results: PracticeEntry[];
 }
+
+// Lap chart + tyre strategy for one race/sprint (OpenF1, 2023+).
+export interface StrategyDriver {
+  num: number;
+  code: string;
+  name: string;
+  colour: string | null; // team hex without '#'
+  grid: number | null; // starting position (lap 0)
+  positions: (number | null)[]; // index = lap number (1-based; [0] = grid)
+  finish: number | null; // position after the last lap the car completed
+  retired: boolean; // stopped before the chequered flag
+}
+
+export interface StrategyStint {
+  num: number;
+  compound: string | null;
+  start: number;
+  end: number;
+}
+
+export interface RaceStrategy {
+  sessionKey: number;
+  kind: "race" | "sprint";
+  totalLaps: number;
+  drivers: StrategyDriver[]; // ordered by finish
+  stints: StrategyStint[];
+}

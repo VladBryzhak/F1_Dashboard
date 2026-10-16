@@ -150,6 +150,22 @@ const en = {
   'wk.colBest': 'Best lap',
   'wk.colGap': 'Gap',
   'wk.colLaps': 'Laps',
+
+  // Lap chart & tyre strategy
+  'wk.tab.strategy': 'Strategy',
+  'strat.lapChart': 'Lap chart',
+  'strat.lapChartHint': 'Tap a driver to highlight. Grid order on the left, finish on the right.',
+  'strat.clear': 'Clear',
+  'strat.tyres': 'Tyre strategy',
+  'strat.laps': 'laps {from}–{to}',
+  'strat.loading': 'Loading lap data from OpenF1…',
+  'strat.error': 'Lap data is not available right now ({error}). OpenF1 may be busy — try again in a minute.',
+  'strat.source': 'Lap and tyre data: OpenF1 (2023 onwards). Positions are the on-track order, before any penalties.',
+  'tyre.SOFT': 'Soft',
+  'tyre.MEDIUM': 'Medium',
+  'tyre.HARD': 'Hard',
+  'tyre.INTERMEDIATE': 'Intermediate',
+  'tyre.WET': 'Wet',
 }
 
 export type Dict = Record<keyof typeof en, string>

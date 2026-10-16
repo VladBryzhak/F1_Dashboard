@@ -3,6 +3,7 @@ import { Link, useParams, useSearchParams } from 'react-router-dom'
 import { api } from '../api/client'
 import Breadcrumbs from '../components/Breadcrumbs'
 import Flag from '../components/Flag'
+import RaceStrategy from '../components/RaceStrategy'
 import { useAsync } from '../hooks/useAsync'
 import { useSeo } from '../hooks/useSeo'
 import { useI18n } from '../i18n/core'
@@ -18,7 +19,7 @@ import type {
 } from '../types/f1'
 import { gpTitle } from '../lib/gpNames'
 
-type Tab = 'race' | 'sprint' | 'quali' | 'practice'
+type Tab = 'race' | 'sprint' | 'quali' | 'practice' | 'strategy'
 
 function Highlight({
   label,
@@ -238,6 +239,8 @@ export default function RaceWeekend() {
           ['sprint', data.sprintResults.length > 0 || data.sprintQualifying.length > 0],
           ['quali', data.qualifying.length > 0],
           ['practice', data.practices.length > 0],
+          // Lap chart + tyres come from OpenF1, which starts in 2023.
+          ['strategy', Number(data.season) >= 2023 && data.results.length > 0],
         ] as [Tab, boolean][]
       )
         .filter(([, has]) => has)
@@ -401,6 +404,14 @@ export default function RaceWeekend() {
               </h3>
               <QualiTable rows={data.qualifying} prefix="Q" />
             </div>
+          )}
+
+          {tab === 'strategy' && (
+            <RaceStrategy
+              season={data.season}
+              round={data.round}
+              hasSprint={data.sprintResults.length > 0}
+            />
           )}
 
           {tab === 'practice' && practice && (

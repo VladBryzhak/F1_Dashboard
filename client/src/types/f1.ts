@@ -486,11 +486,11 @@ export interface LiveStatus {
 
 export interface CircuitSummary {
   circuitId: string
-  name: string; // full name, e.g. "Circuit of the Americas"
+  name: string // full name, e.g. "Circuit of the Americas"
   placeName: string
   countryCode: string | null
   nationality: string
-  type: string; // RACE | ROAD | STREET
+  type: string // RACE | ROAD | STREET
   racesHeld: number
   firstYear: number | null
   lastYear: number | null
@@ -499,7 +499,7 @@ export interface CircuitSummary {
 
 export interface CircuitLayoutInfo {
   layoutId: string
-  length: number | null; // km
+  length: number | null // km
   turns: number | null
   firstYear: number
   lastYear: number
@@ -516,7 +516,7 @@ export interface CircuitLapRecord {
 }
 
 export interface CircuitTally {
-  id: string; // driverId or constructorId
+  id: string // driverId or constructorId
   name: string
   count: number
 }
@@ -538,15 +538,15 @@ export interface CircuitProfile extends CircuitSummary {
   direction: string | null
   latitude: number | null
   longitude: number | null
-  length: number | null; // current layout, km
+  length: number | null // current layout, km
   turns: number | null
   grandsPrix: string[]
   layouts: CircuitLayoutInfo[]
-  lapRecord: CircuitLapRecord | null; // race lap record on the current layout
+  lapRecord: CircuitLapRecord | null // race lap record on the current layout
   topDrivers: CircuitTally[]
   topConstructors: CircuitTally[]
   topPoles: CircuitTally[]
-  races: CircuitRace[]; // newest first, completed races only
+  races: CircuitRace[] // newest first, completed races only
   nextRace: { season: number; round: number; date: string; grandPrixName: string } | null
 }
 
@@ -563,6 +563,33 @@ export interface PracticeEntry {
 }
 
 export interface PracticeSession {
-  number: number; // 1..4
+  number: number // 1..4
   results: PracticeEntry[]
+}
+
+// Lap chart + tyre strategy for one race/sprint (OpenF1, 2023+).
+export interface StrategyDriver {
+  num: number
+  code: string
+  name: string
+  colour: string | null // team hex without '#'
+  grid: number | null // starting position (lap 0)
+  positions: (number | null)[] // index = lap number (1-based; [0] = grid)
+  finish: number | null // position after the last lap the car completed
+  retired: boolean // stopped before the chequered flag
+}
+
+export interface StrategyStint {
+  num: number
+  compound: string | null
+  start: number
+  end: number
+}
+
+export interface RaceStrategy {
+  sessionKey: number
+  kind: 'race' | 'sprint'
+  totalLaps: number
+  drivers: StrategyDriver[] // ordered by finish
+  stints: StrategyStint[]
 }
