@@ -12,6 +12,7 @@ import {
 import { api } from '../api/client'
 import { useAsync } from '../hooks/useAsync'
 import { useSeo } from '../hooks/useSeo'
+import { useI18n } from '../i18n/core'
 
 // OpenF1 telemetry is available from 2023 onward.
 const TELEMETRY_SEASONS = ['2026', '2025', '2024', '2023']
@@ -34,6 +35,7 @@ export default function Telemetry() {
       'Past-race Formula 1 telemetry: speed, throttle, brake, gear and DRS traces lap by lap, from 2023 onward (OpenF1).',
   })
   const [lapNumber, setLapNumber] = useState<number | null>(null)
+  const { t } = useI18n()
 
   const sessions = useAsync(() => api.telemetrySessions(season), [season])
   const drivers = useAsync(
@@ -95,11 +97,11 @@ export default function Telemetry() {
   return (
     <section>
       <div className="page-head">
-        <h1>Telemetry</h1>
+        <h1>{t('nav.telemetry')}</h1>
         <select value={season} onChange={(e) => {
           setSeason(e.target.value)
           setSessionKey(null)
-        }} aria-label="Season">
+        }} aria-label={t('common.season')}>
           {TELEMETRY_SEASONS.map((s) => (
             <option key={s} value={s}>{s}</option>
           ))}
@@ -108,7 +110,7 @@ export default function Telemetry() {
 
       <div className="controls">
         <label>
-          <span className="lbl">Race</span>
+          <span className="lbl">{t('session.race')}</span>
           <select
             value={sessionKey ?? ''}
             onChange={(e) => setSessionKey(Number(e.target.value))}
@@ -122,7 +124,7 @@ export default function Telemetry() {
           </select>
         </label>
         <label>
-          <span className="lbl">Driver</span>
+          <span className="lbl">{t('wk.colDriver')}</span>
           <select
             value={driverNumber ?? ''}
             onChange={(e) => {
@@ -139,7 +141,7 @@ export default function Telemetry() {
           </select>
         </label>
         <label>
-          <span className="lbl">Lap</span>
+          <span className="lbl">{t('tel.lap')}</span>
           <select
             value={lapNumber ?? ''}
             onChange={(e) => setLapNumber(Number(e.target.value))}
@@ -147,8 +149,8 @@ export default function Telemetry() {
           >
             {validLaps.map((l) => (
               <option key={l.lapNumber} value={l.lapNumber}>
-                Lap {l.lapNumber} — {formatLap(l.lapDuration)}
-                {fastestLap?.lapNumber === l.lapNumber ? ' (fastest)' : ''}
+                {t('tel.lapN', { n: l.lapNumber })} — {formatLap(l.lapDuration)}
+                {fastestLap?.lapNumber === l.lapNumber ? ` (${t('tel.fastest')})` : ''}
               </option>
             ))}
           </select>
@@ -156,13 +158,13 @@ export default function Telemetry() {
       </div>
 
       {sessions.error && (
-        <p className="banner">Could not load races: {sessions.error}</p>
+        <p className="banner">{t('tel.racesError', { error: sessions.error })}</p>
       )}
 
       {/* Lap times across the race */}
       <div className="chart-card">
-        <h2 className="chart-title">Lap times — {driver?.acronym ?? ''}</h2>
-        {laps.loading && <p className="muted">Loading laps…</p>}
+        <h2 className="chart-title">{t('tel.lapTimes')} — {driver?.acronym ?? ''}</h2>
+        {laps.loading && <p className="muted">{t('common.loading')}</p>}
         {!laps.loading && validLaps.length > 0 && (
           <ResponsiveContainer width="100%" height={220}>
             <LineChart
@@ -183,7 +185,7 @@ export default function Telemetry() {
               />
               <Tooltip
                 contentStyle={{ background: '#1a1a22', border: '1px solid #2a2a35' }}
-                formatter={(v: number) => [formatLap(v), 'Lap time']}
+                formatter={(v: number) => [formatLap(v), t('tel.lapTime')]}
               />
               {lapNumber != null && (
                 <ReferenceLine x={lapNumber} stroke="#e10600" strokeDasharray="4 3" />
@@ -203,11 +205,11 @@ export default function Telemetry() {
       {/* Speed trace for the selected lap */}
       <div className="chart-card">
         <h2 className="chart-title">
-          Speed trace — Lap {lapNumber ?? '—'}
+          {t('tel.speedTrace')} — {t('tel.lapN', { n: lapNumber ?? '—' })}
         </h2>
-        {telemetry.loading && <p className="muted">Loading telemetry…</p>}
+        {telemetry.loading && <p className="muted">{t('common.loading')}</p>}
         {telemetry.error && (
-          <p className="banner">Could not load telemetry: {telemetry.error}</p>
+          <p className="banner">{t('tel.error', { error: telemetry.error })}</p>
         )}
         {!telemetry.loading && telemetry.data && (
           <>
@@ -223,7 +225,7 @@ export default function Telemetry() {
                   fontSize={12}
                   tickFormatter={(v: number) => `${v}s`}
                 />
-                <YAxis stroke="#9a9aa8" fontSize={12} unit=" km/h" width={70} />
+                <YAxis stroke="#9a9aa8" fontSize={12} unit={` ${t('tel.kmh')}`} width={70} />
                 <Tooltip
                   contentStyle={{ background: '#1a1a22', border: '1px solid #2a2a35' }}
                   labelFormatter={(v) => `${v}s`}
@@ -238,7 +240,7 @@ export default function Telemetry() {
               </LineChart>
             </ResponsiveContainer>
 
-            <h3 className="chart-subtitle">Throttle &amp; brake</h3>
+            <h3 className="chart-subtitle">{t('tel.throttleBrake')}</h3>
             <ResponsiveContainer width="100%" height={150}>
               <LineChart
                 data={telemetry.data.points}
@@ -256,8 +258,8 @@ export default function Telemetry() {
                   contentStyle={{ background: '#1a1a22', border: '1px solid #2a2a35' }}
                   labelFormatter={(v) => `${v}s`}
                 />
-                <Line type="monotone" dataKey="throttle" stroke="#36d399" strokeWidth={2} dot={false} />
-                <Line type="monotone" dataKey="brake" stroke="#e10600" strokeWidth={2} dot={false} />
+                <Line type="monotone" dataKey="throttle" name={t('tel.throttle')} stroke="#36d399" strokeWidth={2} dot={false} />
+                <Line type="monotone" dataKey="brake" name={t('tel.brake')} stroke="#e10600" strokeWidth={2} dot={false} />
               </LineChart>
             </ResponsiveContainer>
           </>

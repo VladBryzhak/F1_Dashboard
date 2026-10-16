@@ -4,17 +4,18 @@ import { useAsync } from '../hooks/useAsync'
 import { fmtTime, segmentClass, teamColor, tyre } from '../lib/live'
 import type { ReplayData, ReplayLap } from '../types/f1'
 import WeatherCard, { weatherAt } from './WeatherCard'
+import { useI18n, type TKey } from '../i18n/core'
 
 const SPEEDS = [5, 15, 30, 60]
 const TICK_MS = 200
 
-const STATUS: Record<string, { label: string; cls: string }> = {
-  green: { label: 'Green flag', cls: 'green' },
-  yellow: { label: 'Yellow flag', cls: 'yellow' },
-  sc: { label: 'Safety Car', cls: 'sc' },
-  vsc: { label: 'Virtual Safety Car', cls: 'vsc' },
-  red: { label: 'Red flag', cls: 'red' },
-  chequered: { label: 'Chequered flag', cls: 'chequered' },
+const STATUS: Record<string, { label: TKey; cls: string }> = {
+  green: { label: 'flag.green', cls: 'green' },
+  yellow: { label: 'flag.yellow', cls: 'yellow' },
+  sc: { label: 'flag.sc', cls: 'sc' },
+  vsc: { label: 'flag.vsc', cls: 'vsc' },
+  red: { label: 'flag.red', cls: 'red' },
+  chequered: { label: 'flag.chequered', cls: 'chequered' },
 }
 
 interface Sector {
@@ -180,6 +181,7 @@ function hhmmss(ms: number): string {
 
 // Expanded per-lap detail for the clicked driver.
 function RowDetail({ data, row }: { data: ReplayData; row: Row }) {
+  const { t: tr } = useI18n()
   const lap = row.lap
   const stints = data.stints.filter((s) => s.num === row.num)
   return (
@@ -189,7 +191,7 @@ function RowDetail({ data, row }: { data: ReplayData; row: Row }) {
           {[0, 1, 2].map((i) => (
             <div className="ld-sector" key={i}>
               <div className="ld-sector-head">
-                <span>Sector {i + 1}</span>
+                <span>{tr('rp.sectorN', { n: i + 1 })}</span>
                 <span
                   className={`ld-sector-time${
                     row.sectors[i].shown ? ` sector-${sectorLong(lap.sc[i])}` : ''
@@ -210,34 +212,34 @@ function RowDetail({ data, row }: { data: ReplayData; row: Row }) {
       <div className="ld-cols">
         {/* Phone-only: the board drops its Last/Best columns there. */}
         <div className="ld-col ld-col--phone">
-          <h4>Lap</h4>
+          <h4>{tr('tel.lap')}</h4>
           <div className="ld-kv">
-            <span>Last</span>
+            <span>{tr('rp.last')}</span>
             <span className="mono">{fmtTime(row.last)}</span>
           </div>
           <div className="ld-kv">
-            <span>Best</span>
+            <span>{tr('rp.best')}</span>
             <span className="mono">{fmtTime(row.best)}</span>
           </div>
         </div>
         <div className="ld-col">
-          <h4>Speeds</h4>
+          <h4>{tr('rp.speeds')}</h4>
           <div className="ld-kv">
-            <span>Speed trap</span>
+            <span>{tr('rp.speedTrap')}</span>
             <span className="mono">
-              {lap?.sp[2] != null ? `${lap.sp[2]} km/h` : '—'}
+              {lap?.sp[2] != null ? `${lap.sp[2]} ${tr('tel.kmh')}` : '—'}
             </span>
           </div>
         </div>
         <div className="ld-col">
-          <h4>Tyres</h4>
+          <h4>{tr('rp.tyres')}</h4>
           {stints.map((s) => {
             const t = tyre(s.compound)
             return (
               <div className="ld-kv" key={s.start}>
                 <span>
-                  <span className={`tyre tyre-${t.cls}`}>{t.label}</span> Laps{' '}
-                  {s.start}–{s.end}
+                  <span className={`tyre tyre-${t.cls}`}>{t.label}</span>{' '}
+                  {tr('strat.laps', { from: s.start, to: s.end })}
                 </span>
                 <span className="muted">{s.compound ?? ''}</span>
               </div>
@@ -254,6 +256,8 @@ function sectorLong(c: string): string {
 }
 
 export default function ReplayPlayer() {
+  // `t` is the playback clock below, so the translator is `tr` here.
+  const { t: tr } = useI18n()
   const races = useAsync(() => api.replayRaces(), [])
   const [sessionKey, setSessionKey] = useState<number | null>(null)
   useEffect(() => {
@@ -339,34 +343,34 @@ export default function ReplayPlayer() {
           className="rp-select"
           value={sessionKey ?? ''}
           onChange={(e) => setSessionKey(Number(e.target.value))}
-          aria-label="Race"
+          aria-label={tr('session.race')}
         >
           {races.data?.map((r) => (
             <option key={r.sessionKey} value={r.sessionKey}>
               {r.year} · {r.location}
-              {r.isSprint ? ' (Sprint)' : ''}
+              {r.isSprint ? ` (${tr('session.sprint')})` : ''}
             </option>
           ))}
         </select>
       </div>
 
-      {replay.loading && <p className="muted">Loading race…</p>}
+      {replay.loading && <p className="muted">{tr('common.loading')}</p>}
       {replay.error && (
-        <p className="banner">Could not load the replay: {replay.error}</p>
+        <p className="banner">{tr('rp.error', { error: replay.error })}</p>
       )}
 
       {data && board && (
         <>
           <div className={`rp-status rp-status--${st.cls}`}>
             <span className="rp-status-dot" />
-            {st.label}
+            {tr(st.label)}
           </div>
 
           <div className="rp-controls">
             <button
               className="rp-play"
               onClick={() => setPlaying((p) => !p)}
-              aria-label={playing ? 'Pause' : 'Play'}
+              aria-label={tr(playing ? 'rp.pause' : 'rp.play')}
             >
               {playing ? '❚❚' : '►'}
             </button>
@@ -377,10 +381,10 @@ export default function ReplayPlayer() {
               max={span}
               value={t}
               onChange={(e) => setT(Number(e.target.value))}
-              aria-label="Timeline"
+              aria-label={tr('rp.timeline')}
             />
             <span className="rp-lap mono">
-              Lap {board.lap} · {hhmmss(t)} / {hhmmss(span)}
+              {tr('tel.lapN', { n: board.lap })} · {hhmmss(t)} / {hhmmss(span)}
             </span>
             <span className="rp-speeds">
               {SPEEDS.map((s) => (
@@ -400,12 +404,12 @@ export default function ReplayPlayer() {
           <div className="rp-board">
             <div className="rp-row rp-head-row">
               <span>#</span>
-              <span>Driver</span>
-              <span>Sectors</span>
-              <span className="rp-num rp-last">Last</span>
-              <span className="rp-num rp-best">Best</span>
-              <span className="rp-num rp-gap">Gap</span>
-              <span>Tyre</span>
+              <span>{tr('wk.colDriver')}</span>
+              <span>{tr('rp.sectors')}</span>
+              <span className="rp-num rp-last">{tr('rp.last')}</span>
+              <span className="rp-num rp-best">{tr('rp.best')}</span>
+              <span className="rp-num rp-gap">{tr('wk.colGap')}</span>
+              <span>{tr('rp.tyre')}</span>
             </div>
             {board.rows.map((r) => {
               const ty = tyre(r.tyreCompound)
@@ -461,11 +465,11 @@ export default function ReplayPlayer() {
           </div>
           <aside className="rp-side">
             <div className="rp-side-card">
-              <h4 className="rp-side-title">Session</h4>
-              <div className="rp-kv"><span>Circuit</span><span>{data.session.location}</span></div>
-              <div className="rp-kv"><span>Lap</span><span className="mono">{board.lap}</span></div>
-              <div className="rp-kv"><span>Fastest lap</span><span className="mono">{fmtTime(fastest)}</span></div>
-              <div className="rp-kv"><span>Status</span><span className={`rp-side-status rp-side-status--${st.cls}`}>{st.label}</span></div>
+              <h4 className="rp-side-title">{tr('rp.session')}</h4>
+              <div className="rp-kv"><span>{tr('rp.circuit')}</span><span>{data.session.location}</span></div>
+              <div className="rp-kv"><span>{tr('tel.lap')}</span><span className="mono">{board.lap}</span></div>
+              <div className="rp-kv"><span>{tr('wk.fastestLap')}</span><span className="mono">{fmtTime(fastest)}</span></div>
+              <div className="rp-kv"><span>{tr('rp.status')}</span><span className={`rp-side-status rp-side-status--${st.cls}`}>{tr(st.label)}</span></div>
             </div>
             <WeatherCard sample={weather} />
           </aside>

@@ -8,6 +8,7 @@ import { useAsync } from '../hooks/useAsync'
 import { useSeasonRoute } from '../hooks/useSeasonRoute'
 import { useSeo } from '../hooks/useSeo'
 import { SAMPLE_CONSTRUCTOR_STANDINGS } from '../lib/sampleData'
+import { useI18n } from '../i18n/core'
 
 type View = 'grid' | 'search'
 
@@ -18,6 +19,7 @@ export default function Teams() {
     slug,
   )
   const [view, setView] = useState<View>('grid')
+  const { t } = useI18n()
 
   useSeo({
     title: `${season} F1 Teams & Constructors`,
@@ -36,7 +38,7 @@ export default function Teams() {
   return (
     <section>
       <div className="page-head">
-        <h1>{view === 'search' ? 'Find a Team' : `${season} F1 Teams`}</h1>
+        <h1>{view === 'search' ? t('teams.findTitle') : t('teams.title', { season })}</h1>
         {view === 'grid' && <SeasonSelect value={season} onChange={goToSeason} />}
       </div>
 
@@ -45,13 +47,13 @@ export default function Teams() {
           className={view === 'grid' ? 'tab active' : 'tab'}
           onClick={() => setView('grid')}
         >
-          Current grid
+          {t('drvs.tabGrid')}
         </button>
         <button
           className={view === 'search' ? 'tab active' : 'tab'}
           onClick={() => setView('search')}
         >
-          Search teams
+          {t('teams.tabSearch')}
         </button>
       </div>
 
@@ -59,13 +61,10 @@ export default function Teams() {
         <TeamSearch />
       ) : (
         <>
-          {loading && <p className="muted">Loading…</p>}
+          {loading && <p className="muted">{t('common.loading')}</p>}
 
           {!loading && error && (
-            <p className="banner">
-              Live API unavailable ({error}). Showing sample teams — real {season}{' '}
-              data appears automatically once the API is reachable.
-            </p>
+            <p className="banner">{t('drvs.sampleBanner', { error, season })}</p>
           )}
 
           {!loading && (

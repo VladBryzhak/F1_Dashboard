@@ -1,3 +1,4 @@
+import { useI18n } from '../i18n/core'
 import { SEASONS } from '../lib/seasons'
 
 export default function SeasonSelect({
@@ -10,12 +11,13 @@ export default function SeasonSelect({
   // Seasons reachable by direct URL (e.g. /standings/2004) may fall outside the
   // default dropdown range; include the current value so it stays selected.
   const options = SEASONS.includes(value) ? SEASONS : [value, ...SEASONS]
+  const { t } = useI18n()
 
   return (
     <select
       value={value}
       onChange={(e) => onChange(e.target.value)}
-      aria-label="Season"
+      aria-label={t('common.season')}
     >
       {options.map((s) => (
         <option key={s} value={s}>

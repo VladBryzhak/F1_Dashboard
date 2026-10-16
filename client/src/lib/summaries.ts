@@ -202,10 +202,24 @@ export function seasonSummary(
   season: string,
   driver: DriverStanding | undefined,
   constructor: ConstructorStanding | undefined,
+  lang: Lang = getLang(),
 ): string {
   if (!driver) return ''
   const complete = Number(season) < CURRENT_SEASON
   const driverName = `${driver.givenName} ${driver.familyName}`
+
+  if (lang === 'uk') {
+    const pts = plural('plural.points', driver.points, undefined, 'uk')
+    const wins = plural('plural.winsShort', driver.wins, undefined, 'uk')
+    if (complete) {
+      let text = `Титул чемпіона світу FIA Формули-1 ${season} року — ${driverName} (${driver.constructorName}): ${pts} і ${wins}.`
+      if (constructor) text += ` Кубок конструкторів — ${constructor.name}.`
+      return text
+    }
+    let text = `Лідер особистого заліку ${season} року — ${driverName} (${driver.constructorName}): ${pts}${driver.wins > 0 ? ` і ${wins}` : ''}.`
+    if (constructor) text += ` У Кубку конструкторів лідирує ${constructor.name}.`
+    return text
+  }
 
   if (complete) {
     let text = `The ${season} FIA Formula One World Championship was won by ${driverName} of ${driver.constructorName}, with ${driver.points} points and ${count(driver.wins, 'win')}.`

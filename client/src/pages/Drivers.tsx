@@ -8,6 +8,7 @@ import { useAsync } from '../hooks/useAsync'
 import { useSeasonRoute } from '../hooks/useSeasonRoute'
 import { useSeo } from '../hooks/useSeo'
 import { SAMPLE_DRIVER_STANDINGS } from '../lib/sampleData'
+import { useI18n } from '../i18n/core'
 
 type View = 'grid' | 'search'
 
@@ -18,6 +19,7 @@ export default function Drivers() {
     slug,
   )
   const [view, setView] = useState<View>('grid')
+  const { t } = useI18n()
 
   useSeo({
     title: `${season} F1 Drivers`,
@@ -41,7 +43,7 @@ export default function Drivers() {
   return (
     <section>
       <div className="page-head">
-        <h1>{view === 'search' ? 'Find a Driver' : `${season} F1 Drivers`}</h1>
+        <h1>{view === 'search' ? t('drvs.findTitle') : t('drvs.title', { season })}</h1>
         {view === 'grid' && <SeasonSelect value={season} onChange={goToSeason} />}
       </div>
 
@@ -50,13 +52,13 @@ export default function Drivers() {
           className={view === 'grid' ? 'tab active' : 'tab'}
           onClick={() => setView('grid')}
         >
-          Current grid
+          {t('drvs.tabGrid')}
         </button>
         <button
           className={view === 'search' ? 'tab active' : 'tab'}
           onClick={() => setView('search')}
         >
-          Search drivers
+          {t('drvs.tabSearch')}
         </button>
       </div>
 
@@ -64,13 +66,10 @@ export default function Drivers() {
         <DriverSearch />
       ) : (
         <>
-          {loading && <p className="muted">Loading…</p>}
+          {loading && <p className="muted">{t('common.loading')}</p>}
 
           {!loading && error && (
-            <p className="banner">
-              Live API unavailable ({error}). Showing sample drivers — real{' '}
-              {season} data appears automatically once the API is reachable.
-            </p>
+            <p className="banner">{t('drvs.sampleBanner', { error, season })}</p>
           )}
 
           {!loading && (

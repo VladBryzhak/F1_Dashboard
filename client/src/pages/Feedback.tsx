@@ -1,6 +1,7 @@
 import { useState, type FormEvent } from 'react'
 import { api } from '../api/client'
 import { useSeo } from '../hooks/useSeo'
+import { useI18n } from '../i18n/core'
 
 type Status = 'idle' | 'sending' | 'sent' | 'error'
 
@@ -16,11 +17,12 @@ export default function Feedback() {
   const [website, setWebsite] = useState('') // honeypot — real users leave empty
   const [status, setStatus] = useState<Status>('idle')
   const [error, setError] = useState('')
+  const { t } = useI18n()
 
   async function onSubmit(e: FormEvent) {
     e.preventDefault()
     if (message.trim().length < 3) {
-      setError('Please write a little more.')
+      setError(t('fb.tooShort'))
       setStatus('error')
       return
     }
@@ -36,44 +38,43 @@ export default function Feedback() {
       setMessage('')
       setContact('')
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Something went wrong.')
+      // Server messages are English; show ours unless it's the rate limit.
+      const msg = err instanceof Error ? err.message : ''
+      setError(/too many/i.test(msg) ? t('fb.rateLimited') : t('fb.failed'))
       setStatus('error')
     }
   }
 
   return (
     <section className="feedback">
-      <h1>Feedback</h1>
-      <p className="muted feedback-intro">
-        Found a bug, have an idea, or just want to say hi? Send a message — it
-        goes straight to the person who builds this site.
-      </p>
+      <h1>{t('nav.feedback')}</h1>
+      <p className="muted feedback-intro">{t('fb.intro')}</p>
 
       {status === 'sent' ? (
         <p className="banner banner-ok">
-          Thanks! Your message was sent. 🏁
+          {t('fb.sent')} 🏁
         </p>
       ) : (
         <form className="feedback-form" onSubmit={onSubmit}>
           <label className="field">
-            <span>Message</span>
+            <span>{t('fb.message')}</span>
             <textarea
               value={message}
               onChange={(e) => setMessage(e.target.value)}
               rows={6}
               maxLength={2000}
               required
-              placeholder="Your feedback…"
+              placeholder={t('fb.messagePh')}
             />
           </label>
 
           <label className="field">
-            <span>Contact (optional)</span>
+            <span>{t('fb.contact')}</span>
             <input
               value={contact}
               onChange={(e) => setContact(e.target.value)}
               maxLength={200}
-              placeholder="Email or @telegram, if you'd like a reply"
+              placeholder={t('fb.contactPh')}
             />
           </label>
 
@@ -90,7 +91,7 @@ export default function Feedback() {
           {status === 'error' && <p className="banner">{error}</p>}
 
           <button type="submit" disabled={status === 'sending'}>
-            {status === 'sending' ? 'Sending…' : 'Send feedback'}
+            {status === 'sending' ? t('fb.sending') : t('fb.send')}
           </button>
         </form>
       )}

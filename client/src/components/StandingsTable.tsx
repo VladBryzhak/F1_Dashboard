@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react'
 import { driverPortraitUrl, teamColor } from '../lib/f1meta'
 import type { ConstructorStanding, DriverStanding } from '../types/f1'
 import Flag from './Flag'
+import { useI18n } from '../i18n/core'
+import { countryName } from '../lib/countries'
 
 // Circular driver photo for a standings row. Tries the season/team-accurate
 // portrait first, falls back to the season-agnostic OpenF1 headshot, then to
@@ -49,19 +51,20 @@ export function DriverStandingsTable({
   season: string
   headshots?: Record<string, string>
 }) {
+  const { t, lang, locale } = useI18n()
   const leaderPoints = rows[0]?.points ?? 0
   return (
     <div className="card">
       <table className="standings standings--rank">
         <thead>
           <tr>
-            <th className="pos">Pos</th>
-            <th>Driver</th>
-            <th>Team</th>
-            <th>Country</th>
-            <th className="num">Wins</th>
-            <th className="num">Points</th>
-            <th className="num">Gap</th>
+            <th className="pos">{t('wk.colPos')}</th>
+            <th>{t('wk.colDriver')}</th>
+            <th>{t('wk.colTeam')}</th>
+            <th>{t('st.country')}</th>
+            <th className="num">{t('drv.colWins')}</th>
+            <th className="num">{t('drv.colPoints')}</th>
+            <th className="num">{t('wk.colGap')}</th>
           </tr>
         </thead>
         <tbody>
@@ -96,7 +99,7 @@ export function DriverStandingsTable({
                 <td>
                   <span className="country">
                     <Flag code={r.countryCode} nationality={r.nationality} />
-                    {r.nationality}
+                    {lang === 'uk' && r.countryCode ? countryName(r.countryCode, locale) : r.nationality}
                   </span>
                 </td>
                 <td className="num">{r.wins}</td>
@@ -116,18 +119,19 @@ export function ConstructorStandingsTable({
 }: {
   rows: ConstructorStanding[]
 }) {
+  const { t, lang, locale } = useI18n()
   const leaderPoints = rows[0]?.points ?? 0
   return (
     <div className="card">
       <table className="standings standings--rank">
         <thead>
           <tr>
-            <th className="pos">Pos</th>
-            <th>Team</th>
-            <th>Country</th>
-            <th className="num">Wins</th>
-            <th className="num">Points</th>
-            <th className="num">Gap</th>
+            <th className="pos">{t('wk.colPos')}</th>
+            <th>{t('wk.colTeam')}</th>
+            <th>{t('st.country')}</th>
+            <th className="num">{t('drv.colWins')}</th>
+            <th className="num">{t('drv.colPoints')}</th>
+            <th className="num">{t('wk.colGap')}</th>
           </tr>
         </thead>
         <tbody>
@@ -148,7 +152,7 @@ export function ConstructorStandingsTable({
                 <td>
                   <span className="country">
                     <Flag code={r.countryCode} nationality={r.nationality} />
-                    {r.nationality}
+                    {lang === 'uk' && r.countryCode ? countryName(r.countryCode, locale) : r.nationality}
                   </span>
                 </td>
                 <td className="num">{r.wins}</td>

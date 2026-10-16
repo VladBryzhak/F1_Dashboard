@@ -40,18 +40,21 @@ function initialName(given: string, family: string): string {
   return given ? `${given[0]}. ${family}` : family
 }
 
-function timeAgo(iso: string): string {
+// "5 min ago" / "5 хв тому", in the interface language.
+function timeAgo(iso: string, locale: string): string {
   const then = new Date(iso).getTime()
   if (Number.isNaN(then)) return ''
+  const rtf = new Intl.RelativeTimeFormat(locale, { numeric: 'auto', style: 'short' })
   const mins = Math.max(0, Math.round((Date.now() - then) / 60000))
-  if (mins < 60) return `${mins}m ago`
+  if (mins < 60) return rtf.format(-mins, 'minute')
   const hrs = Math.round(mins / 60)
-  if (hrs < 24) return `${hrs}h ago`
-  return `${Math.round(hrs / 24)}d ago`
+  if (hrs < 24) return rtf.format(-hrs, 'hour')
+  return rtf.format(-Math.round(hrs / 24), 'day')
 }
 
 // Dynamic hero focused on the latest race winner.
 function WinnerHero({ highlights }: { highlights: HomeHighlights }) {
+  const { t, lang } = useI18n()
   const race = highlights.latestRace as RaceHighlight
   const winner = race.podium.find((p) => p.position === 1) ?? race.podium[0]
   const color = teamColor(winner.constructorId)
@@ -66,10 +69,10 @@ function WinnerHero({ highlights }: { highlights: HomeHighlights }) {
       <Headshot portraitUrl={portrait} color={color} eager />
       <div className="hero-content hero-content--winner">
         <p className="hero-kicker">
-          {race.season} · Round {race.round} · {race.grandPrixName} GP
+          {race.season} · {t('common.round')} {race.round} · {gpTitle(race.grandPrixName, lang)}
         </p>
         <h1 className="hero-title">
-          {lastName(winner.driverName)} <span>wins</span>
+          {lastName(winner.driverName)} <span>{t('home.wins')}</span>
         </h1>
 
         <div className="podium-row">
@@ -87,7 +90,7 @@ function WinnerHero({ highlights }: { highlights: HomeHighlights }) {
 
         {highlights.notableRetirement && (
           <p className="hero-note">
-            <span className="hero-note-tag">Incident</span>
+            <span className="hero-note-tag">{t('home.incident')}</span>
             {highlights.notableRetirement.driverName} —{' '}
             {highlights.notableRetirement.reason}
           </p>
@@ -97,7 +100,7 @@ function WinnerHero({ highlights }: { highlights: HomeHighlights }) {
           to={`/calendar/${race.season}/${race.round}`}
           className="hero-cta"
         >
-          View weekend
+          {t('home.viewWeekend')}
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
             <path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
           </svg>
@@ -115,13 +118,14 @@ function ChampionshipCard({
   rows: DriverStanding[]
   season?: number
 }) {
+  const { t } = useI18n()
   if (!rows.length) return null
   // Bars are scaled to the leader's points.
   const top = Math.max(rows[0].points, 1)
   return (
     <div className="champ-card">
       <div className="champ-head">
-        <span>Championship</span>
+        <span>{t('home.championship')}</span>
         <span className="champ-season">{season}</span>
       </div>
       <ol className="champ-list">
@@ -172,6 +176,7 @@ function NextRaceCard({ race }: { race: NextRace }) {
 
 // Off-season / no-race fallback: the static title-fight poster.
 function TitleFightHero() {
+  const { t } = useI18n()
   return (
     <div className="hero">
       <div className="hero-side hero-left">
@@ -179,7 +184,7 @@ function TitleFightHero() {
           className="hero-photo"
           src={ANTONELLI_SRC}
           onError={fallbackTo(ANTONELLI_FALLBACK)}
-          alt="Kimi Antonelli on the podium"
+          alt={t('home.altAntonelli')}
         />
       </div>
       <div className="hero-side hero-right">
@@ -187,14 +192,14 @@ function TitleFightHero() {
           className="hero-photo"
           src={HAMILTON_SRC}
           onError={fallbackTo(HAMILTON_FALLBACK)}
-          alt="Lewis Hamilton celebrating with a trophy"
+          alt={t('home.altHamilton')}
         />
       </div>
 
       <div className="hero-veil" />
 
       <div className="hero-content">
-        <p className="hero-kicker">2026 Title Fight</p>
+        <p className="hero-kicker">{t('home.titleFight')}</p>
         <h1 className="hero-title">
           F1 <span>DASHBOARD</span>
         </h1>
@@ -209,10 +214,7 @@ function TitleFightHero() {
             <span className="battle-driver">Hamilton</span>
           </div>
         </div>
-        <p className="hero-tag">
-          Silver Arrows meet the Scuderia — Antonelli and Hamilton trade blows
-          for the 2026 crown.
-        </p>
+        <p className="hero-tag">{t('home.titleFightTag')}</p>
       </div>
     </div>
   )
@@ -221,10 +223,11 @@ function TitleFightHero() {
 // Reserves the news-strip's space while /api/home loads, so the links below
 // don't jump down when the real headlines arrive (keeps CLS low).
 function NewsStripSkeleton() {
+  const { t } = useI18n()
   return (
     <section className="news-strip" aria-hidden="true">
       <div className="news-head">
-        <h2>Latest F1 news</h2>
+        <h2>{t('home.news')}</h2>
       </div>
       <div className="news-list">
         {Array.from({ length: 6 }).map((_, i) => (
@@ -236,12 +239,13 @@ function NewsStripSkeleton() {
 }
 
 function NewsStrip({ news }: { news: NewsItem[] }) {
+  const { t, locale } = useI18n()
   if (!news.length) return null
   return (
     <section className="news-strip">
       <div className="news-head">
-        <h2>Latest F1 news</h2>
-        <span className="news-src">via {news[0].source}</span>
+        <h2>{t('home.news')}</h2>
+        <span className="news-src">{t('home.via', { source: news[0].source })}</span>
       </div>
       <div className="news-list">
         {news.map((n) => (
@@ -254,7 +258,7 @@ function NewsStrip({ news }: { news: NewsItem[] }) {
           >
             <span className="news-title">{n.title}</span>
             <span className="news-meta">
-              {n.source} · {timeAgo(n.pubDate)}
+              {n.source} · {timeAgo(n.pubDate, locale)}
             </span>
           </a>
         ))}
@@ -267,9 +271,10 @@ function NewsStrip({ news }: { news: NewsItem[] }) {
 // 420px height, team-colour wash) so there's no layout jump, and — crucially —
 // we no longer flash the static off-season poster during a cold start.
 function HeroSkeleton() {
+  const { t } = useI18n()
   return (
-    <div className="hero hero-skeleton" aria-busy="true" aria-label="Loading latest race">
-      <span className="hero-kicker">Loading latest race…</span>
+    <div className="hero hero-skeleton" aria-busy="true" aria-label={t('home.loadingRace')}>
+      <span className="hero-kicker">{t('home.loadingRace')}</span>
     </div>
   )
 }

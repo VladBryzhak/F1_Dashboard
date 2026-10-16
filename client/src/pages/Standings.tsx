@@ -10,6 +10,7 @@ import TitleRaceChart from '../components/TitleRaceChart'
 import { useAsync } from '../hooks/useAsync'
 import { useSeo } from '../hooks/useSeo'
 import { useSeasonRoute } from '../hooks/useSeasonRoute'
+import { useI18n } from '../i18n/core'
 import { seasonSummary } from '../lib/summaries'
 import {
   SAMPLE_CONSTRUCTOR_STANDINGS,
@@ -25,6 +26,7 @@ export default function Standings() {
     seasonParam,
   )
   const [tab, setTab] = useState<Tab>('drivers')
+  const { t, lang } = useI18n()
 
   useSeo({
     title: `${season} F1 Championship Standings`,
@@ -56,12 +58,13 @@ export default function Standings() {
     season,
     drivers.data?.standings?.[0],
     constructors.data?.standings?.[0],
+    lang,
   )
 
   return (
     <section>
       <div className="page-head">
-        <h1>{season} Championship Standings</h1>
+        <h1>{t('st.title', { season })}</h1>
         <SeasonSelect value={season} onChange={goToSeason} />
       </div>
 
@@ -72,30 +75,26 @@ export default function Standings() {
           className={tab === 'drivers' ? 'tab active' : 'tab'}
           onClick={() => setTab('drivers')}
         >
-          Drivers
+          {t('st.tabDrivers')}
         </button>
         <button
           className={tab === 'constructors' ? 'tab active' : 'tab'}
           onClick={() => setTab('constructors')}
         >
-          Constructors
+          {t('st.tabConstructors')}
         </button>
         <button
           className={tab === 'progression' ? 'tab active' : 'tab'}
           onClick={() => setTab('progression')}
         >
-          Title Race
+          {t('st.tabTitleRace')}
         </button>
       </div>
 
-      {active.loading && <p className="muted">Loading…</p>}
+      {active.loading && <p className="muted">{t('common.loading')}</p>}
 
       {!active.loading && active.error && (
-        <p className="banner">
-          Live standings API unavailable ({active.error}). Showing sample data so
-          the layout is visible — real {season} standings appear automatically
-          once the API is reachable.
-        </p>
+        <p className="banner">{t('st.sampleBanner', { error: active.error, season })}</p>
       )}
 
       {!active.loading && tab === 'drivers' && (

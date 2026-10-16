@@ -3,6 +3,8 @@ import { Link } from 'react-router-dom'
 import { driverPortraitUrl, teamCarUrl, teamColor } from '../lib/f1meta'
 import type { ConstructorStanding, DriverStanding } from '../types/f1'
 import Flag from './Flag'
+import { useI18n } from '../i18n/core'
+import { countryName } from '../lib/countries'
 
 // Official car render; hides itself if the image is missing (e.g. older seasons).
 // Exported so profile pages can reuse the same season-accurate art + fallback.
@@ -95,6 +97,7 @@ export function DriverCard({
   headshot?: string
 }) {
   const color = teamColor(d.constructorId)
+  const { t, tn } = useI18n()
   return (
     <Link to={`/drivers/${d.driverId}`} className="ecard">
       <span className="stripe" style={{ background: color }} />
@@ -115,9 +118,9 @@ export function DriverCard({
       </div>
       <div className="efoot">
         <span className="pts">{d.points}</span>
-        <span className="lbl">pts</span>
+        <span className="lbl">{t('ec.pts')}</span>
         <span className="lbl" style={{ marginLeft: 'auto' }}>
-          {d.wins} {d.wins === 1 ? 'win' : 'wins'}
+          {tn('plural.winsN', d.wins)}
         </span>
       </div>
     </Link>
@@ -132,6 +135,7 @@ export function TeamCard({
   season: string
 }) {
   const color = teamColor(c.constructorId)
+  const { t, tn, lang, locale } = useI18n()
   return (
     <Link to={`/teams/${c.constructorId}`} className="ecard">
       <span className="stripe" style={{ background: color }} />
@@ -145,13 +149,13 @@ export function TeamCard({
       <h3 className="ename">{c.name}</h3>
       <div className="esub">
         <Flag code={c.countryCode} nationality={c.nationality} />
-        {c.nationality}
+        {lang === 'uk' && c.countryCode ? countryName(c.countryCode, locale) : c.nationality}
       </div>
       <div className="efoot">
         <span className="pts">{c.points}</span>
-        <span className="lbl">pts</span>
+        <span className="lbl">{t('ec.pts')}</span>
         <span className="lbl" style={{ marginLeft: 'auto' }}>
-          {c.wins} {c.wins === 1 ? 'win' : 'wins'}
+          {tn('plural.winsN', c.wins)}
         </span>
       </div>
     </Link>

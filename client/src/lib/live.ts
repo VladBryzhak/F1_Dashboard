@@ -1,3 +1,5 @@
+import type { TKey } from '../i18n/core'
+
 // Small formatting / mapping helpers for the live-timing board.
 
 // 98.22 -> "1:38.220"; 25.516 -> "25.516"; null -> "—".
@@ -48,7 +50,7 @@ export function teamColor(hex: string | null): string {
 }
 
 // "2d 14:32:10" / "14:32:10" — time from `now` (ms) until `targetIso`.
-export function fmtCountdown(targetIso: string, now: number): string {
+export function fmtCountdown(targetIso: string, now: number, dayShort = 'd'): string {
   let s = Math.max(0, Math.floor((new Date(targetIso).getTime() - now) / 1000))
   const d = Math.floor(s / 86400)
   s -= d * 86400
@@ -57,7 +59,7 @@ export function fmtCountdown(targetIso: string, now: number): string {
   const m = Math.floor(s / 60)
   s -= m * 60
   const pad = (n: number) => String(n).padStart(2, '0')
-  return `${d > 0 ? `${d}d ` : ''}${pad(h)}:${pad(m)}:${pad(s)}`
+  return `${d > 0 ? `${d}${dayShort} ` : ''}${pad(h)}:${pad(m)}:${pad(s)}`
 }
 
 // Colour a sector time: purple = fastest in the session, green = this driver's
@@ -72,4 +74,21 @@ export function sectorClass(
   if (sessionBest != null && time <= sessionBest + eps) return 'purple'
   if (personalBest != null && time <= personalBest + eps) return 'green'
   return 'yellow'
+}
+
+// OpenF1 session name ("Practice 1", "Sprint Shootout"…) in the interface
+// language; unknown names pass through.
+const SESSION_KEYS: Record<string, TKey> = {
+  'Practice 1': 'session.fp1',
+  'Practice 2': 'session.fp2',
+  'Practice 3': 'session.fp3',
+  Qualifying: 'session.q',
+  'Sprint Qualifying': 'session.sq',
+  'Sprint Shootout': 'session.sq',
+  Sprint: 'session.sprint',
+  Race: 'session.race',
+}
+export function sessionLabel(name: string, t: (key: TKey) => string): string {
+  const key = SESSION_KEYS[name]
+  return key ? t(key) : name
 }

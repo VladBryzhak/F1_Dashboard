@@ -5,6 +5,7 @@ import { useAsync } from '../hooks/useAsync'
 import { useSeo } from '../hooks/useSeo'
 import { teamColor } from '../lib/f1meta'
 import type { DriverProfile, SeasonComparison as SeasonCmp } from '../types/f1'
+import { useI18n } from '../i18n/core'
 
 type View = 'career' | 'season'
 
@@ -53,8 +54,9 @@ function Comparison({ a, b, h2h, photoA, photoB }: { a: DriverProfile; b: Driver
   const bestA = bestFinish(a)
   const bestB = bestFinish(b)
   const totalH2H = h2h.aheadA + h2h.aheadB || 1
+  const { t, tn, fmtNum } = useI18n()
 
-  const num = (n: number, d = 0) => n.toLocaleString('en-GB', { maximumFractionDigits: d })
+  const num = (n: number, d = 0) => fmtNum(n, { maximumFractionDigits: d })
 
   return (
     <>
@@ -81,15 +83,15 @@ function Comparison({ a, b, h2h, photoA, photoB }: { a: DriverProfile; b: Driver
       </div>
 
       <div className="card cmp-table">
-        <Row label="Championships" a={num(a.championships)} b={num(b.championships)} aWins={a.championships > b.championships} bWins={b.championships > a.championships} />
-        <Row label="Wins" a={num(a.wins)} b={num(b.wins)} aWins={a.wins > b.wins} bWins={b.wins > a.wins} />
-        <Row label="Podiums" a={num(a.podiums)} b={num(b.podiums)} aWins={a.podiums > b.podiums} bWins={b.podiums > a.podiums} />
-        <Row label="Points" a={num(a.points, 1)} b={num(b.points, 1)} aWins={a.points > b.points} bWins={b.points > a.points} />
-        <Row label="Races" a={num(a.races)} b={num(b.races)} aWins={a.races > b.races} bWins={b.races > a.races} />
-        <Row label="Win rate" a={`${num(winPct(a), 1)}%`} b={`${num(winPct(b), 1)}%`} aWins={winPct(a) > winPct(b)} bWins={winPct(b) > winPct(a)} />
-        <Row label="Podium rate" a={`${num(podPct(a), 1)}%`} b={`${num(podPct(b), 1)}%`} aWins={podPct(a) > podPct(b)} bWins={podPct(b) > podPct(a)} />
+        <Row label={t('drv.titles')} a={num(a.championships)} b={num(b.championships)} aWins={a.championships > b.championships} bWins={b.championships > a.championships} />
+        <Row label={t('drv.wins')} a={num(a.wins)} b={num(b.wins)} aWins={a.wins > b.wins} bWins={b.wins > a.wins} />
+        <Row label={t('drv.podiums')} a={num(a.podiums)} b={num(b.podiums)} aWins={a.podiums > b.podiums} bWins={b.podiums > a.podiums} />
+        <Row label={t('drv.points')} a={num(a.points, 1)} b={num(b.points, 1)} aWins={a.points > b.points} bWins={b.points > a.points} />
+        <Row label={t('drv.races')} a={num(a.races)} b={num(b.races)} aWins={a.races > b.races} bWins={b.races > a.races} />
+        <Row label={t('cmp.winRate')} a={`${num(winPct(a), 1)}%`} b={`${num(winPct(b), 1)}%`} aWins={winPct(a) > winPct(b)} bWins={winPct(b) > winPct(a)} />
+        <Row label={t('cmp.podiumRate')} a={`${num(podPct(a), 1)}%`} b={`${num(podPct(b), 1)}%`} aWins={podPct(a) > podPct(b)} bWins={podPct(b) > podPct(a)} />
         <Row
-          label="Best season"
+          label={t('cmp.bestSeason')}
           a={bestA === Infinity ? '—' : `P${bestA}`}
           b={bestB === Infinity ? '—' : `P${bestB}`}
           aWins={bestA < bestB}
@@ -100,15 +102,15 @@ function Comparison({ a, b, h2h, photoA, photoB }: { a: DriverProfile; b: Driver
       {h2h.racesTogether > 0 && (
         <div className="card cmp-h2h">
           <div className="cmp-h2h-head">
-            <h3>Head-to-head</h3>
+            <h3>{t('cmp.h2h')}</h3>
             <span className="muted">
-              {h2h.racesTogether} races together · {h2h.sharedSeasons[0]}–
+              {tn('plural.togetherN', h2h.racesTogether)} · {h2h.sharedSeasons[0]}–
               {h2h.sharedSeasons[h2h.sharedSeasons.length - 1]}
             </span>
           </div>
           <div className="cmp-h2h-tally">
             <span className={h2h.aheadA >= h2h.aheadB ? 'win' : ''}>{h2h.aheadA}</span>
-            <span className="muted">finished ahead</span>
+            <span className="muted">{t('cmp.finishedAhead')}</span>
             <span className={h2h.aheadB >= h2h.aheadA ? 'win' : ''}>{h2h.aheadB}</span>
           </div>
           <div className="cmp-h2h-bar">
@@ -127,10 +129,11 @@ function SeasonComparison({ data, photoA, photoB }: { data: SeasonCmp; photoA?: 
   const colorA = teamColor(a.constructorId)
   const colorB = teamColor(b.constructorId)
   const totalH2H = data.headToHead.aheadA + data.headToHead.aheadB || 1
-  const num = (n: number) => n.toLocaleString('en-GB', { maximumFractionDigits: 1 })
+  const { t, tn, fmtNum } = useI18n()
+  const num = (n: number) => fmtNum(n, { maximumFractionDigits: 1 })
   const pos = (n: number | null) => (n == null ? '—' : `P${n}`)
   const sub = (s: typeof a) =>
-    s.raced ? s.constructorName || '—' : 'Did not race this season'
+    s.raced ? s.constructorName || '—' : t('cmp.didNotRace')
 
   return (
     <>
@@ -157,25 +160,25 @@ function SeasonComparison({ data, photoA, photoB }: { data: SeasonCmp; photoA?: 
       </div>
 
       <div className="card cmp-table">
-        <Row label="Championship" a={pos(a.championshipPosition)} b={pos(b.championshipPosition)} aWins={(a.championshipPosition ?? Infinity) < (b.championshipPosition ?? Infinity)} bWins={(b.championshipPosition ?? Infinity) < (a.championshipPosition ?? Infinity)} />
-        <Row label="Points" a={a.raced ? num(a.points) : '—'} b={b.raced ? num(b.points) : '—'} aWins={a.points > b.points} bWins={b.points > a.points} />
-        <Row label="Wins" a={a.raced ? num(a.wins) : '—'} b={b.raced ? num(b.wins) : '—'} aWins={a.wins > b.wins} bWins={b.wins > a.wins} />
-        <Row label="Podiums" a={a.raced ? num(a.podiums) : '—'} b={b.raced ? num(b.podiums) : '—'} aWins={a.podiums > b.podiums} bWins={b.podiums > a.podiums} />
-        <Row label="Poles" a={a.raced ? num(a.poles) : '—'} b={b.raced ? num(b.poles) : '—'} aWins={a.poles > b.poles} bWins={b.poles > a.poles} />
-        <Row label="Fastest laps" a={a.raced ? num(a.fastestLaps) : '—'} b={b.raced ? num(b.fastestLaps) : '—'} aWins={a.fastestLaps > b.fastestLaps} bWins={b.fastestLaps > a.fastestLaps} />
-        <Row label="Best finish" a={pos(a.bestFinish)} b={pos(b.bestFinish)} aWins={(a.bestFinish ?? Infinity) < (b.bestFinish ?? Infinity)} bWins={(b.bestFinish ?? Infinity) < (a.bestFinish ?? Infinity)} />
-        <Row label="Races" a={a.raced ? num(a.races) : '—'} b={b.raced ? num(b.races) : '—'} aWins={false} bWins={false} />
+        <Row label={t('cmp.championship')} a={pos(a.championshipPosition)} b={pos(b.championshipPosition)} aWins={(a.championshipPosition ?? Infinity) < (b.championshipPosition ?? Infinity)} bWins={(b.championshipPosition ?? Infinity) < (a.championshipPosition ?? Infinity)} />
+        <Row label={t('drv.points')} a={a.raced ? num(a.points) : '—'} b={b.raced ? num(b.points) : '—'} aWins={a.points > b.points} bWins={b.points > a.points} />
+        <Row label={t('drv.wins')} a={a.raced ? num(a.wins) : '—'} b={b.raced ? num(b.wins) : '—'} aWins={a.wins > b.wins} bWins={b.wins > a.wins} />
+        <Row label={t('drv.podiums')} a={a.raced ? num(a.podiums) : '—'} b={b.raced ? num(b.podiums) : '—'} aWins={a.podiums > b.podiums} bWins={b.podiums > a.podiums} />
+        <Row label={t('drv.poles')} a={a.raced ? num(a.poles) : '—'} b={b.raced ? num(b.poles) : '—'} aWins={a.poles > b.poles} bWins={b.poles > a.poles} />
+        <Row label={t('drv.fastestLaps')} a={a.raced ? num(a.fastestLaps) : '—'} b={b.raced ? num(b.fastestLaps) : '—'} aWins={a.fastestLaps > b.fastestLaps} bWins={b.fastestLaps > a.fastestLaps} />
+        <Row label={t('drv.bestFinish')} a={pos(a.bestFinish)} b={pos(b.bestFinish)} aWins={(a.bestFinish ?? Infinity) < (b.bestFinish ?? Infinity)} bWins={(b.bestFinish ?? Infinity) < (a.bestFinish ?? Infinity)} />
+        <Row label={t('drv.races')} a={a.raced ? num(a.races) : '—'} b={b.raced ? num(b.races) : '—'} aWins={false} bWins={false} />
       </div>
 
       {data.headToHead.racesTogether > 0 ? (
         <div className="card cmp-h2h">
           <div className="cmp-h2h-head">
-            <h3>Head-to-head · {data.season}</h3>
-            <span className="muted">{data.headToHead.racesTogether} races together</span>
+            <h3>{t('cmp.h2h')} · {data.season}</h3>
+            <span className="muted">{tn('plural.togetherN', data.headToHead.racesTogether)}</span>
           </div>
           <div className="cmp-h2h-tally">
             <span className={data.headToHead.aheadA >= data.headToHead.aheadB ? 'win' : ''}>{data.headToHead.aheadA}</span>
-            <span className="muted">finished ahead</span>
+            <span className="muted">{t('cmp.finishedAhead')}</span>
             <span className={data.headToHead.aheadB >= data.headToHead.aheadA ? 'win' : ''}>{data.headToHead.aheadB}</span>
           </div>
           <div className="cmp-h2h-bar">
@@ -184,7 +187,7 @@ function SeasonComparison({ data, photoA, photoB }: { data: SeasonCmp; photoA?: 
           </div>
         </div>
       ) : (
-        <p className="muted">These drivers didn't race together in {data.season}.</p>
+        <p className="muted">{t('cmp.notTogether', { season: data.season })}</p>
       )}
     </>
   )
@@ -204,6 +207,7 @@ export default function Compare() {
   const [idB, setIdB] = useState(DEFAULT_B)
   const [view, setView] = useState<View>('career')
   const [season, setSeason] = useState<number | null>(null)
+  const { t } = useI18n()
 
   const cmp = useAsync(
     () => api.compareDrivers(idA, idB),
@@ -255,7 +259,7 @@ export default function Compare() {
   return (
     <section>
       <div className="page-head">
-        <h1>Head to Head</h1>
+        <h1>{t('cmp.title')}</h1>
       </div>
 
       <div className="cmp-pickers">
@@ -264,7 +268,7 @@ export default function Compare() {
           list="driver-list"
           defaultValue={nameOf(idA)}
           key={`a-${nameOf(idA)}`}
-          placeholder="Driver A"
+          placeholder={t('cmp.driverA')}
           onChange={(e) => pick(setIdA)(e.target.value)}
         />
         <input
@@ -272,7 +276,7 @@ export default function Compare() {
           list="driver-list"
           defaultValue={nameOf(idB)}
           key={`b-${nameOf(idB)}`}
-          placeholder="Driver B"
+          placeholder={t('cmp.driverB')}
           onChange={(e) => pick(setIdB)(e.target.value)}
         />
         <datalist id="driver-list">
@@ -287,20 +291,20 @@ export default function Compare() {
           className={view === 'career' ? 'tab active' : 'tab'}
           onClick={() => setView('career')}
         >
-          Career
+          {t('cmp.tabCareer')}
         </button>
         <button
           className={view === 'season' ? 'tab active' : 'tab'}
           onClick={() => setView('season')}
         >
-          Season
+          {t('common.season')}
         </button>
         {view === 'season' && seasonOptions.length > 0 && (
           <select
             className="cmp-season"
             value={season ?? ''}
             onChange={(e) => setSeason(Number(e.target.value))}
-            aria-label="Season"
+            aria-label={t('common.season')}
           >
             {seasonOptions.map((y) => (
               <option key={y} value={y}>
@@ -313,9 +317,9 @@ export default function Compare() {
 
       {view === 'career' ? (
         <>
-          {cmp.loading && <p className="muted">Loading…</p>}
+          {cmp.loading && <p className="muted">{t('common.loading')}</p>}
           {!cmp.loading && cmp.error && (
-            <p className="banner">Could not load comparison: {cmp.error}</p>
+            <p className="banner">{t('cmp.loadError', { error: cmp.error })}</p>
           )}
           {!cmp.loading && cmp.data && (
             <Comparison
@@ -329,9 +333,9 @@ export default function Compare() {
         </>
       ) : (
         <>
-          {seasonCmp.loading && <p className="muted">Loading…</p>}
+          {seasonCmp.loading && <p className="muted">{t('common.loading')}</p>}
           {!seasonCmp.loading && seasonCmp.error && (
-            <p className="banner">Could not load comparison: {seasonCmp.error}</p>
+            <p className="banner">{t('cmp.loadError', { error: seasonCmp.error })}</p>
           )}
           {!seasonCmp.loading && seasonCmp.data && (
             <SeasonComparison

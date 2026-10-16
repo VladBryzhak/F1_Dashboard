@@ -4,6 +4,8 @@ import { api } from '../api/client'
 import { useAsync } from '../hooks/useAsync'
 import { teamColor } from '../lib/f1meta'
 import Flag from './Flag'
+import { useI18n } from '../i18n/core'
+import { countryName } from '../lib/countries'
 
 const DECADES = [2020, 2010, 2000, 1990, 1980, 1970, 1960, 1950]
 
@@ -18,12 +20,20 @@ export default function TeamSearch() {
   const [q, setQ] = useState('')
   const [nat, setNat] = useState('')
   const [decade, setDecade] = useState('')
+  const { t, tn, lang, locale } = useI18n()
 
-  const nationalities = useMemo(
-    () =>
-      [...new Set((data ?? []).map((c) => c.nationality).filter(Boolean))].sort(),
-    [data],
-  )
+  // Filter values stay the f1db demonym; labels follow the interface language
+  // (country names in Ukrainian).
+  const nationalities = useMemo(() => {
+    const byNat = new Map<string, string | null>()
+    for (const x of data ?? []) if (x.nationality) byNat.set(x.nationality, x.countryCode)
+    return [...byNat.entries()]
+      .map(([value, code]) => ({
+        value,
+        label: lang === 'uk' && code ? countryName(code, locale) : value,
+      }))
+      .sort((a, b) => a.label.localeCompare(b.label, locale))
+  }, [data, lang, locale])
 
   const results = useMemo(() => {
     let list = data ?? []
@@ -47,48 +57,48 @@ export default function TeamSearch() {
         <input
           className="ds-input"
           type="search"
-          placeholder="Search by name…"
+          placeholder={t('ds.placeholder')}
           value={q}
           onChange={(e) => setQ(e.target.value)}
-          aria-label="Search teams by name"
+          aria-label={t('ds.placeholder')}
         />
         <select
           value={nat}
           onChange={(e) => setNat(e.target.value)}
-          aria-label="Nationality"
+          aria-label={t('ds.nationality')}
         >
-          <option value="">All nationalities</option>
+          <option value="">{t('ds.allNationalities')}</option>
           {nationalities.map((n) => (
-            <option key={n} value={n}>
-              {n}
+            <option key={n.value} value={n.value}>
+              {n.label}
             </option>
           ))}
         </select>
         <select
           value={decade}
           onChange={(e) => setDecade(e.target.value)}
-          aria-label="Era"
+          aria-label={t('ds.era')}
         >
-          <option value="">All eras</option>
+          <option value="">{t('ds.allEras')}</option>
           {DECADES.map((d) => (
             <option key={d} value={d}>
-              {d}s
+              {t('ds.decade', { d })}
             </option>
           ))}
         </select>
       </div>
 
-      {loading && <p className="muted">Loading teams…</p>}
-      {error && <p className="banner">Could not load teams: {error}</p>}
+      {loading && <p className="muted">{t('common.loading')}</p>}
+      {error && <p className="banner">{t('ds.loadError', { error })}</p>}
 
       {!loading && !error && (
         <>
           <p className="ds-count muted">
-            {results.length} team{results.length === 1 ? '' : 's'}
-            {results.length > shown.length && ` · showing first ${shown.length}`}
+            {tn('plural.teamsN', results.length)}
+            {results.length > shown.length && ` · ${t('ds.showingFirst', { n: shown.length })}`}
           </p>
           {results.length === 0 ? (
-            <p className="muted">No teams match those filters.</p>
+            <p className="muted">{t('ds.noMatch')}</p>
           ) : (
             <div className="ds-results">
               {shown.map((c) => {
@@ -119,10 +129,11 @@ export default function TeamSearch() {
                     <span className="ds-name">{c.name}</span>
                     <span className="ds-sub">
                       <Flag code={c.countryCode} nationality={c.nationality} />
-                      {c.nationality} · {c.firstSeason}–{c.lastSeason}
+                      {lang === 'uk' && c.countryCode ? countryName(c.countryCode, locale) : c.nationality} ·{' '}
+                      {c.firstSeason}–{c.lastSeason}
                     </span>
                     <span className="ds-stats muted">
-                      {c.races} races · {c.podiums} podiums
+                      {tn('plural.racesN', c.races)} · {tn('plural.podiumsN', c.podiums)}
                     </span>
                   </span>
                 </Link>

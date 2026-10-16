@@ -4,11 +4,13 @@ import ReplayPlayer from '../components/ReplayPlayer'
 import WeatherCard from '../components/WeatherCard'
 import { useLiveStatus } from '../hooks/useLiveStatus'
 import { useSeo } from '../hooks/useSeo'
+import { useI18n } from '../i18n/core'
 import {
   fmtCountdown,
   fmtTime,
   sectorClass,
   segmentClass,
+  sessionLabel,
   teamColor,
   tyre,
 } from '../lib/live'
@@ -45,6 +47,7 @@ function DriverDetail({
   detail: LiveDriverDetail
   sessionBest: LiveBoard['sessionBest']
 }) {
+  const { t, tn } = useI18n()
   const latest: LiveLap | undefined = detail.laps[0]
   return (
     <div className="ld-detail">
@@ -53,7 +56,7 @@ function DriverDetail({
           {[0, 1, 2].map((i) => (
             <div className="ld-sector" key={i}>
               <div className="ld-sector-head">
-                <span>Sector {i + 1}</span>
+                <span>{t('rp.sectorN', { n: i + 1 })}</span>
                 <span
                   className={`ld-sector-time sector-${sectorClass(
                     latest.sectors[i],
@@ -72,9 +75,9 @@ function DriverDetail({
 
       <div className="ld-cols">
         <div className="ld-col">
-          <h4>Best</h4>
+          <h4>{t('rp.best')}</h4>
           <div className="ld-kv">
-            <span>Lap</span>
+            <span>{t('tel.lap')}</span>
             <span className="mono">{fmtTime(detail.bestLap)}</span>
           </div>
           {detail.bestSectors.map((s, i) => (
@@ -85,26 +88,26 @@ function DriverDetail({
           ))}
           {latest && (
             <div className="ld-kv">
-              <span>Speed trap</span>
+              <span>{t('rp.speedTrap')}</span>
               <span className="mono">
-                {latest.speeds.st != null ? `${latest.speeds.st} km/h` : '—'}
+                {latest.speeds.st != null ? `${latest.speeds.st} ${t('tel.kmh')}` : '—'}
               </span>
             </div>
           )}
         </div>
 
         <div className="ld-col">
-          <h4>Tyres</h4>
+          <h4>{t('rp.tyres')}</h4>
           {detail.stints.length === 0 && <p className="muted">—</p>}
           {detail.stints.map((s) => {
-            const t = tyre(s.compound)
+            const ty = tyre(s.compound)
             const n = s.lapEnd - s.lapStart + 1
             return (
               <div className="ld-kv" key={s.stintNumber}>
                 <span>
-                  <span className={`tyre tyre-${t.cls}`}>{t.label}</span>{' '}
-                  Laps {s.lapStart}–{s.lapEnd}{' '}
-                  <span className="muted">· {n} {n === 1 ? 'lap' : 'laps'}</span>
+                  <span className={`tyre tyre-${ty.cls}`}>{ty.label}</span>{' '}
+                  {t('strat.laps', { from: s.lapStart, to: s.lapEnd })}{' '}
+                  <span className="muted">· {tn('plural.lapsN', n)}</span>
                 </span>
                 <span className="muted">{s.compound ?? ''}</span>
               </div>
@@ -113,11 +116,11 @@ function DriverDetail({
         </div>
 
         <div className="ld-col">
-          <h4>Pit stops</h4>
-          {detail.pits.length === 0 && <p className="muted">None</p>}
+          <h4>{t('rp.pitStops')}</h4>
+          {detail.pits.length === 0 && <p className="muted">{t('rp.none')}</p>}
           {detail.pits.map((p, i) => (
             <div className="ld-kv" key={i}>
-              <span>Lap {p.lapNumber ?? '—'}</span>
+              <span>{t('tel.lapN', { n: p.lapNumber ?? '—' })}</span>
               <span className="mono">
                 {p.pitDuration != null ? `${p.pitDuration.toFixed(1)}s` : '—'}
               </span>
@@ -137,6 +140,8 @@ export default function Live() {
   })
 
   const status = useLiveStatus(30000)
+  const { t } = useI18n()
+  const sessionName = (name: string) => sessionLabel(name, t)
   const now = useNow()
   const [mode, setMode] = useState<'live' | 'replay'>('live')
   const sessionKey = status?.boardSessionKey ?? null
@@ -189,7 +194,7 @@ export default function Live() {
   return (
     <section className="live">
       <div className="page-head">
-        <h1>Live Timing</h1>
+        <h1>{t('live.title')}</h1>
       </div>
 
       <div className="tabs">
@@ -197,13 +202,13 @@ export default function Live() {
           className={mode === 'live' ? 'tab active' : 'tab'}
           onClick={() => setMode('live')}
         >
-          Live
+          {t('nav.live')}
         </button>
         <button
           className={mode === 'replay' ? 'tab active' : 'tab'}
           onClick={() => setMode('replay')}
         >
-          Replay
+          {t('live.replay')}
         </button>
       </div>
 
@@ -211,24 +216,21 @@ export default function Live() {
 
       {mode === 'live' && (
         <>
-          {!status && <p className="muted">Loading…</p>}
+          {!status && <p className="muted">{t('common.loading')}</p>}
 
       {status?.locked && (
         <p className="banner">
-          <span className="live-dot on" /> A Formula 1 session is live right now.
-          Our data source (OpenF1) restricts its API to paid subscribers while a
-          session is in progress, so live timing here is paused — it returns
-          automatically once the session ends.
+          <span className="live-dot on" /> {t('live.locked')}
         </p>
       )}
 
       {status && !status.locked && status.live ? (
         <p className="live-session">
-          <span className="live-dot on" /> LIVE · {status.live.sessionName} ·{' '}
+          <span className="live-dot on" /> {t('sched.live')} · {sessionName(status.live.sessionName)} ·{' '}
           {status.live.location}
           {status.live.dateEnd && (
             <span className="live-count">
-              ends in {fmtCountdown(status.live.dateEnd, now)}
+              {t('live.endsIn', { time: fmtCountdown(status.live.dateEnd, now, t('sched.dayShort')) })}
             </span>
           )}
         </p>
@@ -237,20 +239,20 @@ export default function Live() {
           <>
             {status.next && (
               <div className="next-card">
-                <span className="next-label">Next session</span>
+                <span className="next-label">{t('sched.nextSession')}</span>
                 <span className="next-name">
-                  {status.next.sessionName} · {status.next.location}
+                  {sessionName(status.next.sessionName)} · {status.next.location}
                 </span>
                 <span className="next-count">
-                  in {fmtCountdown(status.next.dateStart, now)}
+                  {t('live.in', { time: fmtCountdown(status.next.dateStart, now, t('sched.dayShort')) })}
                 </span>
               </div>
             )}
             {status.last && (
               <p className="live-session">
-                <span className="live-dot" /> {status.last.sessionName} ·{' '}
+                <span className="live-dot" /> {sessionName(status.last.sessionName)} ·{' '}
                 {status.last.location} · {status.last.year}
-                <span className="live-replay">replay</span>
+                <span className="live-replay">{t('live.replayTag')}</span>
               </p>
             )}
           </>
@@ -258,7 +260,7 @@ export default function Live() {
       )}
 
       {boardError && !board && (
-        <p className="banner">Could not load the board: {boardError}</p>
+        <p className="banner">{t('live.boardError', { error: boardError })}</p>
       )}
 
       {board && (
@@ -267,16 +269,16 @@ export default function Live() {
         <div className="live-board">
           <div className="lb-head">
             <span className="lb-pos">#</span>
-            <span className="lb-drv">Driver</span>
-            <span className="lb-gap">Gap</span>
-            <span className="lb-int">Interval</span>
-            <span className="lb-lap">Last</span>
-            <span className="lb-best">Best</span>
-            <span className="lb-tyre">Tyre</span>
+            <span className="lb-drv">{t('wk.colDriver')}</span>
+            <span className="lb-gap">{t('wk.colGap')}</span>
+            <span className="lb-int">{t('live.interval')}</span>
+            <span className="lb-lap">{t('rp.last')}</span>
+            <span className="lb-best">{t('rp.best')}</span>
+            <span className="lb-tyre">{t('rp.tyre')}</span>
           </div>
 
           {board.rows.map((r) => {
-            const t = tyre(r.tyreCompound)
+            const ty = tyre(r.tyreCompound)
             const open = expanded === r.driverNumber
             return (
               <div className={`lb-row-wrap${open ? ' open' : ''}`} key={r.driverNumber}>
@@ -296,7 +298,7 @@ export default function Live() {
                   <span className="lb-lap mono">{fmtTime(r.lastLap)}</span>
                   <span className="lb-best mono">{fmtTime(r.bestLap)}</span>
                   <span className="lb-tyre">
-                    <span className={`tyre tyre-${t.cls}`}>{t.label}</span>
+                    <span className={`tyre tyre-${ty.cls}`}>{ty.label}</span>
                     {r.tyreAge != null && <span className="tyre-age">{r.tyreAge}</span>}
                   </span>
                 </button>
@@ -306,7 +308,7 @@ export default function Live() {
                     <DriverDetail detail={detail} sessionBest={board.sessionBest} />
                   ) : (
                     <div className="ld-detail">
-                      <p className="muted">Loading detail…</p>
+                      <p className="muted">{t('common.loading')}</p>
                     </div>
                   ))}
               </div>
@@ -316,18 +318,18 @@ export default function Live() {
         </div>
         <aside className="rp-side">
           <div className="rp-side-card">
-            <h4 className="rp-side-title">Session</h4>
-            <div className="rp-kv"><span>Session</span><span>{board.session.sessionName}</span></div>
-            <div className="rp-kv"><span>Circuit</span><span>{board.session.location}</span></div>
+            <h4 className="rp-side-title">{t('rp.session')}</h4>
+            <div className="rp-kv"><span>{t('rp.session')}</span><span>{sessionName(board.session.sessionName)}</span></div>
+            <div className="rp-kv"><span>{t('rp.circuit')}</span><span>{board.session.location}</span></div>
             <div className="rp-kv">
-              <span>Status</span>
+              <span>{t('rp.status')}</span>
               <span className={`rp-side-status rp-side-status--${status?.live ? 'red' : 'chequered'}`}>
-                {status?.live ? 'Live' : 'Finished'}
+                {status?.live ? t('nav.live') : t('live.finished')}
               </span>
             </div>
-            <div className="rp-kv"><span>Fastest lap</span><span className="mono">{fmtTime(board.sessionBest.lap)}</span></div>
+            <div className="rp-kv"><span>{t('wk.fastestLap')}</span><span className="mono">{fmtTime(board.sessionBest.lap)}</span></div>
             {board.sessionBest.sectors.map((s, i) => (
-              <div className="rp-kv" key={i}><span>Best S{i + 1}</span><span className="mono">{fmtTime(s)}</span></div>
+              <div className="rp-kv" key={i}><span>{t('live.bestS', { n: i + 1 })}</span><span className="mono">{fmtTime(s)}</span></div>
             ))}
           </div>
           <WeatherCard sample={board.weather} />

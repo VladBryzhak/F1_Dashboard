@@ -7,7 +7,9 @@ import {
   XAxis,
   YAxis,
 } from 'recharts'
+import { useI18n } from '../i18n/core'
 import { teamColor } from '../lib/f1meta'
+import { gpShort } from '../lib/gpNames'
 import type { SeasonProgression } from '../types/f1'
 
 interface SeriesMeta {
@@ -39,13 +41,14 @@ function ChartTooltip({
   meta: Map<string, SeriesMeta>
   gpByRound: Map<number, string>
 }) {
+  const { lang } = useI18n()
   if (!active || !payload?.length) return null
   const round = Number(label)
   const rows = [...payload].sort((a, b) => toNum(b.value) - toNum(a.value))
   return (
     <div className="chart-tip">
       <div className="chart-tip-head">
-        R{round} · {gpByRound.get(round)}
+        R{round} · {gpShort(gpByRound.get(round) ?? '', lang)}
       </div>
       {rows.map((r) => {
         const m = meta.get(String(r.dataKey))
@@ -63,8 +66,9 @@ function ChartTooltip({
 }
 
 export default function TitleRaceChart({ data }: { data: SeasonProgression }) {
+  const { t } = useI18n()
   if (!data.series.length) {
-    return <p className="muted">No standings data for this season yet.</p>
+    return <p className="muted">{t('st.noData')}</p>
   }
 
   // Teammates share a team colour → dash the second one so they're separable.
@@ -100,8 +104,8 @@ export default function TitleRaceChart({ data }: { data: SeasonProgression }) {
   return (
     <div className="card title-race">
       <div className="title-race-head">
-        <h3>Title race — points by round</h3>
-        <span className="muted">{data.season} season</span>
+        <h3>{t('st.chartTitle')}</h3>
+        <span className="muted">{t('st.seasonN', { season: data.season })}</span>
       </div>
 
       <ResponsiveContainer width="100%" height={360}>
