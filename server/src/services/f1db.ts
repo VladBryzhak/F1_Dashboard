@@ -677,10 +677,23 @@ const REFRESH_INTERVAL_MS =
 let refreshTimer: NodeJS.Timeout | null = null;
 
 // Cached for the process lifetime and refreshed in the background on a timer.
+let datasetReady = false;
+
+// True once the dataset has loaded (requests can then answer instantly).
+export function isDatasetReady(): boolean {
+  return datasetReady;
+}
+
+// Start loading the dataset without waiting for it.
+export function warmDataset(): void {
+  dataset().catch(() => {});
+}
+
 function dataset(): Promise<Dataset> {
   if (!datasetPromise) {
     datasetPromise = loadDataset().then(
       (ds) => {
+        datasetReady = true;
         scheduleRefresh();
         return ds;
       },
@@ -1750,4 +1763,9 @@ export async function getSearchIndex(): Promise<SearchIndex> {
       return [r.year, r.round, gp?.name ?? r.grandPrixId, alpha2(ds, gp?.countryId)];
     });
   return { drivers, teams, circuits, races };
+}
+
+// The newest season in the dataset (the current calendar).
+export async function getCurrentSeason(): Promise<number> {
+  return latestSeason(await dataset());
 }

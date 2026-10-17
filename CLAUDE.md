@@ -49,6 +49,10 @@ Committed JSON built by one-off scripts, so the site makes no extra upstream cal
 - `circuit-outlines.json` ← `node server/scripts/build-circuit-outlines.mjs` — SVG outlines from the open f1-circuits GeoJSON (MIT), keyed by f1db circuitId.
 - `track-lines.json` ← `node server/scripts/build-track-lines.mjs` — replay track map: one reference lap (racing line + per-point timing) and one pit stop (pit-lane path, offset from OpenF1's pit `date`) per OpenF1 circuit_key. The client positions cars from lap/sector/pit/position timing along it (`client/src/lib/trackModel.ts`).
 
+## Link previews (Open Graph)
+
+Social crawlers don't run JS, so the Express SPA fallback (`server/src/services/pageHtml.ts`) fills each page's `<title>`, description, canonical and OG/Twitter tags from `describePage()` in `server/src/services/og.ts`, which also draws the 1200×630 preview served at `/og/<page path>.png` (SVG → PNG with `@resvg/resvg-js`, Saira Condensed from `server/assets/fonts`, OFL). Keep its titles/descriptions in step with the pages' `useSeo` calls. On a cold start people get the page at once with default tags; crawlers wait for the dataset.
+
 ## Server conventions
 
 - Add a feature by writing a `services/*.ts` (fetch + normalize), then a `routes/*.ts` (thin Express handlers that call the service and `next(err)` on failure), then mount it in `src/index.ts`.

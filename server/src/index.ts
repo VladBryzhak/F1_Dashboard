@@ -12,6 +12,8 @@ import liveRouter from "./routes/live";
 import profilesRouter from "./routes/profiles";
 import standingsRouter from "./routes/standings";
 import telemetryRouter from "./routes/telemetry";
+import { previewPng } from "./services/og";
+import { pageHtml } from "./services/pageHtml";
 
 const app = express();
 const PORT = process.env.PORT ?? 3001;
@@ -53,8 +55,22 @@ app.use("/api", profilesRouter);
 // whole app runs as one service (one origin, no CORS, no separate frontend
 // host). The client build lives at <repo>/client/dist.
 const clientDist = path.resolve(__dirname, "../../client/dist");
+// Link-preview images: /og/<page path>.png (e.g. /og/drivers/max-verstappen.png).
+app.get(/^\/og\/(.+)\.png$/, async (req, res, next) => {
+  try {
+    const page = "/" + req.params[0];
+    const png = await previewPng(page === "/index" ? "/" : page);
+    res.set("Cache-Control", "public, max-age=86400");
+    res.type("png").send(png);
+  } catch (err) {
+    next(err);
+  }
+});
+
 if (fs.existsSync(clientDist)) {
-  app.use(express.static(clientDist));
+  // index: false — pages (including "/") go through the fallback below, which
+  // fills in each page's meta tags.
+  app.use(express.static(clientDist, { index: false }));
   // Agent-discovery manifest. express.static serves /ai-catalog.json from the
   // build, but ignores dotfolders, so serve the well-known path explicitly
   // (both return the same file) instead of letting it fall to the SPA shell.
@@ -67,9 +83,15 @@ if (fs.existsSync(clientDist)) {
   );
   // SPA fallback: any non-API route returns index.html so client-side routing
   // (react-router) works on deep links / refreshes.
-  app.get("*", (req, res, next) => {
+  app.get("*", async (req, res, next) => {
     if (req.path.startsWith("/api")) return next();
-    res.sendFile(path.join(clientDist, "index.html"));
+    try {
+      res
+        .type("html")
+        .send(await pageHtml(path.join(clientDist, "index.html"), req.path, req.get("user-agent")));
+    } catch (err) {
+      next(err);
+    }
   });
 }
 
