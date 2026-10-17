@@ -605,16 +605,22 @@ export async function getReplay(sessionKey: number): Promise<ReplayData> {
       for (const m of rc) {
         const msg = (m.message ?? "").toUpperCase();
         const flag = (m.flag ?? "").toUpperCase();
-        if (msg.includes("VIRTUAL SAFETY CAR")) {
+        // Race control writes the virtual safety car both in full and as
+        // "VSC" ("VSC DEPLOYED" / "VSC ENDING").
+        if (msg.includes("VIRTUAL SAFETY CAR") || /\bVSC\b/.test(msg)) {
           if (msg.includes("DEPLOY")) vsc = true;
           else if (msg.includes("ENDING")) vsc = false;
         } else if (m.category === "SafetyCar") {
           if (msg.includes("DEPLOY")) sc = true;
-          else if (msg.includes("IN THIS LAP")) sc = false;
+          else if (msg.includes("IN THIS LAP") || msg.includes("ENDING")) sc = false;
         }
         if (flag === "RED") red = true;
         if (flag === "GREEN") {
+          // A green flag ends any neutralisation, even if its end message
+          // was missed.
           red = false;
+          sc = false;
+          vsc = false;
           yellow.clear();
         }
         if (flag === "YELLOW" || flag === "DOUBLE YELLOW") {
