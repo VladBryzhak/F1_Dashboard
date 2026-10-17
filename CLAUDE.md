@@ -42,6 +42,13 @@ Run both (two terminals): `server` then `client`. The Vite proxy (`client/vite.c
   - We previously used Jolpica-F1; it was dropped (unreliable, frequent outages) in favour of f1db.
 - **OpenF1** (`https://api.openf1.org/v1`) — telemetry (speed/throttle/brake/DRS/gear), laps, sectors. Historical data free from 2023 onward. Used for the Telemetry feature (`server/src/services/openf1.ts`, M4).
 
+## Generated data (server/src/data)
+
+Committed JSON built by one-off scripts, so the site makes no extra upstream calls at runtime. Re-run when a new circuit joins the calendar:
+
+- `circuit-outlines.json` ← `node server/scripts/build-circuit-outlines.mjs` — SVG outlines from the open f1-circuits GeoJSON (MIT), keyed by f1db circuitId.
+- `track-lines.json` ← `node server/scripts/build-track-lines.mjs` — replay track map: one reference lap (racing line + per-point timing) and one pit stop (pit-lane path, offset from OpenF1's pit `date`) per OpenF1 circuit_key. The client positions cars from lap/sector/pit/position timing along it (`client/src/lib/trackModel.ts`).
+
 ## Server conventions
 
 - Add a feature by writing a `services/*.ts` (fetch + normalize), then a `routes/*.ts` (thin Express handlers that call the service and `next(err)` on failure), then mount it in `src/index.ts`.

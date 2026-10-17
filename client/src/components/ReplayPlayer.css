@@ -332,3 +332,35 @@
   margin: 0.6rem 0 0;
   font-size: 0.8rem;
 }
+
+/* With a track map: the board on the left, map + session panel on the right;
+   on narrow screens the map comes first, above the board. */
+.rp-layout.has-map {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(300px, 430px);
+  grid-template-areas:
+    'main map'
+    'main side';
+  grid-template-rows: auto 1fr;
+  align-items: start;
+}
+.rp-layout.has-map .rp-map-slot {
+  grid-area: map;
+  min-width: 0;
+}
+.rp-layout.has-map .rp-main {
+  grid-area: main;
+}
+.rp-layout.has-map .rp-side {
+  grid-area: side;
+}
+@media (max-width: 900px) {
+  .rp-layout.has-map {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas:
+      'map'
+      'main'
+      'side';
+    grid-template-rows: auto;
+  }
+}

@@ -509,7 +509,8 @@ export interface ReplayData {
   pos: { num: number; p: number; t: number }[]
   stints: ReplayStint[]
   flags: { t: number; s: string }[]
-  pits: { num: number; from: number; to: number }[]
+  pits: { num: number; from: number; to: number; at: number; lane: number | null }[] // from–to = off the racing line
+  track: TrackLine | null // racing line + pit lane for the track map
   weather: WeatherSample[]
 }
 
@@ -676,4 +677,22 @@ export interface ReplaySession {
   date: string // session start, ISO
   sessionName: string // "Practice 1" … "Qualifying", "Sprint", "Race"
   isSprint: boolean
+}
+
+// Replay track map data for one circuit (see scripts/build-track-lines.mjs).
+export interface TrackLine {
+  name: string
+  lapTime: number // reference lap, seconds
+  sectors: [number, number] // reference-lap time at the end of S1 and S2
+  w: number // drawing size (longest side 100)
+  h: number
+  line: [number, number][] // racing line, one point every 0.25 s of the reference lap
+  pit: {
+    entry: number // reference-lap time where the pit lane leaves the line
+    exit: number // … and rejoins it (next lap)
+    offset: number // seconds from OpenF1's pit `date` to leaving the line
+    box: [number, number] | null // stationary stretch, seconds after leaving
+    lane: number // the reference stop's pit-lane time
+    path: [number, number, number][] // [x, y, seconds after leaving the line]
+  } | null
 }

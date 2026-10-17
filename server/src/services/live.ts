@@ -1,4 +1,5 @@
 import { cached } from "../cache/cache";
+import { trackLine } from "./trackLines";
 import type {
   LiveBoard,
   LiveBoardRow,
@@ -48,6 +49,7 @@ async function get<T>(path: string, attempt = 0): Promise<T> {
 interface RawSession {
   session_key: number;
   meeting_key?: number;
+  circuit_key?: number;
   session_name: string;
   location: string;
   country_name: string;
@@ -632,12 +634,25 @@ export async function getReplay(sessionKey: number): Promise<ReplayData> {
     }
 
     // In-pit windows: from the stop time for the pit-lane duration.
+    // In-pit windows. OpenF1's `date` comes late in the drive through the pit
+    // lane, so where we know the circuit, shift it by the calibrated offset to
+    // the moment the car leaves the racing line and cover the whole detour.
+    const track = trackLine(sessions[0]?.circuit_key);
     const pits = rawPit
       .filter((p) => p.date)
       .map((p) => {
-        const from = Date.parse(p.date as string);
+        const at = Date.parse(p.date as string);
+        // Practice and qualifying entries have no lane time, and their
+        // pit_duration is time spent in the garage, so don't use it as one.
+        const lane = p.lane_duration ?? null;
+        if (track?.pit) {
+          const laneTime = lane ?? track.pit.lane;
+          const detour = track.pit.path[track.pit.path.length - 1][2] + (laneTime - track.pit.lane);
+          const from = at + track.pit.offset * 1000;
+          return { num: p.driver_number, from, to: from + detour * 1000, at, lane };
+        }
         const dur = (p.pit_duration ?? p.lane_duration ?? 25) * 1000;
-        return { num: p.driver_number, from, to: from + dur };
+        return { num: p.driver_number, from: at, to: at + dur, at, lane };
       })
       .filter((p) => !Number.isNaN(p.from));
 
@@ -669,6 +684,7 @@ export async function getReplay(sessionKey: number): Promise<ReplayData> {
       flags,
       pits,
       weather: toWeather(rawWeather),
+      track,
     };
   });
 }

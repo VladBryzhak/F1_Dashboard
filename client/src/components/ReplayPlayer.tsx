@@ -4,6 +4,8 @@ import { useAsync } from '../hooks/useAsync'
 import { fmtTime, segmentClass, sessionLabel, teamColor, tyre } from '../lib/live'
 import type { ReplayData, ReplayLap, ReplaySession } from '../types/f1'
 import WeatherCard, { weatherAt } from './WeatherCard'
+import TrackMap from './TrackMap'
+import { buildTrackModel } from '../lib/trackModel'
 import { useI18n, type TKey } from '../i18n/core'
 import './ReplayPlayer.css'
 
@@ -395,6 +397,9 @@ export default function ReplayPlayer() {
     [data, t],
   )
   const st = STATUS[status] ?? STATUS.green
+  // Track map: positions from timing (see lib/trackModel). Overtakes are
+  // pinned in races only — in practice/qualifying the order is by best lap.
+  const trackModel = useMemo(() => (data ? buildTrackModel(data, !timed) : null), [data, timed])
   const weather = useMemo(
     () => (data?.weather ? weatherAt(data.weather, data.startMs + t) : null),
     [data, t],
@@ -488,7 +493,20 @@ export default function ReplayPlayer() {
             </span>
           </div>
 
-          <div className="rp-layout">
+          <div className={`rp-layout${trackModel ? ' has-map' : ''}`}>
+          {trackModel && (
+            <div className="rp-map-slot">
+              <TrackMap
+                data={data}
+                model={trackModel}
+                time={data.startMs + t}
+                playing={playing}
+                speed={speed}
+                order={board.rows.map((r) => r.num)}
+                highlight={expanded}
+              />
+            </div>
+          )}
           <div className="rp-main">
           <div className="rp-board">
             <div className="rp-row rp-head-row">

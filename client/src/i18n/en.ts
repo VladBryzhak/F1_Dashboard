@@ -398,6 +398,10 @@ const en = {
   'rp.sq': 'SQ',
   'rp.q': 'Quali',
   'rp.timedNote': 'Practice and qualifying: drivers are ordered by their best lap so far, and the gap is to the fastest lap.',
+
+  // Replay track map
+  'rp.mapLabel': 'Track map with every car',
+  'rp.mapNote': 'Positions are worked out from lap, sector, pit and overtake timing, so they are close but not exact.',
 }
 
 export type Dict = Record<keyof typeof en, string>

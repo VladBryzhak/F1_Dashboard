@@ -1,0 +1,59 @@
+/* Replay track map: grey asphalt, thin red racing line, dashed pit lane, cars
+   as team-coloured dots (leader slightly larger and labelled). */
+.track-map {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 0.9rem 1rem 0.7rem;
+}
+.track-map svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: 340px;
+  overflow: visible;
+}
+.tm-track {
+  fill: none;
+  stroke: #2b2b36;
+  stroke-width: 4.2;
+  stroke-linejoin: round;
+}
+.tm-line {
+  fill: none;
+  stroke: rgba(225, 6, 0, 0.55);
+  stroke-width: 0.6;
+  stroke-linejoin: round;
+}
+.tm-pit {
+  fill: none;
+  stroke: #3a3a46;
+  stroke-width: 1.6;
+  stroke-dasharray: 1.6 1.2;
+  stroke-linecap: round;
+}
+.tm-finish {
+  fill: #fff;
+}
+.tm-car circle {
+  stroke: #0e0e13;
+  stroke-width: 0.5;
+}
+.tm-car text {
+  font: 700 3.4px var(--font-body);
+  fill: #fff;
+  paint-order: stroke;
+  stroke: #0e0e13;
+  stroke-width: 0.8px;
+}
+.tm-car.pit circle {
+  stroke: #ffd12e;
+}
+.tm-car.garage {
+  opacity: 0.25;
+}
+.tm-note {
+  margin: 0.4rem 0 0;
+  font-size: 0.7rem;
+  color: var(--muted-2);
+}
