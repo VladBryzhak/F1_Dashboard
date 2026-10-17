@@ -34,14 +34,18 @@ const en = {
     'Driver and car images are © Formula 1. F1, FORMULA 1 and related marks are trademarks of Formula One Licensing B.V.',
   'footer.independent':
     'An independent, fan-made project — not affiliated with, endorsed by, or associated with Formula 1, Formula One Management or the FIA.',
-  'footer.analytics': 'This site uses Google Analytics to measure site traffic.',
+  'footer.analytics': 'This site uses Google Analytics, with cookies only if you accept them.',
+  'footer.cookieSettings': 'Cookie settings',
 
   // Cookie banner
   'cookie.label': 'Cookie notice',
   'cookie.text':
-    'F1 Dashboard uses cookies for analytics to understand how the site is used. You can accept or decline.',
+    'F1 Dashboard uses Google Analytics cookies to see how the site is used — only if you accept. Without consent no analytics cookies are set.',
   'cookie.decline': 'Decline',
   'cookie.accept': 'Accept',
+  'cookie.more': 'Privacy policy',
+  'cookie.nowAccepted': 'Current choice: accepted.',
+  'cookie.nowDeclined': 'Current choice: declined.',
 
   // Common
   'common.loading': 'Loading…',

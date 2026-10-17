@@ -36,14 +36,18 @@ const uk: Dict & Record<string, string> = {
     'Зображення пілотів і болідів © Formula 1. F1, FORMULA 1 та пов’язані знаки є торговельними марками Formula One Licensing B.V.',
   'footer.independent':
     'Незалежний фанатський проєкт — не пов’язаний із Formula 1, Formula One Management чи FIA і не схвалений ними.',
-  'footer.analytics': 'Сайт використовує Google Analytics для вимірювання відвідуваності.',
+  'footer.analytics': 'Сайт використовує Google Analytics; cookie — лише за вашої згоди.',
+  'footer.cookieSettings': 'Налаштування cookie',
 
   // Cookie banner
   'cookie.label': 'Повідомлення про cookie',
   'cookie.text':
-    'F1 Dashboard використовує cookie для аналітики, щоб розуміти, як користуються сайтом. Ви можете погодитися або відмовитися.',
+    'F1 Dashboard використовує cookie Google Analytics, щоб розуміти, як користуються сайтом, — лише якщо ви погодитесь. Без згоди аналітичні cookie не встановлюються.',
   'cookie.decline': 'Відхилити',
   'cookie.accept': 'Прийняти',
+  'cookie.more': 'Політика конфіденційності',
+  'cookie.nowAccepted': 'Зараз: прийнято.',
+  'cookie.nowDeclined': 'Зараз: відхилено.',
 
   // Common
   'common.loading': 'Завантаження…',

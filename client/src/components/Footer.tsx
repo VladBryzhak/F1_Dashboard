@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom'
 import { useI18n, type TKey } from '../i18n/core'
+import { OPEN_EVENT } from './CookieBanner'
 import './Footer.css'
 
 // Global site footer. Carries the data/image attributions we're obliged to show
@@ -90,6 +91,13 @@ export default function Footer() {
           <p className="footer-links">
             <Link to="/about">{t('nav.about')}</Link>
             <Link to="/privacy">{t('nav.privacy')}</Link>
+            <button
+              type="button"
+              className="footer-link-btn"
+              onClick={() => window.dispatchEvent(new Event(OPEN_EVENT))}
+            >
+              {t('footer.cookieSettings')}
+            </button>
           </p>
         </div>
       </div>

@@ -115,7 +115,21 @@ nav.footer-col ul {
   gap: 0.4rem 1rem;
 }
 
-.footer-links a {
+.footer-links a,
+.footer-link-btn {
   color: var(--text);
   text-decoration: underline;
+}
+
+/* "Cookie settings" reopens the consent notice; styled like the links. */
+.footer-link-btn {
+  padding: 0;
+  background: none;
+  border: 0;
+  font: inherit;
+  cursor: pointer;
+}
+
+.footer-link-btn:hover {
+  color: #fff;
 }

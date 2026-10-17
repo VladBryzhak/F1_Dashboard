@@ -1,46 +1,50 @@
 import { useEffect, useState } from 'react'
+import { Link } from 'react-router-dom'
 import { useI18n } from '../i18n/core'
+import { setAnalyticsConsent, storedConsent, type ConsentChoice } from '../lib/analytics'
 import './CookieBanner.css'
 
-// Cookie-consent notice. Flip ENABLED to false to hide it everywhere (the code
-// stays in place); flip it back to true to render it again when we actually
-// need consent — e.g. for EU/GDPR compliance once we gate analytics on it.
-//
-// For now this only records the visitor's choice; wiring Google Analytics to
-// respect a "declined" choice is the separate "make it real" step.
-const ENABLED = true
-
-const STORAGE_KEY = 'cookieConsent' // 'accepted' | 'declined'
+// Cookie-consent notice. Shown until the visitor answers; "Cookie settings" in
+// the footer reopens it (OPEN_EVENT) so the choice can be changed any time.
+// The answer drives Google Consent Mode (see lib/analytics).
+export const OPEN_EVENT = 'open-cookie-settings'
 
 export default function CookieBanner() {
   const { t } = useI18n()
   const [visible, setVisible] = useState(false)
+  const [current, setCurrent] = useState<ConsentChoice | null>(null)
 
   useEffect(() => {
-    if (!ENABLED) return
-    try {
-      if (!localStorage.getItem(STORAGE_KEY)) setVisible(true)
-    } catch {
-      // storage blocked (private mode / disabled) — show it anyway
+    const choice = storedConsent()
+    setCurrent(choice)
+    if (!choice) setVisible(true)
+    const reopen = () => {
+      setCurrent(storedConsent())
       setVisible(true)
     }
+    window.addEventListener(OPEN_EVENT, reopen)
+    return () => window.removeEventListener(OPEN_EVENT, reopen)
   }, [])
 
-  if (!ENABLED || !visible) return null
+  if (!visible) return null
 
-  function choose(choice: 'accepted' | 'declined') {
-    try {
-      localStorage.setItem(STORAGE_KEY, choice)
-    } catch {
-      // ignore storage failure; we still dismiss for this session
-    }
+  function choose(choice: ConsentChoice) {
+    setAnalyticsConsent(choice)
+    setCurrent(choice)
     setVisible(false)
   }
 
   return (
     <div className="cookie-banner" role="dialog" aria-label={t('cookie.label')}>
       <p className="cookie-text">
-        {t('cookie.text')}
+        {t('cookie.text')}{' '}
+        <Link to="/privacy">{t('cookie.more')}</Link>
+        {current && (
+          <span className="cookie-current">
+            {' '}
+            {t(current === 'accepted' ? 'cookie.nowAccepted' : 'cookie.nowDeclined')}
+          </span>
+        )}
       </p>
       <div className="cookie-actions">
         <button

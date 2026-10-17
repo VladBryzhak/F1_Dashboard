@@ -5,7 +5,7 @@ import { useI18n } from '../i18n/core'
 import './Doc.css'
 
 // Bump when the text below changes.
-const UPDATED = '2026-10-16'
+const UPDATED = '2026-10-17'
 
 function Ext({ href, children }: { href: string; children: React.ReactNode }) {
   return (
@@ -27,12 +27,22 @@ function PrivacyEn({ updated }: { updated: string }) {
 
       <h2>Analytics</h2>
       <p>
-        The live site loads Google Analytics 4 to count visits and see which pages are used. Google
-        Analytics sets cookies and processes information such as your device and browser type, the
-        pages you view and an approximate location derived from your IP address. See{' '}
-        <Ext href="https://policies.google.com/privacy">Google&apos;s privacy policy</Ext>. You can
-        block it with your browser&apos;s tracking protection, a content blocker, or{' '}
-        <Ext href="https://tools.google.com/dlpage/gaoptout">Google&apos;s opt-out add-on</Ext>.
+        The live site uses Google Analytics 4 with Google Consent Mode, and only sets analytics
+        cookies if you accept them in the cookie notice. With your consent, Google Analytics
+        measures visits and pages viewed using cookies and processes information such as your
+        device and browser type and an approximate location derived from your IP address.
+      </p>
+      <p>
+        Until you accept — or if you decline — no analytics cookies are set. Google then receives
+        only cookieless signals without an identifier (for example that a page was viewed, the
+        browser type and the consent status), which cannot be tied to you across visits. See{' '}
+        <Ext href="https://policies.google.com/privacy">Google&apos;s privacy policy</Ext> and{' '}
+        <Ext href="https://support.google.com/analytics/answer/9976101">how consent mode works</Ext>.
+      </p>
+      <p>
+        You can change your choice any time with <b>Cookie settings</b> at the bottom of every page;
+        declining removes the analytics cookies set earlier. Browser tracking protection or a content
+        blocker will also stop it.
       </p>
 
       <h2>Stored in your browser</h2>
@@ -41,7 +51,7 @@ function PrivacyEn({ updated }: { updated: string }) {
           <code>lang</code> — your interface language (EN / UA).
         </li>
         <li>
-          <code>cookieConsent</code> — your answer to the cookie notice.
+          <code>cookieConsent</code> — your answer to the cookie notice (accepted / declined).
         </li>
         <li>
           <code>chunkReloaded</code> — a one-off flag used after a site update to reload once.
@@ -91,12 +101,22 @@ function PrivacyUk({ updated }: { updated: string }) {
 
       <h2>Аналітика</h2>
       <p>
-        На робочому сайті підключено Google Analytics 4, щоб рахувати відвідування й бачити, якими
-        сторінками користуються. Google Analytics встановлює cookie та обробляє інформацію про тип
-        пристрою й браузера, переглянуті сторінки та приблизне місцезнаходження за IP-адресою. Див.{' '}
-        <Ext href="https://policies.google.com/privacy">політику конфіденційності Google</Ext>.
-        Заблокувати аналітику можна захистом від стеження у браузері, блокувальником контенту або{' '}
-        <Ext href="https://tools.google.com/dlpage/gaoptout">доповненням Google для відмови</Ext>.
+        Робочий сайт використовує Google Analytics 4 з режимом згоди Google (Consent Mode) і
+        встановлює аналітичні cookie лише тоді, коли ви їх приймете у повідомленні про cookie. За
+        вашої згоди Google Analytics рахує відвідування й переглянуті сторінки за допомогою cookie та
+        обробляє інформацію про тип пристрою й браузера і приблизне місцезнаходження за IP-адресою.
+      </p>
+      <p>
+        Доки ви не погодились — або якщо відмовились — аналітичні cookie не встановлюються. Google
+        отримує лише сигнали без cookie й без ідентифікатора (наприклад, що сторінку переглянуто, тип
+        браузера і стан згоди), за якими вас не можна впізнати між візитами. Див.{' '}
+        <Ext href="https://policies.google.com/privacy">політику конфіденційності Google</Ext> і{' '}
+        <Ext href="https://support.google.com/analytics/answer/9976101">як працює режим згоди</Ext>.
+      </p>
+      <p>
+        Змінити вибір можна будь-коли кнопкою <b>Налаштування cookie</b> внизу кожної сторінки;
+        відмова видаляє аналітичні cookie, встановлені раніше. Аналітику також зупиняє захист від
+        стеження у браузері або блокувальник контенту.
       </p>
 
       <h2>Що зберігається у браузері</h2>
@@ -105,7 +125,7 @@ function PrivacyUk({ updated }: { updated: string }) {
           <code>lang</code> — мова інтерфейсу (EN / UA).
         </li>
         <li>
-          <code>cookieConsent</code> — ваша відповідь на повідомлення про cookie.
+          <code>cookieConsent</code> — ваша відповідь на повідомлення про cookie (прийнято / відхилено).
         </li>
         <li>
           <code>chunkReloaded</code> — разова позначка для одного перезавантаження після оновлення

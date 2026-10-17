@@ -1,5 +1,3 @@
-/* Cookie-consent notice pinned to the bottom of the screen. */
-
 /* Cookie-consent notice, pinned above the bottom edge. */
 .cookie-banner {
   position: fixed;
@@ -26,6 +24,14 @@
   font-size: 0.85rem;
   line-height: 1.5;
   color: var(--muted);
+}
+
+.cookie-text a {
+  color: var(--text);
+}
+
+.cookie-current {
+  color: var(--text);
 }
 
 .cookie-actions {
