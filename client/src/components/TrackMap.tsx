@@ -9,6 +9,17 @@ import './TrackMap.css'
 // circuit's racing line, with the pit lane. Between the replay clock's ticks
 // (every 200 ms of real time) positions are extrapolated with
 // requestAnimationFrame so cars glide instead of jumping, even at 60×.
+// Dot radius in map units (the drawing's longest side is 100).
+const R = 2.4
+
+// Black or white digits, whichever reads better on the team colour.
+function inkOn(hex: string | null): string {
+  const h = (hex ?? '888888').replace('#', '')
+  const [r, g, b] = [0, 2, 4].map((i) => parseInt(h.slice(i, i + 2), 16) / 255)
+  const lum = 0.2126 * r + 0.7152 * g + 0.0722 * b
+  return lum > 0.55 ? '#0e0e13' : '#fff'
+}
+
 export default function TrackMap({
   data,
   model,
@@ -65,7 +76,7 @@ export default function TrackMap({
     const c = cars.find((x) => x.num === num)
     if (!c || c.inGarage || !(highlight.has(num) || num === leader)) continue
     let dy = 0
-    while (placed.some(([x, y]) => Math.abs(x - c.x) < 9 && Math.abs(y - (c.y + dy)) < 3.6)) dy += 3.8
+    while (placed.some(([x, y]) => Math.abs(x - c.x) < 10 && Math.abs(y - (c.y + dy)) < 3.6)) dy += 3.8
     placed.push([c.x, c.y + dy])
     labelDy.set(num, dy)
   }
@@ -90,9 +101,12 @@ export default function TrackMap({
               className={`tm-car${c.inGarage ? ' garage' : ''}${c.inPit ? ' pit' : ''}`}
               transform={`translate(${c.x.toFixed(2)} ${c.y.toFixed(2)})`}
             >
-              <circle r={c.num === leader ? 2.1 : 1.8} fill={teamColor(drv?.colour ?? null)} />
+              <circle r={R} fill={teamColor(drv?.colour ?? null)} />
+              <text className="tm-num" fill={inkOn(drv?.colour ?? null)} dy="0.36em">
+                {c.num}
+              </text>
               {labelled && !c.inGarage && (
-                <text x={2.8} y={1.1 + (labelDy.get(c.num) ?? 0)}>
+                <text className="tm-code" x={R + 1} y={1.1 + (labelDy.get(c.num) ?? 0)}>
                   {drv?.code}
                 </text>
               )}
