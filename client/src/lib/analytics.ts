@@ -68,10 +68,21 @@ function loadGtag(granted: boolean): void {
   // automatic one to avoid double-counting the initial load.
   window.gtag('config', measurementId, { send_page_view: false })
 
-  const s = document.createElement('script')
-  s.async = true
-  s.src = `https://www.googletagmanager.com/gtag/js?id=${measurementId}`
-  document.head.appendChild(s)
+  // gtag.js is ~180 KB; fetch it once the page has loaded and the browser is
+  // idle so it doesn't compete with the page's own content. Everything above
+  // (consent, config, page views) waits in dataLayer until it runs.
+  const add = () => {
+    const s = document.createElement('script')
+    s.async = true
+    s.src = `https://www.googletagmanager.com/gtag/js?id=${measurementId}`
+    document.head.appendChild(s)
+  }
+  const whenIdle = () =>
+    'requestIdleCallback' in window
+      ? window.requestIdleCallback(add, { timeout: 4000 })
+      : setTimeout(add, 2000)
+  if (document.readyState === 'complete') whenIdle()
+  else window.addEventListener('load', whenIdle, { once: true })
 }
 
 export function initAnalytics(): void {

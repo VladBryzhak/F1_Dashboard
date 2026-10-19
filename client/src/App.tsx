@@ -1,6 +1,9 @@
 import { lazy, Suspense, useEffect, type ComponentType } from 'react'
 import { Route, Routes, useLocation, useParams } from 'react-router-dom'
 import Layout from './components/Layout'
+// The landing page ships in the main bundle: no extra chunk round trip before
+// the first (and largest) paint.
+import Home from './pages/Home'
 import { isSeason } from './hooks/useSeasonRoute'
 import { trackPageView } from './lib/analytics'
 
@@ -23,7 +26,6 @@ function lazyPage<T extends ComponentType<unknown>>(
   )
 }
 
-const Home = lazyPage(() => import('./pages/Home'))
 const Standings = lazyPage(() => import('./pages/Standings'))
 const Calendar = lazyPage(() => import('./pages/Calendar'))
 const RaceWeekend = lazyPage(() => import('./pages/RaceWeekend'))

@@ -41,24 +41,14 @@
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="apple-mobile-web-app-title" content="F1 Dashboard" />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <!-- Warm the connection to the F1 image CDN that serves the hero (LCP) image. -->
-    <link rel="preconnect" href="https://media.formula1.com" crossorigin />
-    <!-- Load the font stylesheet without blocking render: fetch as a preload,
-         then flip it to a stylesheet once ready (display=swap avoids FOIT). -->
-    <link
-      rel="preload"
-      as="style"
-      href="https://fonts.googleapis.com/css2?family=Saira:wght@400;500;600;700&family=Saira+Condensed:wght@600;700;800&display=swap"
-      onload="this.onload=null;this.rel='stylesheet'"
-    />
-    <noscript>
-      <link
-        href="https://fonts.googleapis.com/css2?family=Saira:wght@400;500;600;700&family=Saira+Condensed:wght@600;700;800&display=swap"
-        rel="stylesheet"
-      />
-    </noscript>
+    <!-- Warm the connection to the F1 image CDN that serves the hero (LCP) image.
+         No crossorigin: images load without CORS, and only a matching
+         connection gets reused. -->
+    <link rel="preconnect" href="https://media.formula1.com" />
+    <!-- Self-hosted fonts (public/fonts). Fetched without blocking render, then
+         applied as a stylesheet; font-display: swap shows text right away. -->
+    <link rel="preload" as="style" href="/fonts/fonts.css" onload="this.onload=null;this.rel='stylesheet'" />
+    <noscript><link rel="stylesheet" href="/fonts/fonts.css" /></noscript>
     <title>F1 Dashboard — Formula 1 Standings, Calendar & Stats</title>
   </head>
   <body>

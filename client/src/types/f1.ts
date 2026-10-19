@@ -233,7 +233,11 @@ export interface NewsItem {
 
 export interface HomeResponse {
   highlights: HomeHighlights
-  news: NewsItem[]
+  standings: DriverStanding[] // championship top 5
+  // null only in the payload inlined into the HTML when the feed wasn't
+  // cached yet; the client then fetches /api/home for it.
+  news: NewsItem[] | null
+  heroImage: string | null // winner portrait for the hero (preloaded)
 }
 
 // ----- Championship progression (title-race chart) -----

@@ -53,6 +53,12 @@ Committed JSON built by one-off scripts, so the site makes no extra upstream cal
 
 Social crawlers don't run JS, so the Express SPA fallback (`server/src/services/pageHtml.ts`) fills each page's `<title>`, description, canonical and OG/Twitter tags from `describePage()` in `server/src/services/og.ts`, which also draws the 1200×630 preview served at `/og/<page path>.png` (SVG → PNG with `@resvg/resvg-js`, Saira Condensed from `server/assets/fonts`, OFL). Keep its titles/descriptions in step with the pages' `useSeo` calls. On a cold start people get the page at once with default tags; crawlers wait for the dataset.
 
+## Page speed (home page)
+
+- `pageHtml()` inlines the main stylesheet into the HTML and, for `/`, inlines the home data (`window.__HOME__`, built by `services/home.ts`, same payload as `/api/home`) plus a `<link rel="preload">` for the hero photo. The hero URL comes from `services/portraits.ts`, a mirror of `driverPortraitUrl()` in `client/src/lib/f1meta.ts` — keep the slug maps in step.
+- Home is imported eagerly in `App.tsx` (no chunk round trip on the landing page).
+- Fonts are self-hosted in `client/public/fonts` (Saira, OFL) and loaded by a non-blocking `fonts.css`; gtag.js loads after the page's `load` event, when the browser is idle.
+
 ## Server conventions
 
 - Add a feature by writing a `services/*.ts` (fetch + normalize), then a `routes/*.ts` (thin Express handlers that call the service and `next(err)` on failure), then mount it in `src/index.ts`.

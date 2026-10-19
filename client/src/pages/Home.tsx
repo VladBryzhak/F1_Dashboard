@@ -1,8 +1,7 @@
-import type { CSSProperties, SyntheticEvent } from 'react'
+import { useEffect, useState, type CSSProperties, type SyntheticEvent } from 'react'
 import { Link } from 'react-router-dom'
 import CircuitOutline from '../components/CircuitOutline'
 import { Headshot } from '../components/EntityCards'
-import { useAsync } from '../hooks/useAsync'
 import { useSeo } from '../hooks/useSeo'
 import { siteLd } from '../lib/jsonld'
 import { api } from '../api/client'
@@ -11,6 +10,7 @@ import { useI18n } from '../i18n/core'
 import type {
   DriverStanding,
   HomeHighlights,
+  HomeResponse,
   NewsItem,
   NextRace,
   RaceHighlight,
@@ -55,16 +55,20 @@ function timeAgo(iso: string, locale: string): string {
 }
 
 // Dynamic hero focused on the latest race winner.
-function WinnerHero({ highlights }: { highlights: HomeHighlights }) {
+function WinnerHero({
+  highlights,
+  heroImage,
+}: {
+  highlights: HomeHighlights
+  heroImage: string | null
+}) {
   const { t, lang } = useI18n()
   const race = highlights.latestRace as RaceHighlight
   const winner = race.podium.find((p) => p.position === 1) ?? race.podium[0]
   const color = teamColor(winner.constructorId)
-  const portrait = driverPortraitUrl(
-    winner.driverId,
-    winner.constructorId,
-    String(race.season),
-  )
+  // The server names the same photo in the HTML (preload), so prefer its URL.
+  const portrait =
+    heroImage ?? driverPortraitUrl(winner.driverId, winner.constructorId, String(race.season))
 
   return (
     <div className="hero hero-winner" style={{ '--team': color } as CSSProperties}>
@@ -295,17 +299,38 @@ function HeroSkeleton() {
   )
 }
 
+declare global {
+  interface Window {
+    __HOME__?: HomeResponse
+  }
+}
+
+// The server inlines this page's data into the HTML on a direct visit to "/"
+// (see server/src/services/pageHtml.ts). Used once; later visits fetch fresh.
+let boot: HomeResponse | null = typeof window !== 'undefined' ? (window.__HOME__ ?? null) : null
+
 export default function Home() {
   useSeo({ jsonLd: siteLd() })
-  const { data, loading } = useAsync(() => api.home(), [])
+  const [data, setData] = useState<HomeResponse | null>(() => boot)
+  const [failed, setFailed] = useState(false)
+  useEffect(() => {
+    const fromBoot = boot
+    boot = null
+    // Inlined data may come without headlines (feed not cached yet).
+    if (fromBoot?.news) return
+    let active = true
+    api
+      .home()
+      .then((d) => active && setData(d))
+      .catch(() => active && setFailed(true))
+    return () => {
+      active = false
+    }
+  }, [])
+
+  const loading = !data && !failed
   const season = data?.highlights.season
-  // Top-5 championship for the hero sidebar; loads once the season is known.
-  const standings = useAsync(
-    () => (season ? api.driverStandings(String(season)) : Promise.resolve(null)),
-    [season],
-  )
   const hasRace = !!data?.highlights.latestRace
-  const top5 = standings.data?.standings.slice(0, 5) ?? []
 
   return (
     <section>
@@ -313,20 +338,18 @@ export default function Home() {
         {loading ? (
           <HeroSkeleton />
         ) : hasRace ? (
-          <WinnerHero highlights={data!.highlights} />
+          <WinnerHero highlights={data!.highlights} heroImage={data!.heroImage} />
         ) : (
           <TitleFightHero />
         )}
 
         <aside className="home-aside">
-          <ChampionshipCard rows={top5} season={season} />
-          {data?.highlights.nextRace && (
-            <NextRaceCard race={data.highlights.nextRace} />
-          )}
+          <ChampionshipCard rows={data?.standings ?? []} season={season} />
+          {data?.highlights.nextRace && <NextRaceCard race={data.highlights.nextRace} />}
         </aside>
       </div>
 
-      {loading ? <NewsStripSkeleton /> : data && <NewsStrip news={data.news} />}
+      {data?.news ? <NewsStrip news={data.news} /> : !failed && <NewsStripSkeleton />}
     </section>
   )
 }

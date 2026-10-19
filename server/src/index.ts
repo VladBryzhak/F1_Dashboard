@@ -20,7 +20,7 @@ const PORT = process.env.PORT ?? 3001;
 
 // Security headers. HSTS + clickjacking/MIME/referrer protection are on; the
 // Content-Security-Policy is left off here and added as a separate, tailored
-// step (it must allow our external sources: Google Fonts, formula1.com images,
+// step (it must allow our external sources: formula1.com images,
 // flagcdn, OpenF1). CORP is cross-origin because the API is consumed by other
 // origins (the mobile app on capacitor://localhost).
 // gzip/deflate text responses (HTML, JS, CSS, JSON) so they aren't sent
@@ -70,7 +70,18 @@ app.get(/^\/og\/(.+)\.png$/, async (req, res, next) => {
 if (fs.existsSync(clientDist)) {
   // index: false — pages (including "/") go through the fallback below, which
   // fills in each page's meta tags.
-  app.use(express.static(clientDist, { index: false }));
+  app.use(
+    express.static(clientDist, {
+      index: false,
+      // Vite's /assets files have content hashes in their names, so they can
+      // be cached for good; self-hosted fonts rarely change.
+      setHeaders(res, filePath) {
+        const rel = path.relative(clientDist, filePath).split(path.sep)[0];
+        if (rel === "assets") res.setHeader("Cache-Control", "public, max-age=31536000, immutable");
+        else if (rel === "fonts") res.setHeader("Cache-Control", "public, max-age=2592000");
+      },
+    })
+  );
   // Agent-discovery manifest. express.static serves /ai-catalog.json from the
   // build, but ignores dotfolders, so serve the well-known path explicitly
   // (both return the same file) instead of letting it fall to the SPA shell.

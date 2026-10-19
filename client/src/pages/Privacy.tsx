@@ -5,7 +5,7 @@ import { useI18n } from '../i18n/core'
 import './Doc.css'
 
 // Bump when the text below changes.
-const UPDATED = '2026-10-17'
+const UPDATED = '2026-10-19'
 
 function Ext({ href, children }: { href: string; children: React.ReactNode }) {
   return (
@@ -70,9 +70,9 @@ function PrivacyEn({ updated }: { updated: string }) {
 
       <h2>Content from other services</h2>
       <p>
-        To show fonts, photos and flags, your browser loads files directly from Google Fonts, the
-        Formula 1 image CDN, Wikimedia Commons and flagcdn. Like any web request, these services
-        receive your IP address. News links open Motorsport.com, which has its own policy.
+        Fonts are served by this site. To show photos and flags, your browser loads files directly
+        from the Formula 1 image CDN, Wikimedia Commons and flagcdn. Like any web request, these
+        services receive your IP address. News links open Motorsport.com, which has its own policy.
       </p>
 
       <h2>Hosting</h2>
@@ -146,9 +146,9 @@ function PrivacyUk({ updated }: { updated: string }) {
 
       <h2>Вміст з інших сервісів</h2>
       <p>
-        Щоб показати шрифти, фото й прапори, ваш браузер завантажує файли безпосередньо з Google
-        Fonts, CDN зображень Formula 1, Wikimedia Commons і flagcdn. Як і за будь-якого вебзапиту,
-        ці сервіси отримують вашу IP-адресу. Посилання на новини відкривають Motorsport.com, який
+        Шрифти роздає сам сайт. Щоб показати фото й прапори, ваш браузер завантажує файли
+        безпосередньо з CDN зображень Formula 1, Wikimedia Commons і flagcdn. Як і за будь-якого
+        вебзапиту, ці сервіси отримують вашу IP-адресу. Посилання на новини відкривають Motorsport.com, який
         має власну політику.
       </p>
 
