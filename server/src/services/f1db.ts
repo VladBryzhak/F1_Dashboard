@@ -33,6 +33,10 @@ import type {
   SeasonDriverStats,
   SeasonProgression,
   StandingsResponse,
+  DuelDriver,
+  DuelSide,
+  TeammateDuel,
+  TeammateDuels,
   WeekendHighlight,
   WeekendResult,
 } from "../types/f1";
@@ -1424,6 +1428,183 @@ export async function getSeasonComparison(
     a: statsFor(idA),
     b: statsFor(idB),
     headToHead: { racesTogether, aheadA, aheadB },
+  };
+}
+
+// "1:23.456" / "83.456" → ms; null for empty or unparsable times.
+function lapMs(t: string | null | undefined): number | null {
+  if (!t) return null;
+  const m = /^(?:(\d+):)?(\d+(?:\.\d+)?)$/.exec(t.trim());
+  if (!m) return null;
+  return Math.round(((m[1] ? Number(m[1]) * 60 : 0) + Number(m[2])) * 1000);
+}
+
+// Race entries that never took the start don't count as a race or a duel.
+const NOT_STARTED = new Set(["DNQ", "DNPQ", "DNS", "EX", "DNP"]);
+
+// Teammate duels for one team in one season: each driver's tally for the team
+// and, for every pair who raced together, who out-qualified / out-finished whom
+// round by round. Only rounds both drove for this team count. Returns null when
+// the team didn't race that season.
+export async function getTeammateDuels(
+  constructorId: string,
+  season: number,
+): Promise<TeammateDuels | null> {
+  const ds = await dataset();
+  const rounds = ds.races
+    .filter((r) => r.year === season)
+    .sort((a, b) => a.round - b.round);
+
+  interface RoundRows {
+    round: number;
+    grandPrix: string;
+    race: Map<string, RawRaceResult>;
+    quali: Map<string, QualiRow>;
+  }
+  const perRound: RoundRows[] = [];
+  const stats = new Map<string, DuelDriver>();
+  const statFor = (id: string): DuelDriver => {
+    let st = stats.get(id);
+    if (!st) {
+      const d = ds.drivers.get(id);
+      st = {
+        driverId: id,
+        name: driverName(ds, id),
+        code: d?.abbreviation ?? null,
+        countryCode: alpha2(ds, d?.nationalityCountryId),
+        nationality: demonym(ds, d?.nationalityCountryId),
+        races: 0,
+        points: 0,
+        wins: 0,
+        podiums: 0,
+        poles: 0,
+        dnfs: 0,
+        bestFinish: null,
+      };
+      stats.set(id, st);
+    }
+    return st;
+  };
+
+  for (const r of rounds) {
+    const key = `${season}:${r.round}`;
+    const race = new Map<string, RawRaceResult>();
+    for (const row of ds.resultsByRace.get(key) ?? []) {
+      if (row.constructorId !== constructorId || NOT_STARTED.has(row.positionText)) continue;
+      race.set(row.driverId, row);
+      const st = statFor(row.driverId);
+      st.races += 1;
+      st.points += row.points ?? 0;
+      if (row.positionNumber === 1) st.wins += 1;
+      if (row.positionNumber != null && row.positionNumber <= 3) st.podiums += 1;
+      if (row.positionNumber == null) st.dnfs += 1;
+      if (row.positionNumber != null) {
+        st.bestFinish = Math.min(st.bestFinish ?? Infinity, row.positionNumber);
+      }
+    }
+    for (const row of ds.sprintResultsByRace.get(key) ?? []) {
+      if (row.constructorId === constructorId) statFor(row.driverId).points += row.points ?? 0;
+    }
+    const quali = new Map<string, QualiRow>();
+    for (const row of ds.qualifyingByRace.get(key) ?? []) {
+      if (row.constructorId !== constructorId) continue;
+      quali.set(row.driverId, row);
+      if (row.position === 1) statFor(row.driverId).poles += 1;
+    }
+    if (race.size || quali.size) {
+      perRound.push({
+        round: r.round,
+        grandPrix: ds.grandsPrix.get(r.grandPrixId)?.name ?? r.grandPrixId,
+        race,
+        quali,
+      });
+    }
+  }
+  if (!stats.size) return null;
+
+  // Most points first (then most races), so "a" is the team's lead driver.
+  const drivers = [...stats.values()].sort(
+    (x, y) => y.points - x.points || y.races - x.races || x.name.localeCompare(y.name),
+  );
+
+  const duelOf = (a: string, b: string): TeammateDuel => {
+    const duel: TeammateDuel = {
+      a,
+      b,
+      quali: { a: 0, b: 0 },
+      race: { a: 0, b: 0 },
+      qualiGapMs: null,
+      qualiGapRounds: 0,
+      rounds: [],
+    };
+    const gaps: number[] = [];
+    for (const pr of perRound) {
+      const together =
+        (pr.race.has(a) || pr.quali.has(a)) && (pr.race.has(b) || pr.quali.has(b));
+      if (!together) continue;
+
+      let q: DuelSide = null;
+      const qa = pr.quali.get(a);
+      const qb = pr.quali.get(b);
+      if (qa && qb) {
+        const pa = qa.position ?? Infinity;
+        const pb = qb.position ?? Infinity;
+        if (pa < pb) q = "a";
+        else if (pb < pa) q = "b";
+        // Gap from the furthest session both set a time in (Q3, else Q2, Q1).
+        for (const s of ["q3", "q2", "q1"] as const) {
+          const ta = lapMs(qa[s]);
+          const tb = lapMs(qb[s]);
+          if (ta != null && tb != null) {
+            gaps.push(ta - tb);
+            break;
+          }
+        }
+      }
+
+      let rc: DuelSide = null;
+      const ra = pr.race.get(a);
+      const rb = pr.race.get(b);
+      if (ra && rb) {
+        if (ra.positionDisplayOrder < rb.positionDisplayOrder) rc = "a";
+        else if (rb.positionDisplayOrder < ra.positionDisplayOrder) rc = "b";
+      }
+
+      if (q) duel.quali[q] += 1;
+      if (rc) duel.race[rc] += 1;
+      duel.rounds.push({ round: pr.round, grandPrix: pr.grandPrix, quali: q, race: rc });
+    }
+    if (gaps.length) {
+      gaps.sort((x, y) => x - y);
+      const mid = gaps.length >> 1;
+      duel.qualiGapMs =
+        gaps.length % 2 ? gaps[mid] : Math.round((gaps[mid - 1] + gaps[mid]) / 2);
+      duel.qualiGapRounds = gaps.length;
+    }
+    return duel;
+  };
+
+  const duels: TeammateDuel[] = [];
+  for (let i = 0; i < drivers.length; i++) {
+    for (let j = i + 1; j < drivers.length; j++) {
+      const d = duelOf(drivers[i].driverId, drivers[j].driverId);
+      if (d.rounds.length) duels.push(d);
+    }
+  }
+  // Longest-running pairings first; early seasons with many entries are capped.
+  duels.sort((x, y) => y.rounds.length - x.rounds.length);
+
+  const seasons = new Set<number>();
+  for (const [key, rows] of ds.resultsByRace) {
+    if (rows.some((x) => x.constructorId === constructorId)) seasons.add(Number(key.split(":")[0]));
+  }
+
+  return {
+    constructorId,
+    season,
+    seasons: [...seasons].sort((x, y) => y - x),
+    drivers,
+    duels: duels.slice(0, 6),
   };
 }
 

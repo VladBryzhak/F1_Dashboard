@@ -1,0 +1,221 @@
+/* Teammate duels card on the team profile. Driver "a" is drawn in the team
+   colour (--team, set on the card), driver "b" in grey (--mate, set by the component). */
+
+.duels-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.duels-head .wknd-section {
+  margin-bottom: 0.5rem;
+}
+
+.duel-pairs {
+  flex-wrap: wrap;
+  margin-bottom: 0.75rem;
+}
+
+.duel-names {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin: 0.25rem 0 0.5rem;
+}
+
+.duel-name {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  color: var(--text);
+  text-decoration: none;
+  padding-left: 0.6rem;
+  border-left: 4px solid var(--team);
+}
+
+.duel-name--b {
+  align-items: flex-end;
+  text-align: right;
+  padding: 0 0.6rem 0 0;
+  border-left: 0;
+  border-right: 4px solid var(--mate);
+}
+
+.duel-name:hover .duel-last {
+  color: var(--accent);
+}
+
+.duel-first {
+  color: var(--muted);
+  font-size: 0.8rem;
+}
+
+.duel-last {
+  font: 800 1.5rem/1.05 var(--font-display);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.duel-row {
+  display: grid;
+  grid-template-columns: 3.5rem 1fr 3.5rem;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.45rem 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.duel-row--plain {
+  padding: 0.3rem 0;
+}
+
+.duel-val {
+  font: 800 1.3rem var(--font-display);
+  font-variant-numeric: tabular-nums;
+  color: var(--muted);
+}
+
+.duel-row--plain .duel-val {
+  font-size: 1.05rem;
+}
+
+.duel-val:last-child {
+  text-align: right;
+}
+
+.duel-val.win {
+  color: var(--text);
+}
+
+.duel-mid {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.duel-lbl {
+  color: var(--muted);
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  text-align: center;
+}
+
+.duel-bar {
+  height: 8px;
+  border-radius: 999px;
+  background: var(--mate);
+  overflow: hidden;
+}
+
+.duel-bar-a {
+  display: block;
+  height: 100%;
+  background: var(--team);
+  /* A thin dark seam keeps similar colours apart. */
+  box-shadow: 2px 0 0 #0e0e13;
+}
+
+.duel-gap {
+  margin: 0.9rem 0 0;
+  font-size: 0.9rem;
+}
+
+.duel-sub {
+  margin: 1.1rem 0 0.5rem;
+  color: var(--muted);
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+}
+
+.duel-strip {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.duel-strip-row {
+  display: grid;
+  grid-template-columns: 1.4rem 1fr;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.duel-strip-lbl {
+  color: var(--muted);
+  font: 700 0.75rem var(--font-display);
+}
+
+.duel-cells {
+  display: grid;
+  grid-template-columns: repeat(var(--n), minmax(0, 1fr));
+  gap: 3px;
+  max-width: calc(var(--n) * 26px);
+}
+
+.duel-cell {
+  display: inline-block;
+  height: 16px;
+  min-width: 8px;
+  border-radius: 3px;
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.duel-cell.a {
+  background: var(--team);
+}
+
+.duel-cell.b {
+  background: var(--mate);
+}
+
+.duel-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem 1rem;
+  margin-top: 0.6rem;
+  color: var(--muted);
+  font-size: 0.78rem;
+}
+
+.duel-legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.duel-legend .duel-cell {
+  width: 12px;
+  min-width: 12px;
+  height: 12px;
+}
+
+.duel-note {
+  margin: 0.9rem 0 0;
+  color: var(--muted-2);
+  font-size: 0.75rem;
+}
+
+@media (max-width: 768px) {
+  .duel-last {
+    font-size: 1.2rem;
+  }
+
+  .duel-row {
+    grid-template-columns: 2.6rem 1fr 2.6rem;
+    gap: 0.5rem;
+  }
+
+  .duel-cells {
+    gap: 2px;
+  }
+
+  .duel-cell {
+    min-width: 0;
+  }
+}

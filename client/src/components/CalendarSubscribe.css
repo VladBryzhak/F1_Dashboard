@@ -1,0 +1,90 @@
+/* Calendar page: "Subscribe" toggle (page head) and its panel. */
+
+.sub-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: var(--card);
+  color: var(--text);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 999px;
+  padding: 0.45rem 0.95rem;
+  font: 600 0.9rem var(--font-body);
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.sub-toggle:hover,
+.sub-toggle.on {
+  border-color: var(--accent);
+}
+
+.sub-panel {
+  margin-bottom: 1.25rem;
+}
+
+.sub-title {
+  margin: 0 0 0.35rem;
+  font: 800 1.25rem var(--font-display);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.sub-text {
+  max-width: 68ch;
+  margin: 0 0 0.9rem;
+  color: var(--muted);
+}
+
+.sub-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 0.9rem 0 0.7rem;
+}
+
+.sub-btn {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.55rem 1rem;
+  border-radius: 8px;
+  border: 1px solid var(--accent);
+  background: var(--accent);
+  color: #fff;
+  font: 700 0.85rem var(--font-body);
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.sub-btn:hover {
+  filter: brightness(1.12);
+}
+
+.sub-btn--ghost {
+  background: transparent;
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.sub-url {
+  display: block;
+  overflow-wrap: anywhere;
+  color: var(--muted);
+  font-size: 0.78rem;
+}
+
+.sub-note {
+  margin: 0.6rem 0 0;
+  color: var(--muted-2);
+  font-size: 0.78rem;
+}
+
+@media (max-width: 768px) {
+  .sub-toggle {
+    padding: 0.45rem 0.75rem;
+  }
+
+  .sub-btn {
+    flex: 1 1 100%;
+    justify-content: center;
+  }
+}

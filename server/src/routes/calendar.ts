@@ -4,9 +4,26 @@ import {
   getRaceResults,
   getRaceWeekend,
 } from "../services/f1db";
+import { calendarFeed } from "../services/calendarFeed";
 import { getRaceStrategy } from "../services/strategy";
 
 const router = Router();
+
+// GET /api/calendar/f1-en.ics, f1-uk.ics, f1-races-en.ics, f1-races-uk.ics —
+// subscribable iCalendar feed (all sessions or races only) for calendar apps.
+// Registered before /:season so the file name isn't read as a season.
+router.get(/^\/f1(-races)?-(en|uk)\.ics$/, async (req, res, next) => {
+  try {
+    const racesOnly = !!req.params[0];
+    const lang = req.params[1] as "en" | "uk";
+    const ics = await calendarFeed(lang, racesOnly);
+    res.set("Cache-Control", "public, max-age=3600");
+    res.set("Content-Disposition", `inline; filename="f1${racesOnly ? "-races" : ""}-${lang}.ics"`);
+    res.type("text/calendar; charset=utf-8").send(ics);
+  } catch (err) {
+    next(err);
+  }
+});
 
 // GET /api/calendar/:season
 router.get("/:season", async (req, res, next) => {

@@ -12,6 +12,7 @@ import {
   getSeasonComparison,
   getDriverProfile,
   getSearchIndex,
+  getTeammateDuels,
 } from "../services/f1db";
 
 const router = Router();
@@ -125,6 +126,24 @@ router.get("/constructors/:constructorId", async (req, res, next) => {
         .json({ error: `Unknown constructor: ${req.params.constructorId}` });
     }
     res.json(profile);
+  } catch (err) {
+    next(err);
+  }
+});
+
+// GET /api/constructors/:constructorId/duels/:season — teammate head-to-heads
+// (qualifying, race, points) within one season.
+router.get("/constructors/:constructorId/duels/:season", async (req, res, next) => {
+  try {
+    const season = Number(req.params.season);
+    if (!Number.isInteger(season)) {
+      return res.status(400).json({ error: "Invalid season" });
+    }
+    const duels = await getTeammateDuels(req.params.constructorId, season);
+    if (!duels) {
+      return res.status(404).json({ error: "This team did not race that season" });
+    }
+    res.json(duels);
   } catch (err) {
     next(err);
   }

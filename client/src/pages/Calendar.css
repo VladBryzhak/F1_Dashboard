@@ -16,6 +16,13 @@
   vertical-align: middle;
 }
 
+/* Page head: Subscribe + season picker on the right. */
+.cal-head-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
 /* The next race to run gets a red edge (its NEXT tag is in shared.css). */
 .row-next td:first-child {
   box-shadow: inset 3px 0 0 var(--accent);
@@ -43,6 +50,11 @@
 }
 
 @media (max-width: 768px) {
+  /* Title, Subscribe and the season picker don't fit one phone row. */
+  .cal-head {
+    flex-wrap: wrap;
+  }
+
   /* The calendar table scrolls sideways on phones; keep the open schedule
      pinned to the visible width so it never needs scrolling itself. */
   .standings .sched-row td {

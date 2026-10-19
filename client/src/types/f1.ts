@@ -322,6 +322,54 @@ export interface SeasonComparison {
   headToHead: { racesTogether: number; aheadA: number; aheadB: number }
 }
 
+// ----- Teammate duels (one team, one season) -----
+
+export interface DuelDriver {
+  driverId: string
+  name: string
+  code: string | null
+  countryCode: string | null
+  nationality: string
+  races: number // starts for this team
+  points: number // race + sprint points scored for this team
+  wins: number
+  podiums: number
+  poles: number
+  dnfs: number
+  bestFinish: number | null
+}
+
+// Who was ahead in one round: the duel's driver 'a', 'b', or null when the
+// round doesn't count (one of them didn't take part / no classification).
+export type DuelSide = 'a' | 'b' | null
+
+export interface DuelRound {
+  round: number
+  grandPrix: string // f1db Grand Prix name, e.g. 'Italy'
+  quali: DuelSide
+  race: DuelSide
+}
+
+export interface TeammateDuel {
+  a: string // driverId
+  b: string
+  quali: { a: number; b: number }
+  race: { a: number; b: number }
+  // Median qualifying gap a − b in ms over rounds where both set a time in
+  // the same session (negative = a faster); null when no times are known.
+  qualiGapMs: number | null
+  qualiGapRounds: number
+  rounds: DuelRound[]
+}
+
+export interface TeammateDuels {
+  constructorId: string
+  season: number
+  seasons: number[] // every season the team raced, newest first
+  drivers: DuelDriver[]
+  duels: TeammateDuel[]
+}
+
 // ----- Race weekend detail -----
 
 export interface QualifyingEntry {

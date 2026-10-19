@@ -64,6 +64,7 @@ import type {
   SessionDriver,
   StandingsResponse,
   TeamImage,
+  TeammateDuels,
   TelemetrySession,
 } from '../types/f1'
 
@@ -104,6 +105,8 @@ export const api = {
     getJson<Record<string, TeamImage>>('/constructors/images'),
   constructorProfile: (constructorId: string) =>
     getJson<ConstructorProfile>(`/constructors/${constructorId}`),
+  teamDuels: (constructorId: string, season: number) =>
+    getJson<TeammateDuels>(`/constructors/${constructorId}/duels/${season}`),
   telemetrySessions: (season: string) =>
     getJson<TelemetrySession[]>(`/telemetry/sessions/${season}`),
   sessionDrivers: (sessionKey: number) =>

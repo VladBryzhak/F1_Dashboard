@@ -4,6 +4,7 @@ import { api } from '../api/client'
 import Breadcrumbs from '../components/Breadcrumbs'
 import { CarImage } from '../components/EntityCards'
 import Flag from '../components/Flag'
+import TeammateDuels from '../components/TeammateDuels'
 import { useAsync } from '../hooks/useAsync'
 import { useSeo } from '../hooks/useSeo'
 import { useI18n, type TKey } from '../i18n/core'
@@ -190,6 +191,14 @@ export default function TeamProfile() {
               )}
             </div>
           )}
+
+          <TeammateDuels
+            key={profile.constructorId}
+            constructorId={profile.constructorId}
+            teamName={profile.name}
+            initialSeason={profile.lastSeason}
+            color={color}
+          />
 
           <div className="card">
             <h3 className="wknd-section">{t('drv.career')}</h3>

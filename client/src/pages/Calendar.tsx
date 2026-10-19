@@ -1,6 +1,7 @@
 import { Fragment, useEffect, useRef, useState } from 'react'
 import { Navigate, useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import { api } from '../api/client'
+import SubscribePanel, { SubscribeToggle } from '../components/CalendarSubscribe'
 import Flag from '../components/Flag'
 import SeasonSelect from '../components/SeasonSelect'
 import WeekendSchedule from '../components/WeekendSchedule'
@@ -27,6 +28,7 @@ export default function Calendar() {
   const [params, setParams] = useSearchParams()
   const scheduleParam = Number(params.get('schedule')) || null
   const [openRound, setOpenRound] = useState<number | null>(scheduleParam)
+  const [subOpen, setSubOpen] = useState(false)
 
   useSeo({
     title: `${season} F1 Race Calendar & Results`,
@@ -65,10 +67,14 @@ export default function Calendar() {
 
   return (
     <section>
-      <div className="page-head">
+      <div className="page-head cal-head">
         <h1>{t('cal.title', { season })}</h1>
-        <SeasonSelect value={season} onChange={goToSeason} />
+        <div className="cal-head-actions">
+          <SubscribeToggle open={subOpen} onToggle={() => setSubOpen(!subOpen)} />
+          <SeasonSelect value={season} onChange={goToSeason} />
+        </div>
       </div>
+      {subOpen && <SubscribePanel />}
 
       {loading && <p className="muted">{t('common.loading')}</p>}
       {!loading && error && <p className="banner">{t('cal.loadError', { error })}</p>}

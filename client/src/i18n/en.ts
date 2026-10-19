@@ -85,6 +85,18 @@ const en = {
   'cal.viewWeekend': 'View {name} weekend',
   'cal.showSchedule': 'Show the weekend schedule',
   'cal.hideSchedule': 'Hide the weekend schedule',
+  'cal.subscribe': 'Subscribe',
+  'cal.subTitle': 'The F1 calendar in your calendar app',
+  'cal.subText':
+    'Every session appears in your own calendar, in your timezone, and updates by itself when times change or the next season is announced.',
+  'cal.subAll': 'All sessions',
+  'cal.subRaces': 'Races only',
+  'cal.subGoogle': 'Google Calendar',
+  'cal.subApple': 'Apple Calendar / Outlook',
+  'cal.subCopy': 'Copy link',
+  'cal.subCopied': 'Link copied',
+  'cal.subNote':
+    'Event names are in English. Google Calendar refreshes subscriptions on its own schedule, sometimes only once a day.',
 
   // Home
   'home.nextRace': 'Next race',
@@ -244,6 +256,33 @@ const en = {
   'team.engines': 'Engines',
   'team.colDrivers': 'Drivers',
   'team.colEngine': 'Engine',
+
+  // Teammate duels (team profile)
+  'duel.title': 'Teammate duels',
+  'duel.hint': 'Rounds both drove for {team}',
+  'duel.quali': 'Qualifying',
+  'duel.race': 'Races',
+  'duel.points': 'Points',
+  'duel.starts': 'Starts',
+  'duel.wins': 'Wins',
+  'duel.podiums': 'Podiums',
+  'duel.poles': 'Poles',
+  'duel.best': 'Best finish',
+  'duel.dnfs': 'Retirements',
+  'duel.gap': '{who} faster in qualifying by a median {gap} s',
+  'duel.gapEven': 'Dead even in qualifying',
+  'duel.gapOver_one': 'across {n} session',
+  'duel.gapOver_other': 'across {n} sessions',
+  'duel.byRound': 'Round by round',
+  'duel.rowQ': 'Q',
+  'duel.rowR': 'R',
+  'duel.cellTitle': 'Round {round} · {gp}: {who}',
+  'duel.noDuel': 'no duel',
+  'duel.pairs': 'Teammate pairing',
+  'duel.solo': 'Only one driver raced for the team in {season}.',
+  'duel.loadError': 'Could not load the duels: {error}',
+  'duel.note':
+    'Qualifying: grid order from qualifying. Races: order in the final classification, retirements included. Points include sprints; the gap compares the last session both set a time in.',
 
   // Global search
   'search.label': 'Search',
