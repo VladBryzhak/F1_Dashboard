@@ -177,6 +177,7 @@ export interface PodiumEntry {
   driverId: string
   driverName: string
   driverCode: string | null
+  number: string | null // car number in that race
   constructorId: string
   constructorName: string
   countryCode: string | null

@@ -28,7 +28,7 @@ export async function homePayload(newsWaitMs?: number): Promise<HomeResponse> {
     standings,
     news: items,
     heroImage: winner
-      ? driverPortraitUrl(winner.driverId, winner.constructorId, highlights.latestRace!.season, 300)
+      ? driverPortraitUrl(winner.driverId, winner.constructorId, highlights.latestRace!.season, 600)
       : null,
   };
 }

@@ -71,7 +71,15 @@ function WinnerHero({
     heroImage ?? driverPortraitUrl(winner.driverId, winner.constructorId, String(race.season))
 
   return (
-    <div className="hero hero-winner" style={{ '--team': color } as CSSProperties}>
+    <div className="hero hero-winner hero-num" style={{ '--team': color } as CSSProperties}>
+      {/* Race-number backdrop: the winner's car number, huge, behind the
+          portrait, with a team-colour stripe. */}
+      {winner.number && (
+        <span className="hero-bignum" aria-hidden="true">
+          {winner.number}
+        </span>
+      )}
+      <span className="hero-stripe" aria-hidden="true" />
       <Headshot portraitUrl={portrait} color={color} eager />
       <div className="hero-content hero-content--winner">
         <p className="hero-kicker">

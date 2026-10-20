@@ -142,6 +142,7 @@ interface RawRaceResult {
   positionDisplayOrder: number;
   positionNumber: number | null;
   positionText: string;
+  driverNumber?: string | null; // car number raced with that weekend
   driverId: string;
   constructorId: string;
   time: string | null;
@@ -1111,6 +1112,7 @@ export async function getHomeHighlights(): Promise<HomeHighlights> {
           driverId: r.driverId,
           driverName: driverName(ds, r.driverId),
           driverCode: d?.abbreviation ?? null,
+          number: r.driverNumber != null ? String(r.driverNumber) : (d?.permanentNumber ?? null),
           constructorId: r.constructorId,
           constructorName: c?.name ?? r.constructorId,
           countryCode: alpha2(ds, d?.nationalityCountryId),

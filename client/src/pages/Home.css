@@ -304,6 +304,103 @@
   border-radius: 4px;
 }
 
+/* ---------- Race-number hero ----------
+   The winner from the waist up, large, in front of their car number and a
+   team-colour stripe. The portrait overflows the frame at the bottom and
+   fades out, so it reads as a close-up rather than a full-length figure. */
+.hero-num {
+  min-height: 460px;
+}
+
+.hero-bignum {
+  position: absolute;
+  right: -5%;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 0;
+  font: 800 clamp(18rem, 34vw, 34rem) / 0.8 var(--font-display);
+  letter-spacing: -0.04em;
+  color: color-mix(in srgb, var(--team) 32%, transparent);
+  -webkit-text-stroke: 2px var(--team);
+  pointer-events: none;
+  user-select: none;
+}
+
+.hero-stripe {
+  position: absolute;
+  top: -10%;
+  bottom: -10%;
+  right: 40%;
+  width: 56px;
+  z-index: 0;
+  transform: skewX(-16deg);
+  background: var(--team);
+  opacity: 0.55;
+  box-shadow: 22px 0 0 -14px var(--accent);
+}
+
+.hero-num .head-wrap {
+  right: 11%;
+  align-items: flex-start;
+}
+
+.hero-num .head-img {
+  height: 155%;
+  max-height: none;
+  margin-top: 3%;
+  -webkit-mask-image: linear-gradient(to bottom, #000 50%, transparent 63%);
+  mask-image: linear-gradient(to bottom, #000 50%, transparent 63%);
+}
+
+/* A narrower text column: the name breaks onto its own line(s) and stays
+   clear of the portrait. */
+.hero-num .hero-content--winner {
+  max-width: 46%;
+}
+
+.hero-num .hero-content--winner .hero-title {
+  font-size: clamp(2.2rem, 3.6vw, 3rem);
+}
+
+@media (max-width: 768px) {
+  /* Phones: number top-left, portrait top-right, text on a dark band below. */
+  .hero-num {
+    min-height: 540px;
+    align-items: flex-end;
+    padding-bottom: 1.4rem;
+  }
+  .hero-num::after {
+    content: '';
+    position: absolute;
+    inset: 42% 0 0;
+    z-index: 2;
+    background: linear-gradient(to bottom, rgba(13, 13, 21, 0), #0d0d15 45%);
+    pointer-events: none;
+  }
+  .hero-num .hero-bignum {
+    font-size: 14rem;
+    top: 1.5rem;
+    left: 0.6rem;
+    right: auto;
+    transform: none;
+  }
+  .hero-num .hero-stripe {
+    right: 40%;
+    width: 34px;
+  }
+  .hero.hero-num .head-wrap {
+    right: -2%;
+  }
+  .hero.hero-winner.hero-num .head-img {
+    height: 125%;
+    max-height: none;
+    opacity: 1;
+  }
+  .hero.hero-num .hero-content--winner {
+    max-width: 100%;
+  }
+}
+
 @media (max-width: 768px) {
   /* Winner hero on phones: the photo shrinks and fades behind full-width
      content. One class heavier than the base hero rules above. */
