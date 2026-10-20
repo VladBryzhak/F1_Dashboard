@@ -48,6 +48,8 @@ export function Headshot({
   color,
   alt = '',
   eager = false,
+  srcSet,
+  sizes,
 }: {
   portraitUrl?: string | null
   fallbackUrl?: string
@@ -55,6 +57,9 @@ export function Headshot({
   color: string
   alt?: string
   eager?: boolean
+  // Responsive variants of portraitUrl (only used while it is shown).
+  srcSet?: string | null
+  sizes?: string
 }) {
   // portraitUrl/fallbackUrl are transparent driver renders; thirdUrl is a
   // rectangular photo (Wikimedia) that needs a different, bounded layout.
@@ -76,6 +81,8 @@ export function Headshot({
       <img
         className="head-img"
         src={cur.url}
+        srcSet={idx === 0 && cur.url === portraitUrl ? (srcSet ?? undefined) : undefined}
+        sizes={idx === 0 && cur.url === portraitUrl && srcSet ? sizes : undefined}
         alt={alt}
         loading={eager ? 'eager' : 'lazy'}
         // Set fetchpriority via the DOM so React 18.3 doesn't warn on the prop.

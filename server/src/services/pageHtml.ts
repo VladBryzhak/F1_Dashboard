@@ -53,7 +53,11 @@ async function homeBoot(): Promise<string> {
   try {
     const data = await homePayload(150);
     const preload = data.heroImage
-      ? `<link rel="preload" as="image" href="${attr(data.heroImage)}" fetchpriority="high" />`
+      ? `<link rel="preload" as="image" href="${attr(data.heroImage)}"` +
+        (data.heroSrcSet
+          ? ` imagesrcset="${attr(data.heroSrcSet)}" imagesizes="${attr(data.heroSizes)}"`
+          : "") +
+        ` fetchpriority="high" />`
       : "";
     return `${preload}<script>window.__HOME__=${scriptJson(data)}</script>`;
   } catch {

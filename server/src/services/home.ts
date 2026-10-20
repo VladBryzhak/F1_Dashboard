@@ -11,6 +11,11 @@ import type { HomeResponse } from "../types/f1";
 // newsWaitMs: how long to wait for the news feed. The API waits for it; the
 // HTML only takes it if it's already cached (a feed miss must not delay the
 // first byte) — `news: null` then tells the client to fetch it.
+// The race-number hero shows the portrait about 240 px wide on phones and
+// ~330 px on desktop (see .hero-num in client/src/pages/Home.css).
+const HERO_WIDTHS = [450, 600, 800];
+const HERO_SIZES = "(max-width: 768px) 240px, 330px";
+
 export async function homePayload(newsWaitMs?: number): Promise<HomeResponse> {
   const newsP = getNews().catch(() => []);
   const news =
@@ -23,12 +28,16 @@ export async function homePayload(newsWaitMs?: number): Promise<HomeResponse> {
     news,
   ]);
   const winner = highlights.latestRace?.podium.find((p) => p.position === 1);
+  const portrait = (w: number) =>
+    winner
+      ? driverPortraitUrl(winner.driverId, winner.constructorId, highlights.latestRace!.season, w)
+      : null;
   return {
     highlights,
     standings,
     news: items,
-    heroImage: winner
-      ? driverPortraitUrl(winner.driverId, winner.constructorId, highlights.latestRace!.season, 600)
-      : null,
+    heroImage: portrait(600),
+    heroSrcSet: winner ? HERO_WIDTHS.map((w) => `${portrait(w)} ${w}w`).join(", ") : null,
+    heroSizes: HERO_SIZES,
   };
 }

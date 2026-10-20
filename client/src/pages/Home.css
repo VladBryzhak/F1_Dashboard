@@ -308,7 +308,8 @@
    The winner from the waist up, large, in front of their car number and a
    team-colour stripe. The portrait overflows the frame at the bottom and
    fades out, so it reads as a close-up rather than a full-length figure. */
-.hero-num {
+.hero-num,
+.hero-skeleton {
   min-height: 460px;
 }
 
@@ -364,6 +365,10 @@
 
 @media (max-width: 768px) {
   /* Phones: number top-left, portrait top-right, text on a dark band below. */
+  /* The loading placeholder keeps the same height, so nothing jumps. */
+  .hero-skeleton {
+    min-height: 540px;
+  }
   .hero-num {
     min-height: 540px;
     align-items: flex-end;

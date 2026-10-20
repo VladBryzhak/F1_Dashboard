@@ -55,7 +55,7 @@ Social crawlers don't run JS, so the Express SPA fallback (`server/src/services/
 
 ## Page speed (home page)
 
-- `pageHtml()` inlines the main stylesheet into the HTML and, for `/`, inlines the home data (`window.__HOME__`, built by `services/home.ts`, same payload as `/api/home`) plus a `<link rel="preload">` for the hero photo. The hero URL comes from `services/portraits.ts`, a mirror of `driverPortraitUrl()` in `client/src/lib/f1meta.ts` — keep the slug maps in step.
+- `pageHtml()` inlines the main stylesheet into the HTML and, for `/`, inlines the home data (`window.__HOME__`, built by `services/home.ts`, same payload as `/api/home`) plus a `<link rel="preload">` for the hero photo (`imagesrcset`/`imagesizes` from the payload's `heroSrcSet`/`heroSizes`, which the `<img>` uses too — keep `HERO_SIZES` in `services/home.ts` in step with the `.hero-num` portrait size in `Home.css`). The hero URL comes from `services/portraits.ts`, a mirror of `driverPortraitUrl()` in `client/src/lib/f1meta.ts` — keep the slug maps in step.
 - Home is imported eagerly in `App.tsx` (no chunk round trip on the landing page).
 - Fonts are self-hosted in `client/public/fonts` (Saira, OFL) and loaded by a non-blocking `fonts.css`; gtag.js loads after the page's `load` event, when the browser is idle.
 

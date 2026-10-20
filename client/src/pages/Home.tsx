@@ -58,9 +58,13 @@ function timeAgo(iso: string, locale: string): string {
 function WinnerHero({
   highlights,
   heroImage,
+  heroSrcSet,
+  heroSizes,
 }: {
   highlights: HomeHighlights
   heroImage: string | null
+  heroSrcSet: string | null
+  heroSizes: string
 }) {
   const { t, lang } = useI18n()
   const race = highlights.latestRace as RaceHighlight
@@ -80,7 +84,13 @@ function WinnerHero({
         </span>
       )}
       <span className="hero-stripe" aria-hidden="true" />
-      <Headshot portraitUrl={portrait} color={color} eager />
+      <Headshot
+        portraitUrl={portrait}
+        srcSet={heroImage ? heroSrcSet : null}
+        sizes={heroSizes}
+        color={color}
+        eager
+      />
       <div className="hero-content hero-content--winner">
         <p className="hero-kicker">
           {race.season} · {t('common.round')} {race.round} · {gpTitle(race.grandPrixName, lang)}
@@ -346,7 +356,12 @@ export default function Home() {
         {loading ? (
           <HeroSkeleton />
         ) : hasRace ? (
-          <WinnerHero highlights={data!.highlights} heroImage={data!.heroImage} />
+          <WinnerHero
+            highlights={data!.highlights}
+            heroImage={data!.heroImage}
+            heroSrcSet={data!.heroSrcSet}
+            heroSizes={data!.heroSizes}
+          />
         ) : (
           <TitleFightHero />
         )}

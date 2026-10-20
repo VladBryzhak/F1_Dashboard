@@ -239,6 +239,10 @@ export interface HomeResponse {
   // cached yet; the client then fetches /api/home for it.
   news: NewsItem[] | null
   heroImage: string | null // winner portrait for the hero (preloaded)
+  // Responsive variants of heroImage for <img srcset>/<link imagesrcset>; the
+  // same strings feed the preload and the image so the browser reuses it.
+  heroSrcSet: string | null
+  heroSizes: string
 }
 
 // ----- Championship progression (title-race chart) -----
