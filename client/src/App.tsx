@@ -41,6 +41,7 @@ const Live = lazyPage(() => import('./pages/Live'))
 const Feedback = lazyPage(() => import('./pages/Feedback'))
 const About = lazyPage(() => import('./pages/About'))
 const Privacy = lazyPage(() => import('./pages/Privacy'))
+const Support = lazyPage(() => import('./pages/Support'))
 
 // Reports a GA4 page_view whenever the SPA route changes (react-router keeps the
 // page mounted, so there's no real document load for GA to catch on its own).
@@ -100,6 +101,7 @@ export default function App() {
           <Route path="feedback" element={<Feedback />} />
           <Route path="about" element={<About />} />
           <Route path="privacy" element={<Privacy />} />
+          <Route path="support" element={<Support />} />
         </Route>
       </Routes>
     </Suspense>

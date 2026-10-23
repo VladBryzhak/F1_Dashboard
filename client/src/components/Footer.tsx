@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom'
 import { useI18n, type TKey } from '../i18n/core'
+import { SHOW_SUPPORT_LINKS } from '../lib/support'
 import { OPEN_EVENT } from './CookieBanner'
 import './Footer.css'
 
@@ -89,6 +90,7 @@ export default function Footer() {
           <p>{t('footer.independent')}</p>
           <p>{t('footer.analytics')}</p>
           <p className="footer-links">
+            {SHOW_SUPPORT_LINKS && <Link to="/support">{t('footer.support')}</Link>}
             <Link to="/about">{t('nav.about')}</Link>
             <Link to="/privacy">{t('nav.privacy')}</Link>
             <button

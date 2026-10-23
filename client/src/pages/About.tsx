@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom'
 import Breadcrumbs from '../components/Breadcrumbs'
 import { useSeo } from '../hooks/useSeo'
 import { useI18n } from '../i18n/core'
+import { SHOW_SUPPORT_LINKS } from '../lib/support'
 import './Doc.css'
 
 function Ext({ href, children }: { href: string; children: React.ReactNode }) {
@@ -72,6 +73,17 @@ function AboutEn() {
         and the EN / UA switch in the header remembers your choice in this browser.
       </p>
 
+      {SHOW_SUPPORT_LINKS && (
+        <>
+          <h2>Support</h2>
+          <p>
+            The site is free and has no ads. If it&apos;s useful to you, you can{' '}
+            <Link to="/support">support the project</Link> — donations help pay for hosting and
+            development.
+          </p>
+        </>
+      )}
+
       <h2>Contact</h2>
       <p>
         Found a bug or have an idea? Use the <Link to="/feedback">feedback form</Link>. See also the{' '}
@@ -139,6 +151,17 @@ function AboutUk() {
         Сайт доступний англійською та українською. Спершу він відкривається мовою вашого браузера, а
         перемикач EN / UA у хедері запам&apos;ятовує вибір у цьому браузері.
       </p>
+
+      {SHOW_SUPPORT_LINKS && (
+        <>
+          <h2>Підтримка</h2>
+          <p>
+            Сайт безкоштовний і без реклами. Якщо він вам корисний, можна{' '}
+            <Link to="/support">підтримати проєкт</Link> — донати допомагають оплачувати хостинг і
+            розробку.
+          </p>
+        </>
+      )}
 
       <h2>Зв&apos;язок</h2>
       <p>

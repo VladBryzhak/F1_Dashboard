@@ -36,6 +36,30 @@ const en = {
     'An independent, fan-made project — not affiliated with, endorsed by, or associated with Formula 1, Formula One Management or the FIA.',
   'footer.analytics': 'This site uses Google Analytics, with cookies only if you accept them.',
   'footer.cookieSettings': 'Cookie settings',
+  'footer.support': 'Support the project',
+
+  // Support page
+  'sup.title': 'Support the project',
+  'sup.lead':
+    'F1 Dashboard is free, with no ads and no accounts. One person builds and runs it in their spare time. If the site is useful to you, you can chip in for hosting and development.',
+  'sup.jarTitle': 'monobank jar',
+  'sup.jarText':
+    'Any card from any bank, Apple Pay or Google Pay — no sign-up needed. The payment happens on monobank’s own page.',
+  'sup.donate': 'Donate',
+  'sup.soon': 'The donation link is coming soon.',
+  'sup.qrLabel': 'QR code for the monobank jar',
+  'sup.qrCaption': 'Scan with your phone camera',
+  'sup.sample': 'Sample',
+  'sup.whereTitle': 'Where the money goes',
+  'sup.where1': 'Hosting: the server that runs the site and its data.',
+  'sup.where2': 'A proper domain name for the site.',
+  'sup.where3': 'Time for new features and fixes.',
+  'sup.voluntary':
+    'Donations are voluntary and don’t unlock anything — the site stays the same for everyone.',
+  'sup.otherTitle': 'Other ways to help',
+  'sup.otherText':
+    'Share the site in your F1 chat or with a friend — it helps more people find it. Ideas and bug reports are welcome too, via the',
+  'sup.otherFeedback': 'feedback form',
 
   // Cookie banner
   'cookie.label': 'Cookie notice',

@@ -251,6 +251,12 @@ export async function describePage(rawPath: string): Promise<PageMeta> {
         "How F1 Dashboard handles data: Google Analytics, what is stored in your browser, the feedback form, third-party content and hosting.",
         "How F1 Dashboard handles data.",
       );
+    case "support":
+      return generic(
+        "Support F1 Dashboard",
+        "F1 Dashboard is free, with no ads and no accounts. Donations help pay for hosting and development.",
+        "Free, no ads, no accounts — donations keep it running.",
+      );
     case "feedback":
       return generic("Feedback", "Send feedback, report a bug or suggest a feature for F1 Dashboard.");
     default:

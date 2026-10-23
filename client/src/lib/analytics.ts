@@ -135,3 +135,10 @@ export function trackPageView(path: string): void {
     })
   }, 0)
 }
+
+// A named GA4 event (e.g. a click on the donation button). Like page views it
+// only goes out on the live site, and GA honours the visitor's consent.
+export function trackEvent(name: string, params: Record<string, string> = {}): void {
+  if (!enabled || !loaded || typeof window.gtag !== 'function') return
+  window.gtag('event', name, params)
+}

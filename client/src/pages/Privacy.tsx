@@ -5,7 +5,7 @@ import { useI18n } from '../i18n/core'
 import './Doc.css'
 
 // Bump when the text below changes.
-const UPDATED = '2026-10-19'
+const UPDATED = '2026-10-23'
 
 function Ext({ href, children }: { href: string; children: React.ReactNode }) {
   return (
@@ -66,6 +66,13 @@ function PrivacyEn({ updated }: { updated: string }) {
         messenger. They are used only to read and reply to your message and to improve the site, and
         are never published. Your IP address is used briefly, in memory, to limit spam and is not
         stored by us. Please don&apos;t include sensitive personal information.
+      </p>
+
+      <h2>Donations</h2>
+      <p>
+        Donations on the <Link to="/support">support page</Link> are made on monobank&apos;s own
+        page. We never see your card details; monobank processes the payment under its own privacy
+        policy. The site itself loads no payment scripts.
       </p>
 
       <h2>Content from other services</h2>
@@ -142,6 +149,13 @@ function PrivacyUk({ updated }: { updated: string }) {
         покращити сайт, і ніколи не публікуються. IP-адреса ненадовго використовується в пам&apos;яті
         сервера для захисту від спаму й не зберігається нами. Будь ласка, не додавайте чутливих
         особистих даних.
+      </p>
+
+      <h2>Донати</h2>
+      <p>
+        Донати зі <Link to="/support">сторінки підтримки</Link> відбуваються на сторінці monobank.
+        Ми не бачимо даних вашої картки: платіж обробляє monobank відповідно до власної політики
+        конфіденційності. Сам сайт не завантажує жодних платіжних скриптів.
       </p>
 
       <h2>Вміст з інших сервісів</h2>

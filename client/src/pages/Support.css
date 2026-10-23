@@ -1,0 +1,119 @@
+/* Support page: the Monobank jar card with its QR code. Text styles come
+   from Doc.css. */
+
+.sup-card {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  margin: 1.5rem 0 0.5rem;
+  padding: 1.4rem 1.5rem;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+}
+
+.sup-main {
+  flex: 1;
+  min-width: 0;
+}
+
+.sup-icon {
+  display: inline-grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  background: rgba(225, 6, 0, 0.12);
+  color: var(--accent);
+}
+
+.doc .sup-name {
+  margin: 0.7rem 0 0.3rem;
+}
+
+.doc .sup-text {
+  margin: 0 0 1rem;
+}
+
+.sup-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.65rem 1.2rem;
+  border-radius: 10px;
+  background: var(--accent);
+  font-weight: 700;
+}
+
+.doc a.sup-btn {
+  color: #fff;
+  text-decoration: none;
+}
+
+.sup-btn:hover {
+  filter: brightness(1.08);
+}
+
+.doc .sup-soon {
+  display: inline-block;
+  margin: 0;
+  padding: 0.55rem 1rem;
+  border: 1px dashed rgba(255, 255, 255, 0.25);
+  border-radius: 10px;
+  color: var(--muted);
+  font-weight: 600;
+}
+
+.sup-qr {
+  margin: 0;
+  text-align: center;
+}
+
+.sup-qr svg {
+  display: block;
+  border-radius: 10px;
+}
+
+.sup-qr > div {
+  position: relative;
+}
+
+/* Placeholder link: the QR is only a preview of the layout. */
+.sup-qr-sample svg {
+  opacity: 0.35;
+}
+
+.sup-qr-tag {
+  position: absolute;
+  inset: 50% auto auto 50%;
+  transform: translate(-50%, -50%) rotate(-12deg);
+  padding: 0.2rem 0.6rem;
+  border-radius: 6px;
+  background: var(--accent);
+  color: #fff;
+  font: 800 0.8rem var(--font-display);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.sup-qr figcaption {
+  margin-top: 0.5rem;
+  color: var(--muted);
+  font-size: 0.78rem;
+}
+
+@media (max-width: 768px) {
+  /* On a phone the button is the way in; the QR goes under it. */
+  .sup-card {
+    flex-direction: column;
+    align-items: stretch;
+    text-align: left;
+  }
+  .sup-btn {
+    width: 100%;
+    justify-content: center;
+  }
+  .sup-qr {
+    align-self: center;
+  }
+}
