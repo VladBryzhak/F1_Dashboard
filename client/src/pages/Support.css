@@ -54,13 +54,17 @@
   filter: brightness(1.08);
 }
 
+/* Placeholder link: the button is shown but inactive. */
+.sup-btn.is-off {
+  opacity: 0.45;
+  cursor: not-allowed;
+  filter: none;
+}
+
 .doc .sup-soon {
-  display: inline-block;
-  margin: 0;
-  padding: 0.55rem 1rem;
-  border: 1px dashed rgba(255, 255, 255, 0.25);
-  border-radius: 10px;
+  margin: 0.6rem 0 0;
   color: var(--muted);
+  font-size: 0.85rem;
   font-weight: 600;
 }
 

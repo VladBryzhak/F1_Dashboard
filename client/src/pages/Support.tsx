@@ -46,28 +46,26 @@ export default function Support() {
           </span>
           <h2 className="sup-name">{t('sup.jarTitle')}</h2>
           <p className="sup-text">{t('sup.jarText')}</p>
-          {SUPPORT_READY ? (
-            <a
-              className="sup-btn"
-              href={MONO_JAR_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              onClick={() => trackEvent('donate_click', { provider: 'monobank' })}
-            >
-              {t('sup.donate')}
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                <path
-                  d="M7 17 17 7M9 7h8v8"
-                  stroke="currentColor"
-                  strokeWidth="2.2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
-            </a>
-          ) : (
-            <p className="sup-soon">{t('sup.soon')}</p>
-          )}
+          <a
+            className={`sup-btn${SUPPORT_READY ? '' : ' is-off'}`}
+            href={SUPPORT_READY ? MONO_JAR_URL : undefined}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-disabled={!SUPPORT_READY || undefined}
+            onClick={() => SUPPORT_READY && trackEvent('donate_click', { provider: 'monobank' })}
+          >
+            {t('sup.donate')}
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path
+                d="M7 17 17 7M9 7h8v8"
+                stroke="currentColor"
+                strokeWidth="2.2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          </a>
+          {!SUPPORT_READY && <p className="sup-soon">{t('sup.soon')}</p>}
         </div>
         <figure className="sup-qr">
           <div className={SUPPORT_READY ? undefined : 'sup-qr-sample'}>
