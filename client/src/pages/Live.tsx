@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { api } from '../api/client'
+import BestSectors from '../components/BestSectors'
 import ReplayPlayer from '../components/ReplayPlayer'
 import WeatherCard from '../components/WeatherCard'
 import { useLiveStatus } from '../hooks/useLiveStatus'
@@ -318,6 +319,13 @@ export default function Live() {
         </div>
         </div>
         <aside className="rp-side">
+          <BestSectors
+            sectors={board.sessionBest.sectors.map((time, i) => {
+              const holder = board.rows.find((r) => r.driverNumber === board.sessionBest.sectorDrivers?.[i])
+              return { time, code: holder?.code ?? null, colour: holder?.teamColour ?? null }
+            })}
+            fastestLap={board.sessionBest.lap}
+          />
           <div className="rp-side-card">
             <h4 className="rp-side-title">{t('rp.session')}</h4>
             <div className="rp-kv"><span>{t('rp.session')}</span><span>{sessionName(board.session.sessionName)}</span></div>
@@ -329,9 +337,6 @@ export default function Live() {
               </span>
             </div>
             <div className="rp-kv"><span>{t('wk.fastestLap')}</span><span className="mono">{fmtTime(board.sessionBest.lap)}</span></div>
-            {board.sessionBest.sectors.map((s, i) => (
-              <div className="rp-kv" key={i}><span>{t('live.bestS', { n: i + 1 })}</span><span className="mono">{fmtTime(s)}</span></div>
-            ))}
           </div>
           <WeatherCard sample={board.weather} />
         </aside>

@@ -1,0 +1,70 @@
+/* Best-sectors card (live board and replay side panel). Card frame and title
+   come from .rp-side-card / .rp-side-title. */
+
+.bs-card {
+  margin-bottom: 1rem;
+}
+
+.bs-row {
+  display: grid;
+  grid-template-columns: 2rem 1fr auto;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.45rem 0;
+  font-size: 0.88rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.bs-row:first-of-type {
+  border-top: none;
+}
+
+.bs-sec {
+  color: var(--muted);
+  font: 700 0.8rem var(--font-display);
+  letter-spacing: 0.5px;
+}
+
+.bs-drv {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-weight: 800;
+}
+
+.bs-drv .lb-stripe {
+  width: 3px;
+  height: 14px;
+}
+
+/* Session-best sector times read purple, as on the timing board. */
+.bs-time {
+  color: #c06bf0;
+  font-weight: 700;
+}
+
+.bs-ideal {
+  grid-template-columns: 1fr auto;
+}
+
+.bs-label {
+  color: var(--muted);
+}
+
+.bs-ideal .bs-time {
+  color: var(--text);
+}
+
+.bs-gain {
+  margin-left: 0.4rem;
+  color: var(--muted);
+  font-style: normal;
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+
+.bs-empty {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.85rem;
+}

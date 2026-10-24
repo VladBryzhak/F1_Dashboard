@@ -501,7 +501,11 @@ export interface LiveBoardRow {
 export interface LiveBoard {
   session: LiveSessionMeta;
   rows: LiveBoardRow[];
-  sessionBest: { lap: number | null; sectors: (number | null)[] };
+  sessionBest: {
+    lap: number | null;
+    sectors: (number | null)[];
+    sectorDrivers: (number | null)[]; // driver number holding each best sector
+  };
   weather: WeatherSample | null;
 }
 

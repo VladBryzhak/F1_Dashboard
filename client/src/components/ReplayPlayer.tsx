@@ -4,6 +4,7 @@ import { useAsync } from '../hooks/useAsync'
 import { fmtTime, segmentClass, sessionLabel, teamColor, tyre } from '../lib/live'
 import type { ReplayData, ReplayLap, ReplaySession } from '../types/f1'
 import WeatherCard, { weatherAt } from './WeatherCard'
+import BestSectors, { type SectorRecord } from './BestSectors'
 import TrackMap from './TrackMap'
 import { buildTrackModel } from '../lib/trackModel'
 import { useI18n, type TKey } from '../i18n/core'
@@ -404,6 +405,30 @@ export default function ReplayPlayer() {
     () => (data?.weather ? weatherAt(data.weather, data.startMs + t) : null),
     [data, t],
   )
+  // Best sector times so far and who set them: a sector counts once the car
+  // has crossed its end line on the replay clock.
+  const bestSectors = useMemo((): SectorRecord[] => {
+    const out: SectorRecord[] = [0, 1, 2].map(() => ({ time: null, code: null, colour: null }))
+    if (!data) return out
+    const absT = data.startMs + t
+    const drivers = new Map(data.drivers.map((d) => [d.num, d]))
+    for (const lap of data.laps) {
+      if (lap.t > absT) continue
+      let end = lap.t
+      for (let i = 0; i < 3; i++) {
+        const s = lap.s[i]
+        if (s == null) break
+        end += s * 1000
+        if (end > absT) break
+        if (out[i].time == null || s < out[i].time!) {
+          const drv = drivers.get(lap.num)
+          out[i] = { time: s, code: drv?.code ?? String(lap.num), colour: drv?.colour ?? null }
+        }
+      }
+    }
+    return out
+  }, [data, t])
+
   // Session-fastest lap so far, for the side panel.
   const fastest = useMemo(() => {
     let m: number | null = null
@@ -571,6 +596,7 @@ export default function ReplayPlayer() {
           </div>
           </div>
           <aside className="rp-side">
+            <BestSectors sectors={bestSectors} fastestLap={fastest} />
             <div className="rp-side-card">
               <h4 className="rp-side-title">{tr('rp.session')}</h4>
               <div className="rp-kv"><span>{tr('rp.circuit')}</span><span>{data.session.location}</span></div>

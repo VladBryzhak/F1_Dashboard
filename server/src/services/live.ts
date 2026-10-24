@@ -375,6 +375,7 @@ export async function getBoard(sessionKey: number): Promise<LiveBoard> {
     // Session-wide best lap + best individual sectors, for "purple" colouring.
     let sbLap: number | null = null;
     const sbSectors: (number | null)[] = [null, null, null];
+    const sbDrivers: (number | null)[] = [null, null, null];
     for (const l of laps) {
       if (l.lap_duration != null && (sbLap == null || l.lap_duration < sbLap)) {
         sbLap = l.lap_duration;
@@ -383,6 +384,7 @@ export async function getBoard(sessionKey: number): Promise<LiveBoard> {
       secs.forEach((s, i) => {
         if (s != null && (sbSectors[i] == null || s < sbSectors[i]!)) {
           sbSectors[i] = s;
+          sbDrivers[i] = l.driver_number;
         }
       });
     }
@@ -390,7 +392,7 @@ export async function getBoard(sessionKey: number): Promise<LiveBoard> {
     return {
       session,
       rows,
-      sessionBest: { lap: sbLap, sectors: sbSectors },
+      sessionBest: { lap: sbLap, sectors: sbSectors, sectorDrivers: sbDrivers },
       weather: weather[weather.length - 1] ?? null,
     };
   });
