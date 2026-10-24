@@ -1,0 +1,212 @@
+/* Race story card on the race-weekend page: text, key-moments strip, list. */
+
+.story {
+  margin-bottom: 1.5rem;
+}
+
+.story-text p {
+  max-width: 78ch;
+  margin: 0 0 0.75rem;
+  color: var(--text);
+  line-height: 1.65;
+}
+
+.story-sub {
+  margin: 1.25rem 0 0.25rem;
+  color: var(--muted);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+}
+
+/* Lap strip: markers above, the race as a bar with neutralisation bands,
+   lap numbers below. */
+.story-tl {
+  position: relative;
+  padding-top: 4.2rem;
+  margin: 0 0.4rem;
+}
+
+.story-marks {
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 4rem;
+}
+
+.story-mark {
+  position: absolute;
+  bottom: calc(var(--lvl, 0) * 20px);
+  transform: translateX(-50%);
+  display: grid;
+  place-items: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  font-size: 0.62rem;
+  font-weight: 800;
+  line-height: 1;
+  color: #fff;
+  background: #3a3a46;
+  cursor: default;
+}
+
+.story-mark--lead,
+.story-mark--pit {
+  background: var(--c, #6f6f7a);
+  color: #0e0e13;
+}
+
+.story-mark--pit {
+  font-size: 0.55rem;
+}
+
+.story-mark--penalty {
+  background: #ffd12e;
+  color: #0e0e13;
+}
+
+.story-mark--dnf {
+  background: #55556a;
+}
+
+.story-mark--fastest {
+  background: #b14be8;
+}
+
+.story-mark--sc {
+  background: #ffd12e;
+  color: #0e0e13;
+}
+
+.story-mark--vsc {
+  background: #ff9f1a;
+  color: #0e0e13;
+}
+
+.story-mark--red {
+  background: var(--accent);
+}
+
+.story-bar {
+  position: relative;
+  height: 10px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.1);
+  overflow: hidden;
+}
+
+.story-band {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  min-width: 4px;
+}
+
+.story-band--sc {
+  background: #ffd12e;
+}
+
+.story-band--vsc {
+  background: repeating-linear-gradient(45deg, #ff9f1a 0 4px, #c06f00 4px 8px);
+}
+
+.story-band--red {
+  background: var(--accent);
+}
+
+.story-ticks {
+  position: relative;
+  height: 1.2rem;
+  margin-top: 0.3rem;
+  color: var(--muted-2);
+  font-size: 0.68rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.story-ticks span {
+  position: absolute;
+  transform: translateX(-50%);
+}
+
+.story-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem 1rem;
+  margin: 0.5rem 0 1rem;
+  color: var(--muted);
+  font-size: 0.75rem;
+}
+
+.story-legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+/* Small marker used in the legend and the list. */
+.story-key {
+  display: inline-grid;
+  place-items: center;
+  flex: none;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 3px;
+  border-radius: 9px;
+  font-size: 0.6rem;
+  font-style: normal;
+  font-weight: 800;
+  color: #fff;
+  background: #3a3a46;
+}
+
+.story-key.story-mark--lead,
+.story-key.story-mark--pit {
+  background: var(--c, #9a9aa7);
+  color: #0e0e13;
+}
+
+.story-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  columns: 2 22rem;
+  column-gap: 2rem;
+}
+
+.story-list li {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.35rem 0;
+  break-inside: avoid;
+  font-size: 0.88rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.story-lap {
+  flex: none;
+  min-width: 4.6rem;
+  color: var(--muted);
+  font-size: 0.75rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.story-src {
+  margin: 1rem 0 0;
+  color: var(--muted-2);
+  font-size: 0.72rem;
+}
+
+@media (max-width: 768px) {
+  .story-mark {
+    width: 15px;
+    height: 15px;
+    font-size: 0.55rem;
+    bottom: calc(var(--lvl, 0) * 17px);
+  }
+  .story-list {
+    columns: 1;
+  }
+}

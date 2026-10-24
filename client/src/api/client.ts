@@ -55,6 +55,7 @@ import type {
   ReplayData,
   LapTelemetry,
   RaceResultResponse,
+  RaceStory,
   RaceStrategy,
   ReplaySession,
   SearchIndex,
@@ -86,6 +87,8 @@ export const api = {
     getJson<RaceWeekend>(`/calendar/${season}/${round}/weekend`),
   raceStrategy: (season: string, round: number, kind: 'race' | 'sprint') =>
     getJson<RaceStrategy>(`/calendar/${season}/${round}/strategy?kind=${kind}`),
+  raceStory: (season: string, round: number) =>
+    getJson<RaceStory>(`/calendar/${season}/${round}/story`),
   driverHeadshots: (season: string) =>
     getJson<Record<string, string>>(`/telemetry/headshots/${season}`),
   drivers: () => getJson<DriverListItem[]>('/drivers'),

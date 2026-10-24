@@ -195,6 +195,21 @@ const en = {
   'wk.colGap': 'Gap',
   'wk.colLaps': 'Laps',
 
+  // Race story (race-weekend page)
+  'story.title': 'How the race unfolded',
+  'story.moments': 'Key moments',
+  'story.lap': 'Lap',
+  'story.k.lead': 'Lead change',
+  'story.k.pit': 'Podium finishers’ stops',
+  'story.k.penalty': 'Penalty',
+  'story.k.dnf': 'Retirement',
+  'story.k.fastest': 'Fastest lap',
+  'story.k.sc': 'Safety Car',
+  'story.k.vsc': 'Virtual Safety Car',
+  'story.k.red': 'Red flag',
+  'story.source': 'Written from f1db results and OpenF1 timing and race-control data.',
+  'story.sourceBasic': 'Written from f1db results.',
+
   // Lap chart & tyre strategy
   'wk.tab.strategy': 'Strategy',
   'strat.lapChart': 'Lap chart',

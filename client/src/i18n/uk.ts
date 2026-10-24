@@ -198,6 +198,21 @@ const uk: Dict & Record<string, string> = {
   'wk.colGap': 'Відрив',
   'wk.colLaps': 'Кола',
 
+  // Race story (race-weekend page)
+  'story.title': 'Як пройшла гонка',
+  'story.moments': 'Ключові моменти',
+  'story.lap': 'Коло',
+  'story.k.lead': 'Зміна лідера',
+  'story.k.pit': 'Піт-стопи призерів',
+  'story.k.penalty': 'Штраф',
+  'story.k.dnf': 'Сход',
+  'story.k.fastest': 'Найшвидше коло',
+  'story.k.sc': 'Автомобіль безпеки',
+  'story.k.vsc': 'Віртуальний автомобіль безпеки',
+  'story.k.red': 'Червоний прапор',
+  'story.source': 'Складено за результатами f1db і даними хронометражу та дирекції гонки OpenF1.',
+  'story.sourceBasic': 'Складено за результатами f1db.',
+
   // Lap chart & tyre strategy
   'wk.tab.strategy': 'Стратегія',
   'strat.lapChart': 'Позиції по колах',

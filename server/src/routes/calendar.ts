@@ -5,6 +5,7 @@ import {
   getRaceWeekend,
 } from "../services/f1db";
 import { calendarFeed } from "../services/calendarFeed";
+import { getRaceStory } from "../services/raceStory";
 import { getRaceStrategy } from "../services/strategy";
 
 const router = Router();
@@ -67,6 +68,20 @@ router.get("/:season/:round/strategy", async (req, res, next) => {
       return res.status(404).json({ error: "No lap data for this race" });
     }
     res.json(data);
+  } catch (err) {
+    next(err);
+  }
+});
+
+// GET /api/calendar/:season/:round/story -> facts of how the race unfolded
+// (lead changes, safety cars, penalties, stops, retirements, title swing)
+router.get("/:season/:round/story", async (req, res, next) => {
+  try {
+    const story = await getRaceStory(req.params.season, req.params.round);
+    if (!story) {
+      return res.status(404).json({ error: "No result for this race yet" });
+    }
+    res.json(story);
   } catch (err) {
     next(err);
   }

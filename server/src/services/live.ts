@@ -746,3 +746,30 @@ export async function getReplaySessions(): Promise<ReplaySession[]> {
     return out.sort((a, b) => b.date.localeCompare(a.date));
   });
 }
+
+// Race-control messages for a finished session (flags, safety cars,
+// investigations, penalties), each with the lap OpenF1 logged it on.
+export interface RaceControlMessage {
+  lap: number | null;
+  category: string | null;
+  flag: string | null;
+  driver: number | null;
+  message: string;
+}
+export async function getRaceControl(sessionKey: number): Promise<RaceControlMessage[]> {
+  return cached(`live:rc:${sessionKey}`, 6 * 3600, async () => {
+    const rows = await get<(RawRaceControl & { lap_number?: number | null; driver_number?: number | null })[]>(
+      `/race_control?session_key=${sessionKey}`,
+    );
+    return rows
+      .filter((m) => m.date)
+      .sort((a, b) => a.date.localeCompare(b.date))
+      .map((m) => ({
+        lap: m.lap_number ?? null,
+        category: m.category,
+        flag: m.flag,
+        driver: m.driver_number ?? null,
+        message: m.message ?? "",
+      }));
+  });
+}

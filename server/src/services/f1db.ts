@@ -1648,6 +1648,33 @@ export async function getTeammateDuels(
   };
 }
 
+// Drivers' championship right after a round, and each driver's position
+// before it (for "takes the lead" / "moves up to P2" in race stories).
+export async function getChampionshipAround(
+  season: number,
+  round: number,
+): Promise<{
+  after: { driverId: string; name: string; code: string | null; points: number; position: number }[];
+  before: Map<string, number>;
+} | null> {
+  const ds = await dataset();
+  const rows = ds.racesDriverStandings.filter((s) => s.year === season && (s.round === round || s.round === round - 1));
+  const after = rows
+    .filter((s) => s.round === round)
+    .sort((a, b) => a.positionDisplayOrder - b.positionDisplayOrder)
+    .map((s) => ({
+      driverId: s.driverId,
+      name: driverName(ds, s.driverId),
+      code: ds.drivers.get(s.driverId)?.abbreviation ?? null,
+      points: s.points,
+      position: s.positionNumber ?? s.positionDisplayOrder,
+    }));
+  if (!after.length) return null;
+  const before = new Map<string, number>();
+  for (const s of rows) if (s.round === round - 1) before.set(s.driverId, s.positionNumber ?? s.positionDisplayOrder);
+  return { after, before };
+}
+
 // Full race-weekend detail: qualifying, race (with grid → finish delta),
 // fastest lap and driver of the day. Returns null for an unknown race.
 export async function getRaceWeekend(

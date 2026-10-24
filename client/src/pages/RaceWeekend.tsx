@@ -3,6 +3,7 @@ import { Link, useParams, useSearchParams } from 'react-router-dom'
 import { api } from '../api/client'
 import Breadcrumbs from '../components/Breadcrumbs'
 import Flag from '../components/Flag'
+import RaceStory from '../components/RaceStory'
 import RaceStrategy from '../components/RaceStrategy'
 import { useAsync } from '../hooks/useAsync'
 import { useSeo } from '../hooks/useSeo'
@@ -209,6 +210,8 @@ export default function RaceWeekend() {
     [season, round],
   )
   const [practiceN, setPracticeN] = useState<number | null>(null)
+  // Race story: loads alongside (OpenF1 can be slow); quietly absent on error.
+  const story = useAsync(() => api.raceStory(season, Number(round)), [season, round])
 
   useSeo({
     title: data
@@ -347,6 +350,8 @@ export default function RaceWeekend() {
                 ),
             )}
           </div>
+
+          {story.data && data.results.length > 0 && <RaceStory story={story.data} />}
 
           {available.length > 1 && (
             <div className="tabs wknd-tabs" role="tablist">

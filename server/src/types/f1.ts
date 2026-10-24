@@ -384,6 +384,54 @@ export interface TeammateDuels {
   duels: TeammateDuel[];
 }
 
+// ----- Race story (how a race unfolded) -----
+
+export interface StoryDriver {
+  name: string;
+  code: string | null;
+  constructorId?: string;
+}
+
+export type StoryEventKind = "lead" | "sc" | "vsc" | "red" | "pit" | "penalty" | "dnf" | "fastest";
+
+export interface StoryEvent {
+  lap: number;
+  to?: number; // end lap, for neutralisations
+  kind: StoryEventKind;
+  driver?: StoryDriver;
+  seconds?: number | null; // time penalty
+  penalty?: "time" | "drive" | "stopgo" | "grid" | "other";
+  reason?: string; // penalty / retirement reason (English, as published)
+  stop?: number; // pit stop number for that driver
+}
+
+export interface RaceStory {
+  totalLaps: number | null;
+  hasTiming: boolean; // OpenF1 lap/race-control data available (2023+)
+  winner: (StoryDriver & { team: string; grid: number | null }) | null;
+  second: StoryDriver | null;
+  third: (StoryDriver & { grid: number | null }) | null;
+  margin: string | null; // P2's gap, e.g. "+7.335"
+  lapsLed: (StoryDriver & { laps: number })[]; // most first
+  leadChanges: number;
+  startMovers: (StoryDriver & { from: number; to: number })[]; // grid -> after lap 1
+  neutralisations: { kind: "sc" | "vsc" | "red"; from: number; to: number }[];
+  stops: { winner: number | null; common: number | null };
+  climbers: (StoryDriver & { grid: number; finish: number })[];
+  retirements: (StoryDriver & { reason: string; lap: number | null })[];
+  penalties: StoryEvent[];
+  fastest: (StoryDriver & { time: string; lap: number | null }) | null;
+  rain: boolean;
+  championship: {
+    leader: StoryDriver & { points: number };
+    second: (StoryDriver & { points: number }) | null;
+    winnerPos: number | null; // winner's championship position after the race
+    winnerPosBefore: number | null;
+    leaderChanged: boolean;
+  } | null;
+  events: StoryEvent[]; // timeline, by lap
+}
+
 // ----- Race weekend detail -----
 
 export interface QualifyingEntry {
