@@ -376,9 +376,13 @@ export async function getBoard(sessionKey: number): Promise<LiveBoard> {
     let sbLap: number | null = null;
     const sbSectors: (number | null)[] = [null, null, null];
     const sbDrivers: (number | null)[] = [null, null, null];
+    let sbLapDriver: number | null = null;
+    let sbLapNumber: number | null = null;
     for (const l of laps) {
       if (l.lap_duration != null && (sbLap == null || l.lap_duration < sbLap)) {
         sbLap = l.lap_duration;
+        sbLapDriver = l.driver_number;
+        sbLapNumber = l.lap_number;
       }
       const secs = [l.duration_sector_1, l.duration_sector_2, l.duration_sector_3];
       secs.forEach((s, i) => {
@@ -392,7 +396,13 @@ export async function getBoard(sessionKey: number): Promise<LiveBoard> {
     return {
       session,
       rows,
-      sessionBest: { lap: sbLap, sectors: sbSectors, sectorDrivers: sbDrivers },
+      sessionBest: {
+        lap: sbLap,
+        sectors: sbSectors,
+        sectorDrivers: sbDrivers,
+        lapDriver: sbLapDriver,
+        lapNumber: sbLapNumber,
+      },
       weather: weather[weather.length - 1] ?? null,
     };
   });

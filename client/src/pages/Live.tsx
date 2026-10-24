@@ -324,7 +324,16 @@ export default function Live() {
               const holder = board.rows.find((r) => r.driverNumber === board.sessionBest.sectorDrivers?.[i])
               return { time, code: holder?.code ?? null, colour: holder?.teamColour ?? null }
             })}
-            fastestLap={board.sessionBest.lap}
+            fastest={(() => {
+              const sb = board.sessionBest
+              const holder = board.rows.find((r) => r.driverNumber === sb.lapDriver)
+              return {
+                time: sb.lap,
+                code: holder?.code ?? null,
+                colour: holder?.teamColour ?? null,
+                lap: sb.lapNumber ?? null,
+              }
+            })()}
           />
           <div className="rp-side-card">
             <h4 className="rp-side-title">{t('rp.session')}</h4>
@@ -336,7 +345,6 @@ export default function Live() {
                 {status?.live ? t('nav.live') : t('live.finished')}
               </span>
             </div>
-            <div className="rp-kv"><span>{t('wk.fastestLap')}</span><span className="mono">{fmtTime(board.sessionBest.lap)}</span></div>
           </div>
           <WeatherCard sample={board.weather} />
         </aside>

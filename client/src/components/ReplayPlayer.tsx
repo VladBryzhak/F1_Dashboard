@@ -4,7 +4,7 @@ import { useAsync } from '../hooks/useAsync'
 import { fmtTime, segmentClass, sessionLabel, teamColor, tyre } from '../lib/live'
 import type { ReplayData, ReplayLap, ReplaySession } from '../types/f1'
 import WeatherCard, { weatherAt } from './WeatherCard'
-import BestSectors, { type SectorRecord } from './BestSectors'
+import BestSectors, { type LapRecord, type SectorRecord } from './BestSectors'
 import TrackMap from './TrackMap'
 import { buildTrackModel } from '../lib/trackModel'
 import { useI18n, type TKey } from '../i18n/core'
@@ -429,14 +429,19 @@ export default function ReplayPlayer() {
     return out
   }, [data, t])
 
-  // Session-fastest lap so far, for the side panel.
-  const fastest = useMemo(() => {
-    let m: number | null = null
-    for (const r of board?.rows ?? []) {
-      if (r.best != null && (m == null || r.best < m)) m = r.best
+  // Session-fastest lap so far and who set it, for the bests card.
+  const fastest = useMemo((): LapRecord | null => {
+    if (!data) return null
+    const absT = data.startMs + t
+    let best: ReplayLap | null = null
+    for (const lap of data.laps) {
+      if (lap.d == null || lap.t + lap.d * 1000 > absT) continue
+      if (!best || lap.d < best.d!) best = lap
     }
-    return m
-  }, [board])
+    if (!best) return null
+    const drv = data.drivers.find((d) => d.num === best!.num)
+    return { time: best.d, code: drv?.code ?? String(best.num), colour: drv?.colour ?? null, lap: best.lap }
+  }, [data, t])
 
   return (
     <div className="replay">
@@ -596,7 +601,7 @@ export default function ReplayPlayer() {
           </div>
           </div>
           <aside className="rp-side">
-            <BestSectors sectors={bestSectors} fastestLap={fastest} />
+            <BestSectors sectors={bestSectors} fastest={fastest} />
             <div className="rp-side-card">
               <h4 className="rp-side-title">{tr('rp.session')}</h4>
               <div className="rp-kv"><span>{tr('rp.circuit')}</span><span>{data.session.location}</span></div>
@@ -606,7 +611,6 @@ export default function ReplayPlayer() {
               {!timed && (
                 <div className="rp-kv"><span>{tr('tel.lap')}</span><span className="mono">{board.lap}</span></div>
               )}
-              <div className="rp-kv"><span>{tr('wk.fastestLap')}</span><span className="mono">{fmtTime(fastest)}</span></div>
               <div className="rp-kv"><span>{tr('rp.status')}</span><span className={`rp-side-status rp-side-status--${st.cls}`}>{tr(st.label)}</span></div>
             </div>
             <WeatherCard sample={weather} />

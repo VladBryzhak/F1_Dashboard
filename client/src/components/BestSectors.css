@@ -7,7 +7,7 @@
 
 .bs-row {
   display: grid;
-  grid-template-columns: 2rem 1fr auto;
+  grid-template-columns: 2.6rem 1fr auto;
   align-items: center;
   gap: 0.6rem;
   padding: 0.45rem 0;
@@ -30,6 +30,24 @@
   align-items: center;
   gap: 0.45rem;
   font-weight: 800;
+}
+
+.bs-who {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  min-width: 0;
+}
+
+.bs-lapno {
+  color: var(--muted);
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+
+/* The fastest lap leads the card, a touch bigger than the sector rows. */
+.bs-lap {
+  font-size: 0.95rem;
 }
 
 .bs-drv .lb-stripe {

@@ -500,6 +500,8 @@ export interface LiveBoard {
     lap: number | null
     sectors: (number | null)[]
     sectorDrivers: (number | null)[] // driver number holding each best sector
+    lapDriver: number | null // driver number holding the fastest lap
+    lapNumber: number | null // lap it was set on
   }
   weather: WeatherSample | null
 }
