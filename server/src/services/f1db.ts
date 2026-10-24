@@ -65,6 +65,7 @@ interface RawSeasonConstructorStanding {
   positionNumber: number | null;
   positionText: string;
   constructorId: string;
+  engineManufacturerId?: string;
   points: number;
 }
 interface RawDriver {
@@ -145,6 +146,7 @@ interface RawRaceResult {
   driverNumber?: string | null; // car number raced with that weekend
   driverId: string;
   constructorId: string;
+  engineManufacturerId?: string;
   time: string | null;
   gap: string | null;
   gapLaps: number | null;
@@ -367,6 +369,7 @@ interface Dataset {
   chronology: RawChronology[];
   // `${year}:${constructorId}` -> engine manufacturer names / race drivers
   enginesByYearTeam: Map<string, string[]>;
+  engineNames: Map<string, string>; // engineManufacturerId -> name
   driversByYearTeam: Map<string, string[]>;
 }
 
@@ -666,6 +669,7 @@ async function loadDataset(): Promise<Dataset> {
     familyByDriver,
     chronology,
     enginesByYearTeam,
+    engineNames,
     driversByYearTeam,
   };
 }
@@ -777,17 +781,34 @@ export async function getConstructorStandings(
   const ds = await dataset();
   const year = Number(season);
   const wins = ds.winsByYear.get(year);
-  const standings: ConstructorStanding[] = ds.constructorStandings
+  const rows = ds.constructorStandings
     .filter((s) => s.year === year)
-    .sort((a, b) => a.positionDisplayOrder - b.positionDisplayOrder)
-    .map((s) => {
+    .sort((a, b) => a.positionDisplayOrder - b.positionDisplayOrder);
+  // Until 1985 each chassis–engine pair was classified separately, so a team
+  // can appear twice (McLaren-Ford and McLaren-BRM in 1968). Name those
+  // entries after their engine and count wins per pair.
+  const entries = new Map<string, number>();
+  for (const r of rows) entries.set(r.constructorId, (entries.get(r.constructorId) ?? 0) + 1);
+  const pairWins = (constructorId: string, engineId: string) => {
+    let n = 0;
+    for (const [key, results] of ds.resultsByRace) {
+      if (!key.startsWith(`${year}:`)) continue;
+      if (results.some((r) => r.positionNumber === 1 && r.constructorId === constructorId && r.engineManufacturerId === engineId)) n++;
+    }
+    return n;
+  };
+  const standings: ConstructorStanding[] = rows.map((s) => {
       const c = ds.constructors.get(s.constructorId);
+      const split = (entries.get(s.constructorId) ?? 0) > 1 && !!s.engineManufacturerId;
+      const engine = split ? ds.engineNames.get(s.engineManufacturerId!) ?? s.engineManufacturerId! : null;
       return {
         position: s.positionNumber ?? s.positionDisplayOrder,
         points: s.points,
-        wins: wins?.constructors.get(s.constructorId) ?? 0,
+        wins: split
+          ? pairWins(s.constructorId, s.engineManufacturerId!)
+          : wins?.constructors.get(s.constructorId) ?? 0,
         constructorId: s.constructorId,
-        name: c?.name ?? s.constructorId,
+        name: engine ? `${c?.name ?? s.constructorId}-${engine}` : c?.name ?? s.constructorId,
         nationality: demonym(ds, c?.countryId),
         countryCode: alpha2(ds, c?.countryId),
       };
@@ -991,13 +1012,30 @@ export async function getConstructorProfile(
   if (!career) return null;
 
   const c = ds.constructors.get(constructorId);
-  const rawSeasons = ds.constructorStandings
-    .filter((s) => s.constructorId === constructorId)
-    .sort((a, b) => a.year - b.year);
+  // Until 1985 the constructors' championship scored each chassis–engine pair
+  // separately (McLaren-Ford and McLaren-BRM in 1968), so f1db can hold
+  // several rows per year for one team. Fold them into one season: best
+  // position, points added up. (Wins are already per team and year.)
+  const byYear = new Map<number, { year: number; position: number; best: number | null; points: number }>();
+  for (const st of ds.constructorStandings) {
+    if (st.constructorId !== constructorId) continue;
+    const pos = st.positionNumber ?? st.positionDisplayOrder;
+    const cur = byYear.get(st.year);
+    if (!cur) {
+      byYear.set(st.year, { year: st.year, position: pos, best: st.positionNumber, points: st.points });
+    } else {
+      cur.points += st.points;
+      if (pos < cur.position) {
+        cur.position = pos;
+        cur.best = st.positionNumber;
+      }
+    }
+  }
+  const rawSeasons = [...byYear.values()].sort((a, b) => a.year - b.year);
 
   const seasons: ConstructorSeasonEntry[] = rawSeasons.map((s) => ({
     season: s.year,
-    position: s.positionNumber ?? s.positionDisplayOrder,
+    position: s.position,
     points: s.points,
     wins: ds.winsByYear.get(s.year)?.constructors.get(constructorId) ?? 0,
     drivers: (ds.driversByYearTeam.get(`${s.year}:${constructorId}`) ?? []).map((id) => ({
@@ -1014,7 +1052,7 @@ export async function getConstructorProfile(
     countryCode: alpha2(ds, c?.countryId),
     firstSeason: career.firstSeason,
     lastSeason: career.lastSeason,
-    championships: rawSeasons.filter((s) => s.positionNumber === 1).length,
+    championships: rawSeasons.filter((s) => s.best === 1).length,
     wins: seasons.reduce((sum, s) => sum + s.wins, 0),
     podiums: career.podiums,
     points: rawSeasons.reduce((sum, s) => sum + s.points, 0),

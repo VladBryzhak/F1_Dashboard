@@ -138,7 +138,7 @@ export function ConstructorStandingsTable({
           {rows.map((r) => {
             const gap = leaderPoints - r.points
             return (
-              <tr key={r.constructorId}>
+              <tr key={`${r.constructorId}:${r.name}`}>
                 <td className="pos">{r.position}</td>
                 <td>
                   <span className="team">

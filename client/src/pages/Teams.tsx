@@ -70,7 +70,7 @@ export default function Teams() {
           {!loading && (
             <div className="grid">
               {teams.map((c) => (
-                <TeamCard key={c.constructorId} c={c} season={season} />
+                <TeamCard key={`${c.constructorId}:${c.name}`} c={c} season={season} />
               ))}
             </div>
           )}
