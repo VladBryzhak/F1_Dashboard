@@ -11,10 +11,10 @@ import type { HomeResponse } from "../types/f1";
 // newsWaitMs: how long to wait for the news feed. The API waits for it; the
 // HTML only takes it if it's already cached (a feed miss must not delay the
 // first byte) — `news: null` then tells the client to fetch it.
-// The race-number hero shows the portrait about 240 px wide on phones and
-// ~330 px on desktop (see .hero-num in client/src/pages/Home.css).
+// The timing panel shows the portrait about 185 px wide on phones and 220 px
+// on desktop (.hm-portrait img in client/src/pages/Home.css).
 const HERO_WIDTHS = [450, 600, 800];
-const HERO_SIZES = "(max-width: 768px) 240px, 330px";
+const HERO_SIZES = "(max-width: 900px) 185px, 220px";
 
 export async function homePayload(newsWaitMs?: number): Promise<HomeResponse> {
   const newsP = getNews().catch(() => []);

@@ -1,7 +1,6 @@
 import { useEffect, useState, type CSSProperties, type SyntheticEvent } from 'react'
 import { Link } from 'react-router-dom'
 import CircuitOutline from '../components/CircuitOutline'
-import { Headshot } from '../components/EntityCards'
 import { useSeo } from '../hooks/useSeo'
 import { siteLd } from '../lib/jsonld'
 import { api } from '../api/client'
@@ -16,7 +15,14 @@ import type {
   RaceHighlight,
 } from '../types/f1'
 import { gpTitle } from '../lib/gpNames'
+import { retirementReason } from '../lib/retirementReasons'
 import './Home.css'
+
+// Home page, "timing screen" design: graphite surfaces cut by hairlines,
+// readings (points, gaps, dates, car numbers) in a monospace face, team
+// colours only as swatches beside the driver they belong to, and F1 red kept
+// for the one action on each screen. Data wiring is unchanged: the server
+// inlines /api/home into the HTML on a direct visit (see pageHtml.ts).
 
 const F1 = 'https://media.formula1.com/image/upload/c_lfill,w_600/q_auto/v1740000001/common/f1'
 
@@ -54,7 +60,8 @@ function timeAgo(iso: string, locale: string): string {
   return rtf.format(-Math.round(hrs / 24), 'day')
 }
 
-// Dynamic hero focused on the latest race winner.
+// First screen: the result in words on the left, the timing panel on the
+// right (the winner over their car number, then the podium as timing rows).
 function WinnerHero({
   highlights,
   heroImage,
@@ -69,146 +76,187 @@ function WinnerHero({
   const { t, lang } = useI18n()
   const race = highlights.latestRace as RaceHighlight
   const winner = race.podium.find((p) => p.position === 1) ?? race.podium[0]
+  const second = race.podium.find((p) => p.position === 2)
+  const third = race.podium.find((p) => p.position === 3)
   const color = teamColor(winner.constructorId)
   // The server names the same photo in the HTML (preload), so prefer its URL.
   const portrait =
     heroImage ?? driverPortraitUrl(winner.driverId, winner.constructorId, String(race.season))
+  const [photoOk, setPhotoOk] = useState(true)
 
   return (
-    <div className="hero hero-winner hero-num" style={{ '--team': color } as CSSProperties}>
-      {/* Race-number backdrop: the winner's car number, huge, behind the
-          portrait, with a team-colour stripe. */}
-      {winner.number && (
-        <span className="hero-bignum" aria-hidden="true">
-          {winner.number}
-        </span>
-      )}
-      <span className="hero-stripe" aria-hidden="true" />
-      <Headshot
-        portraitUrl={portrait}
-        srcSet={heroImage ? heroSrcSet : null}
-        sizes={heroSizes}
-        color={color}
-        eager
-      />
-      <div className="hero-content hero-content--winner">
-        <p className="hero-kicker">
-          {race.season} · {t('common.round')} {race.round} · {gpTitle(race.grandPrixName, lang)}
+    <section className="hm-hero" style={{ '--team': color } as CSSProperties}>
+      <div className="hm-hero-text">
+        <h1 className="hm-display">{t('home.winnerHead', { name: lastName(winner.driverName) })}</h1>
+        <p className="hm-lead">
+          {t('home.raceLine', {
+            gp: gpTitle(race.grandPrixName, lang),
+            season: race.season,
+            round: race.round,
+          })}{' '}
+          {second && third
+            ? t('home.podiumLine', {
+                p2: lastName(second.driverName),
+                p3: lastName(third.driverName),
+              })
+            : null}
         </p>
-        <h1 className="hero-title">
-          {lastName(winner.driverName)} <span>{t('home.wins')}</span>
-        </h1>
-
-        <div className="podium-row">
-          {race.podium.map((p) => (
-            <span className="podium-chip" key={p.position}>
-              <span className="podium-pos">P{p.position}</span>
-              <span
-                className="dot"
-                style={{ background: teamColor(p.constructorId) }}
-              />
-              {p.driverCode ?? lastName(p.driverName)}
-            </span>
-          ))}
-        </div>
-
-        {highlights.notableRetirement && (
-          <p className="hero-note">
-            <span className="hero-note-tag">{t('home.incident')}</span>
-            {highlights.notableRetirement.driverName} —{' '}
-            {highlights.notableRetirement.reason}
-          </p>
-        )}
-
-        <Link
-          to={`/calendar/${race.season}/${race.round}`}
-          className="hero-cta"
-        >
+        <Link to={`/calendar/${race.season}/${race.round}`} className="hm-btn hm-btn--primary">
           {t('home.viewWeekend')}
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-            <path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
-          </svg>
         </Link>
       </div>
-    </div>
+
+      <figure className="hm-panel hm-timing">
+        <div className="hm-portrait">
+          {winner.number && (
+            <span className="hm-carnum" aria-hidden="true">
+              {winner.number}
+            </span>
+          )}
+          {portrait && photoOk && (
+            <img
+              src={portrait}
+              srcSet={heroImage && heroSrcSet ? heroSrcSet : undefined}
+              sizes={heroImage && heroSrcSet ? heroSizes : undefined}
+              alt={winner.driverName}
+              loading="eager"
+              ref={(el) => {
+                // Set fetchpriority via the DOM so React 18.3 doesn't warn on the prop.
+                if (el) el.setAttribute('fetchpriority', 'high')
+              }}
+              onError={() => setPhotoOk(false)}
+            />
+          )}
+        </div>
+        <ol className="hm-podium" aria-label={t('home.podium')}>
+          {race.podium.map((p) => (
+            <li key={p.position}>
+              <span className="hm-pos">P{p.position}</span>
+              <span
+                className="hm-swatch"
+                style={{ background: teamColor(p.constructorId) }}
+                aria-hidden="true"
+              />
+              <span className="hm-code">{p.driverCode ?? lastName(p.driverName)}</span>
+              <span className="hm-name">{p.driverName}</span>
+              <span className="hm-team">{p.constructorName}</span>
+            </li>
+          ))}
+          {highlights.notableRetirement && (
+            <li className="hm-out">
+              <span className="hm-pos">{t('home.retired')}</span>
+              <span className="hm-name">
+                {highlights.notableRetirement.driverName},{' '}
+                {retirementReason(highlights.notableRetirement.reason, lang)}
+              </span>
+            </li>
+          )}
+        </ol>
+      </figure>
+    </section>
   )
 }
 
-// Championship top 5 — sits beside the hero on desktop, under it on mobile.
-function ChampionshipCard({
-  rows,
-  season,
-}: {
-  rows: DriverStanding[]
-  season?: number
-}) {
-  const { t } = useI18n()
+// Drivers' championship, top 5, as a timing table: position, driver, points
+// and the gap to the leader, with a bar for each driver's share of the
+// leader's points (one series, in the instrument colour).
+function Championship({ rows, season }: { rows: DriverStanding[]; season?: number }) {
+  const { t, fmtNum } = useI18n()
   if (!rows.length) return null
-  // Bars are scaled to the leader's points.
   const top = Math.max(rows[0].points, 1)
   return (
-    <div className="champ-card">
-      <div className="champ-head">
-        <span>{t('home.championship')}</span>
-        <span className="champ-season">{season}</span>
+    <section className="hm-section">
+      <div className="hm-head">
+        <h2>{t('home.standingsHead', { season: season ?? '' })}</h2>
       </div>
-      <ol className="champ-list">
-        {rows.map((d) => {
-          const color = teamColor(d.constructorId)
-          const pct = Math.max(2, Math.min(100, (d.points / top) * 100))
-          return (
-            <li key={d.driverId}>
-              <span className="champ-pos">{d.position}</span>
-              <div className="champ-main">
-                <div className="champ-line">
-                  <span className="champ-dot" style={{ background: color }} />
-                  <Link to={`/drivers/${d.driverId}`} className="champ-name">
-                    {initialName(d.givenName, d.familyName)}
-                  </Link>
-                </div>
-                <span className="champ-bar" aria-hidden="true">
-                  <span style={{ width: `${pct}%`, background: color }} />
-                </span>
-              </div>
-              <span className="champ-pts">{d.points}</span>
-            </li>
-          )
-        })}
-      </ol>
-    </div>
+      <div className="hm-panel">
+        <table className="hm-table">
+          <thead>
+            <tr>
+              <th scope="col">{t('home.colPos')}</th>
+              <th scope="col">{t('home.colDriver')}</th>
+              <th scope="col" className="hm-bar-col">
+                <span className="visually-hidden">{t('home.colShare')}</span>
+              </th>
+              <th scope="col" className="num">
+                {t('home.colPoints')}
+              </th>
+              <th scope="col" className="num">
+                {t('home.colGap')}
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {rows.map((d) => {
+              const pct = Math.max(1, Math.min(100, (d.points / top) * 100))
+              const gap = rows[0].points - d.points
+              return (
+                <tr key={d.driverId}>
+                  <td className="hm-pos">{d.position}</td>
+                  <td>
+                    <span className="hm-driver">
+                      <span
+                        className="hm-swatch"
+                        style={{ background: teamColor(d.constructorId) }}
+                        aria-hidden="true"
+                      />
+                      <Link to={`/drivers/${d.driverId}`}>
+                        {initialName(d.givenName, d.familyName)}
+                      </Link>
+                      <span className="hm-team">{d.constructorName}</span>
+                    </span>
+                  </td>
+                  <td className="hm-bar-col" aria-hidden="true">
+                    <span className="hm-bar">
+                      <span style={{ width: `${pct}%` }} />
+                    </span>
+                  </td>
+                  <td className="num hm-reading">{fmtNum(d.points)}</td>
+                  <td className="num hm-reading hm-gap">
+                    {gap === 0 ? t('home.leader') : `−${fmtNum(gap)}`}
+                  </td>
+                </tr>
+              )
+            })}
+          </tbody>
+        </table>
+      </div>
+    </section>
   )
 }
 
-function NextRaceCard({ race }: { race: NextRace }) {
+// The next race as a band on the deepest surface: the date as a reading, the
+// Grand Prix and the place, and the circuit drawn large.
+function NextRaceBand({ race }: { race: NextRace }) {
   const { t, lang, fmtDate } = useI18n()
   const day = fmtDate(race.date, { day: '2-digit' })
-  const month = fmtDate(race.date, { month: 'short' }).replace('.', '').toUpperCase()
-  // Opens the calendar with this race's weekend schedule expanded.
+  const month = fmtDate(race.date, { month: 'short' }).replace('.', '')
   return (
-    <Link
-      to={`/calendar?schedule=${race.round}`}
-      className={`home-next${race.outline ? ' has-map' : ''}`}
-    >
-      <span className="home-next-row">
-        <span className="home-next-date">
-          <b>{day || '—'}</b>
-          <em>{month}</em>
-        </span>
-        <span className="home-next-info">
-          <span className="home-next-label">{t('home.nextRace')}</span>
-          <span className="home-next-gp">{gpTitle(race.grandPrixName, lang)}</span>
-          {race.placeName && <span className="home-next-place">{race.placeName}</span>}
-        </span>
-      </span>
-      {race.outline && (
-        <span className="home-next-map">
-          <CircuitOutline
-            outline={race.outline}
-            label={t('circ.outlineOf', { name: race.placeName || race.grandPrixName })}
-          />
-        </span>
-      )}
-    </Link>
+    <section className="hm-band">
+      <div className="hm-band-inner">
+        <div className="hm-next-text">
+          <h2>{t('home.nextRace')}</h2>
+          <p className="hm-date">
+            <span className="hm-date-day">{day}</span>
+            <span className="hm-date-month">{month}</span>
+          </p>
+          <p className="hm-next-gp">{gpTitle(race.grandPrixName, lang)}</p>
+          {race.placeName && <p className="hm-next-place">{race.placeName}</p>}
+          {/* Opens the calendar with this race's weekend schedule expanded. */}
+          <Link to={`/calendar?schedule=${race.round}`} className="hm-btn">
+            {t('home.schedule')}
+          </Link>
+        </div>
+        {race.outline && (
+          <div className="hm-panel hm-circuit">
+            <CircuitOutline
+              outline={race.outline}
+              label={t('circ.outlineOf', { name: race.placeName || race.grandPrixName })}
+            />
+          </div>
+        )}
+      </div>
+    </section>
   )
 }
 
@@ -216,104 +264,76 @@ function NextRaceCard({ race }: { race: NextRace }) {
 function TitleFightHero() {
   const { t } = useI18n()
   return (
-    <div className="hero">
-      <div className="hero-side hero-left">
+    <section className="hm-hero">
+      <div className="hm-hero-text">
+        <h1 className="hm-display">{t('home.titleFight')}</h1>
+        <p className="hm-lead">{t('home.titleFightTag')}</p>
+        <Link to="/standings" className="hm-btn hm-btn--primary">
+          {t('home.allStandings')}
+        </Link>
+      </div>
+      <div className="hm-panel hm-duo">
         <img
-          className="hero-photo"
           src={ANTONELLI_SRC}
           onError={fallbackTo(ANTONELLI_FALLBACK)}
           alt={t('home.altAntonelli')}
         />
-      </div>
-      <div className="hero-side hero-right">
-        <img
-          className="hero-photo"
-          src={HAMILTON_SRC}
-          onError={fallbackTo(HAMILTON_FALLBACK)}
-          alt={t('home.altHamilton')}
-        />
-      </div>
-
-      <div className="hero-veil" />
-
-      <div className="hero-content">
-        <p className="hero-kicker">{t('home.titleFight')}</p>
-        <h1 className="hero-title">
-          F1 <span>DASHBOARD</span>
-        </h1>
-        <div className="hero-battle">
-          <div className="battle-side battle-merc">
-            <span className="battle-team">Mercedes</span>
-            <span className="battle-driver">Antonelli</span>
-          </div>
-          <span className="battle-vs">VS</span>
-          <div className="battle-side battle-fer">
-            <span className="battle-team">Ferrari</span>
-            <span className="battle-driver">Hamilton</span>
-          </div>
-        </div>
-        <p className="hero-tag">{t('home.titleFightTag')}</p>
-      </div>
-    </div>
-  )
-}
-
-// Reserves the news-strip's space while /api/home loads, so the links below
-// don't jump down when the real headlines arrive (keeps CLS low).
-function NewsStripSkeleton() {
-  const { t } = useI18n()
-  return (
-    <section className="news-strip" aria-hidden="true">
-      <div className="news-head">
-        <h2>{t('home.news')}</h2>
-      </div>
-      <div className="news-list">
-        {Array.from({ length: 6 }).map((_, i) => (
-          <span key={i} className="news-item news-item--skeleton" />
-        ))}
+        <img src={HAMILTON_SRC} onError={fallbackTo(HAMILTON_FALLBACK)} alt={t('home.altHamilton')} />
       </div>
     </section>
   )
 }
 
-function NewsStrip({ news }: { news: NewsItem[] }) {
+function NewsIndex({ news }: { news: NewsItem[] }) {
   const { t, locale } = useI18n()
   if (!news.length) return null
   return (
-    <section className="news-strip">
-      <div className="news-head">
+    <section className="hm-section">
+      <div className="hm-head">
         <h2>{t('home.news')}</h2>
-        <span className="news-src">{t('home.via', { source: news[0].source })}</span>
+        <p className="hm-note">{t('home.via', { source: news[0].source })}</p>
       </div>
-      <div className="news-list">
+      <ol className="hm-panel hm-news">
         {news.map((n) => (
-          <a
-            key={n.link}
-            className="news-item"
-            href={n.link}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <span className="news-title">{n.title}</span>
-            <span className="news-meta">
-              {n.source} · {timeAgo(n.pubDate, locale)}
-            </span>
-          </a>
+          <li key={n.link}>
+            <a href={n.link} target="_blank" rel="noopener noreferrer">
+              <time className="hm-reading" dateTime={n.pubDate}>
+                {timeAgo(n.pubDate, locale)}
+              </time>
+              <span className="hm-news-title">{n.title}</span>
+            </a>
+          </li>
         ))}
-      </div>
+      </ol>
     </section>
   )
 }
 
-// Placeholder shown while /api/home is loading. Reuses the .hero frame (same
-// 420px height, team-colour wash) so there's no layout jump, and — crucially —
-// we no longer flash the static off-season poster during a cold start.
+// Placeholders while /api/home loads (only when the HTML came without the
+// inlined data): the same frames, so nothing below jumps when data arrives.
 function HeroSkeleton() {
   const { t } = useI18n()
   return (
-    <div className="hero hero-skeleton" aria-busy="true" aria-label={t('home.loadingRace')}>
-      <span className="hero-kicker">{t('home.loadingRace')}</span>
-    </div>
+    <section className="hm-hero hm-skeleton" aria-busy="true" aria-label={t('home.loadingRace')}>
+      <p className="hm-lead">{t('home.loadingRace')}</p>
+      <div className="hm-panel hm-timing" />
+    </section>
+  )
+}
+
+function NewsSkeleton() {
+  const { t } = useI18n()
+  return (
+    <section className="hm-section" aria-hidden="true">
+      <div className="hm-head">
+        <h2>{t('home.news')}</h2>
+      </div>
+      <ol className="hm-panel hm-news hm-news--skeleton">
+        {Array.from({ length: 6 }).map((_, i) => (
+          <li key={i} />
+        ))}
+      </ol>
+    </section>
   )
 }
 
@@ -351,28 +371,23 @@ export default function Home() {
   const hasRace = !!data?.highlights.latestRace
 
   return (
-    <section>
-      <div className="home-top">
-        {loading ? (
-          <HeroSkeleton />
-        ) : hasRace ? (
-          <WinnerHero
-            highlights={data!.highlights}
-            heroImage={data!.heroImage}
-            heroSrcSet={data!.heroSrcSet}
-            heroSizes={data!.heroSizes}
-          />
-        ) : (
-          <TitleFightHero />
-        )}
+    <div className="home">
+      {loading ? (
+        <HeroSkeleton />
+      ) : hasRace ? (
+        <WinnerHero
+          highlights={data!.highlights}
+          heroImage={data!.heroImage}
+          heroSrcSet={data!.heroSrcSet}
+          heroSizes={data!.heroSizes}
+        />
+      ) : (
+        <TitleFightHero />
+      )}
 
-        <aside className="home-aside">
-          <ChampionshipCard rows={data?.standings ?? []} season={season} />
-          {data?.highlights.nextRace && <NextRaceCard race={data.highlights.nextRace} />}
-        </aside>
-      </div>
-
-      {data?.news ? <NewsStrip news={data.news} /> : !failed && <NewsStripSkeleton />}
-    </section>
+      <Championship rows={data?.standings ?? []} season={season} />
+      {data?.highlights.nextRace && <NextRaceBand race={data.highlights.nextRace} />}
+      {data?.news ? <NewsIndex news={data.news} /> : !failed && <NewsSkeleton />}
+    </div>
   )
 }
