@@ -181,6 +181,9 @@ export interface PodiumEntry {
   constructorId: string
   constructorName: string
   countryCode: string | null
+  // The winner's race time, or the gap to the winner ("+1.234", "+1 lap").
+  time: string | null
+  points: number | null
 }
 
 export interface RaceHighlight {

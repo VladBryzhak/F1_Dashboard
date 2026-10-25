@@ -1154,6 +1154,11 @@ export async function getHomeHighlights(): Promise<HomeHighlights> {
           constructorId: r.constructorId,
           constructorName: c?.name ?? r.constructorId,
           countryCode: alpha2(ds, d?.nationalityCountryId),
+          time:
+            r.positionNumber === 1
+              ? r.time
+              : (r.gap ?? (r.gapLaps ? `+${r.gapLaps} lap${r.gapLaps > 1 ? "s" : ""}` : null)),
+          points: r.points,
         };
       });
 

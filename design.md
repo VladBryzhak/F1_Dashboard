@@ -4,7 +4,7 @@ The locked system. Every Hallmark run reads this first and pages share it. Chang
 
 ## System
 - Genre: modern-minimal (pages are data screens; the home page is the one composed page)
-- Shape of the first page: timing screen (Stage hero, Table, Band, Index), `client/src/pages/Home.css`
+- Home page: the race-number hero (winner portrait over their car number, team-colour wash; the one place a gradient is allowed, by the owner's choice) with a podium timing board, championship card, next race and news, `client/src/pages/Home.css`
 - Theme: Console (graphite), brand kept: Saira / Saira Condensed, F1 red
 - Axes: dark/condensed-sans/brand-red · posture: restrained
 

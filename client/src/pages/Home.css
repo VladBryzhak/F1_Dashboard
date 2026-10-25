@@ -1,541 +1,848 @@
-/* Hallmark · shape: timing screen (Stage hero, Table, Band, Index) · genre: modern-minimal · theme: Console (deal 2/3, seed formula-stats-home-latest-454c·96361965·2026-10-25·r0), brand kept: Saira faces, F1 red · redesign: full · job: visit (read the latest result) · hero: Stage · nav: kept · footer: kept · imagery: the product (the winner's official portrait) · signature: the timing panel, the winner over the car number above the podium rows · console: graphite
- * axes: dark/condensed-sans/brand-red · posture: restrained · contrast: pass · fold: pass · v2.0.0 */
-/* Hallmark · pre-emit critique: P4 H5 E4 S5 R4 V4 · weakest: E, the page is checked in a browser here but not by the render tier (no puppeteer); kept the hero to head, one sentence, one action and moved the race facts into the timing panel instead of a line above the head */
-/* Hallmark · answered F16 · ::selection is themed on this page; the scrollbar belongs to the whole site, whose other pages keep their system */
-/* Hallmark · waive 59 · sections part by hairline panels and the deep next-race band · a stats hub reads by its surfaces, so 96px gaps keep the five blocks on fewer screens */
+/* Home page: latest-winner hero, championship sidebar, next race, news.
+   The race-number hero keeps its team-colour wash (the one composed page);
+   everything else follows the tokens: graphite panels, hairlines, readings
+   (dates, times, points) in instrument blue. */
 
-/* Home page in the Console material: a graphite ground in three steps,
-   hairline panels, readings (points, gaps, dates, car numbers, codes) in a
-   monospace face, team colours only as swatches beside their driver, F1 red
-   for the one action on a screen and the instrument blue for readings. No
-   gradients, glows or shadows. Tokens live in styles/tokens.css. */
-
-.home {
-  display: grid;
-  gap: var(--space-3xl);
-  color: var(--color-ink);
-}
-
-.home h1,
-.home h2 {
-  margin: 0;
-  font-family: var(--font-display);
-  font-weight: 800;
-  text-transform: uppercase;
-  letter-spacing: -0.005em;
-  line-height: 1.02;
-  font-synthesis: none;
-  overflow-wrap: break-word;
-  min-width: 0;
-  text-wrap: balance;
-}
-
-.home h2 {
-  font-size: var(--text-section);
-  max-width: 24ch;
-}
-
-.home p {
-  margin: 0;
-}
-
-/* Readings: what the timing system wrote. */
-.hm-reading,
-.hm-pos,
-.hm-code,
-.hm-carnum,
-.hm-date {
-  font-family: var(--font-outlier);
-  font-variant-numeric: tabular-nums slashed-zero;
-}
-
-.home ::selection {
-  background: var(--color-cool-soft);
-  color: var(--color-ink);
-}
-
-.home .visually-hidden {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  overflow: hidden;
-  clip-path: inset(50%);
-  white-space: nowrap;
-}
-
-/* Hairline panel: one surface, seams instead of nested boxes. */
-.hm-panel {
-  border: var(--rule-hair) solid var(--color-rule);
+/* ---------- Hero frame and the off-season title-fight poster ---------- */
+.hero {
+  position: relative;
+  min-height: 420px;
   border-radius: var(--radius-card);
-  background: var(--color-paper-2);
-  color: var(--color-ink);
   overflow: hidden;
-}
-
-/* Controls: one primary (brand red) and one outline, 48px tall. */
-.hm-btn {
-  display: inline-flex;
+  border: var(--rule-hair) solid var(--color-rule);
+  display: flex;
   align-items: center;
   justify-content: center;
-  min-height: 48px;
-  padding: 0 var(--space-lg);
-  border: var(--rule-hair) solid var(--color-rule-2);
-  border-radius: var(--radius-pill);
-  background: var(--color-paper-2);
-  color: var(--color-ink);
-  font: 600 var(--text-md) / 1 var(--font-body);
-  text-decoration: none;
-  white-space: nowrap;
-  width: fit-content;
-  transition:
-    background-color var(--dur-short) var(--ease-out),
-    border-color var(--dur-short) var(--ease-out),
-    transform var(--dur-micro) var(--ease-out);
-}
-
-.hm-btn:hover {
-  border-color: var(--color-ink-2);
-}
-
-.hm-btn:active {
-  transform: translateY(1px);
-}
-
-.hm-btn:focus-visible,
-.home a:focus-visible {
-  outline: 2px solid var(--color-focus);
-  outline-offset: 3px;
-  transition: none;
-}
-
-.hm-btn--primary {
-  border-color: var(--color-accent);
-  background: var(--color-accent);
-  color: var(--color-accent-ink);
-}
-
-.hm-btn--primary:hover {
-  border-color: var(--color-accent-hover);
-  background: var(--color-accent-hover);
-}
-
-/* ---------- Hero: the result, then the timing panel ---------- */
-.hm-hero {
-  display: grid;
-  grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
-  align-items: center;
-  gap: var(--space-2xl);
-  min-height: min(640px, calc(100svh - 140px));
-}
-
-.hm-hero-text {
-  display: grid;
-  gap: var(--space-lg);
-  justify-items: start;
-}
-
-.hm-display {
-  font-size: var(--text-display);
-}
-
-.hm-lead {
-  font-size: var(--text-lead);
-  line-height: 1.45;
-  color: var(--color-ink-2);
-  max-width: 32ch;
-  text-wrap: pretty;
-}
-
-.hm-timing {
-  display: grid;
-  margin: 0;
-}
-
-/* The winner over their car number, on the deepest surface. */
-.hm-portrait {
-  position: relative;
-  height: 360px;
   background: var(--color-paper-3);
-  border-bottom: var(--rule-hair) solid var(--color-rule);
-  overflow: hidden;
 }
 
-.hm-carnum {
+/* Off-season poster: Mercedes in from the left, Ferrari from the right, with
+   a dark centre vignette so the banner stays legible. */
+.hero-fight {
+  background:
+    radial-gradient(72% 130% at 50% 8%, transparent 0%, color-mix(in oklch, var(--color-paper-3) 62%, transparent) 74%),
+    linear-gradient(105deg, color-mix(in oklch, var(--merc) 50%, transparent) 0%, transparent 44%),
+    linear-gradient(255deg, color-mix(in oklch, var(--fer) 50%, transparent) 0%, transparent 44%),
+    var(--color-paper-3);
+}
+
+/* Each podium photo covers its own half and fades toward the centre where the
+   battle banner sits. Faded on the inner edge (and softly top/bottom). */
+.hero-side {
   position: absolute;
-  left: var(--space-lg);
-  bottom: calc(-1 * var(--space-lg));
-  font-size: var(--text-carnum);
-  font-weight: 700;
-  line-height: 0.8;
-  letter-spacing: -0.06em;
-  color: color-mix(in oklab, var(--team, var(--color-cool)) 22%, var(--color-paper-3));
-  -webkit-text-stroke: 2px var(--team, var(--color-cool));
-  user-select: none;
-}
-
-.hm-portrait img {
-  position: absolute;
-  right: var(--space-xl);
-  top: var(--space-lg);
-  height: 175%;
-  width: auto;
-}
-
-/* Podium as timing rows. */
-.hm-podium {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-}
-
-.hm-podium li {
-  display: grid;
-  grid-template-columns: 3rem 4px 3.25rem minmax(0, 1fr) auto;
-  align-items: center;
-  gap: var(--space-sm);
-  padding: var(--space-sm) var(--space-lg);
-  border-top: var(--rule-hair) solid var(--color-rule);
-}
-
-.hm-podium li:first-child {
-  border-top: 0;
-}
-
-.hm-pos {
-  color: var(--color-muted);
-  font-size: var(--text-sm);
-}
-
-.hm-swatch {
-  display: block;
-  width: 4px;
-  height: 20px;
-  border-radius: 2px;
-}
-
-.hm-code {
-  font-weight: 700;
-  color: var(--color-ink);
-}
-
-.hm-name {
-  min-width: 0;
+  top: 0;
+  bottom: 0;
+  width: 54%;
   overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  color: var(--color-ink-2);
+  z-index: 1;
+  pointer-events: none;
 }
 
-.hm-team {
-  color: var(--color-muted);
-  font-size: var(--text-sm);
-}
-
-.hm-podium .hm-out {
-  grid-template-columns: auto minmax(0, 1fr);
-  background: var(--color-paper-3);
-}
-
-.hm-out .hm-name {
-  color: var(--color-muted);
-}
-
-/* ---------- Sections ---------- */
-.hm-section {
-  display: grid;
-  gap: var(--space-xl);
-}
-
-.hm-head {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  gap: var(--space-md);
-}
-
-.hm-note {
-  color: var(--color-muted);
-  font-size: var(--text-sm);
-}
-
-/* Championship as a timing table. */
-.hm-table {
-  width: 100%;
-  border-collapse: collapse;
-}
-
-.hm-table th {
-  padding: var(--space-sm) var(--space-lg);
-  border-bottom: var(--rule-hair) solid var(--color-rule);
-  color: var(--color-muted);
-  font: 500 var(--text-sm) / 1.2 var(--font-body);
-  text-align: left;
-}
-
-.hm-table td {
-  padding: var(--space-md) var(--space-lg);
-  border-top: var(--rule-hair) solid var(--color-rule);
-  vertical-align: middle;
-}
-
-.hm-table tbody tr:first-child td {
-  border-top: 0;
-}
-
-.hm-table .num {
-  text-align: right;
-  white-space: nowrap;
-}
-
-.hm-table td.hm-reading {
-  font-size: var(--text-lead);
-  color: var(--color-ink);
-}
-
-.hm-table td.hm-gap {
-  font-size: var(--text-md);
-  color: var(--color-cool);
-}
-
-.hm-driver {
-  display: flex;
-  align-items: center;
-  gap: var(--space-sm);
-  min-width: 0;
-}
-
-.hm-driver a {
-  color: var(--color-ink);
-  white-space: nowrap;
-  font-weight: 600;
-  text-decoration: underline;
-  text-decoration-color: transparent;
-  text-underline-offset: 4px;
-  transition: text-decoration-color var(--dur-short) var(--ease-out);
-}
-
-.hm-driver a:hover {
-  text-decoration-color: var(--color-accent);
-}
-
-.hm-bar-col {
-  width: 34%;
-}
-
-.hm-bar {
-  display: block;
-  height: 8px;
-  border-radius: 2px;
-  background: var(--color-track);
-  overflow: hidden;
-}
-
-.hm-bar > span {
-  display: block;
-  height: 100%;
-  border-radius: 0 2px 2px 0;
-  background: var(--color-cool);
-}
-
-/* ---------- Next race band ---------- */
-.hm-band {
-  padding: var(--space-2xl);
-  border: var(--rule-hair) solid var(--color-rule);
-  border-radius: var(--radius-card);
-  background: var(--color-paper-3);
-  color: var(--color-ink);
-}
-
-.hm-band-inner {
-  display: grid;
-  grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
-  align-items: center;
-  gap: var(--space-2xl);
-}
-
-.hm-next-text {
-  display: grid;
-  gap: var(--space-md);
-  justify-items: start;
-}
-
-.hm-date {
-  display: flex;
-  align-items: baseline;
-  gap: var(--space-sm);
-  margin-top: var(--space-md);
-  line-height: 0.9;
-}
-
-.hm-date-day {
-  font-size: var(--text-reading);
-  font-weight: 500;
-  letter-spacing: -0.04em;
-  color: var(--color-ink);
-}
-
-.hm-date-month {
-  font-size: var(--text-lead);
-  color: var(--color-cool);
-}
-
-.hm-next-gp {
-  font: 800 var(--text-title) / 1.1 var(--font-display);
-  text-transform: uppercase;
-}
-
-.hm-next-place {
-  color: var(--color-muted);
-  margin-bottom: var(--space-md);
-}
-
-.hm-circuit {
-  height: 360px;
-  padding: var(--space-xl);
-  background: var(--color-paper-2);
-}
-
-.hm-circuit svg {
-  width: 100%;
-  height: 100%;
-}
-
-/* ---------- News index ---------- */
-.hm-news {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-}
-
-.hm-news li + li {
-  border-top: var(--rule-hair) solid var(--color-rule);
-}
-
-.hm-news a {
-  display: grid;
-  grid-template-columns: 9rem minmax(0, 1fr);
-  align-items: baseline;
-  gap: var(--space-lg);
-  padding: var(--space-md) var(--space-lg);
-  color: var(--color-ink);
-  text-decoration: none;
-  transition: background-color var(--dur-short) var(--ease-out);
-}
-
-.hm-news a:hover {
-  background: var(--color-paper-3);
-}
-
-.hm-news a:hover .hm-news-title {
-  text-decoration-color: var(--color-accent);
-}
-
-.hm-news time {
-  color: var(--color-cool);
-  font-size: var(--text-sm);
-}
-
-.hm-news-title {
-  font-weight: 600;
-  line-height: 1.35;
-  text-decoration: underline;
-  text-decoration-color: transparent;
-  text-underline-offset: 4px;
-  transition: text-decoration-color var(--dur-short) var(--ease-out);
-}
-
-/* ---------- Loading frames and the off-season fallback ---------- */
-.hm-skeleton .hm-timing {
-  min-height: 560px;
-  background: var(--color-paper-2);
-}
-
-.hm-skeleton .hm-lead {
-  color: var(--color-muted);
-}
-
-.hm-news--skeleton li {
-  height: 56px;
-}
-
-.hm-duo {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-  gap: var(--rule-hair);
-  background: var(--color-rule);
-  height: 480px;
-}
-
-.hm-duo img {
+.hero-photo {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  opacity: 0.82;
+}
+
+.hero-left {
+  left: 0;
+}
+
+.hero-left .hero-photo {
+  object-position: 52% 22%;
+  mask-image: linear-gradient(90deg, #000 0%, #000 52%, transparent 100%);
+  -webkit-mask-image: linear-gradient(90deg, #000 0%, #000 52%, transparent 100%);
+}
+
+.hero-right {
+  right: 0;
+}
+
+.hero-right .hero-photo {
+  object-position: 62% 28%;
+  mask-image: linear-gradient(270deg, #000 0%, #000 52%, transparent 100%);
+  -webkit-mask-image: linear-gradient(270deg, #000 0%, #000 52%, transparent 100%);
+}
+
+/* Dark vignette over the photos so the central banner stays legible. */
+.hero-veil {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  background: radial-gradient(
+    62% 130% at 50% 46%,
+    color-mix(in oklch, var(--color-paper-3) 90%, transparent) 0%,
+    color-mix(in oklch, var(--color-paper-3) 90%, transparent) 24%,
+    color-mix(in oklch, var(--color-paper-3) 50%, transparent) 52%,
+    transparent 78%
+  );
+}
+
+.hero-content {
+  position: relative;
+  z-index: 3;
+  text-align: center;
+  padding: 0 1rem;
+  max-width: 560px;
+}
+
+.hero-kicker {
+  color: var(--color-cool);
+  font-weight: 600;
+  margin: 0 0 0.4rem;
+  font-size: 0.9rem;
+}
+
+.hero-title {
+  font-size: 3.2rem;
+  font-weight: 900;
+  font-style: italic;
+  margin: 0;
+  line-height: 1;
+  text-shadow: 0 2px 12px var(--color-veil);
+}
+
+.hero-title span {
+  color: var(--color-accent);
+}
+
+/* Central battle banner — the season fight between the two sides. */
+.hero-battle {
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
+  gap: 0;
+  margin: 1.3rem auto 0;
+  border-radius: var(--radius-card);
+  overflow: hidden;
+  border: var(--rule-hair) solid var(--color-rule-2);
+  background: color-mix(in oklch, var(--color-paper-2) 88%, transparent);
+}
+
+.battle-side {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.15rem;
+  padding: 0.7rem 1.4rem;
+  min-width: 130px;
+}
+
+.battle-team {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--color-muted);
+}
+
+.battle-driver {
+  font-size: 1.25rem;
+  font-weight: 900;
+  font-style: italic;
+  letter-spacing: 0.5px;
+}
+
+.battle-merc {
+  border-top: 3px solid var(--merc);
+}
+
+.battle-fer {
+  border-top: 3px solid var(--fer);
+}
+
+.battle-vs {
+  display: flex;
+  align-items: center;
+  padding: 0 0.9rem;
+  font-weight: 900;
+  font-style: italic;
+  font-size: 0.95rem;
+  color: var(--color-ink);
   background: var(--color-paper-3);
 }
 
-/* ---------- Narrow screens ---------- */
-@media (max-width: 900px) {
-  .hm-hero,
-  .hm-band-inner {
-    grid-template-columns: minmax(0, 1fr);
-    gap: var(--space-xl);
-    min-height: 0;
-  }
-
-  .hm-portrait {
-    height: 300px;
-  }
-
-  .hm-band {
-    padding: var(--space-xl) var(--space-lg);
-  }
-
-  .hm-circuit {
-    height: 260px;
-  }
+.hero-tag {
+  color: var(--color-ink-2);
+  margin: 1rem auto 0;
+  max-width: 420px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  text-shadow: 0 1px 6px var(--color-veil);
 }
 
-@media (max-width: 640px) {
-  .home {
-    gap: var(--space-2xl);
-  }
-
-  .hm-podium li {
-    grid-template-columns: 2.5rem 4px 3rem minmax(0, 1fr);
-    padding: var(--space-sm) var(--space-md);
-  }
-
-  .hm-podium .hm-team {
-    display: none;
-  }
-
-  .hm-table th,
-  .hm-table td {
-    padding-inline: var(--space-sm);
-  }
-
-  .hm-table .hm-bar-col,
-  .hm-driver .hm-team {
-    display: none;
-  }
-
-  .hm-news a {
-    grid-template-columns: minmax(0, 1fr);
-    gap: var(--space-2xs);
-    padding: var(--space-md);
-  }
+/* ---------- Latest-winner hero ---------- */
+/* Loading placeholder: the hero wash with a gently pulsing label. */
+.hero-skeleton .hero-kicker {
+  animation: heroPulse 1.4s ease-in-out infinite;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .hm-btn,
-  .hm-driver a,
-  .hm-news a,
-  .hm-news-title {
+  .hero-skeleton .hero-kicker {
+    animation: none;
+  }
+}
+
+@keyframes heroPulse {
+  0%,
+  100% {
+    opacity: 0.3;
+  }
+  50% {
+    opacity: 0.85;
+  }
+}
+
+.hero-winner {
+  justify-content: flex-start;
+  /* Team-colour glow behind the driver (so the dark figure pops), fading to a
+     dark-left panel that keeps the headline legible. */
+  background:
+    radial-gradient(46% 78% at 80% 58%, var(--team, var(--color-rule)) -35%, transparent 72%),
+    linear-gradient(100deg, var(--color-paper-3) 34%, color-mix(in oklch, var(--color-paper-3) 15%, transparent) 100%),
+    var(--color-paper-3);
+}
+
+/* Winner portrait: full-height, anchored bottom-right, behind the content. */
+.hero-winner .head-wrap {
+  position: absolute;
+  top: 0;
+  right: 2%;
+  bottom: 0;
+  height: 100%;
+  width: auto;
+  margin: 0;
+  padding: 0;
+  border: none;
+  border-radius: 0;
+  background: transparent !important;
+  display: flex;
+  align-items: flex-end;
+  justify-content: flex-end;
+  overflow: visible;
+  opacity: 1;
+  z-index: 1;
+}
+
+.hero-winner .head-img {
+  height: 96%;
+  max-height: 400px;
+  width: auto;
+  object-fit: contain;
+  filter: drop-shadow(0 14px 30px var(--color-veil));
+}
+
+.hero-content--winner {
+  text-align: left;
+  z-index: 3;
+  padding: 0 2rem;
+  max-width: 62%;
+}
+
+.hero-content--winner .hero-title {
+  font-size: 3rem;
+  font-style: normal;
+  text-transform: uppercase;
+  letter-spacing: -0.5px;
+}
+
+.hero-content--winner .hero-kicker {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.2rem 1rem;
+}
+
+/* ---------- Podium board ----------
+   The last race's top three as a small timing board on a solid panel:
+   position, team swatch, surname over team, then the winner's race time or
+   the gap to the winner in instrument blue. */
+.podium-board {
+  list-style: none;
+  margin: 1.2rem 0 0;
+  padding: 0.2rem 0;
+  max-width: 400px;
+  background: color-mix(in oklch, var(--color-paper-2) 92%, transparent);
+  border: var(--rule-hair) solid var(--color-rule);
+  border-radius: var(--radius-card);
+}
+
+.pb-row {
+  display: grid;
+  grid-template-columns: 1.1rem 4px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.5rem 0.75rem;
+  border-top: var(--rule-hair) solid var(--color-rule);
+}
+
+.pb-row:first-child {
+  border-top: 0;
+}
+
+.pb-pos {
+  font-family: var(--font-outlier);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  color: var(--color-muted);
+}
+
+.pb-row--p1 .pb-pos {
+  color: var(--color-accent);
+}
+
+.pb-swatch {
+  height: 1.8rem;
+  border-radius: 2px;
+}
+
+.pb-name {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  color: var(--color-ink);
+  text-decoration: none;
+}
+
+.pb-name b {
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+  font-weight: 800;
+  line-height: 1.05;
+  text-transform: uppercase;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  transition: color var(--dur-micro) var(--ease-out);
+}
+
+.pb-name:hover b {
+  color: var(--color-cool);
+}
+
+.pb-name:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+.pb-team {
+  font-size: 0.78rem;
+  font-weight: 500;
+  color: var(--color-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.pb-time {
+  font-family: var(--font-outlier);
+  font-size: 0.8rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums slashed-zero;
+  color: var(--color-cool);
+  white-space: nowrap;
+}
+
+.pb-row--p1 .pb-time {
+  color: var(--color-ink);
+}
+
+.hero-note {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin: 0.9rem 0 0;
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: var(--color-ink);
+  text-shadow: 0 1px 6px var(--color-veil);
+}
+
+.hero-note-tag {
+  border: var(--rule-hair) solid var(--color-bad);
+  color: var(--color-bad);
+  font-size: 0.8rem;
+  font-weight: 600;
+  padding: 0 0.45rem;
+  border-radius: 4px;
+}
+
+/* ---------- Race-number hero ----------
+   The winner from the waist up, large, in front of their car number and a
+   team-colour stripe. The portrait overflows the frame at the bottom and
+   fades out, so it reads as a close-up rather than a full-length figure. */
+.hero-num,
+.hero-skeleton {
+  min-height: 460px;
+}
+
+.hero-bignum {
+  position: absolute;
+  right: -5%;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 0;
+  font: 800 clamp(18rem, 34vw, 34rem) / 0.8 var(--font-display);
+  letter-spacing: -0.04em;
+  color: color-mix(in oklch, var(--team) 32%, transparent);
+  -webkit-text-stroke: 2px var(--team);
+  pointer-events: none;
+  user-select: none;
+}
+
+.hero-stripe {
+  position: absolute;
+  top: -10%;
+  bottom: -10%;
+  right: 40%;
+  width: 56px;
+  z-index: 0;
+  transform: skewX(-16deg);
+  background: var(--team);
+  opacity: 0.55;
+  box-shadow: 22px 0 0 -14px var(--accent);
+}
+
+.hero-num .head-wrap {
+  right: 11%;
+  align-items: flex-start;
+}
+
+.hero-num .head-img {
+  height: 155%;
+  max-height: none;
+  margin-top: 3%;
+  -webkit-mask-image: linear-gradient(to bottom, #000 50%, transparent 63%);
+  mask-image: linear-gradient(to bottom, #000 50%, transparent 63%);
+}
+
+/* A narrower text column: the name breaks onto its own line(s) and stays
+   clear of the portrait. */
+.hero-num .hero-content--winner {
+  max-width: 52%;
+}
+
+/* Whole words only: the surname and "wins" never split mid-word. */
+.hero-num .hero-content--winner .hero-title {
+  font-size: clamp(2rem, 3.1vw, 2.8rem);
+  overflow-wrap: normal;
+  word-break: normal;
+  hyphens: none;
+}
+
+@media (max-width: 768px) {
+  /* Phones: number top-left, portrait top-right, text on a dark band below. */
+  /* The loading placeholder keeps the same height, so nothing jumps. */
+  .hero-skeleton {
+    min-height: 660px;
+  }
+  .hero-num {
+    min-height: 660px;
+    align-items: flex-end;
+    padding-bottom: 1.4rem;
+  }
+  .hero-num::after {
+    content: '';
+    position: absolute;
+    inset: 42% 0 0;
+    z-index: 2;
+    background: linear-gradient(to bottom, transparent, var(--color-paper-3) 45%);
+    pointer-events: none;
+  }
+  .hero-num .hero-bignum {
+    font-size: 14rem;
+    top: 1.5rem;
+    left: 0.6rem;
+    right: auto;
+    transform: none;
+  }
+  .hero-num .hero-stripe {
+    right: 40%;
+    width: 34px;
+  }
+  .hero.hero-num .head-wrap {
+    right: -2%;
+  }
+  /* A fixed height (not a share of the taller hero) keeps the face in the
+     top half, clear of the podium board below. */
+  .hero.hero-winner.hero-num .head-img {
+    height: 560px;
+    max-height: none;
+    opacity: 1;
+  }
+  .hero.hero-num .hero-content--winner {
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 768px) {
+  /* Winner hero on phones: the photo shrinks and fades behind full-width
+     content. One class heavier than the base hero rules above. */
+  .hero .hero-content--winner {
+    max-width: 100%;
+    padding: 0 1.1rem;
+  }
+  .hero .hero-content--winner .hero-title {
+    font-size: 2.5rem;
+  }
+  .hero.hero-winner .head-img {
+    max-height: 300px;
+    opacity: 0.35;
+  }
+}
+
+/* ---------- News strip ---------- */
+.news-strip {
+  margin-top: 1.5rem;
+}
+
+.news-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 0.75rem;
+}
+
+.news-head h2 {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.news-src {
+  color: var(--color-muted);
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
+.news-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 0.75rem;
+}
+
+.news-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  min-height: 84px;
+  background: var(--color-paper-2);
+  border: var(--rule-hair) solid var(--color-rule);
+  border-radius: var(--radius-card);
+  padding: 0.9rem 1rem;
+  text-decoration: none;
+  color: var(--color-ink);
+  transition: border-color var(--dur-short) var(--ease-out);
+}
+
+/* Empty placeholder card shown while headlines load (reserves the space). */
+.news-item--skeleton {
+  opacity: 0.4;
+}
+
+.news-item:hover {
+  border-color: var(--color-ink-2);
+}
+
+.news-item:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+.news-title {
+  font-weight: 700;
+  font-size: 0.9rem;
+  line-height: 1.3;
+}
+
+.news-meta {
+  display: flex;
+  gap: 0.8rem;
+  color: var(--color-muted);
+  font-size: 0.78rem;
+  font-weight: 500;
+  margin-top: auto;
+}
+
+.news-ago {
+  color: var(--color-cool);
+}
+
+/* ---------- Hero + championship sidebar + next race ---------- */
+.home-top {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: stretch;
+  gap: 1.25rem;
+}
+
+.home-top > .hero {
+  flex: 999 1 560px;
+  min-width: 0;
+}
+
+.home-aside {
+  flex: 1 1 300px;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+/* Red CTA under the hero headline: the page's one primary action. */
+.hero-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  min-height: 44px;
+  margin-top: 1.2rem;
+  background: var(--color-accent);
+  color: var(--color-accent-ink);
+  font-weight: 700;
+  font-size: 0.9rem;
+  padding: 0 1.15rem;
+  border-radius: var(--radius-pill);
+  text-decoration: none;
+  width: fit-content;
+  transition: background-color var(--dur-micro) var(--ease-out);
+}
+
+.hero-cta:hover {
+  background: var(--color-accent-hover);
+}
+
+.hero-cta:active {
+  transform: translateY(1px);
+}
+
+.hero-cta:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 3px;
+}
+
+.champ-card {
+  flex: 1;
+  background: var(--color-paper-2);
+  border: var(--rule-hair) solid var(--color-rule);
+  border-radius: var(--radius-card);
+  padding: 1.1rem 1.2rem;
+}
+
+.champ-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  font-family: var(--font-display);
+  font-weight: 800;
+  text-transform: uppercase;
+  font-size: 1.25rem;
+  line-height: 1.1;
+  color: var(--color-ink);
+  margin-bottom: 0.9rem;
+}
+
+.champ-season {
+  font-family: var(--font-outlier);
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--color-cool);
+}
+
+.champ-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.champ-list li {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+}
+
+.champ-pos {
+  font-family: var(--font-outlier);
+  font-weight: 600;
+  font-size: 0.95rem;
+  width: 1.1rem;
+  color: var(--color-muted);
+}
+
+.champ-list li:first-child .champ-pos {
+  color: var(--color-accent);
+}
+
+/* Name line + team-colour progress bar (scaled to the leader's points). */
+.champ-main {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.champ-line {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: 0;
+}
+
+.champ-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 2px;
+  flex: none;
+}
+
+.champ-bar {
+  display: block;
+  height: 3px;
+  border-radius: 2px;
+  background: var(--color-rule);
+  overflow: hidden;
+}
+
+.champ-bar > span {
+  display: block;
+  height: 100%;
+  border-radius: 2px;
+}
+
+.champ-name {
+  flex: 1;
+  min-width: 0;
+  color: var(--color-ink);
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 0.9rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.champ-name:hover {
+  color: var(--color-cool);
+}
+
+.champ-name:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+.champ-pts {
+  font-family: var(--font-outlier);
+  font-weight: 600;
+  font-size: 1rem;
+  font-variant-numeric: tabular-nums slashed-zero;
+  color: var(--color-cool);
+}
+
+.home-next {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+  background: var(--color-paper-2);
+  border: var(--rule-hair) solid var(--color-rule);
+  border-radius: var(--radius-card);
+  padding: 0.85rem 1rem;
+  color: var(--color-ink);
+  text-decoration: none;
+  transition: border-color var(--dur-short) var(--ease-out);
+}
+
+.home-next:hover {
+  border-color: var(--color-ink-2);
+}
+
+.home-next:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+.home-next-date {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  flex: none;
+  background: var(--color-cool-soft);
+  border-radius: var(--radius-pill);
+  color: var(--color-cool);
+  font-variant-numeric: tabular-nums;
+}
+
+.home-next-date b {
+  font-family: var(--font-outlier);
+  font-weight: 600;
+  font-size: 1.1rem;
+  line-height: 1;
+}
+
+.home-next-date em {
+  font-style: normal;
+  font-size: 0.65rem;
+  font-weight: 600;
+}
+
+.home-next-label {
+  display: block;
+  font-size: 0.8rem;
+  color: var(--color-muted);
+  font-weight: 500;
+}
+
+.home-next-gp {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1.1rem;
+}
+
+.home-next-row {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+  min-width: 0;
+}
+
+.home-next-place {
+  display: block;
+  margin-top: 0.1rem;
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--color-muted);
+}
+
+/* With a track outline the card stacks: date + name, then the map. */
+.home-next.has-map {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0.8rem;
+}
+
+.home-next-map {
+  display: block;
+  aspect-ratio: 16 / 9;
+  padding: 0.9rem 1.1rem;
+  background: var(--color-paper-3);
+  border-radius: var(--radius-pill);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .news-item,
+  .home-next,
+  .hero-cta,
+  .pb-name b {
     transition: none;
   }
-
-  .hm-btn:active {
+  .hero-cta:active {
     transform: none;
   }
 }
