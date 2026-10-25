@@ -60,7 +60,7 @@ export default function WeekendSchedule({
     return `${d > 0 ? `${d}${t('sched.dayShort')} ` : ''}${pad(h)}:${pad(m)}:${pad(s)}`
   }
 
-  // "Fri 23" / "Пт 23" — the month is already shown in the calendar row.
+  // "Fri 23" / "Пт 23": the month is already shown in the calendar row.
   function dayLabel(start: string): string {
     const wd = fmtDate(start, { weekday: 'short' }).replace('.', '')
     const day = fmtDate(start, { day: 'numeric' })
@@ -134,9 +134,10 @@ export default function WeekendSchedule({
 
       <div className="sched-foot">
         {hasTimes && <p className="sched-tz">{t('sched.localTime', { tz })}</p>}
-        <Link to={`/circuits/${race.circuitId}`} className="sched-circuit">
-          {race.circuitName} · {t('circ.viewCircuit')} ›
-        </Link>
+        <p className="sched-circuit">
+          {t('circ.viewCircuit')}:{' '}
+          <Link to={`/circuits/${race.circuitId}`}>{race.circuitName}</Link>
+        </p>
       </div>
     </div>
   )

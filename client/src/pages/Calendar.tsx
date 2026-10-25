@@ -80,7 +80,7 @@ export default function Calendar() {
       {!loading && error && <p className="banner">{t('cal.loadError', { error })}</p>}
 
       {!loading && data && (
-        <div className="card">
+        <div className="card cal-card">
           <table className="standings">
             <thead>
               <tr>
@@ -129,7 +129,7 @@ export default function Calendar() {
                           {r.isSprint && <span className="sprint-badge">{t('cal.sprint')}</span>}
                         </span>
                       </td>
-                      <td className="muted">
+                      <td className="muted cal-date">
                         {fmtDate(r.date, { day: '2-digit', month: 'short' }) || r.date}
                       </td>
                       <td>
@@ -152,9 +152,7 @@ export default function Calendar() {
                             />
                             {r.winnerConstructorName}
                           </span>
-                        ) : (
-                          <span className="muted">—</span>
-                        )}
+                        ) : null}
                       </td>
                       <td className="muted chevron">
                         {done ? '›' : <span className={`sched-caret${open ? ' open' : ''}`}>›</span>}

@@ -1,9 +1,14 @@
+/* Hallmark · shape: app screen · genre: modern-minimal · theme: Console (graphite), brand kept · redesign: full
+ * nav: kept · signature: the season as a timing table, the next race's schedule opening under its row · states: loading, error, full
+ * axes: dark/condensed-sans/brand-red · contrast: pass · v2.0.0 */
+/* Hallmark · waive 26b · the schedule's one control, .sched-ics, takes :active and :disabled in styles/shared.css · that button is styled once for every page that shows it */
+
 /* Weekend schedule that expands under an upcoming race in the calendar. */
 
 .sched {
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  background: var(--panel);
+  border: var(--rule-hair) solid var(--color-rule);
+  border-radius: var(--radius-card);
+  background: var(--color-paper-2);
   padding: 1rem 1.1rem 0.85rem;
 }
 
@@ -24,33 +29,29 @@
 }
 
 .sched-label {
-  font-size: 0.68rem;
-  font-weight: 700;
-  letter-spacing: 1.2px;
-  text-transform: uppercase;
-  color: var(--muted-2);
+  font-size: var(--text-sm);
+  font-weight: 500;
+  color: var(--color-muted);
 }
 
 .sched-label--live {
   display: inline-flex;
   align-items: center;
   gap: 0.4rem;
-  color: var(--accent);
+  color: var(--color-accent);
 }
 
 .sched-next b {
   font-family: var(--font-display);
   font-size: 1.15rem;
   font-weight: 700;
-  color: var(--text);
+  color: var(--color-ink);
 }
 
 .sched-count {
-  font-family: var(--font-display);
-  font-size: 1.15rem;
-  font-weight: 700;
-  color: var(--accent);
-  font-variant-numeric: tabular-nums;
+  font-size: 1.05rem;
+  font-weight: 500;
+  color: var(--color-cool);
 }
 
 .sched-list {
@@ -66,7 +67,7 @@
   align-items: center;
   gap: 0.75rem;
   padding: 0.55rem 0.6rem;
-  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  border-top: var(--rule-hair) solid var(--color-rule);
 }
 
 .sched-item:first-child {
@@ -74,35 +75,34 @@
 }
 
 .sched-day {
-  color: var(--muted);
+  color: var(--color-muted);
   font-size: 0.85rem;
 }
 
 .sched-name {
   font-weight: 600;
-  color: var(--text);
+  color: var(--color-ink);
 }
 
 .sched-time {
-  font-weight: 700;
-  font-variant-numeric: tabular-nums;
-  color: var(--text);
+  font-weight: 500;
+  color: var(--color-ink);
 }
 
 .sched-item--race {
-  box-shadow: inset 3px 0 0 var(--accent);
-  background: rgba(225, 6, 0, 0.06);
+  box-shadow: inset 3px 0 0 var(--color-accent);
+  background: var(--color-paper-3);
   border-radius: 4px;
 }
 
 .sched-item--race .sched-name {
-  color: #fff;
+  color: var(--color-ink);
 }
 
 .sched-item--done .sched-name,
 .sched-item--done .sched-time,
 .sched-item--done .sched-day {
-  color: var(--muted-2);
+  color: var(--color-muted-2);
 }
 
 .sched-item--done .sched-time {
@@ -110,19 +110,17 @@
 }
 
 .sched-live {
-  padding: 0.08rem 0.5rem;
-  border-radius: 999px;
-  background: var(--accent);
-  color: #fff;
-  font-size: 0.7rem;
-  font-weight: 800;
-  letter-spacing: 0.8px;
+  padding: 0.05rem 0.45rem;
+  border-radius: 4px;
+  background: var(--color-accent);
+  color: var(--color-accent-ink);
+  font: 600 0.78rem var(--font-body);
 }
 
 .sched-tz {
   margin: 0.7rem 0 0;
-  font-size: 0.75rem;
-  color: var(--muted-2);
+  font-size: 0.8rem;
+  color: var(--color-muted);
 }
 
 .sched-empty {
@@ -134,8 +132,10 @@
   .sched {
     position: sticky;
     left: 0;
-    /* viewport − page gutters (2 × 1rem) − card padding (2 × 1.5rem) − border */
-    width: calc(100vw - 5rem - 2px);
+    /* The calendar card is a size container and 100cqw is its content
+       width, so the schedule fills the visible part of a table that scrolls
+       sideways. */
+    width: 100cqw;
     box-sizing: border-box;
     padding: 0.85rem 0.8rem 0.7rem;
   }
@@ -160,12 +160,23 @@
 
 .sched-circuit {
   margin-top: 0.7rem;
-  font-size: 0.8rem;
-  font-weight: 600;
-  color: var(--muted);
-  text-decoration: none;
+  font-size: 0.85rem;
+  color: var(--color-muted);
 }
 
-.sched-circuit:hover {
-  color: var(--accent);
+.sched-circuit a {
+  color: var(--color-ink);
+  font-weight: 600;
+  text-decoration: underline;
+  text-decoration-color: var(--color-rule-2);
+  text-underline-offset: 3px;
+}
+
+.sched-circuit a:hover {
+  text-decoration-color: var(--color-accent);
+}
+
+.sched-circuit a:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
 }

@@ -1,19 +1,33 @@
+/* Hallmark · shape: app screen · genre: modern-minimal · theme: Console (graphite), brand kept · redesign: full
+ * nav: kept · signature: the season as a timing table, the next race's schedule opening under its row · states: loading, error, full
+ * axes: dark/condensed-sans/brand-red · contrast: pass · v2.0.0 */
+
 /* Calendar table: next-race marker, sprint badge, expandable schedule rows. */
 
 /* Sprint marker next to a Grand Prix name. */
 .sprint-badge {
   display: inline-block;
   margin-left: 0.5rem;
-  padding: 0.08rem 0.45rem;
-  border-radius: 999px;
-  background: rgba(225, 6, 0, 0.1);
-  border: 1px solid rgba(225, 6, 0, 0.45);
-  color: #ff6a66;
-  font-size: 0.62rem;
-  font-weight: 800;
-  letter-spacing: 0.6px;
-  text-transform: uppercase;
+  padding: 0.05rem 0.45rem;
+  border-radius: 4px;
+  background: var(--color-cool-soft);
+  border: var(--rule-hair) solid color-mix(in oklab, var(--color-cool) 40%, transparent);
+  color: var(--color-cool);
+  font-size: 0.78rem;
+  font-weight: 600;
   vertical-align: middle;
+}
+
+/* The schedule under an open row sizes to this card (see WeekendSchedule.css). */
+.cal-card {
+  container-type: inline-size;
+}
+
+/* Race dates are readings. */
+.cal-date {
+  white-space: nowrap;
+  font-family: var(--font-outlier);
+  font-variant-numeric: tabular-nums slashed-zero;
 }
 
 /* Page head: Subscribe + season picker on the right. */
@@ -23,29 +37,35 @@
   gap: 0.5rem;
 }
 
-/* The next race to run gets a red edge (its NEXT tag is in shared.css). */
+/* The next race to run gets a red edge (its Next tag is in shared.css). */
 .row-next td:first-child {
-  box-shadow: inset 3px 0 0 var(--accent);
+  box-shadow: inset 3px 0 0 var(--color-accent);
 }
 
 .sched-caret {
   display: inline-block;
-  transition: transform 0.15s ease;
+  transition: transform var(--dur-short) var(--ease-out);
 }
 
 .sched-caret.open {
   transform: rotate(90deg);
-  color: var(--accent);
+  color: var(--color-accent);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sched-caret {
+    transition: none;
+  }
 }
 
 .row-open td {
   border-bottom-color: transparent;
-  background: rgba(255, 255, 255, 0.03);
+  background: var(--color-paper-3);
 }
 
 .standings .sched-row td {
   padding: 0 0.75rem 1rem;
-  background: rgba(255, 255, 255, 0.03);
+  background: var(--color-paper-3);
   font-weight: 500;
 }
 

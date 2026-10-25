@@ -1,14 +1,19 @@
+/* Hallmark · shape: app screen · genre: modern-minimal · theme: Console (graphite), brand kept · redesign: full
+ * nav: kept · signature: the season as a timing table, the next race's schedule opening under its row · states: loading, error, full
+ * axes: dark/condensed-sans/brand-red · contrast: pass · v2.0.0 */
+
 /* Calendar page: "Subscribe" toggle (page head) and its panel. */
 
 .sub-toggle {
   display: inline-flex;
   align-items: center;
   gap: 0.4rem;
-  background: var(--card);
-  color: var(--text);
-  border: 1px solid rgba(255, 255, 255, 0.14);
-  border-radius: 999px;
-  padding: 0.45rem 0.95rem;
+  min-height: 40px;
+  background: var(--color-paper-2);
+  color: var(--color-ink);
+  border: var(--rule-hair) solid var(--color-rule-2);
+  border-radius: var(--radius-pill);
+  padding: 0 var(--space-md);
   font: 600 0.9rem var(--font-body);
   cursor: pointer;
   white-space: nowrap;
@@ -16,7 +21,13 @@
 
 .sub-toggle:hover,
 .sub-toggle.on {
-  border-color: var(--accent);
+  border-color: var(--color-ink-2);
+}
+
+.sub-toggle:focus-visible,
+.sub-btn:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
 }
 
 .sub-panel {
@@ -25,15 +36,14 @@
 
 .sub-title {
   margin: 0 0 0.35rem;
-  font: 800 1.25rem var(--font-display);
+  font: 800 1.25rem / 1.1 var(--font-display);
   text-transform: uppercase;
-  letter-spacing: 0.5px;
 }
 
 .sub-text {
   max-width: 68ch;
   margin: 0 0 0.9rem;
-  color: var(--muted);
+  color: var(--color-muted);
 }
 
 .sub-actions {
@@ -46,35 +56,64 @@
 .sub-btn {
   display: inline-flex;
   align-items: center;
-  padding: 0.55rem 1rem;
-  border-radius: 8px;
-  border: 1px solid var(--accent);
-  background: var(--accent);
-  color: #fff;
-  font: 700 0.85rem var(--font-body);
+  min-height: 40px;
+  padding: 0 var(--space-md);
+  border-radius: var(--radius-pill);
+  border: var(--rule-hair) solid var(--color-rule-2);
+  background: var(--color-paper-2);
+  color: var(--color-ink);
+  font: 600 0.9rem var(--font-body);
   text-decoration: none;
   cursor: pointer;
+  transition: background-color var(--dur-short) var(--ease-out), border-color var(--dur-short) var(--ease-out);
 }
 
 .sub-btn:hover {
-  filter: brightness(1.12);
+  border-color: var(--color-ink-2);
+}
+
+/* One primary action: subscribing in Google Calendar. */
+.sub-btn--primary {
+  border-color: var(--color-accent);
+  background: var(--color-accent);
+  color: var(--color-accent-ink);
+}
+
+.sub-btn--primary:hover {
+  border-color: var(--color-accent-hover);
+  background: var(--color-accent-hover);
 }
 
 .sub-btn--ghost {
   background: transparent;
-  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.sub-btn:active,
+.sub-toggle:active {
+  transform: translateY(1px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sub-btn {
+    transition: none;
+  }
+  .sub-btn:active,
+  .sub-toggle:active {
+    transform: none;
+  }
 }
 
 .sub-url {
   display: block;
   overflow-wrap: anywhere;
-  color: var(--muted);
+  font-family: var(--font-outlier);
+  color: var(--color-muted);
   font-size: 0.78rem;
 }
 
 .sub-note {
   margin: 0.6rem 0 0;
-  color: var(--muted-2);
+  color: var(--color-muted);
   font-size: 0.78rem;
 }
 

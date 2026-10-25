@@ -562,6 +562,21 @@ table.standings {
   outline-offset: 2px;
 }
 
+.sched-ics:active {
+  transform: translateY(1px);
+}
+
+.sched-ics:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sched-ics:active {
+    transform: none;
+  }
+}
+
 a.sched-ics {
   text-decoration: none;
 }

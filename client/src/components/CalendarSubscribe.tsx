@@ -75,7 +75,7 @@ export default function SubscribePanel() {
       </div>
 
       <div className="sub-actions">
-        <a className="sub-btn" href={googleUrl} target="_blank" rel="noopener noreferrer">
+        <a className="sub-btn sub-btn--primary" href={googleUrl} target="_blank" rel="noopener noreferrer">
           {t('cal.subGoogle')}
         </a>
         <a className="sub-btn" href={webcalUrl}>
