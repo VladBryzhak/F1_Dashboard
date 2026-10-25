@@ -55,33 +55,7 @@
   align-items: flex-end;
 }
 
-/* Head and shoulders on the deepest surface: renders and photos are both
-   cropped from the top so the faces line up. */
-.duel-photo {
-  flex: none;
-  display: grid;
-  place-items: center;
-  width: 88px;
-  height: 100px;
-  overflow: hidden;
-  border: var(--rule-hair) solid var(--color-rule);
-  border-radius: var(--radius-pill);
-  background: var(--color-paper-3);
-}
-
-.duel-photo img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  object-position: 50% 0;
-}
-
-.duel-photo-code {
-  font: 600 1.1rem var(--font-outlier);
-  color: var(--color-muted);
-}
-
-.duel-name:hover .duel-photo {
+.duel-name:hover .drv-thumb {
   border-color: var(--color-ink-2);
 }
 
@@ -283,7 +257,7 @@
     align-items: flex-end;
   }
 
-  .duel-photo {
+  .duel-name .drv-thumb {
     width: 64px;
     height: 72px;
   }

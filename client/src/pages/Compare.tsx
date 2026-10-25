@@ -1,9 +1,10 @@
 import { useEffect, useMemo, useState } from 'react'
 import { api } from '../api/client'
+import DriverThumb from '../components/DriverThumb'
 import Flag from '../components/Flag'
 import { useAsync } from '../hooks/useAsync'
 import { useSeo } from '../hooks/useSeo'
-import { teamColor } from '../lib/f1meta'
+import { driverPortraitUrl, teamColor } from '../lib/f1meta'
 import type { DriverProfile, SeasonComparison as SeasonCmp } from '../types/f1'
 import { useI18n } from '../i18n/core'
 import './Compare.css'
@@ -21,6 +22,45 @@ function bestFinish(p: DriverProfile): number {
   return p.seasons.reduce(
     (best, s) => (s.position > 0 ? Math.min(best, s.position) : best),
     Infinity,
+  )
+}
+
+// One driver's header: thumbnail, name, flag and team swatch with a line of
+// context (career span or that season's team). Side b mirrors side a.
+function Head({
+  side,
+  givenName,
+  familyName,
+  countryCode,
+  nationality,
+  color,
+  urls,
+  sub,
+}: {
+  side: 'a' | 'b'
+  givenName: string
+  familyName: string
+  countryCode: string | null
+  nationality: string
+  color: string
+  urls: (string | null | undefined)[]
+  sub: string
+}) {
+  return (
+    <div className={`cmp-head cmp-head--${side}`}>
+      <DriverThumb urls={urls} code={familyName.slice(0, 3).toUpperCase()} />
+      <div className="cmp-id">
+        <h2>
+          <span className="cmp-given">{givenName}</span>
+          {familyName}
+        </h2>
+        <div className="cmp-sub">
+          <Flag code={countryCode} nationality={nationality} />
+          <span className="cmp-swatch" style={{ background: color }} />
+          <span>{sub}</span>
+        </div>
+      </div>
+    </div>
   )
 }
 
@@ -62,25 +102,27 @@ function Comparison({ a, b, h2h, photoA, photoB }: { a: DriverProfile; b: Driver
   return (
     <>
       <div className="cmp-heads">
-        <div className="cmp-head" style={{ borderTopColor: colorA }}>
-          <span className="stripe" style={{ background: colorA }} />
-          {photoA && <img className="cmp-photo" src={photoA} alt="" loading="lazy" />}
-          <h2>{a.givenName} {a.familyName}</h2>
-          <div className="cmp-sub">
-            <Flag code={a.countryCode} nationality={a.nationality} />
-            {a.firstSeason}–{a.lastSeason}
-          </div>
-        </div>
+        <Head
+          side="a"
+          givenName={a.givenName}
+          familyName={a.familyName}
+          countryCode={a.countryCode}
+          nationality={a.nationality}
+          color={colorA}
+          urls={[driverPortraitUrl(a.driverId, lastConstructor(a), String(a.lastSeason)), photoA]}
+          sub={`${a.firstSeason}-${a.lastSeason}`}
+        />
         <div className="cmp-vs">VS</div>
-        <div className="cmp-head" style={{ borderTopColor: colorB }}>
-          <span className="stripe" style={{ background: colorB }} />
-          {photoB && <img className="cmp-photo" src={photoB} alt="" loading="lazy" />}
-          <h2>{b.givenName} {b.familyName}</h2>
-          <div className="cmp-sub">
-            <Flag code={b.countryCode} nationality={b.nationality} />
-            {b.firstSeason}–{b.lastSeason}
-          </div>
-        </div>
+        <Head
+          side="b"
+          givenName={b.givenName}
+          familyName={b.familyName}
+          countryCode={b.countryCode}
+          nationality={b.nationality}
+          color={colorB}
+          urls={[driverPortraitUrl(b.driverId, lastConstructor(b), String(b.lastSeason)), photoB]}
+          sub={`${b.firstSeason}-${b.lastSeason}`}
+        />
       </div>
 
       <div className="card cmp-table">
@@ -93,8 +135,8 @@ function Comparison({ a, b, h2h, photoA, photoB }: { a: DriverProfile; b: Driver
         <Row label={t('cmp.podiumRate')} a={`${num(podPct(a), 1)}%`} b={`${num(podPct(b), 1)}%`} aWins={podPct(a) > podPct(b)} bWins={podPct(b) > podPct(a)} />
         <Row
           label={t('cmp.bestSeason')}
-          a={bestA === Infinity ? '—' : `P${bestA}`}
-          b={bestB === Infinity ? '—' : `P${bestB}`}
+          a={bestA === Infinity ? '' : `P${bestA}`}
+          b={bestB === Infinity ? '' : `P${bestB}`}
           aWins={bestA < bestB}
           bWins={bestB < bestA}
         />
@@ -103,10 +145,12 @@ function Comparison({ a, b, h2h, photoA, photoB }: { a: DriverProfile; b: Driver
       {h2h.racesTogether > 0 && (
         <div className="card cmp-h2h">
           <div className="cmp-h2h-head">
-            <h3>{t('cmp.h2h')}</h3>
-            <span className="muted">
-              {tn('plural.togetherN', h2h.racesTogether)} · {h2h.sharedSeasons[0]}–
-              {h2h.sharedSeasons[h2h.sharedSeasons.length - 1]}
+            <h3 className="wknd-section">{t('cmp.h2h')}</h3>
+            <span className="muted cmp-h2h-meta">
+              <span>{tn('plural.togetherN', h2h.racesTogether)}</span>
+              <span className="mono">
+                {h2h.sharedSeasons[0]}-{h2h.sharedSeasons[h2h.sharedSeasons.length - 1]}
+              </span>
             </span>
           </div>
           <div className="cmp-h2h-tally">
@@ -132,49 +176,56 @@ function SeasonComparison({ data, photoA, photoB }: { data: SeasonCmp; photoA?: 
   const totalH2H = data.headToHead.aheadA + data.headToHead.aheadB || 1
   const { t, tn, fmtNum } = useI18n()
   const num = (n: number) => fmtNum(n, { maximumFractionDigits: 1 })
-  const pos = (n: number | null) => (n == null ? '—' : `P${n}`)
-  const sub = (s: typeof a) =>
-    s.raced ? s.constructorName || '—' : t('cmp.didNotRace')
+  const pos = (n: number | null) => (n == null ? '' : `P${n}`)
+  const sub = (s: typeof a) => (s.raced ? s.constructorName : t('cmp.didNotRace'))
+  const thumb = (s: typeof a, photo?: string) => [
+    driverPortraitUrl(s.driverId, s.constructorId, String(data.season)),
+    photo,
+  ]
 
   return (
     <>
       <div className="cmp-heads">
-        <div className="cmp-head" style={{ borderTopColor: colorA }}>
-          <span className="stripe" style={{ background: colorA }} />
-          {photoA && <img className="cmp-photo" src={photoA} alt="" loading="lazy" />}
-          <h2>{a.givenName} {a.familyName}</h2>
-          <div className="cmp-sub">
-            <Flag code={a.countryCode} nationality={a.nationality} />
-            {sub(a)}
-          </div>
-        </div>
-        <div className="cmp-vs">{data.season}</div>
-        <div className="cmp-head" style={{ borderTopColor: colorB }}>
-          <span className="stripe" style={{ background: colorB }} />
-          {photoB && <img className="cmp-photo" src={photoB} alt="" loading="lazy" />}
-          <h2>{b.givenName} {b.familyName}</h2>
-          <div className="cmp-sub">
-            <Flag code={b.countryCode} nationality={b.nationality} />
-            {sub(b)}
-          </div>
-        </div>
+        <Head
+          side="a"
+          givenName={a.givenName}
+          familyName={a.familyName}
+          countryCode={a.countryCode}
+          nationality={a.nationality}
+          color={colorA}
+          urls={thumb(a, photoA)}
+          sub={sub(a)}
+        />
+        <div className="cmp-vs mono">{data.season}</div>
+        <Head
+          side="b"
+          givenName={b.givenName}
+          familyName={b.familyName}
+          countryCode={b.countryCode}
+          nationality={b.nationality}
+          color={colorB}
+          urls={thumb(b, photoB)}
+          sub={sub(b)}
+        />
       </div>
 
       <div className="card cmp-table">
         <Row label={t('cmp.championship')} a={pos(a.championshipPosition)} b={pos(b.championshipPosition)} aWins={(a.championshipPosition ?? Infinity) < (b.championshipPosition ?? Infinity)} bWins={(b.championshipPosition ?? Infinity) < (a.championshipPosition ?? Infinity)} />
-        <Row label={t('drv.points')} a={a.raced ? num(a.points) : '—'} b={b.raced ? num(b.points) : '—'} aWins={a.points > b.points} bWins={b.points > a.points} />
-        <Row label={t('drv.wins')} a={a.raced ? num(a.wins) : '—'} b={b.raced ? num(b.wins) : '—'} aWins={a.wins > b.wins} bWins={b.wins > a.wins} />
-        <Row label={t('drv.podiums')} a={a.raced ? num(a.podiums) : '—'} b={b.raced ? num(b.podiums) : '—'} aWins={a.podiums > b.podiums} bWins={b.podiums > a.podiums} />
-        <Row label={t('drv.poles')} a={a.raced ? num(a.poles) : '—'} b={b.raced ? num(b.poles) : '—'} aWins={a.poles > b.poles} bWins={b.poles > a.poles} />
-        <Row label={t('drv.fastestLaps')} a={a.raced ? num(a.fastestLaps) : '—'} b={b.raced ? num(b.fastestLaps) : '—'} aWins={a.fastestLaps > b.fastestLaps} bWins={b.fastestLaps > a.fastestLaps} />
+        <Row label={t('drv.points')} a={a.raced ? num(a.points) : ''} b={b.raced ? num(b.points) : ''} aWins={a.points > b.points} bWins={b.points > a.points} />
+        <Row label={t('drv.wins')} a={a.raced ? num(a.wins) : ''} b={b.raced ? num(b.wins) : ''} aWins={a.wins > b.wins} bWins={b.wins > a.wins} />
+        <Row label={t('drv.podiums')} a={a.raced ? num(a.podiums) : ''} b={b.raced ? num(b.podiums) : ''} aWins={a.podiums > b.podiums} bWins={b.podiums > a.podiums} />
+        <Row label={t('drv.poles')} a={a.raced ? num(a.poles) : ''} b={b.raced ? num(b.poles) : ''} aWins={a.poles > b.poles} bWins={b.poles > a.poles} />
+        <Row label={t('drv.fastestLaps')} a={a.raced ? num(a.fastestLaps) : ''} b={b.raced ? num(b.fastestLaps) : ''} aWins={a.fastestLaps > b.fastestLaps} bWins={b.fastestLaps > a.fastestLaps} />
         <Row label={t('drv.bestFinish')} a={pos(a.bestFinish)} b={pos(b.bestFinish)} aWins={(a.bestFinish ?? Infinity) < (b.bestFinish ?? Infinity)} bWins={(b.bestFinish ?? Infinity) < (a.bestFinish ?? Infinity)} />
-        <Row label={t('drv.races')} a={a.raced ? num(a.races) : '—'} b={b.raced ? num(b.races) : '—'} aWins={false} bWins={false} />
+        <Row label={t('drv.races')} a={a.raced ? num(a.races) : ''} b={b.raced ? num(b.races) : ''} aWins={false} bWins={false} />
       </div>
 
       {data.headToHead.racesTogether > 0 ? (
         <div className="card cmp-h2h">
           <div className="cmp-h2h-head">
-            <h3>{t('cmp.h2h')} · {data.season}</h3>
+            <h3 className="wknd-section">
+              {t('cmp.h2h')} <span className="mono">{data.season}</span>
+            </h3>
             <span className="muted">{tn('plural.togetherN', data.headToHead.racesTogether)}</span>
           </div>
           <div className="cmp-h2h-tally">
@@ -196,12 +247,12 @@ function SeasonComparison({ data, photoA, photoB }: { data: SeasonCmp; photoA?: 
 
 export default function Compare() {
   useSeo({
-    title: 'F1 Driver Comparison — Head to Head',
+    title: 'F1 Driver Comparison: Head to Head',
     description:
-      'Compare any two Formula 1 drivers head-to-head: championships, wins, podiums, points and their race-by-race record — overall or in a single season.',
+      'Compare any two Formula 1 drivers head-to-head: championships, wins, podiums, points and their race-by-race record, over a career or a single season.',
   })
   const drivers = useAsync(() => api.drivers(), [])
-  // Wikimedia driver photos (shared map, cached server-side). Optional — a
+  // Wikimedia driver photos (shared map, cached server-side). Optional: a
   // driver with no photo simply shows none.
   const photos = useAsync(() => api.driverPhotos(), [])
   const [idA, setIdA] = useState(DEFAULT_A)

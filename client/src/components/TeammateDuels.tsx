@@ -6,6 +6,7 @@ import { useI18n, type TKey } from '../i18n/core'
 import { driverPortraitUrl } from '../lib/f1meta'
 import { gpShort } from '../lib/gpNames'
 import type { DuelDriver, DuelSide, TeammateDuel } from '../types/f1'
+import DriverThumb from './DriverThumb'
 import Flag from './Flag'
 import './TeammateDuels.css'
 
@@ -24,35 +25,6 @@ function mateColor(team: string): string {
 
 const lastName = (d: DuelDriver) => d.name.split(' ').slice(-1)[0]
 const label = (d: DuelDriver) => d.code ?? lastName(d)
-
-// The driver's face over the name: the official portrait for that team and
-// season first, the Wikimedia photo next, the code on a blank tile last.
-function DuelPhoto({
-  d,
-  constructorId,
-  season,
-}: {
-  d: DuelDriver
-  constructorId: string
-  season: number
-}) {
-  const urls = [driverPortraitUrl(d.driverId, constructorId, String(season)), d.photoUrl].filter(
-    (u): u is string => !!u,
-  )
-  const key = urls.join('|')
-  const [idx, setIdx] = useState(0)
-  useEffect(() => setIdx(0), [key])
-  const url = urls[idx]
-  return (
-    <span className="duel-photo" aria-hidden="true">
-      {url ? (
-        <img src={url} alt="" loading="lazy" onError={() => setIdx((i) => i + 1)} />
-      ) : (
-        <span className="duel-photo-code">{label(d)}</span>
-      )}
-    </span>
-  )
-}
 
 // A two-sided score bar: a's share in the team colour, b's in grey.
 function ScoreRow({
@@ -166,7 +138,10 @@ function Duel({
             to={`/drivers/${d.driverId}`}
             className={`duel-name duel-name--${i ? 'b' : 'a'}`}
           >
-            <DuelPhoto d={d} constructorId={constructorId} season={season} />
+            <DriverThumb
+              urls={[driverPortraitUrl(d.driverId, constructorId, String(season)), d.photoUrl]}
+              code={label(d)}
+            />
             <span className="duel-id">
               <Flag code={d.countryCode} nationality={d.nationality} />
               <span className="duel-first">

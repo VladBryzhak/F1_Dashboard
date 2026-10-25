@@ -204,7 +204,13 @@ export async function describePage(rawPath: string): Promise<PageMeta> {
           ].filter((x): x is string => !!x);
           return page(
             `${c.name}: F1 Circuit Guide, Lap Record & Winners`,
-            `${c.name} (${c.placeName}): ${c.length ?? "—"} km, ${c.turns ?? "—"} turns, ${c.racesHeld} Formula 1 Grands Prix${c.firstYear ? ` since ${c.firstYear}` : ""}. Race lap record, most successful drivers and teams, and every winner.`,
+            `${c.name} (${c.placeName}): ${[
+              c.length != null ? `${c.length} km` : "",
+              c.turns != null ? `${c.turns} turns` : "",
+              `${c.racesHeld} Formula 1 Grands Prix${c.firstYear ? ` since ${c.firstYear}` : ""}`,
+            ]
+              .filter(Boolean)
+              .join(", ")}. Race lap record, most successful drivers and teams, and every winner.`,
             {
               kind: "circuit",
               country,
@@ -225,13 +231,13 @@ export async function describePage(rawPath: string): Promise<PageMeta> {
 
     case "compare":
       return generic(
-        "F1 Driver Comparison — Head to Head",
-        "Compare any two Formula 1 drivers head-to-head: championships, wins, podiums, points and their race-by-race record — overall or in a single season.",
+        "F1 Driver Comparison: Head to Head",
+        "Compare any two Formula 1 drivers head-to-head: championships, wins, podiums, points and their race-by-race record, over a career or a single season.",
       );
     case "live":
       return generic(
         "Live Timing",
-        "Live Formula 1 timing board — positions, gaps, lap times, sectors, mini-sectors and tyres, with expandable per-driver detail.",
+        "Live Formula 1 timing board: positions, gaps, lap times, sectors, mini-sectors and tyres, with expandable per-driver detail.",
         "Live timing and race replays with a track map — every session since 2023.",
       );
     case "telemetry":
