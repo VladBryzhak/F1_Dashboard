@@ -143,7 +143,15 @@ router.get("/constructors/:constructorId/duels/:season", async (req, res, next) 
     if (!duels) {
       return res.status(404).json({ error: "This team did not race that season" });
     }
-    res.json(duels);
+    // Photos for the duel heads; the client tries the official portrait first
+    // and falls back to these, so a failed lookup only drops the fallback.
+    const drivers = await Promise.all(
+      duels.drivers.map(async (d) => ({
+        ...d,
+        photoUrl: await getDriverPhoto(d.name).catch(() => null),
+      })),
+    );
+    res.json({ ...duels, drivers });
   } catch (err) {
     next(err);
   }

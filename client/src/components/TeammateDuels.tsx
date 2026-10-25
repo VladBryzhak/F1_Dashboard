@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { api } from '../api/client'
 import { useAsync } from '../hooks/useAsync'
 import { useI18n, type TKey } from '../i18n/core'
+import { driverPortraitUrl } from '../lib/f1meta'
 import { gpShort } from '../lib/gpNames'
 import type { DuelDriver, DuelSide, TeammateDuel } from '../types/f1'
 import Flag from './Flag'
@@ -23,6 +24,35 @@ function mateColor(team: string): string {
 
 const lastName = (d: DuelDriver) => d.name.split(' ').slice(-1)[0]
 const label = (d: DuelDriver) => d.code ?? lastName(d)
+
+// The driver's face over the name: the official portrait for that team and
+// season first, the Wikimedia photo next, the code on a blank tile last.
+function DuelPhoto({
+  d,
+  constructorId,
+  season,
+}: {
+  d: DuelDriver
+  constructorId: string
+  season: number
+}) {
+  const urls = [driverPortraitUrl(d.driverId, constructorId, String(season)), d.photoUrl].filter(
+    (u): u is string => !!u,
+  )
+  const key = urls.join('|')
+  const [idx, setIdx] = useState(0)
+  useEffect(() => setIdx(0), [key])
+  const url = urls[idx]
+  return (
+    <span className="duel-photo" aria-hidden="true">
+      {url ? (
+        <img src={url} alt="" loading="lazy" onError={() => setIdx((i) => i + 1)} />
+      ) : (
+        <span className="duel-photo-code">{label(d)}</span>
+      )}
+    </span>
+  )
+}
 
 // A two-sided score bar: a's share in the team colour, b's in grey.
 function ScoreRow({
@@ -110,7 +140,17 @@ function Strip({ duel, a, b }: { duel: TeammateDuel; a: DuelDriver; b: DuelDrive
   )
 }
 
-function Duel({ duel, drivers }: { duel: TeammateDuel; drivers: Map<string, DuelDriver> }) {
+function Duel({
+  duel,
+  drivers,
+  constructorId,
+  season,
+}: {
+  duel: TeammateDuel
+  drivers: Map<string, DuelDriver>
+  constructorId: string
+  season: number
+}) {
   const { t, tn, fmtNum } = useI18n()
   const a = drivers.get(duel.a)!
   const b = drivers.get(duel.b)!
@@ -126,11 +166,14 @@ function Duel({ duel, drivers }: { duel: TeammateDuel; drivers: Map<string, Duel
             to={`/drivers/${d.driverId}`}
             className={`duel-name duel-name--${i ? 'b' : 'a'}`}
           >
-            <Flag code={d.countryCode} nationality={d.nationality} />
-            <span className="duel-first">
-              {d.name.slice(0, d.name.length - lastName(d).length).trim()}
+            <DuelPhoto d={d} constructorId={constructorId} season={season} />
+            <span className="duel-id">
+              <Flag code={d.countryCode} nationality={d.nationality} />
+              <span className="duel-first">
+                {d.name.slice(0, d.name.length - lastName(d).length).trim()}
+              </span>
+              <span className="duel-last">{lastName(d)}</span>
             </span>
-            <span className="duel-last">{lastName(d)}</span>
           </Link>
         ))}
       </div>
@@ -256,7 +299,9 @@ export default function TeammateDuels({
       )}
 
       {!loading && data && !duel && <p className="muted">{t('duel.solo', { season })}</p>}
-      {!loading && duel && <Duel duel={duel} drivers={drivers} />}
+      {!loading && duel && (
+        <Duel duel={duel} drivers={drivers} constructorId={constructorId} season={season} />
+      )}
       {!loading && duel && <p className="duel-note">{t('duel.note')}</p>}
     </div>
   )

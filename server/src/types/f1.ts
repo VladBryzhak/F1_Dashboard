@@ -351,6 +351,7 @@ export interface DuelDriver {
   poles: number;
   dnfs: number;
   bestFinish: number | null;
+  photoUrl?: string | null; // Wikimedia Commons photo, added by the route
 }
 
 // Who was ahead in one round: the duel's driver "a", "b", or null when the
