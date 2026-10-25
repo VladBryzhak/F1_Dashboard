@@ -7,6 +7,12 @@
   max-width: 1080px;
   margin: 0 auto;
   padding: var(--space-xl) 1.75rem 2rem;
+  /* At least a screen tall, so the footer starts below the fold: a page
+     that renders its data after a short "Loading" line then pushes only an
+     off-screen footer down, not visible content (no layout shift). */
+  min-height: 100vh;
+  min-height: 100svh;
+  box-sizing: border-box;
 }
 
 .page-head {
