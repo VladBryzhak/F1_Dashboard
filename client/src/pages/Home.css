@@ -246,10 +246,28 @@
   letter-spacing: -0.5px;
 }
 
+/* The block's height must not depend on which font is showing: the text is
+   laid out first in a fallback face and again when Saira arrives, and a line
+   that wraps in one face but not the other moves the whole bottom-anchored
+   block (PageSpeed's CLS on phones). So the surname and "wins" always take a
+   line each, and the kicker stays on one line. */
+.hero-content--winner .hero-title span {
+  display: block;
+}
+
 .hero-content--winner .hero-kicker {
   display: flex;
-  flex-wrap: wrap;
-  gap: 0.2rem 1rem;
+  flex-wrap: nowrap;
+  gap: 1rem;
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.hero-content--winner .hero-kicker > span:last-child {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 /* ---------- Podium board ----------
@@ -355,6 +373,13 @@
   font-size: 0.9rem;
   color: var(--color-ink);
   text-shadow: 0 1px 6px var(--color-veil);
+  white-space: nowrap;
+}
+
+.hero-note > span:last-child {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .hero-note-tag {
