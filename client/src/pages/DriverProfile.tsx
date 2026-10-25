@@ -25,7 +25,7 @@ function yearsBetween(from: string, to: string | null): number | null {
   return y
 }
 
-// "Born 30 September 1997 (age 29) · Hasselt, Belgium"
+// "Born 30 September 1997 (age 29)" and "Hasselt, Belgium", set apart by space
 function BioLine({ p }: { p: Profile }) {
   const { t, tn, fmtDate, locale } = useI18n()
   if (!p.dateOfBirth && !p.placeOfBirth) return null
@@ -44,7 +44,13 @@ function BioLine({ p }: { p: Profile }) {
     parts.push(died)
   }
   if (place) parts.push(place)
-  return <p className="profile-bio">{parts.join(' · ')}</p>
+  return (
+    <p className="profile-bio">
+      {parts.map((part) => (
+        <span key={part}>{part}</span>
+      ))}
+    </p>
+  )
 }
 
 // Finishing position chip: P1 red, podium bright, DNF etc. muted.
@@ -80,10 +86,10 @@ export default function DriverProfile() {
 
   useSeo({
     title: profile
-      ? `${profile.givenName} ${profile.familyName} — F1 Career Stats`
+      ? `${profile.givenName} ${profile.familyName}: F1 Career Stats`
       : undefined,
     description: profile
-      ? `${profile.givenName} ${profile.familyName}'s Formula 1 career: ${profile.championships} title${profile.championships === 1 ? '' : 's'}, ${profile.wins} wins, ${profile.podiums} podiums and ${profile.races} races across ${profile.firstSeason}–${profile.lastSeason}.`
+      ? `${profile.givenName} ${profile.familyName}'s Formula 1 career: ${profile.championships} title${profile.championships === 1 ? '' : 's'}, ${profile.wins} wins, ${profile.podiums} podiums and ${profile.races} races from ${profile.firstSeason} to ${profile.lastSeason}.`
       : undefined,
     jsonLd: profile
       ? [
@@ -170,7 +176,7 @@ export default function DriverProfile() {
             <div className="stat-grid">
               <div className="stat-card">
                 <div className="stat-num">
-                  {profile.firstSeason}–{profile.lastSeason}
+                  {profile.firstSeason}-{profile.lastSeason}
                 </div>
                 <div className="stat-lbl">{t('drv.seasons')}</div>
               </div>
@@ -284,10 +290,10 @@ export default function DriverProfile() {
                               className="dot"
                               style={{ background: teamColor(s.constructorId) }}
                             />
-                            {s.constructorName || '—'}
+                            {s.constructorName || ''}
                           </Link>
                         ) : (
-                          <span className="team">{s.constructorName || '—'}</span>
+                          <span className="team">{s.constructorName || ''}</span>
                         )}
                       </td>
                       <td className="num">{s.position}</td>

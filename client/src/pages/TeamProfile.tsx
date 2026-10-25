@@ -26,7 +26,7 @@ export default function TeamProfile() {
   const color = teamColor(constructorId ?? '')
 
   useSeo({
-    title: profile ? `${profile.name} — F1 History, Titles & Wins` : undefined,
+    title: profile ? `${profile.name}: F1 History, Titles & Wins` : undefined,
     description: profile
       ? `${profile.name} in Formula 1: ${profile.championships} constructors' title${profile.championships === 1 ? '' : 's'}, ${profile.wins} wins, ${profile.podiums} podiums and ${profile.races} races since ${profile.firstSeason}.`
       : undefined,
@@ -95,7 +95,7 @@ export default function TeamProfile() {
             <div className="stat-grid">
               <div className="stat-card">
                 <div className="stat-num">
-                  {profile.firstSeason}–{profile.lastSeason}
+                  {profile.firstSeason}-{profile.lastSeason}
                 </div>
                 <div className="stat-lbl">{t('drv.seasons')}</div>
               </div>
@@ -153,7 +153,7 @@ export default function TeamProfile() {
                   <ol className="lineage">
                     {profile.lineage.map((l) => {
                       const here = l.constructorId === profile.constructorId
-                      const years = `${l.yearFrom}–${l.yearTo ?? t('team.present')}`
+                      const years = `${l.yearFrom}-${l.yearTo ?? t('team.present')}`
                       return (
                         <li key={l.constructorId} className={here ? 'here' : undefined}>
                           <span className="lineage-dot" style={{ background: teamColor(l.constructorId) }} />
@@ -182,7 +182,7 @@ export default function TeamProfile() {
                         <li key={`${e.name}-${e.yearFrom}`}>
                           <span>{e.name}</span>
                           <span className="muted">
-                            {e.yearFrom === e.yearTo ? e.yearFrom : `${e.yearFrom}–${e.yearTo}`}
+                            {e.yearFrom === e.yearTo ? e.yearFrom : `${e.yearFrom}-${e.yearTo}`}
                           </span>
                         </li>
                       ))}
@@ -232,7 +232,7 @@ export default function TeamProfile() {
                           </span>
                         ))}
                       </td>
-                      <td className="muted">{s.engine ?? '—'}</td>
+                      <td className="muted">{s.engine ?? ''}</td>
                     </tr>
                   ))}
               </tbody>

@@ -18,7 +18,7 @@ function mateColor(team: string): string {
   const [r, g, b] = [1, 3, 5].map((i) => parseInt(team.slice(i, i + 2), 16) / 255)
   const max = Math.max(r, g, b)
   const sat = max ? (max - Math.min(r, g, b)) / max : 0
-  return sat < 0.2 ? '#5a5c69' : '#e6e7ec'
+  return sat < 0.2 ? 'var(--color-rule-2)' : 'var(--color-ink-2)'
 }
 
 const lastName = (d: DuelDriver) => d.name.split(' ').slice(-1)[0]
@@ -70,9 +70,9 @@ function StatRow({
   const bWins = ok && !aWins
   return (
     <div className="duel-row duel-row--plain">
-      <span className={`duel-val${aWins ? ' win' : ''}`}>{a ?? '—'}</span>
+      <span className={`duel-val${aWins ? ' win' : ''}`}>{a ?? ''}</span>
       <span className="duel-lbl">{title}</span>
-      <span className={`duel-val${bWins ? ' win' : ''}`}>{b ?? '—'}</span>
+      <span className={`duel-val${bWins ? ' win' : ''}`}>{b ?? ''}</span>
     </div>
   )
 }
@@ -249,7 +249,7 @@ export default function TeammateDuels({
               aria-pressed={i === pair}
               onClick={() => setPair(i)}
             >
-              {label(drivers.get(d.a)!)} · {label(drivers.get(d.b)!)}
+              {label(drivers.get(d.a)!)}/{label(drivers.get(d.b)!)}
             </button>
           ))}
         </div>

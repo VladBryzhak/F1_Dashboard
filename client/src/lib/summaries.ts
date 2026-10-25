@@ -2,7 +2,7 @@
 // with almost no body text, which search engines have little to rank. These
 // builders turn the data we already load into a natural-reading paragraph that
 // is unique per page. Written without personal pronouns (we don't know any
-// driver's pronouns) — the surname is repeated instead.
+// driver's pronouns); the surname is repeated instead.
 import type {
   ConstructorProfile,
   ConstructorStanding,
@@ -59,10 +59,10 @@ function driverSummaryUk(p: DriverProfile): string {
     ? `з ${p.firstSeason} року`
     : p.firstSeason === p.lastSeason
       ? `у ${p.firstSeason} році`
-      : `у ${p.firstSeason}–${p.lastSeason} роках`
+      : `у ${p.firstSeason}-${p.lastSeason} роках`
   const teams = [...new Set(p.seasons.map((s) => s.constructorName))].filter(Boolean)
 
-  let text = `${p.givenName} ${p.familyName}${country ? ` (${country})` : ''} — ${active ? 'учасник' : 'колишній учасник'} чемпіонату світу FIA Формули-1 ${span}.`
+  let text = `${p.givenName} ${p.familyName}${country ? ` (${country})` : ''}: виступи в чемпіонаті світу FIA Формули-1 ${span}.`
   if (teams.length) text += ` ${teams.length === 1 ? 'Команда' : 'Команди'}: ${teams.join(', ')}.`
 
   const feats: string[] = []
@@ -113,8 +113,8 @@ function teamSummaryUk(p: ConstructorProfile): string {
     ? `з ${p.firstSeason} року`
     : p.firstSeason === p.lastSeason
       ? `у ${p.firstSeason} році`
-      : `у ${p.firstSeason}–${p.lastSeason} роках`
-  let text = `${p.name}${country ? ` (${country})` : ''} — ${active ? 'команда' : 'колишня команда'} чемпіонату світу FIA Формули-1 ${span}.`
+      : `у ${p.firstSeason}-${p.lastSeason} роках`
+  let text = `${p.name}${country ? ` (${country})` : ''}: ${active ? 'команда' : 'колишня команда'} чемпіонату світу FIA Формули-1 ${span}.`
   const feats: string[] = []
   if (p.championships > 0) feats.push(plural('plural.ctitles', p.championships, undefined, 'uk'))
   if (p.wins > 0) feats.push(plural('plural.wins', p.wins, undefined, 'uk'))
@@ -123,7 +123,7 @@ function teamSummaryUk(p: ConstructorProfile): string {
   const points = plural('plural.points', p.points, undefined, 'uk')
   text += feats.length
     ? ` За ${starts}: ${feats.join(', ')} і ${points}.`
-    : ` За ${starts} — ${points}.`
+    : ` За ${starts}: ${points}.`
   return text
 }
 
@@ -212,11 +212,11 @@ export function seasonSummary(
     const pts = plural('plural.points', driver.points, undefined, 'uk')
     const wins = plural('plural.winsShort', driver.wins, undefined, 'uk')
     if (complete) {
-      let text = `Титул чемпіона світу FIA Формули-1 ${season} року — ${driverName} (${driver.constructorName}): ${pts} і ${wins}.`
-      if (constructor) text += ` Кубок конструкторів — ${constructor.name}.`
+      let text = `Титул чемпіона світу FIA Формули-1 ${season} року: ${driverName} (${driver.constructorName}), ${pts} і ${wins}.`
+      if (constructor) text += ` Кубок конструкторів: ${constructor.name}.`
       return text
     }
-    let text = `Лідер особистого заліку ${season} року — ${driverName} (${driver.constructorName}): ${pts}${driver.wins > 0 ? ` і ${wins}` : ''}.`
+    let text = `Лідер особистого заліку ${season} року: ${driverName} (${driver.constructorName}), ${pts}${driver.wins > 0 ? ` і ${wins}` : ''}.`
     if (constructor) text += ` У Кубку конструкторів лідирує ${constructor.name}.`
     return text
   }

@@ -135,7 +135,7 @@ export async function describePage(rawPath: string): Promise<PageMeta> {
         if (p) {
           const lastTeam = p.seasons[p.seasons.length - 1]?.constructorId ?? "";
           return page(
-            `${p.givenName} ${p.familyName} — F1 Career Stats`,
+            `${p.givenName} ${p.familyName}: F1 Career Stats`,
             `${p.givenName} ${p.familyName}'s Formula 1 career: ${p.championships} title${p.championships === 1 ? "" : "s"}, ${p.wins} wins, ${p.podiums} podiums and ${p.races} races across ${p.firstSeason}–${p.lastSeason}.`,
             {
               kind: "driver",
@@ -166,7 +166,7 @@ export async function describePage(rawPath: string): Promise<PageMeta> {
         const p = await getConstructorProfile(a).catch(() => null);
         if (p) {
           return page(
-            `${p.name} — F1 History, Titles & Wins`,
+            `${p.name}: F1 History, Titles & Wins`,
             `${p.name} in Formula 1: ${p.championships} constructors' title${p.championships === 1 ? "" : "s"}, ${p.wins} wins, ${p.podiums} podiums and ${p.races} races since ${p.firstSeason}.`,
             {
               kind: "team",
