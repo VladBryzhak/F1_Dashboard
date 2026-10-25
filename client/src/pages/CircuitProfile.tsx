@@ -51,9 +51,15 @@ export default function CircuitProfile() {
   const { data: c, loading, error } = useAsync(() => api.circuitProfile(circuitId), [circuitId])
 
   useSeo({
-    title: c ? `${c.name} — F1 Circuit Guide, Lap Record & Winners` : undefined,
+    title: c ? `${c.name}: F1 Circuit Guide, Lap Record & Winners` : undefined,
     description: c
-      ? `${c.name} (${c.placeName}): ${c.length ?? '—'} km, ${c.turns ?? '—'} turns, ${c.racesHeld} Formula 1 Grands Prix${c.firstYear ? ` since ${c.firstYear}` : ''}. Race lap record, most successful drivers and teams, and every winner.`
+      ? `${c.name} (${c.placeName}): ${[
+          c.length != null ? `${c.length} km` : '',
+          c.turns != null ? `${c.turns} turns` : '',
+          `${c.racesHeld} Formula 1 Grands Prix${c.firstYear ? ` since ${c.firstYear}` : ''}`,
+        ]
+          .filter(Boolean)
+          .join(', ')}. Race lap record, most successful drivers and teams, and every winner.`
       : undefined,
     jsonLd: c
       ? [
@@ -92,7 +98,7 @@ export default function CircuitProfile() {
       ? `https://www.openstreetmap.org/?mlat=${c.latitude}&mlon=${c.longitude}#map=15/${c.latitude}/${c.longitude}`
       : null
   const km = (n: number | null) =>
-    n == null ? '—' : t('circ.km', { n: fmtNum(n, { maximumFractionDigits: 3 }) })
+    n == null ? '' : t('circ.km', { n: fmtNum(n, { maximumFractionDigits: 3 }) })
 
   return (
     <section>
@@ -110,10 +116,11 @@ export default function CircuitProfile() {
             <Flag code={c.countryCode} nationality={c.nationality} />
             <div>
               <h1>{c.name}</h1>
-              <p>
-                {c.placeName}
-                {country ? ` · ${country}` : ''} · {t(`circ.type.${c.type}` as TKey)}
-                {c.direction ? ` · ${t(`circ.dir.${c.direction}` as TKey)}` : ''}
+              <p className="wknd-meta">
+                <span>{c.placeName}</span>
+                {country && <span>{country}</span>}
+                <span>{t(`circ.type.${c.type}` as TKey)}</span>
+                {c.direction && <span>{t(`circ.dir.${c.direction}` as TKey)}</span>}
               </p>
             </div>
           </div>
@@ -153,7 +160,7 @@ export default function CircuitProfile() {
             </div>
             <div className="wknd-hl">
               <div className="wknd-hl-label">{t('circ.turns')}</div>
-              <div className="wknd-hl-name">{c.turns ?? '—'}</div>
+              <div className="wknd-hl-name">{c.turns ?? ''}</div>
             </div>
             <div className="wknd-hl">
               <div className="wknd-hl-label">{t('circ.racesHeld')}</div>
@@ -161,7 +168,7 @@ export default function CircuitProfile() {
             </div>
             <div className="wknd-hl">
               <div className="wknd-hl-label">{t('circ.firstGp')}</div>
-              <div className="wknd-hl-name">{c.firstYear ?? '—'}</div>
+              <div className="wknd-hl-name">{c.firstYear ?? ''}</div>
             </div>
           </div>
         </div>
@@ -177,17 +184,20 @@ export default function CircuitProfile() {
       </div>
 
       <div className="card circ-record">
-        <span className="stripe" style={{ background: c.lapRecord ? teamColor(c.lapRecord.constructorId) : undefined }} />
         <h3 className="wknd-section">{t('circ.lapRecord')}</h3>
         {c.lapRecord ? (
           <div className="circ-record-body">
             <span className="circ-record-time mono">{c.lapRecord.time}</span>
             <span className="circ-record-who">
               <Link to={`/drivers/${c.lapRecord.driverId}`}>{c.lapRecord.driverName}</Link>
-              <span className="muted">
-                {' '}
-                · {c.lapRecord.constructorName} · {c.lapRecord.year}
+              <span className="circ-record-team">
+                <span
+                  className="wknd-hl-swatch"
+                  style={{ background: teamColor(c.lapRecord.constructorId) }}
+                />
+                {c.lapRecord.constructorName}
               </span>
+              <span className="mono circ-record-year">{c.lapRecord.year}</span>
             </span>
             <span className="circ-record-note">{t('circ.lapRecordNote')}</span>
           </div>
@@ -208,7 +218,7 @@ export default function CircuitProfile() {
       </div>
 
       {c.layouts.length > 1 && (
-        <div className="card" style={{ marginTop: '1rem' }}>
+        <div className="card circ-block">
           <h3 className="wknd-section">{t('circ.layouts')}</h3>
           <div className="table-scroll">
             <table className="standings">
@@ -226,9 +236,9 @@ export default function CircuitProfile() {
                   .reverse()
                   .map((l) => (
                     <tr key={l.layoutId}>
-                      <td>{l.firstYear === l.lastYear ? l.firstYear : `${l.firstYear}–${l.lastYear}`}</td>
+                      <td>{l.firstYear === l.lastYear ? l.firstYear : `${l.firstYear}-${l.lastYear}`}</td>
                       <td className="num">{km(l.length)}</td>
-                      <td className="num">{l.turns ?? '—'}</td>
+                      <td className="num">{l.turns ?? ''}</td>
                       <td className="num">{l.races}</td>
                     </tr>
                   ))}
@@ -239,7 +249,7 @@ export default function CircuitProfile() {
       )}
 
       {c.races.length > 0 && (
-        <div className="card" style={{ marginTop: '1rem' }}>
+        <div className="card circ-block">
           <h3 className="wknd-section">{t('circ.winners')}</h3>
           <div className="table-scroll">
             <table className="standings">
@@ -263,7 +273,7 @@ export default function CircuitProfile() {
                     <td className="mono">{r.year}</td>
                     {c.grandsPrix.length > 1 && <td className="muted">{gpShort(r.grandPrixName, lang)}</td>}
                     <td>
-                      <span className="name">{r.winnerName ?? '—'}</span>
+                      <span className="name">{r.winnerName ?? ''}</span>
                     </td>
                     <td>
                       {r.winnerConstructorName ? (
@@ -274,11 +284,9 @@ export default function CircuitProfile() {
                           />
                           {r.winnerConstructorName}
                         </span>
-                      ) : (
-                        <span className="muted">—</span>
-                      )}
+                      ) : null}
                     </td>
-                    <td className="muted">{r.poleDriverName ?? '—'}</td>
+                    <td className="muted">{r.poleDriverName ?? ''}</td>
                     <td className="muted chevron">›</td>
                   </tr>
                 ))}

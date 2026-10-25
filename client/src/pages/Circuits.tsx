@@ -26,11 +26,11 @@ function CircuitTile({ c }: { c: CircuitSummary }) {
           <CircuitOutline outline={c.outline} label={t('circ.outlineOf', { name: c.name })} />
         </span>
       )}
+      <span className="circuit-tile-place">{c.placeName}</span>
       <span className="circuit-tile-country">
         <Flag code={c.countryCode} nationality={c.nationality} />
         <span>{country || c.nationality}</span>
       </span>
-      <span className="circuit-tile-place">{c.placeName}</span>
       <span className="circuit-tile-name">{c.name}</span>
       <span className="circuit-tile-meta">
         <span>{t(`circ.type.${c.type}` as TKey)}</span>
@@ -44,7 +44,7 @@ function CircuitTile({ c }: { c: CircuitSummary }) {
 export default function Circuits() {
   const { t, locale } = useI18n()
   useSeo({
-    title: 'F1 Circuits — Track Maps, Lap Records & Winners',
+    title: 'F1 Circuits: Track Maps, Lap Records & Winners',
     description:
       'Formula 1 circuits on the current calendar and classic tracks: track maps, length, turns, race lap records, layouts and every winner at each venue.',
   })

@@ -203,7 +203,7 @@ export async function describePage(rawPath: string): Promise<PageMeta> {
             `${c.racesHeld} Grands Prix`,
           ].filter((x): x is string => !!x);
           return page(
-            `${c.name} — F1 Circuit Guide, Lap Record & Winners`,
+            `${c.name}: F1 Circuit Guide, Lap Record & Winners`,
             `${c.name} (${c.placeName}): ${c.length ?? "—"} km, ${c.turns ?? "—"} turns, ${c.racesHeld} Formula 1 Grands Prix${c.firstYear ? ` since ${c.firstYear}` : ""}. Race lap record, most successful drivers and teams, and every winner.`,
             {
               kind: "circuit",
@@ -218,7 +218,7 @@ export async function describePage(rawPath: string): Promise<PageMeta> {
         }
       }
       return generic(
-        "F1 Circuits — Track Maps, Lap Records & Winners",
+        "F1 Circuits: Track Maps, Lap Records & Winners",
         "Formula 1 circuits on the current calendar and classic tracks: track maps, length, turns, race lap records, layouts and every winner at each venue.",
       );
     }

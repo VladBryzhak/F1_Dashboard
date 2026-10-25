@@ -1,80 +1,110 @@
+/* Hallmark · shape: app screen · genre: modern-minimal · theme: Console (graphite), brand kept · redesign: full
+ * nav: kept · signature: every circuit as its own track map, the red line on the deepest surface · states: loading, error, empty, full
+ * axes: dark/condensed-sans/brand-red · contrast: pass · v2.0.0 */
+
 /* Circuits list: search box and circuit tiles. */
 
 .circuit-search {
   width: 100%;
   max-width: 460px;
   box-sizing: border-box;
+  min-height: 40px;
   margin: 0.25rem 0 1.5rem;
-  background: var(--card);
-  border: 1px solid rgba(255, 255, 255, 0.14);
-  border-radius: 10px;
-  color: var(--text);
+  padding: 0.55rem 0.8rem;
+  background: var(--color-paper-2);
+  border: var(--rule-hair) solid var(--color-rule-2);
+  border-radius: var(--radius-pill);
+  color: var(--color-ink);
   font: inherit;
-  padding: 0.65rem 0.8rem;
+  transition: border-color var(--dur-micro) var(--ease-out);
 }
 
-.circuit-search:focus {
-  outline: none;
-  border-color: var(--accent);
+.circuit-search::placeholder {
+  color: var(--color-muted);
+}
+
+.circuit-search:hover {
+  border-color: var(--color-ink-2);
+}
+
+.circuit-search:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
 }
 
 .section-title {
   margin: 1.75rem 0 0.9rem;
   font-family: var(--font-display);
-  font-size: 1rem;
-  font-weight: 700;
-  letter-spacing: 1.2px;
+  font-size: 1.25rem;
+  font-weight: 800;
+  line-height: 1.1;
   text-transform: uppercase;
-  color: var(--muted);
+  color: var(--color-ink);
 }
 
 .circuit-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-  gap: 0.8rem;
+  gap: var(--space-md);
 }
 
 .circuit-tile {
   display: flex;
   flex-direction: column;
-  gap: 0.45rem;
-  padding: 0.95rem 1.05rem;
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  color: var(--text);
+  gap: 0.3rem;
+  padding: 0 1.05rem 0.95rem;
+  overflow: hidden;
+  background: var(--color-paper-2);
+  border: var(--rule-hair) solid var(--color-rule);
+  border-radius: var(--radius-card);
+  color: var(--color-ink);
   text-decoration: none;
-  transition: border-color 0.15s ease, transform 0.15s ease;
+  transition: border-color var(--dur-short) var(--ease-out);
 }
 
 .circuit-tile:hover {
-  border-color: rgba(225, 6, 0, 0.6);
-  transform: translateY(-1px);
+  border-color: var(--color-ink-2);
 }
 
-/* Track outline on a darker inset, like a framed map. */
+.circuit-tile:active {
+  border-color: var(--color-accent);
+}
+
+.circuit-tile:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+/* The track map on the deepest surface, edge to edge, a seam under it. */
 .circuit-tile-art {
   display: block;
   aspect-ratio: 16 / 10;
-  margin: -0.15rem -0.25rem 0.35rem;
+  margin: 0 -1.05rem 0.6rem;
   padding: 0.9rem 1.1rem;
-  background: var(--bg);
-  border-radius: 9px;
+  background: var(--color-paper-3);
+  border-bottom: var(--rule-hair) solid var(--color-rule);
 }
 
-/* Country in red, city under it — the circuit-map poster look. */
+/* The city is the tile's head; country and circuit name sit under it. */
+.circuit-tile-place {
+  font-family: var(--font-display);
+  font-size: 1.3rem;
+  font-weight: 800;
+  line-height: 1.05;
+  text-transform: uppercase;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .circuit-tile-country {
   display: flex;
   align-items: center;
   gap: 0.5rem;
   min-width: 0;
-  font-family: var(--font-display);
-  font-size: 1.15rem;
-  font-weight: 800;
-  line-height: 1.1;
-  letter-spacing: 0.5px;
-  text-transform: uppercase;
-  color: var(--accent);
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--color-ink-2);
 }
 
 .circuit-tile-country > span {
@@ -83,35 +113,27 @@
   white-space: nowrap;
 }
 
-.circuit-tile-place {
-  margin-top: -0.3rem;
-  font-family: var(--font-display);
-  font-size: 0.85rem;
-  font-weight: 700;
-  letter-spacing: 0.8px;
-  text-transform: uppercase;
-  color: var(--text);
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
 .circuit-tile-name {
-  font-size: 0.82rem;
-  font-weight: 600;
+  font-size: var(--text-sm);
+  font-weight: 500;
   line-height: 1.3;
-  color: var(--muted);
+  color: var(--color-muted);
 }
 
 .circuit-tile-meta {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.25rem 0.6rem;
-  font-size: 0.75rem;
-  color: var(--muted-2);
+  gap: 0.25rem 1rem;
+  margin-top: 0.4rem;
+  padding-top: 0.6rem;
+  border-top: var(--rule-hair) solid var(--color-rule);
+  font-size: var(--text-sm);
+  color: var(--color-muted);
 }
 
-.circuit-tile-meta span + span::before {
-  content: '·';
-  margin-right: 0.6rem;
+@media (prefers-reduced-motion: reduce) {
+  .circuit-tile,
+  .circuit-search {
+    transition: none;
+  }
 }

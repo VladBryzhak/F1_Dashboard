@@ -36,13 +36,6 @@
   outline-offset: 2px;
 }
 
-/* Season, round, date and circuit under the title, set apart by space. */
-.wknd-meta {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.2rem 1.1rem;
-}
-
 /* Race weekend: session tabs, session date next to each table title, and the
    FP1/FP2/FP3 switch. */
 .wknd-tabs {
