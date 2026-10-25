@@ -106,7 +106,7 @@ export async function describePage(rawPath: string): Promise<PageMeta> {
             .filter((r) => ["1", "2", "3"].includes(r.positionText))
             .map((r) => ({ pos: Number(r.positionText), name: r.driverName, team: r.constructorName, color: teamColor(r.constructorId) }));
           return page(
-            `${w.grandPrixName} GP ${w.season} — Results, Qualifying & Practice`,
+            `${w.grandPrixName} GP ${w.season}: Results, Qualifying & Practice`,
             `${w.grandPrixName} Grand Prix ${w.season}: full race result, starting grid, qualifying times, practice sessions${w.sprintResults.length ? ", sprint" : ""}, fastest lap and Driver of the Day.`,
             {
               kind: "race",

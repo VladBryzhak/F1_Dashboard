@@ -1,3 +1,7 @@
+/* Hallmark · shape: app screen · genre: modern-minimal · theme: Console (graphite), brand kept · redesign: full
+ * nav: kept · signature: the race told from its data, a lap strip of key moments above the classification · states: loading, error, full
+ * axes: dark/condensed-sans/brand-red · contrast: pass · v2.0.0 */
+
 /* Race weekend → Strategy tab: lap chart and tyre stints. */
 
 .strat-kind {
@@ -16,7 +20,7 @@
 }
 
 .strat-grid {
-  stroke: rgba(255, 255, 255, 0.05);
+  stroke: var(--color-rule);
   stroke-width: 1;
 }
 
@@ -50,8 +54,7 @@
 
 .strat-code {
   fill: var(--muted-2);
-  font: 700 12px var(--font-body);
-  letter-spacing: 0.5px;
+  font: 600 12px var(--font-outlier);
   cursor: pointer;
 }
 
@@ -73,15 +76,30 @@
 .strat-clear {
   background: transparent;
   color: var(--text);
-  border: 1px solid rgba(255, 255, 255, 0.14);
-  border-radius: 6px;
+  border: var(--rule-hair) solid var(--color-rule-2);
+  border-radius: var(--radius-pill);
   padding: 0.25rem 0.6rem;
   font: 600 0.75rem var(--font-body);
   cursor: pointer;
 }
 
 .strat-clear:hover {
-  border-color: var(--accent);
+  border-color: var(--color-ink-2);
+}
+
+.strat-clear:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+.strat-clear:active {
+  transform: translateY(1px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .strat-clear:active {
+    transform: none;
+  }
 }
 
 .strat-tyres {
@@ -122,7 +140,7 @@
   position: relative;
   height: 18px;
   border-radius: 4px;
-  background: rgba(255, 255, 255, 0.04);
+  background: var(--color-track);
 }
 
 .strat-stint {

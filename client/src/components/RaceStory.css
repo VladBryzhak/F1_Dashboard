@@ -1,3 +1,8 @@
+/* Hallmark · shape: app screen · genre: modern-minimal · theme: Console (graphite), brand kept · redesign: full
+ * nav: kept · signature: the race told from its data, a lap strip of key moments above the classification · states: loading, error, full
+ * axes: dark/condensed-sans/brand-red · contrast: pass · v2.0.0 */
+/* Hallmark · waive 26b · the race story has no controls, each lap marker is a read-only span with a title · a lap or a moment of the race cannot be pressed or disabled */
+
 /* Race story card on the race-weekend page: text, key-moments strip, list. */
 
 .story {
@@ -5,7 +10,7 @@
 }
 
 .story-text p {
-  max-width: 78ch;
+  max-width: 72ch;
   margin: 0 0 0.75rem;
   color: var(--text);
   line-height: 1.65;
@@ -16,8 +21,6 @@
   color: var(--muted);
   font-size: 0.72rem;
   font-weight: 700;
-  letter-spacing: 1.2px;
-  text-transform: uppercase;
 }
 
 /* Lap strip: markers above, the race as a bar with neutralisation bands,
@@ -46,15 +49,15 @@
   font-size: 0.62rem;
   font-weight: 800;
   line-height: 1;
-  color: #fff;
-  background: #3a3a46;
+  color: var(--color-ink);
+  background: var(--color-mark);
   cursor: default;
 }
 
 .story-mark--lead,
 .story-mark--pit {
-  background: var(--c, #6f6f7a);
-  color: #0e0e13;
+  background: var(--c, var(--color-muted));
+  color: var(--color-ink-dark);
 }
 
 .story-mark--pit {
@@ -62,26 +65,26 @@
 }
 
 .story-mark--penalty {
-  background: #ffd12e;
-  color: #0e0e13;
+  background: var(--color-sc);
+  color: var(--color-ink-dark);
 }
 
 .story-mark--dnf {
-  background: #55556a;
+  background: var(--color-rule-2);
 }
 
 .story-mark--fastest {
-  background: #b14be8;
+  background: var(--color-fastest);
 }
 
 .story-mark--sc {
-  background: #ffd12e;
-  color: #0e0e13;
+  background: var(--color-sc);
+  color: var(--color-ink-dark);
 }
 
 .story-mark--vsc {
-  background: #ff9f1a;
-  color: #0e0e13;
+  background: var(--color-vsc);
+  color: var(--color-ink-dark);
 }
 
 .story-mark--red {
@@ -92,7 +95,7 @@
   position: relative;
   height: 10px;
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.1);
+  background: var(--color-track);
   overflow: hidden;
 }
 
@@ -104,11 +107,11 @@
 }
 
 .story-band--sc {
-  background: #ffd12e;
+  background: var(--color-sc);
 }
 
 .story-band--vsc {
-  background: repeating-linear-gradient(45deg, #ff9f1a 0 4px, #c06f00 4px 8px);
+  background: var(--color-vsc);
 }
 
 .story-band--red {
@@ -151,19 +154,19 @@
   flex: none;
   min-width: 18px;
   height: 18px;
-  padding: 0 3px;
+  padding: 0 4px;
   border-radius: 9px;
   font-size: 0.6rem;
   font-style: normal;
   font-weight: 800;
-  color: #fff;
-  background: #3a3a46;
+  color: var(--color-ink);
+  background: var(--color-mark);
 }
 
 .story-key.story-mark--lead,
 .story-key.story-mark--pit {
-  background: var(--c, #9a9aa7);
-  color: #0e0e13;
+  background: var(--c, var(--color-muted));
+  color: var(--color-ink-dark);
 }
 
 .story-list {
@@ -181,7 +184,7 @@
   padding: 0.35rem 0;
   break-inside: avoid;
   font-size: 0.88rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  border-bottom: var(--rule-hair) solid var(--color-rule);
 }
 
 .story-lap {

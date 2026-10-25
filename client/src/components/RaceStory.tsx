@@ -14,7 +14,7 @@ const MARK: Record<StoryEventKind, string> = {
   pit: '▲',
   penalty: '!',
   dnf: '✕',
-  fastest: '⏱',
+  fastest: 'FL',
   sc: 'SC',
   vsc: 'VSC',
   red: '■',

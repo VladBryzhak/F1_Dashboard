@@ -162,22 +162,22 @@ export function raceSummary(w: RaceWeekend, lang: Lang = getLang()): string {
     : null
 
   if (lang === 'uk') {
-    // Gender-neutral phrasing: "Перемога — X" rather than a gendered verb.
+    // Gender-neutral phrasing: "Перемога: X" rather than a gendered verb.
     const date = new Date(w.date).toLocaleDateString('uk-UA', {
       day: 'numeric',
       month: 'long',
     })
     let text = `${gpTitle(w.grandPrixName, 'uk')} ${w.season} року відбулося ${date}.`
     if (winner) {
-      text += ` Перемога — ${winner.driverName} (${winner.constructorName})`
+      text += ` Перемога: ${winner.driverName} (${winner.constructorName})`
       if (grid === 1) text += ', старт із поул-позиції'
       else if (grid) text += `, старт із P${grid}`
       text += '.'
     }
     if (pole && (!winner || pole.driverId !== winner.driverId)) {
-      text += ` Поул-позиція — ${pole.driverName}.`
+      text += ` Поул-позиція: ${pole.driverName}.`
     }
-    if (w.fastestLap) text += ` Найшвидше коло гонки — ${w.fastestLap.driverName}.`
+    if (w.fastestLap) text += ` Найшвидше коло гонки: ${w.fastestLap.driverName}.`
     return text
   }
 

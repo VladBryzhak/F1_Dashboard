@@ -81,7 +81,7 @@ export function storyParagraphs(s: RaceStory, lang: Lang): string[] {
     const ledWinner = s.lapsLed.find((l) => l.code === w.code)?.laps ?? null
     const parts: string[] = []
     if (uk) {
-      let p = `Перемога — ${w.name} (${w.team})`
+      let p = `Перемога ${w.name} (${w.team})`
       const how: string[] = []
       if (w.grid === 1) how.push('старт із поулу')
       else if (w.grid) how.push(`старт із P${w.grid}`)
@@ -95,7 +95,7 @@ export function storyParagraphs(s: RaceStory, lang: Lang): string[] {
       parts.push(p + '.')
       if (s.third) {
         parts.push(
-          `Третє місце — ${s.third.name}${s.third.grid && s.third.grid > 3 ? ` (старт із P${s.third.grid})` : ''}.`,
+          `Третє місце: ${s.third.name}${s.third.grid && s.third.grid > 3 ? ` (старт із P${s.third.grid})` : ''}.`,
         )
       }
     } else {
@@ -131,7 +131,7 @@ export function storyParagraphs(s: RaceStory, lang: Lang): string[] {
     for (const m of s.startMovers.slice(0, 1)) {
       parts.push(
         uk
-          ? `Найкращий старт — ${m.name}: P${m.from} → P${m.to} після першого кола.`
+          ? `Найкращий старт: ${m.name}, P${m.from} → P${m.to} після першого кола.`
           : `${m.name} made the best start, from P${m.from} to P${m.to} by the end of lap 1.`,
       )
     }
@@ -168,7 +168,7 @@ export function storyParagraphs(s: RaceStory, lang: Lang): string[] {
         const count = s.neutralisations.length
         parts.push(
           uk
-            ? `${sentence(name(k, count > 1))}${count > 1 ? ` — ${count} ${ukPlural(count, 'раз', 'рази', 'разів')}` : ''}: ${ranges}.`
+            ? `${sentence(name(k, count > 1))}${count > 1 ? `, ${count} ${ukPlural(count, 'раз', 'рази', 'разів')}` : ''}: ${ranges}.`
             : `${sentence(name(k, count > 1))} came out ${times(count)} (${ranges}).`,
         )
       } else {
@@ -198,18 +198,18 @@ export function storyParagraphs(s: RaceStory, lang: Lang): string[] {
       const winnerPits = s.events.filter((e) => e.kind === 'pit' && e.driver?.code === w.code)
       const laps = winnerPits.map((e) => e.lap)
       if (s.stops.winner === 0) {
-        parts.push(uk ? `У переможця — жодного піт-стопу.` : `The winner didn't stop.`)
+        parts.push(uk ? `У переможця жодного піт-стопу.` : `The winner didn't stop.`)
       } else {
         parts.push(
           uk
-            ? `У переможця — ${s.stops.winner} ${ukPlural(s.stops.winner, 'піт-стоп', 'піт-стопи', 'піт-стопів')} (${laps.length === 1 ? 'коло' : 'кола'} ${laps.join(', ')}).`
+            ? `У переможця ${s.stops.winner} ${ukPlural(s.stops.winner, 'піт-стоп', 'піт-стопи', 'піт-стопів')} (${laps.length === 1 ? 'коло' : 'кола'} ${laps.join(', ')}).`
             : `${last(w)} stopped ${times(s.stops.winner)} (lap${laps.length === 1 ? '' : 's'} ${laps.join(', ')}).`,
         )
       }
       if (s.stops.common != null && s.stops.common !== s.stops.winner) {
         parts.push(
           uk
-            ? `У більшості пілотів — ${s.stops.common} ${ukPlural(s.stops.common, 'піт-стоп', 'піт-стопи', 'піт-стопів')}.`
+            ? `У більшості пілотів ${s.stops.common} ${ukPlural(s.stops.common, 'піт-стоп', 'піт-стопи', 'піт-стопів')}.`
             : `Most drivers stopped ${times(s.stops.common)}.`,
         )
       }
@@ -247,7 +247,7 @@ export function storyParagraphs(s: RaceStory, lang: Lang): string[] {
                   ? 'штраф'
                   : 'penalty'
         const why = penaltyReason(p.reason, lang)
-        return `${p.driver?.name} — ${what}${why ? ` (${why})` : ''}`
+        return `${p.driver?.name} (${what}${why ? `, ${why}` : ''})`
       })
       parts.push(uk ? `Штрафи: ${list(items, lang)}.` : `Penalties: ${list(items, lang)}.`)
     }
@@ -267,7 +267,7 @@ export function storyParagraphs(s: RaceStory, lang: Lang): string[] {
     if (s.fastest) {
       parts.push(
         uk
-          ? `Найшвидше коло — ${s.fastest.name}, ${s.fastest.time}${s.fastest.lap ? ` (коло ${s.fastest.lap})` : ''}.`
+          ? `Найшвидше коло: ${s.fastest.name}, ${s.fastest.time}${s.fastest.lap ? ` (коло ${s.fastest.lap})` : ''}.`
           : `${s.fastest.name} set the fastest lap, ${s.fastest.time}${s.fastest.lap ? ` on lap ${s.fastest.lap}` : ''}.`,
       )
     }
@@ -281,7 +281,7 @@ export function storyParagraphs(s: RaceStory, lang: Lang): string[] {
     const gap = c.second ? c.leader.points - c.second.points : null
     if (uk) {
       parts.push(
-        `${c.leaderChanged ? 'Новий лідер чемпіонату' : 'Лідер чемпіонату'} — ${c.leader.name}: ${c.leader.points} ${ukPlural(c.leader.points, 'очко', 'очки', 'очок')}${
+        `${c.leaderChanged ? 'Новий лідер чемпіонату' : 'Лідер чемпіонату'}: ${c.leader.name}, ${c.leader.points} ${ukPlural(c.leader.points, 'очко', 'очки', 'очок')}${
           gap != null && c.second ? `, на ${gap} більше, ніж у ${c.second.name}` : ''
         }.`,
       )
@@ -313,7 +313,7 @@ export function eventText(e: StoryEvent, lang: Lang, withLaps = true): string {
   const range = e.to && e.to !== e.lap ? `${e.lap}–${e.to}` : `${e.lap}`
   switch (e.kind) {
     case 'lead':
-      return uk ? `${n} — у лідерах` : `${n} takes the lead`
+      return uk ? `${n} у лідерах` : `${n} takes the lead`
     case 'sc':
       return (
         (uk ? 'Автомобіль безпеки' : 'Safety Car') +
@@ -338,12 +338,12 @@ export function eventText(e: StoryEvent, lang: Lang, withLaps = true): string {
             ? 'штраф'
             : 'penalty'
       const why = penaltyReason(e.reason, lang)
-      return `${n}: ${what}${why ? ` — ${why}` : ''}`
+      return `${n}: ${what}${why ? `, ${why}` : ''}`
     }
     case 'dnf':
       return uk
-        ? `${n}: сход — ${retirementReason(e.reason ?? '', lang)}`
-        : `${n} retires — ${retirementReason(e.reason ?? '', lang)}`
+        ? `${n}: сход, ${retirementReason(e.reason ?? '', lang)}`
+        : `${n} retires: ${retirementReason(e.reason ?? '', lang)}`
     case 'fastest':
       return uk ? `${n}: найшвидше коло` : `${n}: fastest lap`
   }

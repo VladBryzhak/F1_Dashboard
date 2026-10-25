@@ -192,7 +192,7 @@ function TyreStrategy({ data }: { data: Strategy }) {
                       left: `${((s.start - 1) / laps) * 100}%`,
                       width: `${(n / laps) * 100}%`,
                     }}
-                    title={`${s.compound ?? '?'} · ${t('strat.laps', { from: s.start, to: s.end })}`}
+                    title={`${s.compound ?? '?'}, ${t('strat.laps', { from: s.start, to: s.end })}`}
                   >
                     {n >= 5 ? n : ''}
                   </span>

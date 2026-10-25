@@ -36,9 +36,15 @@ function Highlight({
 }) {
   return (
     <div className="wknd-hl">
-      <span className="stripe" style={{ background: teamColor(constructorId) }} />
       <div className="wknd-hl-label">{label}</div>
-      <div className="wknd-hl-name">{name}</div>
+      <div className="wknd-hl-name">
+        <span
+          className="wknd-hl-swatch"
+          style={{ background: teamColor(constructorId) }}
+          aria-hidden="true"
+        />
+        {name}
+      </div>
       <div className="wknd-hl-detail muted">{detail}</div>
     </div>
   )
@@ -46,7 +52,7 @@ function Highlight({
 
 // A colored ± delta for grid → finish.
 function Delta({ n }: { n: number | null }) {
-  if (n == null || n === 0) return <span className="muted">—</span>
+  if (n == null || n === 0) return null
   const up = n > 0
   return (
     <span className={up ? 'delta up' : 'delta down'}>
@@ -115,7 +121,7 @@ function ResultTable({ rows }: { rows: WeekendResult[] }) {
               <td>
                 <TeamCell id={r.constructorId} name={r.constructorName} />
               </td>
-              <td className="num muted">{r.gridPosition ?? '—'}</td>
+              <td className="num muted">{r.gridPosition ?? ''}</td>
               <td className="num">
                 <Delta n={r.positionsGained} />
               </td>
@@ -147,16 +153,16 @@ function QualiTable({ rows, prefix }: { rows: QualifyingEntry[]; prefix: string 
         <tbody>
           {rows.map((q) => (
             <tr key={q.driverId}>
-              <td className="pos">{q.position ?? '—'}</td>
+              <td className="pos">{q.position ?? ''}</td>
               <td>
                 <DriverCell name={q.driverName} code={q.driverCode} />
               </td>
               <td>
                 <TeamCell id={q.constructorId} name={q.constructorName} />
               </td>
-              <td className="muted mono">{q.q1 ?? '—'}</td>
-              <td className="muted mono">{q.q2 ?? '—'}</td>
-              <td className="mono">{q.q3 ?? '—'}</td>
+              <td className="muted mono">{q.q1 ?? ''}</td>
+              <td className="muted mono">{q.q2 ?? ''}</td>
+              <td className="mono">{q.q3 ?? ''}</td>
             </tr>
           ))}
         </tbody>
@@ -190,9 +196,9 @@ function PracticeTable({ session }: { session: PracticeSession }) {
               <td>
                 <TeamCell id={p.constructorId} name={p.constructorName} />
               </td>
-              <td className="mono">{p.time ?? '—'}</td>
-              <td className="muted mono">{p.gap ?? (p.time ? '' : '—')}</td>
-              <td className="num muted">{p.laps ?? '—'}</td>
+              <td className="mono">{p.time ?? ''}</td>
+              <td className="muted mono">{p.gap ?? ''}</td>
+              <td className="num muted">{p.laps ?? ''}</td>
             </tr>
           ))}
         </tbody>
@@ -215,7 +221,7 @@ export default function RaceWeekend() {
 
   useSeo({
     title: data
-      ? `${data.grandPrixName} GP ${data.season} — Results, Qualifying & Practice`
+      ? `${data.grandPrixName} GP ${data.season}: Results, Qualifying & Practice`
       : undefined,
     description: data
       ? `${data.grandPrixName} Grand Prix ${data.season}: full race result, starting grid, qualifying times, practice sessions${data.sprintResults.length ? ', sprint' : ''}, fastest lap and Driver of the Day.`
@@ -324,9 +330,14 @@ export default function RaceWeekend() {
             <Flag code={data.countryCode} nationality="" />
             <div>
               <h1>{gpTitle(data.grandPrixName, lang)}</h1>
-              <p className="muted">
-                {data.season} · {t('common.round')} {data.round} ·{' '}
-                {fmtDate(data.date, { day: '2-digit', month: 'short', year: 'numeric' })} ·{' '}
+              <p className="muted wknd-meta">
+                <span>{data.season}</span>
+                <span>
+                  {t('common.round')} {data.round}
+                </span>
+                <span className="mono">
+                  {fmtDate(data.date, { day: '2-digit', month: 'short', year: 'numeric' })}
+                </span>
                 <Link to={`/circuits/${data.circuitId}`} className="wknd-circuit">
                   {data.circuitName}
                 </Link>

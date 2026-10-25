@@ -1,28 +1,46 @@
+/* Hallmark · shape: app screen · genre: modern-minimal · theme: Console (graphite), brand kept · redesign: full
+ * nav: kept · signature: the race told from its data, a lap strip of key moments above the classification · states: loading, error, full
+ * axes: dark/condensed-sans/brand-red · contrast: pass · v2.0.0 */
+/* Hallmark · waive 26b · the race, qualifying and practice tabs and the practice switch are styled in styles/shared.css · this file only places them on the race weekend page */
+
 /* Race weekend page: session tabs, practice switch, grid → finish deltas. */
 
 .delta {
-  font-weight: 800;
+  font-family: var(--font-outlier);
+  font-weight: 600;
   font-size: 0.85rem;
 }
 
 .delta.up {
-  color: #52e252;
+  color: var(--color-ok);
 }
 
 .delta.down {
-  color: #ff6b6b;
+  color: var(--color-bad);
 }
 
 .wknd-circuit {
   color: inherit;
   text-decoration: underline;
-  text-decoration-color: rgba(255, 255, 255, 0.3);
+  text-decoration-color: var(--color-rule-2);
   text-underline-offset: 3px;
 }
 
 .wknd-circuit:hover {
-  color: #fff;
-  text-decoration-color: var(--accent);
+  color: var(--color-ink);
+  text-decoration-color: var(--color-accent);
+}
+
+.wknd-circuit:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+/* Season, round, date and circuit under the title, set apart by space. */
+.wknd-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.2rem 1.1rem;
 }
 
 /* Race weekend: session tabs, session date next to each table title, and the

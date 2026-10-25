@@ -191,6 +191,24 @@ select option {
   outline-offset: 4px;
 }
 
+.tab:active,
+.seg-switch button:active {
+  transform: translateY(1px);
+}
+
+.tab:disabled,
+.seg-switch button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tab:active,
+  .seg-switch button:active {
+    transform: none;
+  }
+}
+
 .tab.active::after {
   content: '';
   position: absolute;
@@ -474,16 +492,18 @@ table.standings {
   background: var(--card);
   border: 1px solid var(--border);
   border-radius: var(--radius-card);
-  padding: 0.95rem 1.1rem 0.95rem 1.25rem;
+  padding: 0.95rem 1.1rem;
 }
 
-/* team-colour edge on each highlight card */
-.wknd-hl .stripe {
-  position: absolute;
-  left: 0;
-  top: 0;
-  bottom: 0;
+/* Team colour as a swatch before the name (the system keeps team colours
+   to swatches; a coloured card edge is the generated look). */
+.wknd-hl-swatch {
+  display: inline-block;
   width: 4px;
+  height: 0.9em;
+  margin-right: 0.5rem;
+  border-radius: 2px;
+  vertical-align: -0.05em;
 }
 
 .wknd-hl-label {
