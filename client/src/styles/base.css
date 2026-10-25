@@ -28,6 +28,11 @@ body {
   background: var(--bg);
   color: var(--text);
   font-weight: 400;
+  /* An explicit line height: with "normal" a line was 1.18em in the
+     fallback font and 1.58em once Saira arrived, so text jumped when the
+     web font loaded (and Cyrillic lines, always in the fallback, sat tighter
+     than Latin ones). */
+  line-height: 1.5;
 }
 
 /* Pit Wall: big headings use the condensed display face; body stays Saira. */

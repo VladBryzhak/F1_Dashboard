@@ -387,6 +387,11 @@
   -webkit-text-stroke: 2px var(--team);
   pointer-events: none;
   user-select: none;
+  visibility: hidden;
+}
+
+.hero-bignum.is-ready {
+  visibility: visible;
 }
 
 .hero-stripe {

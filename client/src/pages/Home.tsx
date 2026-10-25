@@ -55,6 +55,17 @@ function timeAgo(iso: string, locale: string): string {
   return rtf.format(-Math.round(hrs / 24), 'day')
 }
 
+// True once the Saira Condensed 800 face itself has loaded. (fonts.check()
+// is no help here: it also says yes before fonts.css has declared the face.)
+function numFontLoaded(): boolean {
+  if (typeof document === 'undefined' || !document.fonts) return true
+  for (const f of document.fonts) {
+    if (f.family.replace(/["']/g, '') === 'Saira Condensed' && f.weight === '800' && f.status === 'loaded')
+      return true
+  }
+  return false
+}
+
 // Dynamic hero focused on the latest race winner.
 function WinnerHero({
   highlights,
@@ -71,6 +82,22 @@ function WinnerHero({
   const race = highlights.latestRace as RaceHighlight
   const winner = race.podium.find((p) => p.position === 1) ?? race.podium[0]
   const color = teamColor(winner.constructorId)
+  // The car number is drawn in Saira Condensed, which arrives after the first
+  // paint; shown in the fallback face it would change size when the font
+  // swaps in (a layout shift), so it appears once the face is ready.
+  const [numReady, setNumReady] = useState(numFontLoaded)
+  useEffect(() => {
+    if (numReady) return
+    const check = () => numFontLoaded() && setNumReady(true)
+    document.fonts.addEventListener('loadingdone', check)
+    // Never leave it hidden for long (font blocked or slow network).
+    const id = setTimeout(() => setNumReady(true), 3000)
+    check()
+    return () => {
+      document.fonts.removeEventListener('loadingdone', check)
+      clearTimeout(id)
+    }
+  }, [numReady])
   // The server names the same photo in the HTML (preload), so prefer its URL.
   const portrait =
     heroImage ?? driverPortraitUrl(winner.driverId, winner.constructorId, String(race.season))
@@ -80,7 +107,7 @@ function WinnerHero({
       {/* Race-number backdrop: the winner's car number, huge, behind the
           portrait, with a team-colour stripe. */}
       {winner.number && (
-        <span className="hero-bignum" aria-hidden="true">
+        <span className={`hero-bignum${numReady ? ' is-ready' : ''}`} aria-hidden="true">
           {winner.number}
         </span>
       )}
@@ -89,6 +116,9 @@ function WinnerHero({
         portraitUrl={portrait}
         srcSet={heroImage ? heroSrcSet : null}
         sizes={heroSizes}
+        // formula1.com portraits are all cut to the same tall frame.
+        width={450}
+        height={1293}
         color={color}
         eager
       />

@@ -153,6 +153,10 @@ export default function DriverProfile() {
               )}
               fallbackUrl={profile.code ? headshots.data?.[profile.code] : undefined}
               thirdUrl={profile.photoUrl}
+              // formula1.com portraits share one tall frame (the size is only
+              // applied to that first candidate).
+              width={450}
+              height={1293}
               color={color}
               alt={`${profile.givenName} ${profile.familyName}`}
               eager

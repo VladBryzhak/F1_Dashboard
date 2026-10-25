@@ -50,6 +50,8 @@ export function Headshot({
   eager = false,
   srcSet,
   sizes,
+  width,
+  height,
 }: {
   portraitUrl?: string | null
   fallbackUrl?: string
@@ -61,6 +63,9 @@ export function Headshot({
   // Responsive variants of portraitUrl (only used while it is shown).
   srcSet?: string | null
   sizes?: string
+  // Intrinsic size of portraitUrl, so the browser reserves its box early.
+  width?: number
+  height?: number
 }) {
   // portraitUrl/fallbackUrl are transparent driver renders; thirdUrl is a
   // rectangular photo (Wikimedia) that needs a different, bounded layout.
@@ -84,6 +89,8 @@ export function Headshot({
         srcSet={idx === 0 && cur.url === portraitUrl ? (srcSet ?? undefined) : undefined}
         sizes={idx === 0 && cur.url === portraitUrl && srcSet ? sizes : undefined}
         alt={alt}
+        width={idx === 0 && cur.url === portraitUrl ? width : undefined}
+        height={idx === 0 && cur.url === portraitUrl ? height : undefined}
         loading={eager ? 'eager' : 'lazy'}
         // Set fetchpriority via the DOM so React 18.3 doesn't warn on the prop.
         ref={(el) => {
