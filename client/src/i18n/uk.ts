@@ -30,13 +30,13 @@ const uk: Dict & Record<string, string> = {
   'footer.flagsBy': 'Іконки прапорів:',
   'footer.outlinesBy': 'Схеми трас намальовано за даними',
   'footer.photosVia': 'Фото пілотів і логотипи/фото команд з',
-  'footer.photosLicense': '(CC BY-SA / суспільне надбання, автори — відповідні правовласники)',
+  'footer.photosLicense': '(CC BY-SA / суспільне надбання, автори: відповідні правовласники)',
   'footer.legal': 'Правова інформація',
   'footer.trademark':
     'Зображення пілотів і болідів © Formula 1. F1, FORMULA 1 та пов’язані знаки є торговельними марками Formula One Licensing B.V.',
   'footer.independent':
-    'Незалежний фанатський проєкт — не пов’язаний із Formula 1, Formula One Management чи FIA і не схвалений ними.',
-  'footer.analytics': 'Сайт використовує Google Analytics; cookie — лише за вашої згоди.',
+    'Незалежний фанатський проєкт, не пов’язаний із Formula 1, Formula One Management чи FIA і не схвалений ними.',
+  'footer.analytics': 'Сайт використовує Google Analytics; cookie лише за вашої згоди.',
   'footer.cookieSettings': 'Налаштування cookie',
   'footer.support': 'Підтримати проєкт',
 
@@ -46,7 +46,7 @@ const uk: Dict & Record<string, string> = {
     'F1 Dashboard безкоштовний, без реклами й без реєстрації. Його робить і підтримує одна людина у вільний час. Якщо сайт вам корисний, можна допомогти з оплатою хостингу й розробки.',
   'sup.jarTitle': 'Банка monobank',
   'sup.jarText':
-    'Будь-яка картка будь-якого банку, Apple Pay чи Google Pay — реєструватися не потрібно. Оплата відбувається на сторінці monobank.',
+    'Будь-яка картка будь-якого банку, Apple Pay чи Google Pay, реєструватися не потрібно. Оплата відбувається на сторінці monobank.',
   'sup.donate': 'Задонатити',
   'sup.soon': 'Посилання для донату з’явиться найближчим часом.',
   'sup.qrLabel': 'QR-код банки monobank',
@@ -56,16 +56,16 @@ const uk: Dict & Record<string, string> = {
   'sup.where1': 'Хостинг: сервер, на якому працюють сайт і дані.',
   'sup.where2': 'Власний домен для сайту.',
   'sup.where3': 'Час на нові функції та виправлення.',
-  'sup.voluntary': 'Донати добровільні й нічого не відкривають — сайт однаковий для всіх.',
+  'sup.voluntary': 'Донати добровільні й нічого не відкривають: сайт однаковий для всіх.',
   'sup.otherTitle': 'Як ще можна допомогти',
   'sup.otherText':
-    'Поділіться сайтом в F1-чаті чи з друзями — так його знайде більше людей. Ідеї та повідомлення про помилки теж вітаються через',
+    'Поділіться сайтом в F1-чаті чи з друзями, так його знайде більше людей. Ідеї та повідомлення про помилки теж вітаються через',
   'sup.otherFeedback': 'форму відгуку',
 
   // Cookie banner
   'cookie.label': 'Повідомлення про cookie',
   'cookie.text':
-    'F1 Dashboard використовує cookie Google Analytics, щоб розуміти, як користуються сайтом, — лише якщо ви погодитесь. Без згоди аналітичні cookie не встановлюються.',
+    'F1 Dashboard використовує cookie Google Analytics, щоб розуміти, як користуються сайтом, лише якщо ви погодитесь. Без згоди аналітичні cookie не встановлюються.',
   'cookie.decline': 'Відхилити',
   'cookie.accept': 'Прийняти',
   'cookie.more': 'Політика конфіденційності',
@@ -121,7 +121,7 @@ const uk: Dict & Record<string, string> = {
   'cal.subCopy': 'Скопіювати посилання',
   'cal.subCopied': 'Посилання скопійовано',
   'cal.subNote':
-    'Назви подій — українською. Google Календар оновлює підписки за власним графіком, іноді лише раз на добу.',
+    'Назви подій українською. Google Календар оновлює підписки за власним графіком, іноді лише раз на добу.',
 
   // Home
   'home.nextRace': 'Наступна гонка',
@@ -216,13 +216,13 @@ const uk: Dict & Record<string, string> = {
   // Lap chart & tyre strategy
   'wk.tab.strategy': 'Стратегія',
   'strat.lapChart': 'Позиції по колах',
-  'strat.lapChartHint': 'Торкніться пілота, щоб виділити. Зліва — стартова решітка, справа — фініш.',
+  'strat.lapChartHint': 'Торкніться пілота, щоб виділити. Зліва стартова решітка, справа фініш.',
   'strat.clear': 'Скинути',
   'strat.tyres': 'Шинна стратегія',
-  'strat.laps': 'кола {from}–{to}',
+  'strat.laps': 'кола {from}-{to}',
   'strat.loading': 'Завантажуємо дані кіл з OpenF1…',
-  'strat.error': 'Дані кіл зараз недоступні ({error}). OpenF1 може бути перевантажений — спробуйте за хвилину.',
-  'strat.source': 'Дані кіл і шин: OpenF1 (з 2023 року). Позиції — порядок на трасі, без урахування штрафів.',
+  'strat.error': 'Дані кіл зараз недоступні ({error}). OpenF1 може бути перевантажений; спробуйте за хвилину.',
+  'strat.source': 'Дані кіл і шин: OpenF1 (з 2023 року). Позиції: порядок на трасі, без урахування штрафів.',
   'tyre.SOFT': 'М’які',
   'tyre.MEDIUM': 'Середні',
   'tyre.HARD': 'Жорсткі',
@@ -314,7 +314,7 @@ const uk: Dict & Record<string, string> = {
   'team.back': '← До списку команд',
   'team.poles': 'Поул-позиції',
   'team.fastestLaps': 'Найшвидші кола',
-  'team.oneTwos': 'Дублі 1–2',
+  'team.oneTwos': 'Дублі 1-2',
   'team.sprintWins': 'Перемоги у спринтах',
   'team.lineage': 'Історія команди',
   'team.lineageHint': 'Назви, під якими виступала команда',
@@ -358,7 +358,7 @@ const uk: Dict & Record<string, string> = {
 
   // Global search
   'search.label': 'Пошук',
-  'search.placeholder': 'Пілоти, команди, траси, гонки — напр. «Monaco 2021»',
+  'search.placeholder': 'Пілоти, команди, траси, гонки, напр. «Monaco 2021»',
   'search.hint': 'Введіть назву. Додайте рік, щоб знайти гонку, напр. «Італія 2024».',
   'search.none': 'Нічого не знайдено за запитом «{q}».',
   'search.error': 'Пошук зараз недоступний. Спробуйте ще раз.',
@@ -403,7 +403,7 @@ const uk: Dict & Record<string, string> = {
   'st.noData': 'Для цього сезону ще немає даних заліку.',
   'st.chartTitle': 'Очки по етапах',
   'st.seasonN': 'сезон {season}',
-  'st.sampleBanner': 'API заліку недоступне ({error}). Показано приклад даних — справжній залік {season} з’явиться автоматично, щойно API запрацює.',
+  'st.sampleBanner': 'API заліку недоступне ({error}). Показано приклад даних; справжній залік {season} з’явиться автоматично, щойно API запрацює.',
   'plural.winsShort_one': '{n} перемога',
   'plural.winsShort_few': '{n} перемоги',
   'plural.winsShort_many': '{n} перемог',
@@ -414,7 +414,7 @@ const uk: Dict & Record<string, string> = {
   'drvs.findTitle': 'Знайти пілота',
   'drvs.tabGrid': 'Поточний склад',
   'drvs.tabSearch': 'Пошук пілотів',
-  'drvs.sampleBanner': 'API недоступне ({error}). Показано приклад даних — справжні дані {season} з’являться автоматично, щойно API запрацює.',
+  'drvs.sampleBanner': 'API недоступне ({error}). Показано приклад даних; справжні дані {season} з’являться автоматично, щойно API запрацює.',
   'teams.title': 'Команди F1 {season}',
   'teams.findTitle': 'Знайти команду',
   'teams.tabSearch': 'Пошук команд',
@@ -469,7 +469,7 @@ const uk: Dict & Record<string, string> = {
   'plural.togetherN_other': '{n} спільної гонки',
 
   // Feedback
-  'fb.intro': 'Знайшли помилку, маєте ідею чи просто хочете привітатися? Надішліть повідомлення — воно надійде напряму автору сайту.',
+  'fb.intro': 'Знайшли помилку, маєте ідею чи просто хочете привітатися? Надішліть повідомлення: воно надійде напряму автору сайту.',
   'fb.sent': 'Дякуємо! Повідомлення надіслано.',
   'fb.message': 'Повідомлення',
   'fb.messagePh': 'Ваш відгук…',
@@ -478,7 +478,7 @@ const uk: Dict & Record<string, string> = {
   'fb.sending': 'Надсилаємо…',
   'fb.send': 'Надіслати відгук',
   'fb.tooShort': 'Напишіть, будь ласка, трохи більше.',
-  'fb.rateLimited': 'Забагато повідомлень — спробуйте пізніше.',
+  'fb.rateLimited': 'Забагато повідомлень. Спробуйте пізніше.',
   'fb.failed': 'Щось пішло не так. Спробуйте ще раз.',
 
   // Telemetry

@@ -1,3 +1,7 @@
+/* Hallmark · shape: app screen · genre: modern-minimal · theme: Console (graphite), brand kept · redesign: full
+ * nav: kept · signature: the black header bar with the red logo tile and the page links · states: full
+ * axes: dark/condensed-sans/brand-red · contrast: pass · v2.0.0 */
+
 /* Site header: logo, navigation, search button, EN | UA switch, burger menu. */
 
 /* ---------- Header bar, logo and nav ---------- */
@@ -34,7 +38,7 @@
   color: var(--color-accent-ink);
   font-style: italic;
   font-weight: 900;
-  padding: 2px 7px;
+  padding: 2px 8px;
   border-radius: 3px;
   font-size: 0.95rem;
 }
@@ -252,7 +256,6 @@
     background: var(--color-nav);
     border-top: var(--rule-hair) solid var(--color-rule);
     border-bottom: var(--rule-hair) solid var(--color-rule);
-    box-shadow: 0 18px 40px var(--color-veil);
   }
   .topbar.menu-open .nav {
     display: flex;
@@ -306,4 +309,21 @@
 /* Header gap tweaks so search + language sit together at the right. */
 .search-btn + .lang-switch {
   margin-left: 0.6rem;
+}
+
+/* Pressed states for the header controls. */
+.nav-link:active,
+.search-btn:active,
+.lang-switch button:active,
+.nav-toggle:active {
+  transform: translateY(1px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .nav-link:active,
+  .search-btn:active,
+  .lang-switch button:active,
+  .nav-toggle:active {
+    transform: none;
+  }
 }

@@ -93,7 +93,7 @@ export async function describePage(rawPath: string): Promise<PageMeta> {
         color: teamColor(d.constructorId),
       }));
       const title = `${season} F1 Championship Standings`;
-      const description = `Formula 1 drivers' and constructors' championship standings for the ${season} season — points, wins and gaps to the leader.`;
+      const description = `Formula 1 drivers' and constructors' championship standings for the ${season} season: points, wins and gaps to the leader.`;
       return rows.length ? page(title, description, { kind: "standings", season, rows }) : generic(title, description);
     }
 
@@ -248,7 +248,7 @@ export async function describePage(rawPath: string): Promise<PageMeta> {
     case "about":
       return generic(
         "About",
-        "About F1 Dashboard: an independent, fan-made Formula 1 statistics site — where the data comes from (f1db, OpenF1, Wikimedia Commons), accuracy and independence.",
+        "About F1 Dashboard: an independent, fan-made Formula 1 statistics site: where the data comes from (f1db, OpenF1, Wikimedia Commons), accuracy and independence.",
         "An independent, fan-made Formula 1 statistics site.",
       );
     case "privacy":

@@ -28,24 +28,24 @@ function AboutEn() {
       <ul>
         <li>
           <Ext href="https://github.com/f1db/f1db">f1db</Ext> (
-          <Ext href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</Ext>) — results,
+          <Ext href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</Ext>): results,
           standings, schedules, circuits, drivers and teams from 1950 to today. It is refreshed
           after race weekends.
         </li>
         <li>
-          <Ext href="https://openf1.org">OpenF1</Ext> — live timing, telemetry, laps, tyres and
+          <Ext href="https://openf1.org">OpenF1</Ext>: live timing, telemetry, laps, tyres and
           weather, from 2023 onwards.
         </li>
         <li>
-          <Ext href="https://commons.wikimedia.org">Wikimedia Commons</Ext> — driver photos and team
+          <Ext href="https://commons.wikimedia.org">Wikimedia Commons</Ext>: driver photos and team
           logos/photos under free licences (CC BY-SA or public domain), credited to their authors.
         </li>
         <li>
-          <Ext href="https://flagcdn.com">flagcdn</Ext> — flag icons.
+          <Ext href="https://flagcdn.com">flagcdn</Ext>: flag icons.
         </li>
         <li>
           <Ext href="https://github.com/bacinger/f1-circuits">f1-circuits</Ext> (MIT, © Tomislav
-          Bacinger) — circuit geodata; the track outlines are drawn from it.
+          Bacinger): circuit geodata; the track outlines are drawn from it.
         </li>
         <li>
           News headlines on the home page come from the Motorsport.com RSS feed and link to the
@@ -78,7 +78,7 @@ function AboutEn() {
           <h2>Support</h2>
           <p>
             The site is free and has no ads. If it&apos;s useful to you, you can{' '}
-            <Link to="/support">support the project</Link> — donations help pay for hosting and
+            <Link to="/support">support the project</Link>: donations help pay for hosting and
             development.
           </p>
         </>
@@ -98,7 +98,7 @@ function AboutUk() {
     <>
       <h1>Про F1 Dashboard</h1>
       <p className="doc-lead">
-        F1 Dashboard — незалежний фанатський сайт зі статистикою Формули-1. Тут зібрано турнірні
+        F1 Dashboard: незалежний фанатський сайт зі статистикою Формули-1. Тут зібрано турнірні
         таблиці, календар із розкладом вікендів, повні вікенди (гонка, спринт, кваліфікація й
         практики), путівники трасами, історію пілотів і команд з 1950 року, порівняння пілотів,
         телеметрію, live-таймінг і повтори гонок.
@@ -108,25 +108,25 @@ function AboutUk() {
       <ul>
         <li>
           <Ext href="https://github.com/f1db/f1db">f1db</Ext> (
-          <Ext href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</Ext>) — результати,
+          <Ext href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</Ext>): результати,
           заліки, розклади, траси, пілоти й команди з 1950 року до сьогодні. Оновлюється після
           гоночних вікендів.
         </li>
         <li>
-          <Ext href="https://openf1.org">OpenF1</Ext> — live-таймінг, телеметрія, кола, шини й
+          <Ext href="https://openf1.org">OpenF1</Ext>: live-таймінг, телеметрія, кола, шини й
           погода, починаючи з 2023 року.
         </li>
         <li>
-          <Ext href="https://commons.wikimedia.org">Wikimedia Commons</Ext> — фото пілотів і
+          <Ext href="https://commons.wikimedia.org">Wikimedia Commons</Ext>: фото пілотів і
           логотипи/фото команд за вільними ліцензіями (CC BY-SA або суспільне надбання) із
           зазначенням авторів.
         </li>
         <li>
-          <Ext href="https://flagcdn.com">flagcdn</Ext> — іконки прапорів.
+          <Ext href="https://flagcdn.com">flagcdn</Ext>: іконки прапорів.
         </li>
         <li>
           <Ext href="https://github.com/bacinger/f1-circuits">f1-circuits</Ext> (MIT, © Tomislav
-          Bacinger) — геодані трас, за якими намальовано схеми трас.
+          Bacinger): геодані трас, за якими намальовано схеми трас.
         </li>
         <li>
           Заголовки новин на головній беруться з RSS Motorsport.com і ведуть на оригінальні статті.
@@ -157,7 +157,7 @@ function AboutUk() {
           <h2>Підтримка</h2>
           <p>
             Сайт безкоштовний і без реклами. Якщо він вам корисний, можна{' '}
-            <Link to="/support">підтримати проєкт</Link> — донати допомагають оплачувати хостинг і
+            <Link to="/support">підтримати проєкт</Link>: донати допомагають оплачувати хостинг і
             розробку.
           </p>
         </>
@@ -177,7 +177,7 @@ export default function About() {
   useSeo({
     title: 'About',
     description:
-      'About F1 Dashboard: an independent, fan-made Formula 1 statistics site — where the data comes from (f1db, OpenF1, Wikimedia Commons), accuracy and independence.',
+      'About F1 Dashboard: an independent, fan-made Formula 1 statistics site: where the data comes from (f1db, OpenF1, Wikimedia Commons), accuracy and independence.',
   })
   return (
     <section className="doc">

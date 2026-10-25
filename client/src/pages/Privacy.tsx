@@ -33,7 +33,7 @@ function PrivacyEn({ updated }: { updated: string }) {
         device and browser type and an approximate location derived from your IP address.
       </p>
       <p>
-        Until you accept — or if you decline — no analytics cookies are set. Google then receives
+        Until you accept, or if you decline, no analytics cookies are set. Google then receives
         only cookieless signals without an identifier (for example that a page was viewed, the
         browser type and the consent status), which cannot be tied to you across visits. See{' '}
         <Ext href="https://policies.google.com/privacy">Google&apos;s privacy policy</Ext> and{' '}
@@ -48,13 +48,13 @@ function PrivacyEn({ updated }: { updated: string }) {
       <h2>Stored in your browser</h2>
       <ul>
         <li>
-          <code>lang</code> — your interface language (EN / UA).
+          <code>lang</code>: your interface language (EN / UA).
         </li>
         <li>
-          <code>cookieConsent</code> — your answer to the cookie notice (accepted / declined).
+          <code>cookieConsent</code>: your answer to the cookie notice (accepted / declined).
         </li>
         <li>
-          <code>chunkReloaded</code> — a one-off flag used after a site update to reload once.
+          <code>chunkReloaded</code>: a one-off flag used after a site update to reload once.
         </li>
       </ul>
       <p>These stay on your device and are not sent to us.</p>
@@ -114,7 +114,7 @@ function PrivacyUk({ updated }: { updated: string }) {
         обробляє інформацію про тип пристрою й браузера і приблизне місцезнаходження за IP-адресою.
       </p>
       <p>
-        Доки ви не погодились — або якщо відмовились — аналітичні cookie не встановлюються. Google
+        Доки ви не погодились (або якщо відмовились), аналітичні cookie не встановлюються. Google
         отримує лише сигнали без cookie й без ідентифікатора (наприклад, що сторінку переглянуто, тип
         браузера і стан згоди), за якими вас не можна впізнати між візитами. Див.{' '}
         <Ext href="https://policies.google.com/privacy">політику конфіденційності Google</Ext> і{' '}
@@ -129,13 +129,13 @@ function PrivacyUk({ updated }: { updated: string }) {
       <h2>Що зберігається у браузері</h2>
       <ul>
         <li>
-          <code>lang</code> — мова інтерфейсу (EN / UA).
+          <code>lang</code>: мова інтерфейсу (EN / UA).
         </li>
         <li>
-          <code>cookieConsent</code> — ваша відповідь на повідомлення про cookie (прийнято / відхилено).
+          <code>cookieConsent</code>: ваша відповідь на повідомлення про cookie (прийнято / відхилено).
         </li>
         <li>
-          <code>chunkReloaded</code> — разова позначка для одного перезавантаження після оновлення
+          <code>chunkReloaded</code>: разова позначка для одного перезавантаження після оновлення
           сайту.
         </li>
       </ul>
@@ -144,7 +144,7 @@ function PrivacyUk({ updated }: { updated: string }) {
       <h2>Форма відгуку</h2>
       <p>
         Коли ви надсилаєте <Link to="/feedback">відгук</Link>, ваше повідомлення та необов&apos;язковий
-        контакт передаються на наш сервер і пересилаються власнику сайту через Telegram — сторонній
+        контакт передаються на наш сервер і пересилаються власнику сайту через Telegram, сторонній
         месенджер. Вони використовуються лише для того, щоб прочитати повідомлення, відповісти та
         покращити сайт, і ніколи не публікуються. IP-адреса ненадовго використовується в пам&apos;яті
         сервера для захисту від спаму й не зберігається нами. Будь ласка, не додавайте чутливих

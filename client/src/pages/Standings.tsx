@@ -30,7 +30,7 @@ export default function Standings() {
 
   useSeo({
     title: `${season} F1 Championship Standings`,
-    description: `Formula 1 drivers' and constructors' championship standings for the ${season} season — points, wins and gaps to the leader.`,
+    description: `Formula 1 drivers' and constructors' championship standings for the ${season} season: points, wins and gaps to the leader.`,
     canonicalPath,
   })
 

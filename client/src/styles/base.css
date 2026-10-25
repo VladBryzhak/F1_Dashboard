@@ -1,3 +1,7 @@
+/* Hallmark · shape: app screen · genre: modern-minimal · theme: Console (graphite), brand kept · redesign: full
+ * nav: kept · signature: the Saira faces and element defaults every page starts from · states: full
+ * axes: dark/condensed-sans/brand-red · contrast: pass · v2.0.0 */
+
 /* Design tokens (colours, fonts) and element defaults. Loaded first, on every page. */
 
 :root {
@@ -61,4 +65,14 @@ h1 {
   h1 {
     font-size: 1.75rem;
   }
+}
+
+/* Browser surfaces in the palette: text selection and scrollbars. */
+::selection {
+  background: var(--color-accent);
+  color: var(--color-accent-ink);
+}
+
+html {
+  scrollbar-color: var(--color-rule-2) var(--color-paper);
 }

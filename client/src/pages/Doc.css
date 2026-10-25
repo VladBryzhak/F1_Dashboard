@@ -1,4 +1,8 @@
-/* Text pages (About, Privacy). */
+/* Hallmark · shape: app screen · genre: modern-minimal · theme: Console (graphite), brand kept · redesign: full
+ * nav: kept · signature: plain reading pages at a comfortable measure, links underlined in a quiet rule · states: full
+ * axes: dark/condensed-sans/brand-red · contrast: pass · v2.0.0 */
+
+/* Text pages (About, Privacy, Support). */
 
 .doc {
   max-width: 72ch;
@@ -6,16 +10,18 @@
 
 .doc h1 {
   margin-bottom: 0.5rem;
+  text-wrap: balance;
 }
 
 .doc h2 {
   margin: 2rem 0 0.6rem;
   font-size: 1.25rem;
+  text-wrap: balance;
 }
 
 .doc p,
 .doc li {
-  color: var(--muted);
+  color: var(--color-ink-2);
   line-height: 1.65;
 }
 
@@ -28,37 +34,54 @@
 }
 
 .doc a {
-  color: var(--text);
+  color: var(--color-ink);
   text-decoration: underline;
-  text-decoration-color: rgba(225, 6, 0, 0.6);
+  text-decoration-color: var(--color-rule-2);
   text-underline-offset: 3px;
+  transition: text-decoration-color var(--dur-micro) var(--ease-out);
 }
 
 .doc a:hover {
-  color: #fff;
-  text-decoration-color: var(--accent);
+  text-decoration-color: var(--color-accent);
+}
+
+.doc a:active {
+  color: var(--color-accent);
+}
+
+.doc a:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
 }
 
 .doc .breadcrumbs a {
-  color: var(--muted);
+  color: var(--color-muted);
   text-decoration: none;
 }
 
 .doc code {
+  font-family: var(--font-outlier);
   font-size: 0.85em;
   padding: 0.05rem 0.35rem;
   border-radius: 4px;
-  background: rgba(255, 255, 255, 0.07);
-  color: var(--text);
+  background: var(--color-paper-3);
+  border: var(--rule-hair) solid var(--color-rule);
+  color: var(--color-ink);
 }
 
 .doc-lead {
   font-size: 1.05rem;
-  color: var(--text) !important;
+  color: var(--color-ink) !important;
 }
 
 .doc-updated {
   margin: 0 0 1rem;
   font-size: 0.8rem;
-  color: var(--muted-2) !important;
+  color: var(--color-muted) !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .doc a {
+    transition: none;
+  }
 }

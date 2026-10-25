@@ -1,3 +1,7 @@
+/* Hallmark · shape: app screen · genre: modern-minimal · theme: Console (graphite), brand kept · redesign: full
+ * nav: kept · signature: the jar as one card, a red donate button beside its QR code · states: empty, full
+ * axes: dark/condensed-sans/brand-red · contrast: pass · v2.0.0 */
+
 /* Support page: the Monobank jar card with its QR code. Text styles come
    from Doc.css. */
 
@@ -7,9 +11,9 @@
   gap: 1.5rem;
   margin: 1.5rem 0 0.5rem;
   padding: 1.4rem 1.5rem;
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: 16px;
+  background: var(--color-paper-2);
+  border: var(--rule-hair) solid var(--color-rule);
+  border-radius: var(--radius-card);
 }
 
 .sup-main {
@@ -22,9 +26,10 @@
   place-items: center;
   width: 40px;
   height: 40px;
-  border-radius: 10px;
-  background: rgba(225, 6, 0, 0.12);
-  color: var(--accent);
+  border-radius: var(--radius-pill);
+  background: var(--color-paper-3);
+  border: var(--rule-hair) solid var(--color-rule);
+  color: var(--color-accent);
 }
 
 .doc .sup-name {
@@ -35,35 +40,52 @@
   margin: 0 0 1rem;
 }
 
+/* Donate: the page's one primary action. */
 .sup-btn {
   display: inline-flex;
   align-items: center;
   gap: 0.45rem;
-  padding: 0.65rem 1.2rem;
-  border-radius: 10px;
-  background: var(--accent);
+  min-height: 48px;
+  padding: 0 1.2rem;
+  border-radius: var(--radius-pill);
+  background: var(--color-accent);
   font-weight: 700;
+  transition: background-color var(--dur-micro) var(--ease-out);
 }
 
 .doc a.sup-btn {
-  color: #fff;
+  color: var(--color-accent-ink);
   text-decoration: none;
 }
 
 .sup-btn:hover {
-  filter: brightness(1.08);
+  background: var(--color-accent-hover);
 }
 
-/* Placeholder link: the button is shown but inactive. */
-.sup-btn.is-off {
-  opacity: 0.45;
+.sup-btn:active {
+  transform: translateY(1px);
+}
+
+.doc a.sup-btn:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 3px;
+}
+
+/* Placeholder link: the button is shown but inactive (aria-disabled). */
+.sup-btn.is-off,
+.sup-btn[aria-disabled='true'] {
+  background: var(--color-paper-3);
   cursor: not-allowed;
-  filter: none;
+  transform: none;
+}
+
+.doc a.sup-btn.is-off {
+  color: var(--color-muted);
 }
 
 .doc .sup-soon {
   margin: 0.6rem 0 0;
-  color: var(--muted);
+  color: var(--color-muted);
   font-size: 0.85rem;
   font-weight: 600;
 }
@@ -75,7 +97,7 @@
 
 .sup-qr svg {
   display: block;
-  border-radius: 10px;
+  border-radius: var(--radius-pill);
 }
 
 .sup-qr > div {
@@ -90,20 +112,21 @@
 .sup-qr-tag {
   position: absolute;
   inset: 50% auto auto 50%;
-  transform: translate(-50%, -50%) rotate(-12deg);
+  transform: translate(-50%, -50%);
   padding: 0.2rem 0.6rem;
-  border-radius: 6px;
-  background: var(--accent);
-  color: #fff;
-  font: 800 0.8rem var(--font-display);
-  letter-spacing: 1px;
-  text-transform: uppercase;
+  border-radius: var(--radius-pill);
+  background: var(--color-paper-2);
+  border: var(--rule-hair) solid var(--color-rule-2);
+  color: var(--color-ink);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  white-space: nowrap;
 }
 
 .sup-qr figcaption {
   margin-top: 0.5rem;
-  color: var(--muted);
-  font-size: 0.78rem;
+  color: var(--color-muted);
+  font-size: 0.8rem;
 }
 
 @media (max-width: 768px) {
@@ -119,5 +142,14 @@
   }
   .sup-qr {
     align-self: center;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sup-btn {
+    transition: none;
+  }
+  .sup-btn:active {
+    transform: none;
   }
 }

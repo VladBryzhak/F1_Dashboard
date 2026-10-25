@@ -15,7 +15,7 @@ export default function Feedback() {
 
   const [message, setMessage] = useState('')
   const [contact, setContact] = useState('')
-  const [website, setWebsite] = useState('') // honeypot — real users leave empty
+  const [website, setWebsite] = useState('') // honeypot: real users leave it empty
   const [status, setStatus] = useState<Status>('idle')
   const [error, setError] = useState('')
   const { t } = useI18n()
@@ -53,7 +53,7 @@ export default function Feedback() {
 
       {status === 'sent' ? (
         <p className="banner banner-ok">
-          {t('fb.sent')} 🏁
+          {t('fb.sent')}
         </p>
       ) : (
         <form className="feedback-form" onSubmit={onSubmit}>

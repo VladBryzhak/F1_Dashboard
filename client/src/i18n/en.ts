@@ -33,7 +33,7 @@ const en = {
   'footer.trademark':
     'Driver and car images are © Formula 1. F1, FORMULA 1 and related marks are trademarks of Formula One Licensing B.V.',
   'footer.independent':
-    'An independent, fan-made project — not affiliated with, endorsed by, or associated with Formula 1, Formula One Management or the FIA.',
+    'An independent, fan-made project, not affiliated with, endorsed by, or associated with Formula 1, Formula One Management or the FIA.',
   'footer.analytics': 'This site uses Google Analytics, with cookies only if you accept them.',
   'footer.cookieSettings': 'Cookie settings',
   'footer.support': 'Support the project',
@@ -44,7 +44,7 @@ const en = {
     'F1 Dashboard is free, with no ads and no accounts. One person builds and runs it in their spare time. If the site is useful to you, you can chip in for hosting and development.',
   'sup.jarTitle': 'monobank jar',
   'sup.jarText':
-    'Any card from any bank, Apple Pay or Google Pay — no sign-up needed. The payment happens on monobank’s own page.',
+    'Any card from any bank, Apple Pay or Google Pay, no sign-up needed. The payment happens on monobank’s own page.',
   'sup.donate': 'Donate',
   'sup.soon': 'The donation link is coming soon.',
   'sup.qrLabel': 'QR code for the monobank jar',
@@ -55,16 +55,16 @@ const en = {
   'sup.where2': 'A proper domain name for the site.',
   'sup.where3': 'Time for new features and fixes.',
   'sup.voluntary':
-    'Donations are voluntary and don’t unlock anything — the site stays the same for everyone.',
+    'Donations are voluntary and don’t unlock anything: the site stays the same for everyone.',
   'sup.otherTitle': 'Other ways to help',
   'sup.otherText':
-    'Share the site in your F1 chat or with a friend — it helps more people find it. Ideas and bug reports are welcome too, via the',
+    'Share the site in your F1 chat or with a friend; it helps more people find it. Ideas and bug reports are welcome too, via the',
   'sup.otherFeedback': 'feedback form',
 
   // Cookie banner
   'cookie.label': 'Cookie notice',
   'cookie.text':
-    'F1 Dashboard uses Google Analytics cookies to see how the site is used — only if you accept. Without consent no analytics cookies are set.',
+    'F1 Dashboard uses Google Analytics cookies to see how the site is used, only if you accept. Without consent no analytics cookies are set.',
   'cookie.decline': 'Decline',
   'cookie.accept': 'Accept',
   'cookie.more': 'Privacy policy',
@@ -216,9 +216,9 @@ const en = {
   'strat.lapChartHint': 'Tap a driver to highlight. Grid order on the left, finish on the right.',
   'strat.clear': 'Clear',
   'strat.tyres': 'Tyre strategy',
-  'strat.laps': 'laps {from}–{to}',
+  'strat.laps': 'laps {from}-{to}',
   'strat.loading': 'Loading lap data from OpenF1…',
-  'strat.error': 'Lap data is not available right now ({error}). OpenF1 may be busy — try again in a minute.',
+  'strat.error': 'Lap data is not available right now ({error}). OpenF1 may be busy; try again in a minute.',
   'strat.source': 'Lap and tyre data: OpenF1 (2023 onwards). Positions are the on-track order, before any penalties.',
   'tyre.SOFT': 'Soft',
   'tyre.MEDIUM': 'Medium',
@@ -287,7 +287,7 @@ const en = {
   'team.back': '← Back to Teams',
   'team.poles': 'Pole positions',
   'team.fastestLaps': 'Fastest laps',
-  'team.oneTwos': '1–2 finishes',
+  'team.oneTwos': '1-2 finishes',
   'team.sprintWins': 'Sprint wins',
   'team.lineage': 'Team history',
   'team.lineageHint': 'Names this team has raced under',
@@ -325,7 +325,7 @@ const en = {
 
   // Global search
   'search.label': 'Search',
-  'search.placeholder': 'Drivers, teams, circuits, races — e.g. “Monaco 2021”',
+  'search.placeholder': 'Drivers, teams, circuits, races, e.g. “Monaco 2021”',
   'search.hint': 'Type a name. Add a year to find a race, e.g. “Silverstone 2024”.',
   'search.none': 'Nothing found for “{q}”.',
   'search.error': 'Search is unavailable right now. Please try again.',
@@ -370,14 +370,14 @@ const en = {
   'st.noData': 'No standings data for this season yet.',
   'st.chartTitle': 'Points by round',
   'st.seasonN': '{season} season',
-  'st.sampleBanner': 'Live standings API unavailable ({error}). Showing sample data so the layout is visible — real {season} standings appear automatically once the API is reachable.',
+  'st.sampleBanner': 'Live standings API unavailable ({error}). Showing sample data so the layout is visible; real {season} standings appear automatically once the API is reachable.',
 
   // Drivers / Teams lists & search
   'drvs.title': '{season} F1 Drivers',
   'drvs.findTitle': 'Find a Driver',
   'drvs.tabGrid': 'Current grid',
   'drvs.tabSearch': 'Search drivers',
-  'drvs.sampleBanner': 'Live API unavailable ({error}). Showing sample data — real {season} data appears automatically once the API is reachable.',
+  'drvs.sampleBanner': 'Live API unavailable ({error}). Showing sample data; real {season} data appears automatically once the API is reachable.',
   'teams.title': '{season} F1 Teams',
   'teams.findTitle': 'Find a Team',
   'teams.tabSearch': 'Search teams',
@@ -420,7 +420,7 @@ const en = {
   'plural.togetherN_other': '{n} races together',
 
   // Feedback
-  'fb.intro': 'Found a bug, have an idea, or just want to say hi? Send a message — it goes straight to the person who builds this site.',
+  'fb.intro': 'Found a bug, have an idea, or just want to say hi? Send a message: it goes straight to the person who builds this site.',
   'fb.sent': 'Thanks! Your message was sent.',
   'fb.message': 'Message',
   'fb.messagePh': 'Your feedback…',
@@ -429,7 +429,7 @@ const en = {
   'fb.sending': 'Sending…',
   'fb.send': 'Send feedback',
   'fb.tooShort': 'Please write a little more.',
-  'fb.rateLimited': 'Too many messages — please try again later.',
+  'fb.rateLimited': 'Too many messages. Please try again later.',
   'fb.failed': 'Something went wrong. Please try again.',
 
   // Telemetry
