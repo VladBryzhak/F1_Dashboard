@@ -1,19 +1,30 @@
+/* Hallmark · shape: app screen · genre: modern-minimal · theme: Console (graphite), brand kept · redesign: full
+ * nav: kept · signature: the timing board itself, F1's own purple, green and yellow marks on graphite · states: loading, error, empty, full
+ * axes: dark/condensed-sans/brand-red · contrast: pass · v2.0.0 */
+
 /* Live timing page: status line, live board, side panel and driver detail. */
 
 /* ---------- Live status line and next-session card ---------- */
 .live-session {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.3rem 1.1rem;
   font-weight: 600;
   margin: 0 0 1.25rem;
 }
 
+.live-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
 .live-count {
-  margin-left: 0.6rem;
-  font-variant-numeric: tabular-nums;
-  color: var(--muted);
-  font-weight: 700;
+  font-family: var(--font-outlier);
+  font-variant-numeric: tabular-nums slashed-zero;
+  color: var(--color-cool);
+  font-weight: 600;
 }
 
 /* Next-session countdown card (shown when nothing is live). */
@@ -21,36 +32,38 @@
   display: flex;
   flex-wrap: wrap;
   align-items: baseline;
-  gap: 0.4rem 0.9rem;
-  background: var(--panel);
-  border: 1px solid var(--border);
-  border-radius: 12px;
+  gap: 0.4rem 1.1rem;
+  background: var(--color-paper-2);
+  border: var(--rule-hair) solid var(--color-rule);
+  border-radius: var(--radius-card);
   padding: 0.9rem 1.1rem;
   margin-bottom: 1rem;
 }
 
 .next-label {
-  font-size: 0.7rem;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  font-weight: 700;
-  color: var(--muted-2);
+  font-size: var(--text-sm);
+  font-weight: 500;
+  color: var(--color-muted);
 }
 
 .next-name {
-  font-weight: 800;
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 0.2rem 1rem;
+  font-weight: 700;
 }
 
 .next-count {
   margin-left: auto;
-  font-variant-numeric: tabular-nums;
-  font-weight: 800;
+  font-family: var(--font-outlier);
+  font-variant-numeric: tabular-nums slashed-zero;
+  font-weight: 600;
   font-size: 1.05rem;
-  color: var(--accent);
+  color: var(--color-cool);
 }
 
-/* ---------- Board + SESSION side panel (Live and Replay) ---------- */
-/* Replay 2-column: board (left) + session side panel (right); stacks narrow. */
+/* ---------- Board + session side panel (Live and Replay) ---------- */
+/* Two columns: board (left) and the session side panel (right); stacks narrow. */
 .rp-layout {
   display: flex;
   flex-wrap: wrap;
@@ -69,20 +82,20 @@
 }
 
 .rp-side-card {
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: 14px;
+  background: var(--color-paper-2);
+  border: var(--rule-hair) solid var(--color-rule);
+  border-radius: var(--radius-card);
   padding: 1rem 1.1rem;
 }
 
 .rp-side-title {
   margin: 0 0 0.6rem;
   font-family: var(--font-display);
-  font-weight: 700;
-  letter-spacing: 1.2px;
+  font-weight: 800;
+  font-size: 1.1rem;
+  line-height: 1.1;
   text-transform: uppercase;
-  font-size: 0.9rem;
-  color: var(--muted);
+  color: var(--color-ink);
 }
 
 .rp-kv {
@@ -91,8 +104,8 @@
   justify-content: space-between;
   gap: 1rem;
   padding: 0.45rem 0;
-  font-size: 0.85rem;
-  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  font-size: var(--text-sm);
+  border-top: var(--rule-hair) solid var(--color-rule);
 }
 
 .rp-kv:first-of-type {
@@ -100,54 +113,54 @@
 }
 
 .rp-kv > span:first-child {
-  color: var(--muted);
+  color: var(--color-muted);
 }
 
 .rp-kv > span:last-child {
   font-weight: 600;
+  text-align: right;
 }
 
 .rp-side-status {
+  font-size: var(--text-sm);
   font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  font-size: 0.78rem;
 }
 
 .rp-side-status--green {
-  color: #38d66b;
+  color: var(--color-ok);
 }
 
 .rp-side-status--yellow,
-.rp-side-status--sc,
+.rp-side-status--sc {
+  color: var(--color-sc);
+}
+
 .rp-side-status--vsc {
-  color: #ffd12e;
+  color: var(--color-vsc);
 }
 
 .rp-side-status--red {
-  color: #ff5a5a;
+  color: var(--color-bad);
 }
 
 .rp-side-status--chequered {
-  color: var(--text);
+  color: var(--color-ink);
 }
 
 /* ---------- Live timing board ---------- */
 .live-replay {
-  margin-left: 0.5rem;
-  font-size: 0.7rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  color: var(--muted-2);
-  border: 1px solid var(--border);
-  border-radius: 20px;
-  padding: 0.1rem 0.6rem;
+  font-size: var(--text-sm);
+  font-weight: 500;
+  color: var(--color-muted);
+  border: var(--rule-hair) solid var(--color-rule-2);
+  border-radius: var(--radius-pill);
+  padding: 0.05rem 0.5rem;
 }
 
 .live-board {
-  border: 1px solid var(--border);
-  border-radius: 12px;
+  background: var(--color-paper-2);
+  border: var(--rule-hair) solid var(--color-rule);
+  border-radius: var(--radius-card);
   overflow: hidden;
 }
 
@@ -161,12 +174,11 @@
 }
 
 .lb-head {
-  height: 34px;
-  font-size: 0.68rem;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  color: var(--muted-2);
-  border-bottom: 1px solid var(--border);
+  height: 36px;
+  font-size: var(--text-sm);
+  font-weight: 500;
+  color: var(--color-muted);
+  border-bottom: var(--rule-hair) solid var(--color-rule);
 }
 
 .lb-row {
@@ -174,11 +186,12 @@
   height: 46px;
   background: none;
   border: none;
-  border-top: 1px solid rgba(255, 255, 255, 0.04);
-  color: var(--text);
+  border-top: var(--rule-hair) solid var(--color-rule);
+  color: var(--color-ink);
   font: inherit;
   text-align: left;
   cursor: pointer;
+  transition: background-color var(--dur-micro) var(--ease-out);
 }
 
 .lb-row-wrap:first-child .lb-row {
@@ -186,16 +199,36 @@
 }
 
 .lb-row:hover {
-  background: rgba(255, 255, 255, 0.03);
+  background: var(--color-paper-3);
+}
+
+.lb-row:active {
+  background: var(--color-paper);
+}
+
+.lb-row:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: -2px;
+}
+
+.lb-row:disabled {
+  cursor: default;
+  color: var(--color-muted);
 }
 
 .lb-row-wrap.open .lb-row {
-  background: rgba(255, 255, 255, 0.05);
+  background: var(--color-paper-3);
 }
 
 .lb-pos {
-  font-weight: 800;
-  color: var(--muted);
+  font-family: var(--font-outlier);
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+  color: var(--color-muted);
+}
+
+.lb-head .lb-pos {
+  font-family: inherit;
 }
 
 .lb-drv {
@@ -205,42 +238,58 @@
   min-width: 0;
 }
 
+/* Team colour as a swatch beside the code. */
 .lb-stripe {
   width: 4px;
-  height: 20px;
+  height: 18px;
   border-radius: 2px;
   flex: none;
 }
 
 .lb-code {
-  font-weight: 800;
+  font-family: var(--font-outlier);
+  font-weight: 700;
 }
 
 .lb-team {
-  color: var(--muted-2);
+  color: var(--color-muted);
   font-size: 0.8rem;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
+.lb-gap {
+  color: var(--color-cool);
+}
+
+.lb-head .lb-gap {
+  color: inherit;
+}
+
+/* Times in mono run wider than the body face; a step smaller keeps them
+   inside their columns. */
+.lb-row .mono {
+  font-size: 0.88rem;
+}
+
 .lb-tyre {
   display: flex;
   align-items: center;
-  gap: 0.25rem;
+  gap: 0.3rem;
 }
 
 .tyre-age {
-  font-size: 0.72rem;
-  color: var(--muted-2);
+  font-family: var(--font-outlier);
+  font-size: 0.75rem;
+  color: var(--color-muted);
 }
 
 /* ---------- Expanded driver detail (Live and Replay) ---------- */
-/* Expanded driver detail. */
 .ld-detail {
   padding: 1rem 1.1rem 1.2rem;
-  background: var(--card);
-  border-top: 1px solid var(--border);
+  background: var(--color-paper-3);
+  border-top: var(--rule-hair) solid var(--color-rule);
 }
 
 .ld-sectors {
@@ -253,27 +302,28 @@
 .ld-sector-head {
   display: flex;
   justify-content: space-between;
-  font-size: 0.78rem;
-  color: var(--muted);
+  font-size: 0.8rem;
+  color: var(--color-muted);
   margin-bottom: 0.35rem;
 }
 
 .ld-sector-time {
-  font-variant-numeric: tabular-nums;
-  color: var(--text);
-  font-weight: 700;
+  font-family: var(--font-outlier);
+  font-variant-numeric: tabular-nums slashed-zero;
+  color: var(--color-ink);
+  font-weight: 600;
 }
 
 .ld-sector-time.sector-purple {
-  color: #c06bf0;
+  color: var(--timing-best);
 }
 
 .ld-sector-time.sector-green {
-  color: #4fcf5f;
+  color: var(--timing-pb);
 }
 
 .ld-sector-time.sector-yellow {
-  color: #e0c04a;
+  color: var(--timing-slow);
 }
 
 .seg-bar {
@@ -285,27 +335,27 @@
   flex: 1;
   height: 7px;
   border-radius: 2px;
-  background: #33333c;
+  background: var(--color-rule);
 }
 
 .seg-green {
-  background: #43b02a;
+  background: var(--timing-pb);
 }
 
 .seg-purple {
-  background: #b14be8;
+  background: var(--timing-best);
 }
 
 .seg-yellow {
-  background: #e0c04a;
+  background: var(--timing-slow);
 }
 
 .seg-pit {
-  background: #2a6df4;
+  background: var(--timing-pit);
 }
 
 .seg-none {
-  background: #33333c;
+  background: var(--color-rule);
 }
 
 .ld-cols {
@@ -316,19 +366,25 @@
 
 .ld-col h4 {
   margin: 0 0 0.6rem;
-  font-size: 0.7rem;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  color: var(--muted-2);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--color-ink-2);
 }
 
 .ld-kv {
   display: flex;
   justify-content: space-between;
   gap: 0.75rem;
-  font-size: 0.82rem;
-  padding: 0.22rem 0;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  font-size: 0.85rem;
+  padding: 0.25rem 0;
+  border-bottom: var(--rule-hair) solid var(--color-rule);
+}
+
+.ld-stint {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.2rem 0.6rem;
 }
 
 .ld-kv .tyre {
@@ -340,7 +396,7 @@
 @media (max-width: 680px) {
   .lb-head,
   .lb-row {
-    grid-template-columns: 1.8rem minmax(70px, 1fr) 4.3rem 4.6rem 2.8rem;
+    grid-template-columns: 1.6rem minmax(60px, 1fr) 4.3rem 5rem 2.8rem;
     gap: 0.4rem;
     padding: 0 0.6rem;
   }
@@ -355,5 +411,11 @@
   }
   .ld-sectors {
     gap: 0.5rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lb-row {
+    transition: none;
   }
 }

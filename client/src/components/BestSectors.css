@@ -1,3 +1,7 @@
+/* Hallmark · shape: app screen · genre: modern-minimal · theme: Console (graphite), brand kept · redesign: full
+ * nav: kept · signature: who holds each sector and the fastest lap, in the session-best purple · states: empty, full
+ * axes: dark/condensed-sans/brand-red · contrast: pass · v2.0.0 */
+
 /* Best-sectors card (live board and replay side panel). Card frame and title
    come from .rp-side-card / .rp-side-title. */
 
@@ -12,7 +16,7 @@
   gap: 0.6rem;
   padding: 0.45rem 0;
   font-size: 0.88rem;
-  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  border-top: var(--rule-hair) solid var(--color-rule);
 }
 
 .bs-row:first-of-type {
@@ -20,16 +24,16 @@
 }
 
 .bs-sec {
-  color: var(--muted);
-  font: 700 0.8rem var(--font-display);
-  letter-spacing: 0.5px;
+  color: var(--color-muted);
+  font: 600 0.8rem var(--font-outlier);
 }
 
 .bs-drv {
   display: inline-flex;
   align-items: center;
   gap: 0.45rem;
-  font-weight: 800;
+  font-family: var(--font-outlier);
+  font-weight: 700;
 }
 
 .bs-who {
@@ -40,9 +44,9 @@
 }
 
 .bs-lapno {
-  color: var(--muted);
-  font-size: 0.78rem;
-  font-weight: 600;
+  color: var(--color-muted);
+  font-size: 0.8rem;
+  font-weight: 500;
 }
 
 /* The fastest lap leads the card, a touch bigger than the sector rows. */
@@ -57,8 +61,8 @@
 
 /* Session-best sector times read purple, as on the timing board. */
 .bs-time {
-  color: #c06bf0;
-  font-weight: 700;
+  color: var(--timing-best);
+  font-weight: 600;
 }
 
 .bs-ideal {
@@ -66,23 +70,23 @@
 }
 
 .bs-label {
-  color: var(--muted);
+  color: var(--color-muted);
 }
 
 .bs-ideal .bs-time {
-  color: var(--text);
+  color: var(--color-ink);
 }
 
 .bs-gain {
   margin-left: 0.4rem;
-  color: var(--muted);
+  color: var(--color-muted);
   font-style: normal;
-  font-size: 0.78rem;
-  font-weight: 600;
+  font-size: 0.8rem;
+  font-weight: 500;
 }
 
 .bs-empty {
   margin: 0;
-  color: var(--muted);
+  color: var(--color-muted);
   font-size: 0.85rem;
 }

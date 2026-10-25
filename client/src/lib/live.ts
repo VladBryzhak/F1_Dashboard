@@ -4,7 +4,7 @@ import type { TKey } from '../i18n/core'
 
 // 98.22 -> "1:38.220"; 25.516 -> "25.516"; null -> "—".
 export function fmtTime(s: number | null | undefined): string {
-  if (s == null) return '—'
+  if (s == null) return ''
   const m = Math.floor(s / 60)
   const rem = (s % 60).toFixed(3)
   if (m === 0) return rem
@@ -41,7 +41,7 @@ export function tyre(compound: string | null): { label: string; cls: string } {
     case 'WET':
       return { label: 'W', cls: 'wet' }
     default:
-      return { label: '–', cls: 'unknown' }
+      return { label: '?', cls: 'unknown' }
   }
 }
 

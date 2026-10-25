@@ -17,7 +17,7 @@ function inkOn(hex: string | null): string {
   const h = (hex ?? '888888').replace('#', '')
   const [r, g, b] = [0, 2, 4].map((i) => parseInt(h.slice(i, i + 2), 16) / 255)
   const lum = 0.2126 * r + 0.7152 * g + 0.0722 * b
-  return lum > 0.55 ? '#0e0e13' : '#fff'
+  return lum > 0.55 ? 'var(--tyre-ink-dark)' : 'var(--tyre-ink-light)'
 }
 
 export default function TrackMap({
@@ -102,7 +102,7 @@ export default function TrackMap({
               transform={`translate(${c.x.toFixed(2)} ${c.y.toFixed(2)})`}
             >
               <circle r={R} fill={teamColor(drv?.colour ?? null)} />
-              <text className="tm-num" fill={inkOn(drv?.colour ?? null)} dy="0.36em">
+              <text className="tm-num" style={{ fill: inkOn(drv?.colour ?? null) }} dy="0.36em">
                 {c.num}
               </text>
               {labelled && !c.inGarage && (

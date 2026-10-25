@@ -60,6 +60,13 @@
   --color-fastest: oklch(62% 0.21 310); /* fastest-lap purple, F1's own */
   --color-veil: oklch(10% 0.008 285 / 0.6);
 
+  /* Timing marks: F1's own coding on the timing board (purple session
+     best, green personal best, yellow slower, blue in the pit). */
+  --timing-best: var(--color-fastest);
+  --timing-pb: oklch(74% 0.17 148);
+  --timing-slow: oklch(85% 0.15 92);
+  --timing-pit: oklch(62% 0.16 258);
+
   /* Tyre compounds: data colours, F1's own coding. */
   --tyre-soft: oklch(58% 0.235 29);
   --tyre-medium: oklch(84% 0.16 90);

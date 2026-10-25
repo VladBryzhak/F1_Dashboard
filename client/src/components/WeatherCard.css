@@ -1,10 +1,12 @@
-/* Weather card under the SESSION panel (Live and Replay). */
+/* Hallmark · shape: app screen · genre: modern-minimal · theme: Console (graphite), brand kept · redesign: full
+ * nav: kept · signature: track weather as plain readings under the session panel · states: full
+ * axes: dark/condensed-sans/brand-red · contrast: pass · v2.0.0 */
 
-/* Weather card under the SESSION panel (Live + Replay). */
+/* Weather card under the session panel (Live and Replay). */
 .rp-weather {
   margin-top: 0.9rem;
 }
 
 .rp-wx-rain {
-  color: #5aa9ff;
+  color: var(--color-cool);
 }

@@ -250,7 +250,7 @@ function RowDetail({ data, row }: { data: ReplayData; row: Row }) {
                     row.sectors[i].shown ? ` sector-${sectorLong(lap.sc[i])}` : ''
                   }`}
                 >
-                  {row.sectors[i].shown ? fmtTime(lap.s[i]) : '—'}
+                  {row.sectors[i].shown ? fmtTime(lap.s[i]) : ''}
                 </span>
               </div>
               <span className="seg-bar">
@@ -280,7 +280,7 @@ function RowDetail({ data, row }: { data: ReplayData; row: Row }) {
           <div className="ld-kv">
             <span>{tr('rp.speedTrap')}</span>
             <span className="mono">
-              {lap?.sp[2] != null ? `${lap.sp[2]} ${tr('tel.kmh')}` : '—'}
+              {lap?.sp[2] != null ? `${lap.sp[2]} ${tr('tel.kmh')}` : ''}
             </span>
           </div>
         </div>
@@ -290,9 +290,9 @@ function RowDetail({ data, row }: { data: ReplayData; row: Row }) {
             const t = tyre(s.compound)
             return (
               <div className="ld-kv" key={s.start}>
-                <span>
-                  <span className={`tyre tyre-${t.cls}`}>{t.label}</span>{' '}
-                  {tr('strat.laps', { from: s.start, to: s.end })}
+                <span className="ld-stint">
+                  <span className={`tyre tyre-${t.cls}`}>{t.label}</span>
+                  <span>{tr('strat.laps', { from: s.start, to: s.end })}</span>
                 </span>
                 <span className="muted">{s.compound ?? ''}</span>
               </div>
@@ -454,7 +454,7 @@ export default function ReplayPlayer() {
         >
           {weekends.map((w) => (
             <option key={w[0].meetingKey} value={w[0].meetingKey}>
-              {w[0].year} · {w[0].location}
+              {w[0].location} {w[0].year}
             </option>
           ))}
         </select>
@@ -495,7 +495,13 @@ export default function ReplayPlayer() {
               onClick={() => setPlaying((p) => !p)}
               aria-label={tr(playing ? 'rp.pause' : 'rp.play')}
             >
-              {playing ? '❚❚' : '►'}
+              <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true">
+                {playing ? (
+                  <path d="M4 2.5h3v11H4zM9 2.5h3v11H9z" fill="currentColor" />
+                ) : (
+                  <path d="M4.5 2.2v11.6L13.5 8z" fill="currentColor" />
+                )}
+              </svg>
             </button>
             <input
               className="rp-scrub"
@@ -507,8 +513,10 @@ export default function ReplayPlayer() {
               aria-label={tr('rp.timeline')}
             />
             <span className="rp-lap mono">
-              {timed ? '' : `${tr('tel.lapN', { n: board.lap })} · `}
-              {hhmmss(t)} / {hhmmss(span)}
+              {!timed && <span>{tr('tel.lapN', { n: board.lap })}</span>}
+              <span>
+                {hhmmss(t)} / {hhmmss(span)}
+              </span>
             </span>
             <span className="rp-speeds">
               {SPEEDS.map((s) => (
@@ -561,7 +569,7 @@ export default function ReplayPlayer() {
                     aria-expanded={open}
                   >
                     <span className="rp-pos">
-                      {r.position ?? '–'}
+                      {r.position ?? ''}
                       {r.posMove && (
                         <span className={`rp-arrow rp-arrow-${r.posMove}`}>
                           {r.posMove === 'up' ? '▲' : '▼'}
@@ -586,7 +594,7 @@ export default function ReplayPlayer() {
                     </span>
                     <span className="rp-num rp-last mono">{fmtTime(r.last)}</span>
                     <span className="rp-num rp-best mono">{fmtTime(r.best)}</span>
-                    <span className="rp-num rp-gap mono">{r.gl ?? '—'}</span>
+                    <span className="rp-num rp-gap mono">{r.gl ?? ''}</span>
                     <span className="rp-tyre">
                       <span className={`tyre tyre-${ty.cls}`}>{ty.label}</span>
                       {r.tyreAge != null && (

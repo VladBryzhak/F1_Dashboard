@@ -1,23 +1,18 @@
+/* Hallmark · shape: app screen · genre: modern-minimal · theme: Console (graphite), brand kept · redesign: full
+ * nav: kept · signature: the race replayed on the timing board, sector bars filling in as the laps run · states: loading, error, empty, full
+ * axes: dark/condensed-sans/brand-red · contrast: pass · v2.0.0 */
+
 /* Live → Replay: race picker, playback controls and the replay board. */
 
 /* ---------- Race picker and playback controls ---------- */
-/* Weekend picker + session switch (FP1 … Race) side by side; wraps on phones. */
+/* Weekend picker + session switch (FP1 … Race) side by side; wraps on phones.
+   The picker itself is the site's select (styles/base.css and shared.css). */
 .rp-head {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   gap: 0.6rem 0.8rem;
   margin: 1rem 0;
-}
-
-.rp-select {
-  background: var(--card);
-  border: 1px solid rgba(255, 255, 255, 0.14);
-  border-radius: 10px;
-  color: var(--text);
-  font: inherit;
-  font-weight: 600;
-  padding: 0.5rem 0.7rem;
 }
 
 .rp-controls {
@@ -27,34 +22,63 @@
   flex-wrap: wrap;
   margin-bottom: 1rem;
   padding: 0.7rem 0.9rem;
-  background: var(--panel);
-  border: 1px solid var(--border);
-  border-radius: 10px;
+  background: var(--color-paper-2);
+  border: var(--rule-hair) solid var(--color-rule);
+  border-radius: var(--radius-card);
 }
 
+/* Play / pause: the screen's one primary action. */
 .rp-play {
   flex: none;
+  display: grid;
+  place-items: center;
   width: 40px;
   height: 40px;
-  border-radius: 50%;
+  border-radius: var(--radius-pill);
   border: none;
-  background: var(--accent);
-  color: #fff;
-  font-size: 0.9rem;
+  background: var(--color-accent);
+  color: var(--color-accent-ink);
   cursor: pointer;
+  transition: background-color var(--dur-micro) var(--ease-out);
+}
+
+.rp-play:hover {
+  background: var(--color-accent-hover);
+}
+
+.rp-play:active {
+  transform: translateY(1px);
+}
+
+.rp-play:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+.rp-play:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 .rp-scrub {
   flex: 1 1 180px;
   min-width: 120px;
-  accent-color: var(--accent);
+  accent-color: var(--color-accent);
+}
+
+.rp-scrub:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 4px;
 }
 
 .rp-lap {
-  font-weight: 700;
+  display: inline-flex;
+  gap: 0.9rem;
+  font-weight: 600;
   font-size: 0.85rem;
   white-space: nowrap;
-  font-variant-numeric: tabular-nums;
+  font-variant-numeric: tabular-nums slashed-zero;
+  color: var(--color-cool);
 }
 
 .rp-speeds {
@@ -63,27 +87,46 @@
 }
 
 .rp-speed {
+  min-height: 32px;
   background: transparent;
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  color: var(--muted);
-  font: inherit;
-  font-size: 0.78rem;
-  font-weight: 700;
-  padding: 0.3rem 0.5rem;
+  border: var(--rule-hair) solid var(--color-rule-2);
+  border-radius: var(--radius-pill);
+  color: var(--color-muted);
+  font-family: var(--font-outlier);
+  font-size: 0.8rem;
+  font-weight: 600;
+  padding: 0 0.5rem;
   cursor: pointer;
+  transition:
+    border-color var(--dur-micro) var(--ease-out),
+    color var(--dur-micro) var(--ease-out);
+}
+
+.rp-speed:hover {
+  border-color: var(--color-ink-2);
+  color: var(--color-ink);
+}
+
+.rp-speed:active {
+  transform: translateY(1px);
+}
+
+.rp-speed:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
 }
 
 .rp-speed.active {
-  background: var(--accent);
-  border-color: var(--accent);
-  color: #fff;
+  background: var(--color-accent);
+  border-color: var(--color-accent);
+  color: var(--color-accent-ink);
 }
 
 /* ---------- Replay board ---------- */
 .rp-board {
-  border: 1px solid var(--border);
-  border-radius: 12px;
+  background: var(--color-paper-2);
+  border: var(--rule-hair) solid var(--color-rule);
+  border-radius: var(--radius-card);
   overflow: hidden;
 }
 
@@ -94,7 +137,7 @@
   gap: 0.5rem;
   padding: 0 0.9rem;
   height: 44px;
-  border-top: 1px solid rgba(255, 255, 255, 0.04);
+  border-top: var(--rule-hair) solid var(--color-rule);
 }
 
 .rp-row:first-child {
@@ -102,19 +145,18 @@
 }
 
 .rp-head-row {
-  height: 32px;
-  font-size: 0.68rem;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  color: var(--muted-2);
-  border-bottom: 1px solid var(--border);
+  height: 36px;
+  font-size: var(--text-sm);
+  font-weight: 500;
+  color: var(--color-muted);
+  border-bottom: var(--rule-hair) solid var(--color-rule);
 }
 
 .rp-pos {
-  font-family: var(--font-display);
-  font-weight: 800;
-  font-size: 1.05rem;
-  color: var(--text);
+  font-family: var(--font-outlier);
+  font-weight: 600;
+  font-size: 1rem;
+  color: var(--color-ink);
   display: inline-flex;
   align-items: center;
   gap: 0.25rem;
@@ -128,11 +170,11 @@
 }
 
 .rp-arrow-up {
-  color: #52e252;
+  color: var(--color-ok);
 }
 
 .rp-arrow-down {
-  color: #ff5a5a;
+  color: var(--color-bad);
 }
 
 .rp-row-btn.rp-move-up {
@@ -145,7 +187,7 @@
 
 @keyframes rpMoveUp {
   0% {
-    background: rgba(82, 226, 82, 0.28);
+    background: color-mix(in oklch, var(--color-ok) 24%, transparent);
   }
   100% {
     background: transparent;
@@ -154,7 +196,7 @@
 
 @keyframes rpMoveDown {
   0% {
-    background: rgba(255, 90, 90, 0.28);
+    background: color-mix(in oklch, var(--color-bad) 24%, transparent);
   }
   100% {
     background: transparent;
@@ -169,7 +211,20 @@
 
 .rp-num {
   text-align: right;
-  font-variant-numeric: tabular-nums;
+  font-variant-numeric: tabular-nums slashed-zero;
+}
+
+.rp-gap {
+  color: var(--color-cool);
+}
+
+.rp-head-row .rp-gap {
+  color: inherit;
+}
+
+/* Mono times a step smaller so they stay inside their columns. */
+.rp-row .mono {
+  font-size: 0.88rem;
 }
 
 .rp-tyre {
@@ -178,7 +233,7 @@
   gap: 0.25rem;
 }
 
-/* Sector segments — three bars that fill the column and reveal sector-by-sector
+/* Sector segments: three bars that fill the column and reveal sector-by-sector
    (HUD style), coloured by timing: purple = session best, green, yellow. */
 .rp-sectors {
   display: flex;
@@ -191,19 +246,19 @@
   min-width: 0;
   height: 5px;
   border-radius: 2px;
-  background: #2a2a33;
+  background: var(--color-rule);
 }
 
 .rp-sec.sec-p {
-  background: #b14be8;
+  background: var(--timing-best);
 }
 
 .rp-sec.sec-g {
-  background: #38d66b;
+  background: var(--timing-pb);
 }
 
 .rp-sec.sec-y {
-  background: #ffd12e;
+  background: var(--timing-slow);
 }
 
 /* Rows are buttons (click to expand lap detail). */
@@ -211,52 +266,61 @@
   width: 100%;
   background: none;
   border: none;
-  border-top: 1px solid rgba(255, 255, 255, 0.04);
-  color: var(--text);
+  border-top: var(--rule-hair) solid var(--color-rule);
+  color: var(--color-ink);
   font: inherit;
   text-align: left;
   cursor: pointer;
 }
 
 .rp-row-btn:hover {
-  background: rgba(255, 255, 255, 0.03);
+  background: var(--color-paper-3);
+}
+
+.rp-row-btn:active {
+  background: var(--color-paper);
+}
+
+.rp-row-btn:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: -2px;
 }
 
 .rp-row-btn.open {
-  background: rgba(255, 255, 255, 0.05);
+  background: var(--color-paper-3);
 }
 
-/* "PIT" badge next to a driver in the pit lane. */
+/* "PIT" code next to a driver in the pit lane, in the pit-lane blue. */
 .rp-pit {
-  font-size: 0.6rem;
-  font-weight: 800;
-  letter-spacing: 0.5px;
-  background: #ffd12e;
-  color: #0e0e13;
+  font-family: var(--font-outlier);
+  font-size: 0.7rem;
+  font-weight: 700;
+  background: var(--timing-pit);
+  color: var(--tyre-ink-light);
   padding: 0.05rem 0.3rem;
   border-radius: 3px;
   margin-left: 0.35rem;
 }
 
-/* Leader row — subtle red edge accent (the first data row on the board). */
-.rp-board > div:nth-child(2) > .rp-row-btn {
-  box-shadow: inset 3px 0 0 var(--accent);
+/* The leader's position reads red, as on the home timing screen. */
+.rp-board > div:nth-child(2) .rp-pos {
+  color: var(--color-accent);
 }
 
 /* ---------- Track-status banner ---------- */
-/* Track-status banner. */
+/* The flag as a coloured dot and word on a hairline band; the colour is the
+   flag's own (green, yellow, SC/VSC orange, red). */
 .rp-status {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  font-weight: 800;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  font-size: 0.8rem;
+  gap: 0.6rem;
+  font-weight: 700;
+  font-size: 0.9rem;
   padding: 0.55rem 0.9rem;
-  border-radius: 10px;
+  border-radius: var(--radius-card);
   margin-bottom: 0.8rem;
-  border: 1px solid var(--border);
+  background: var(--color-paper-2);
+  border: var(--rule-hair) solid var(--color-rule);
 }
 
 .rp-status-dot {
@@ -267,38 +331,27 @@
 }
 
 .rp-status--green {
-  color: #43b02a;
-  background: rgba(67, 176, 42, 0.12);
-  border-color: rgba(67, 176, 42, 0.4);
+  color: var(--color-ok);
 }
 
-.rp-status--yellow {
-  color: #e0c04a;
-  background: rgba(224, 192, 74, 0.12);
-  border-color: rgba(224, 192, 74, 0.4);
-}
-
+.rp-status--yellow,
 .rp-status--sc {
-  color: #ffb020;
-  background: rgba(255, 176, 32, 0.15);
-  border-color: rgba(255, 176, 32, 0.5);
+  color: var(--color-sc);
+  border-color: color-mix(in oklch, var(--color-sc) 45%, transparent);
 }
 
 .rp-status--vsc {
-  color: #ffb020;
-  background: rgba(255, 176, 32, 0.1);
-  border-color: rgba(255, 176, 32, 0.4);
+  color: var(--color-vsc);
+  border-color: color-mix(in oklch, var(--color-vsc) 45%, transparent);
 }
 
 .rp-status--red {
-  color: #ff4d4d;
-  background: rgba(225, 6, 0, 0.15);
-  border-color: rgba(225, 6, 0, 0.5);
+  color: var(--color-bad);
+  border-color: color-mix(in oklch, var(--color-bad) 50%, transparent);
 }
 
 .rp-status--chequered {
-  color: var(--muted);
-  background: var(--panel);
+  color: var(--color-muted);
 }
 
 /* ---------- Phones ---------- */
@@ -308,8 +361,8 @@
   display: none;
 }
 
-/* Phone replay board, as in the mockup: P · driver · sectors · gap · tyre,
-   fitting the screen with no sideways scroll. */
+/* Phone replay board: position, driver, sectors, gap and tyre, fitting the
+   screen with no sideways scroll. */
 @media (max-width: 680px) {
   .rp-row {
     grid-template-columns: 1.8rem minmax(52px, 1fr) 4.4rem 4.3rem 2.9rem;
@@ -362,5 +415,20 @@
       'main'
       'side';
     grid-template-rows: auto;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rp-row-btn.rp-move-up,
+  .rp-row-btn.rp-move-down {
+    animation: none;
+  }
+  .rp-play,
+  .rp-speed {
+    transition: none;
+  }
+  .rp-play:active,
+  .rp-speed:active {
+    transform: none;
   }
 }

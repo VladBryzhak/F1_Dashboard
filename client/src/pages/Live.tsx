@@ -32,7 +32,7 @@ function useNow(): number {
 
 // A sector's mini-sectors as a colour-coded bar.
 function SegmentBar({ segments }: { segments: number[] }) {
-  if (!segments.length) return <span className="muted">—</span>
+  if (!segments.length) return null
   return (
     <span className="seg-bar">
       {segments.map((code, i) => (
@@ -92,7 +92,7 @@ function DriverDetail({
             <div className="ld-kv">
               <span>{t('rp.speedTrap')}</span>
               <span className="mono">
-                {latest.speeds.st != null ? `${latest.speeds.st} ${t('tel.kmh')}` : '—'}
+                {latest.speeds.st != null ? `${latest.speeds.st} ${t('tel.kmh')}` : ''}
               </span>
             </div>
           )}
@@ -100,16 +100,15 @@ function DriverDetail({
 
         <div className="ld-col">
           <h4>{t('rp.tyres')}</h4>
-          {detail.stints.length === 0 && <p className="muted">—</p>}
           {detail.stints.map((s) => {
             const ty = tyre(s.compound)
             const n = s.lapEnd - s.lapStart + 1
             return (
               <div className="ld-kv" key={s.stintNumber}>
-                <span>
-                  <span className={`tyre tyre-${ty.cls}`}>{ty.label}</span>{' '}
-                  {t('strat.laps', { from: s.lapStart, to: s.lapEnd })}{' '}
-                  <span className="muted">· {tn('plural.lapsN', n)}</span>
+                <span className="ld-stint">
+                  <span className={`tyre tyre-${ty.cls}`}>{ty.label}</span>
+                  <span>{t('strat.laps', { from: s.lapStart, to: s.lapEnd })}</span>
+                  <span className="muted">{tn('plural.lapsN', n)}</span>
                 </span>
                 <span className="muted">{s.compound ?? ''}</span>
               </div>
@@ -122,9 +121,9 @@ function DriverDetail({
           {detail.pits.length === 0 && <p className="muted">{t('rp.none')}</p>}
           {detail.pits.map((p, i) => (
             <div className="ld-kv" key={i}>
-              <span>{t('tel.lapN', { n: p.lapNumber ?? '—' })}</span>
+              <span>{p.lapNumber != null ? t('tel.lapN', { n: p.lapNumber }) : ''}</span>
               <span className="mono">
-                {p.pitDuration != null ? `${p.pitDuration.toFixed(1)}s` : '—'}
+                {p.pitDuration != null ? `${p.pitDuration.toFixed(1)}s` : ''}
               </span>
             </div>
           ))}
@@ -138,7 +137,7 @@ export default function Live() {
   useSeo({
     title: 'Live Timing',
     description:
-      'Live Formula 1 timing board — positions, gaps, lap times, sectors, mini-sectors and tyres, with expandable per-driver detail.',
+      'Live Formula 1 timing board: positions, gaps, lap times, sectors, mini-sectors and tyres, with expandable per-driver detail.',
   })
 
   const status = useLiveStatus(30000)
@@ -228,8 +227,11 @@ export default function Live() {
 
       {status && !status.locked && status.live ? (
         <p className="live-session">
-          <span className="live-dot on" /> {t('sched.live')} · {sessionName(status.live.sessionName)} ·{' '}
-          {status.live.location}
+          <span className="live-tag">
+            <span className="live-dot on" /> {t('sched.live')}
+          </span>
+          <span>{sessionName(status.live.sessionName)}</span>
+          <span>{status.live.location}</span>
           {status.live.dateEnd && (
             <span className="live-count">
               {t('live.endsIn', { time: fmtCountdown(status.live.dateEnd, now, t('sched.dayShort')) })}
@@ -243,7 +245,8 @@ export default function Live() {
               <div className="next-card">
                 <span className="next-label">{t('sched.nextSession')}</span>
                 <span className="next-name">
-                  {sessionName(status.next.sessionName)} · {status.next.location}
+                  <span>{sessionName(status.next.sessionName)}</span>
+                  <span>{status.next.location}</span>
                 </span>
                 <span className="next-count">
                   {t('live.in', { time: fmtCountdown(status.next.dateStart, now, t('sched.dayShort')) })}
@@ -252,8 +255,11 @@ export default function Live() {
             )}
             {status.last && (
               <p className="live-session">
-                <span className="live-dot" /> {sessionName(status.last.sessionName)} ·{' '}
-                {status.last.location} · {status.last.year}
+                <span className="live-tag">
+                  <span className="live-dot" /> {sessionName(status.last.sessionName)}
+                </span>
+                <span>{status.last.location}</span>
+                <span className="mono">{status.last.year}</span>
                 <span className="live-replay">{t('live.replayTag')}</span>
               </p>
             )}
@@ -289,14 +295,14 @@ export default function Live() {
                   onClick={() => setExpanded(open ? null : r.driverNumber)}
                   aria-expanded={open}
                 >
-                  <span className="lb-pos">{r.position ?? '–'}</span>
+                  <span className="lb-pos">{r.position ?? ''}</span>
                   <span className="lb-drv">
                     <span className="lb-stripe" style={{ background: teamColor(r.teamColour) }} />
                     <span className="lb-code">{r.code}</span>
                     <span className="lb-team">{r.teamName}</span>
                   </span>
-                  <span className="lb-gap mono">{r.gapToLeader ?? '—'}</span>
-                  <span className="lb-int mono">{r.interval ?? '—'}</span>
+                  <span className="lb-gap mono">{r.gapToLeader ?? ''}</span>
+                  <span className="lb-int mono">{r.interval ?? ''}</span>
                   <span className="lb-lap mono">{fmtTime(r.lastLap)}</span>
                   <span className="lb-best mono">{fmtTime(r.bestLap)}</span>
                   <span className="lb-tyre">

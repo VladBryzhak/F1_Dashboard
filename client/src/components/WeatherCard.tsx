@@ -27,7 +27,7 @@ function compass(deg: number): string {
 export default function WeatherCard({ sample }: { sample: WeatherSample | null }) {
   const { t, fmtNum } = useI18n()
   if (!sample) return null
-  const deg = (n: number | null) => (n == null ? '—' : `${fmtNum(n, { maximumFractionDigits: 1 })}°C`)
+  const deg = (n: number | null) => (n == null ? '' : `${fmtNum(n, { maximumFractionDigits: 1 })}°C`)
   return (
     <div className="rp-side-card rp-weather">
       <h4 className="rp-side-title">{t('wx.title')}</h4>
@@ -42,16 +42,16 @@ export default function WeatherCard({ sample }: { sample: WeatherSample | null }
       <div className="rp-kv">
         <span>{t('wx.humidity')}</span>
         <span className="mono">
-          {sample.humidity == null ? '—' : `${fmtNum(sample.humidity, { maximumFractionDigits: 0 })}%`}
+          {sample.humidity == null ? '' : `${fmtNum(sample.humidity, { maximumFractionDigits: 0 })}%`}
         </span>
       </div>
       <div className="rp-kv">
         <span>{t('wx.wind')}</span>
         <span className="mono">
           {sample.wind == null
-            ? '—'
+            ? ''
             : `${fmtNum(sample.wind, { maximumFractionDigits: 1 })} ${t('wx.ms')}${
-                sample.windDir != null ? ` · ${compass(sample.windDir)}` : ''
+                sample.windDir != null ? ` ${compass(sample.windDir)}` : ''
               }`}
         </span>
       </div>

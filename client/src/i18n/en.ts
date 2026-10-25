@@ -450,7 +450,7 @@ const en = {
   'live.title': 'Live Timing',
   'live.replay': 'Replay',
   'live.replayTag': 'replay',
-  'live.locked': 'A Formula 1 session is live right now. Our data source (OpenF1) restricts its API to paid subscribers while a session is in progress, so live timing here is paused — it returns automatically once the session ends.',
+  'live.locked': 'A Formula 1 session is live right now. Our data source (OpenF1) restricts its API to paid subscribers while a session is in progress, so live timing here is paused; it returns automatically once the session ends.',
   'live.endsIn': 'ends in {time}',
   'live.in': 'in {time}',
   'live.boardError': 'Could not load the board: {error}',
