@@ -1,38 +1,50 @@
-/* Driver and team cards (Drivers / Teams grids) with photo or car art. */
+/* Hallmark · shape: app screen · genre: modern-minimal · theme: Console (graphite), brand kept · redesign: full
+ * nav: kept · signature: the grid as timing cards, position and points as readings over the official art · states: loading, error, full
+ * axes: dark/condensed-sans/brand-red · contrast: pass · v2.0.0 */
+/* Hallmark · waive 26b · every driver and team card is a link to a profile, never a form control · a link to a driver or a team cannot be disabled */
+
+/* Driver and team cards (Drivers / Teams grids) with photo or car art: a
+   hairline panel, the art on the deepest surface, position, car number and
+   points as mono readings, the team colour as a swatch beside its name. */
 
 .grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
-  gap: 1rem;
+  gap: var(--space-md);
 }
 
 .ecard {
   position: relative;
-  background: var(--card);
-  border-radius: 14px;
+  background: var(--color-paper-2);
+  border-radius: var(--radius-card);
   padding: 1.1rem 1.2rem;
   overflow: hidden;
-  border: 1px solid var(--border);
-  transition: border-color 0.15s ease, transform 0.15s ease;
+  border: var(--rule-hair) solid var(--color-rule);
+  transition: border-color var(--dur-short) var(--ease-out);
   /* the root element is a <Link> (anchor) so cards are clickable; reset link
      defaults so it still looks like a plain card. */
   display: block;
-  color: inherit;
+  color: var(--color-ink);
   text-decoration: none;
 }
 
 .ecard:hover {
-  border-color: var(--accent);
-  transform: translateY(-2px);
+  border-color: var(--color-ink-2);
 }
 
-/* coloured team stripe down the left edge */
-.ecard .stripe {
-  position: absolute;
-  left: 0;
-  top: 0;
-  bottom: 0;
-  width: 5px;
+.ecard:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+.ecard:active {
+  border-color: var(--color-accent);
+}
+
+/* Car and portrait art on the deepest surface. */
+.car-wrap,
+.head-wrap {
+  background: var(--color-paper-3);
 }
 
 .ecard .car-wrap {
@@ -42,7 +54,7 @@
   align-items: center;
   justify-content: center;
   height: 96px;
-  border-bottom: 1px solid var(--border);
+  border-bottom: var(--rule-hair) solid var(--color-rule);
 }
 
 .ecard .car-img {
@@ -57,7 +69,7 @@
   display: flex;
   align-items: flex-end;
   justify-content: center;
-  border-bottom: 1px solid var(--border);
+  border-bottom: var(--rule-hair) solid var(--color-rule);
   overflow: hidden;
 }
 
@@ -67,26 +79,26 @@
 }
 
 .ecard .rank {
-  font-family: var(--font-display);
-  font-size: 0.95rem;
-  font-weight: 800;
-  color: var(--muted);
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
+  font-family: var(--font-outlier);
+  font-variant-numeric: tabular-nums slashed-zero;
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--color-muted);
 }
 
 /* The leader's card (first in the sorted grid) gets the red position. */
 .grid > .ecard:first-child .rank {
-  color: var(--accent);
+  color: var(--color-accent);
 }
 
+/* The car number, a reading in the corner of the art. */
 .ecard .big-num {
-  font-family: var(--font-display);
-  font-size: 2.8rem;
-  font-weight: 800;
-  font-style: normal;
+  font-family: var(--font-outlier);
+  font-variant-numeric: tabular-nums slashed-zero;
+  font-size: 2.4rem;
+  font-weight: 600;
   line-height: 1;
-  color: #2f2f3a;
+  color: var(--color-rule-2);
   position: absolute;
   right: 0.9rem;
   top: 0.7rem;
@@ -95,18 +107,34 @@
 .ecard .ename {
   font-size: 1.3rem;
   font-weight: 800;
+  line-height: 1.05;
   text-transform: uppercase;
-  letter-spacing: 0.2px;
-  margin: 0.5rem 0 0.15rem;
+  margin: 0.4rem 0 0.15rem;
+  overflow-wrap: break-word;
+  min-width: 0;
 }
 
 .ecard .esub {
-  color: var(--muted);
+  color: var(--color-muted);
   font-weight: 600;
   font-size: 0.9rem;
   display: flex;
   align-items: center;
   gap: 0.5rem;
+}
+
+/* Team colour as a swatch beside the team (or the team's name). */
+.eswatch {
+  display: inline-block;
+  flex: none;
+  width: 4px;
+  height: 0.95em;
+  border-radius: 2px;
+}
+
+.ename .eswatch {
+  margin-right: 0.45rem;
+  vertical-align: -0.05em;
 }
 
 .ecard .efoot {
@@ -115,18 +143,23 @@
   gap: 0.4rem;
   margin-top: 0.9rem;
   padding-top: 0.7rem;
-  border-top: 1px solid var(--border);
+  border-top: var(--rule-hair) solid var(--color-rule);
 }
 
 .ecard .efoot .pts {
-  font-family: var(--font-display);
-  font-size: 1.5rem;
-  font-weight: 800;
+  font-family: var(--font-outlier);
+  font-variant-numeric: tabular-nums slashed-zero;
+  font-size: 1.4rem;
+  font-weight: 600;
 }
 
 .ecard .efoot .lbl {
-  color: var(--muted-2);
-  font-size: 0.75rem;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
+  color: var(--color-muted);
+  font-size: var(--text-sm);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ecard {
+    transition: none;
+  }
 }

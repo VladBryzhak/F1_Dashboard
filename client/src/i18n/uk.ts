@@ -22,7 +22,7 @@ const uk: Dict & Record<string, string> = {
   'lang.label': 'Мова інтерфейсу',
 
   // Footer
-  'footer.tagline': 'Турнірні таблиці, календарі та статистика Формули-1 — з 1950 року до сьогодні.',
+  'footer.tagline': 'Турнірні таблиці, календарі та статистика Формули-1 з 1950 року до сьогодні.',
   'footer.explore': 'Розділи',
   'footer.credits': 'Дані та джерела',
   'footer.dataBy': 'Дані:',

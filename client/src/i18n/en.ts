@@ -20,7 +20,7 @@ const en = {
   'lang.label': 'Interface language',
 
   // Footer
-  'footer.tagline': 'Formula 1 standings, calendars and career stats — 1950 to today.',
+  'footer.tagline': 'Formula 1 standings, calendars and career stats, from 1950 to today.',
   'footer.explore': 'Explore',
   'footer.credits': 'Data & credits',
   'footer.dataBy': 'Data by',

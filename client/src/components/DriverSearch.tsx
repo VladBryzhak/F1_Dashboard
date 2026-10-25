@@ -93,7 +93,7 @@ export default function DriverSearch() {
         <>
           <p className="ds-count muted">
             {tn('plural.driversN', results.length)}
-            {results.length > shown.length && ` · ${t('ds.showingFirst', { n: shown.length })}`}
+            {results.length > shown.length && `, ${t('ds.showingFirst', { n: shown.length })}`}
           </p>
           {results.length === 0 ? (
             <p className="muted">{t('ds.noMatch')}</p>
@@ -123,11 +123,11 @@ export default function DriverSearch() {
                       <span className="ds-name">{d.name}</span>
                       <span className="ds-sub">
                         <Flag code={d.countryCode} nationality={d.nationality} />
-                        {lang === 'uk' && d.countryCode ? countryName(d.countryCode, locale) : d.nationality} ·{' '}
-                        {d.firstSeason}–{d.lastSeason}
+                        {lang === 'uk' && d.countryCode ? countryName(d.countryCode, locale) : d.nationality},{' '}
+                        {d.firstSeason}-{d.lastSeason}
                       </span>
                       <span className="ds-stats muted">
-                        {tn('plural.racesN', d.races)} · {tn('plural.podiumsN', d.podiums)}
+                        {tn('plural.racesN', d.races)}, {tn('plural.podiumsN', d.podiums)}
                       </span>
                     </span>
                   </Link>

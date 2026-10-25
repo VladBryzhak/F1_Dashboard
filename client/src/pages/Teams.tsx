@@ -23,7 +23,7 @@ export default function Teams() {
 
   useSeo({
     title: `${season} F1 Teams & Constructors`,
-    description: `Formula 1 constructors on the ${season} grid, plus a searchable index of every constructor since 1950 — with links to full team histories.`,
+    description: `Formula 1 constructors on the ${season} grid, plus a searchable index of every constructor since 1950, with links to full team histories.`,
     canonicalPath,
   })
   const { data, loading, error } = useAsync(

@@ -53,6 +53,7 @@
   --color-ok: oklch(76% 0.15 150);
   --color-nav: oklch(10% 0.008 285);
   --color-ink-dark: oklch(16% 0.01 285); /* text on the bright marks below */
+  --color-logo-tile: oklch(97% 0.004 285); /* light tile behind team logos */
   --color-mark: oklch(33% 0.012 285); /* neutral marker on a timeline */
   --color-sc: oklch(87% 0.17 95); /* Safety Car yellow */
   --color-vsc: oklch(78% 0.16 65); /* Virtual Safety Car orange */

@@ -96,7 +96,7 @@ export default function TeamSearch() {
         <>
           <p className="ds-count muted">
             {tn('plural.teamsN', results.length)}
-            {results.length > shown.length && ` · ${t('ds.showingFirst', { n: shown.length })}`}
+            {results.length > shown.length && `, ${t('ds.showingFirst', { n: shown.length })}`}
           </p>
           {results.length === 0 ? (
             <p className="muted">{t('ds.noMatch')}</p>
@@ -130,11 +130,11 @@ export default function TeamSearch() {
                     <span className="ds-name">{c.name}</span>
                     <span className="ds-sub">
                       <Flag code={c.countryCode} nationality={c.nationality} />
-                      {lang === 'uk' && c.countryCode ? countryName(c.countryCode, locale) : c.nationality} ·{' '}
-                      {c.firstSeason}–{c.lastSeason}
+                      {lang === 'uk' && c.countryCode ? countryName(c.countryCode, locale) : c.nationality},{' '}
+                      {c.firstSeason}-{c.lastSeason}
                     </span>
                     <span className="ds-stats muted">
-                      {tn('plural.racesN', c.races)} · {tn('plural.podiumsN', c.podiums)}
+                      {tn('plural.racesN', c.races)}, {tn('plural.podiumsN', c.podiums)}
                     </span>
                   </span>
                 </Link>

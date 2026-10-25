@@ -157,7 +157,7 @@ export async function describePage(rawPath: string): Promise<PageMeta> {
       const season = isSeason(a) ? a! : current;
       return generic(
         `${season} F1 Drivers`,
-        `Every Formula 1 driver on the ${season} grid, plus a searchable index of every driver since 1950 — with links to full career profiles.`,
+        `Every Formula 1 driver on the ${season} grid, plus a searchable index of every driver since 1950, with links to full career profiles.`,
       );
     }
 
@@ -186,7 +186,7 @@ export async function describePage(rawPath: string): Promise<PageMeta> {
       const season = isSeason(a) ? a! : current;
       return generic(
         `${season} F1 Teams & Constructors`,
-        `Formula 1 constructors on the ${season} grid, plus a searchable index of every constructor since 1950 — with links to full team histories.`,
+        `Formula 1 constructors on the ${season} grid, plus a searchable index of every constructor since 1950, with links to full team histories.`,
       );
     }
 

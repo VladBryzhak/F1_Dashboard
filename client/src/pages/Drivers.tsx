@@ -23,14 +23,14 @@ export default function Drivers() {
 
   useSeo({
     title: `${season} F1 Drivers`,
-    description: `Every Formula 1 driver on the ${season} grid, plus a searchable index of every driver since 1950 — with links to full career profiles.`,
+    description: `Every Formula 1 driver on the ${season} grid, plus a searchable index of every driver since 1950, with links to full career profiles.`,
     canonicalPath,
   })
   const { data, loading, error } = useAsync(
     () => api.driverStandings(season),
     [season],
   )
-  // Official headshots (OpenF1, 2023+). Optional — failures are non-fatal.
+  // Official headshots (OpenF1, 2023+). Optional: failures are non-fatal.
   const headshots = useAsync<Record<string, string>>(
     () => api.driverHeadshots(season).catch(() => ({})),
     [season],

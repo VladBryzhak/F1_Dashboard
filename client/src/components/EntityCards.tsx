@@ -12,13 +12,14 @@ import './EntityCards.css'
 export function CarImage({
   constructorId,
   season,
-  color,
   alt = '',
   eager = false,
 }: {
   constructorId: string
   season: string
-  color: string
+  // Team colour; the art sits on the deepest surface (team colours stay
+  // swatches in the design system), so it is no longer painted behind it.
+  color?: string
   alt?: string
   eager?: boolean
 }) {
@@ -26,7 +27,7 @@ export function CarImage({
   const url = teamCarUrl(constructorId, season)
   if (!url || failed) return null
   return (
-    <div className="car-wrap" style={{ background: `${color}22` }}>
+    <div className="car-wrap">
       <img
         className="car-img"
         src={url}
@@ -45,7 +46,6 @@ export function Headshot({
   portraitUrl,
   fallbackUrl,
   thirdUrl,
-  color,
   alt = '',
   eager = false,
   srcSet,
@@ -54,7 +54,8 @@ export function Headshot({
   portraitUrl?: string | null
   fallbackUrl?: string
   thirdUrl?: string | null
-  color: string
+  // Team colour; kept for callers, not painted (see CarImage).
+  color?: string
   alt?: string
   eager?: boolean
   // Responsive variants of portraitUrl (only used while it is shown).
@@ -76,7 +77,6 @@ export function Headshot({
   return (
     <div
       className={`head-wrap${cur.photo ? ' is-photo' : ''}`}
-      style={{ background: `${color}22` }}
     >
       <img
         className="head-img"
@@ -108,7 +108,6 @@ export function DriverCard({
   const { t, tn } = useI18n()
   return (
     <Link to={`/drivers/${d.driverId}`} className="ecard">
-      <span className="stripe" style={{ background: color }} />
       <Headshot
         portraitUrl={driverPortraitUrl(d.driverId, d.constructorId, season)}
         fallbackUrl={headshot}
@@ -122,6 +121,7 @@ export function DriverCard({
       </h3>
       <div className="esub">
         <Flag code={d.countryCode} nationality={d.nationality} />
+        <span className="eswatch" style={{ background: color }} aria-hidden="true" />
         {d.constructorName}
       </div>
       <div className="efoot">
@@ -146,7 +146,6 @@ export function TeamCard({
   const { t, tn, lang, locale } = useI18n()
   return (
     <Link to={`/teams/${c.constructorId}`} className="ecard">
-      <span className="stripe" style={{ background: color }} />
       <CarImage
         constructorId={c.constructorId}
         season={season}
@@ -154,7 +153,10 @@ export function TeamCard({
         alt={`${c.name} Formula 1 car`}
       />
       <div className="rank">P{c.position}</div>
-      <h3 className="ename">{c.name}</h3>
+      <h3 className="ename">
+        <span className="eswatch" style={{ background: color }} aria-hidden="true" />
+        {c.name}
+      </h3>
       <div className="esub">
         <Flag code={c.countryCode} nationality={c.nationality} />
         {lang === 'uk' && c.countryCode ? countryName(c.countryCode, locale) : c.nationality}
