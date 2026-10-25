@@ -8,54 +8,7 @@
    hairline panels, readings (points, gaps, dates, car numbers, codes) in a
    monospace face, team colours only as swatches beside their driver, F1 red
    for the one action on a screen and the instrument blue for readings. No
-   gradients, glows or shadows. The tokens below are new names (--color-*,
-   --space-*, --text-*) that only the home page reads; the rest of the site
-   keeps its own system. */
-
-:root {
-  --color-paper: oklch(15.5% 0.01 285);
-  --color-paper-2: oklch(19.5% 0.011 285);
-  --color-paper-3: oklch(12.5% 0.009 285);
-  --color-ink: oklch(96% 0.005 285);
-  --color-ink-2: oklch(86% 0.008 285);
-  --color-muted: oklch(72% 0.012 285);
-  --color-rule: oklch(29% 0.012 285);
-  --color-rule-2: oklch(40% 0.014 285);
-  --color-accent: oklch(58% 0.235 29);
-  --color-accent-hover: oklch(63% 0.22 29);
-  --color-accent-ink: oklch(98.5% 0.006 29);
-  --color-focus: oklch(66% 0.2 29);
-  --color-cool: oklch(80% 0.11 235);
-  --color-cool-soft: oklch(30% 0.05 235);
-  --color-track: oklch(24% 0.012 285);
-
-  --font-outlier: ui-monospace, 'SF Mono', 'JetBrains Mono', Menlo, Consolas, monospace;
-
-  --text-sm: 0.875rem;
-  --text-md: 1rem;
-  --text-lead: 1.3rem;
-  --text-title: 1.6rem;
-  --text-section: clamp(2.25rem, 1.6rem + 2vw, 3.25rem);
-  --text-display: clamp(2.75rem, 1.6rem + 3.4vw, 4.5rem);
-  --text-reading: clamp(5rem, 3rem + 6vw, 7.5rem);
-  --text-carnum: clamp(10rem, 6rem + 12vw, 17rem);
-
-  --space-2xs: 4px;
-  --space-xs: 8px;
-  --space-sm: 12px;
-  --space-md: 16px;
-  --space-lg: 24px;
-  --space-xl: 40px;
-  --space-2xl: 64px;
-  --space-3xl: 96px;
-
-  --radius-card: 10px;
-  --radius-pill: 6px;
-  --rule-hair: 1px;
-  --dur-micro: 120ms;
-  --dur-short: 220ms;
-  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
-}
+   gradients, glows or shadows. Tokens live in styles/tokens.css. */
 
 .home {
   display: grid;

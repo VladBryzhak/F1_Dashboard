@@ -401,7 +401,7 @@ const uk: Dict & Record<string, string> = {
   'st.tabTitleRace': 'Битва за титул',
   'st.country': 'Країна',
   'st.noData': 'Для цього сезону ще немає даних заліку.',
-  'st.chartTitle': 'Битва за титул — очки по етапах',
+  'st.chartTitle': 'Очки по етапах',
   'st.seasonN': 'сезон {season}',
   'st.sampleBanner': 'API заліку недоступне ({error}). Показано приклад даних — справжній залік {season} з’явиться автоматично, щойно API запрацює.',
   'plural.winsShort_one': '{n} перемога',

@@ -111,16 +111,16 @@ export default function TitleRaceChart({ data }: { data: SeasonProgression }) {
 
       <ResponsiveContainer width="100%" height={360}>
         <LineChart data={rows} margin={{ top: 8, right: 16, bottom: 4, left: 0 }}>
-          <CartesianGrid stroke="#2a2a35" vertical={false} />
+          <CartesianGrid stroke="var(--color-rule)" vertical={false} />
           <XAxis
             dataKey="round"
-            stroke="#9a9aa8"
+            stroke="var(--color-muted)"
             fontSize={12}
             tickFormatter={(v: number) => `R${v}`}
           />
-          <YAxis stroke="#9a9aa8" fontSize={12} width={36} />
+          <YAxis stroke="var(--color-muted)" fontSize={12} width={36} />
           <Tooltip
-            cursor={{ stroke: '#4a4a58', strokeWidth: 1 }}
+            cursor={{ stroke: 'var(--color-rule-2)', strokeWidth: 1 }}
             content={(p) => (
               <ChartTooltip {...p} meta={meta} gpByRound={gpByRound} />
             )}

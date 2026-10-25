@@ -1,16 +1,6 @@
 /* Design tokens (colours, fonts) and element defaults. Loaded first, on every page. */
 
 :root {
-  /* "Pit Wall" palette — near-black ground, lifted surfaces, F1 red accent */
-  --bg: #0e0e13;
-  --panel: #16161f;
-  --card: #15151d;
-  --border: rgba(255, 255, 255, 0.08);
-  --text: #f4f4f6;
-  --muted: #9a9aa7;
-  --muted-2: #6f6f7a;
-  --accent: #e10600; /* F1 red */
-
   /* Condensed technical display face for headings; Saira for body/UI. */
   --font-body: 'Saira', system-ui, Arial, sans-serif;
   --font-display: 'Saira Condensed', 'Saira', system-ui, sans-serif;
@@ -57,15 +47,18 @@ h2,
 }
 
 h1 {
-  font-size: 1.9rem;
-  font-weight: 900;
+  font-size: 2.25rem;
+  font-weight: 800;
+  line-height: 1.02;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
   margin: 0;
+  overflow-wrap: break-word;
+  min-width: 0;
+  text-wrap: balance;
 }
 
 @media (max-width: 768px) {
   h1 {
-    font-size: 1.55rem;
+    font-size: 1.75rem;
   }
 }

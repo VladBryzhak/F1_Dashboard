@@ -3,8 +3,9 @@
 /* Global site footer: brand + attributions + disclaimer + links, laid out as
    columns spread across the full content width. */
 .site-footer {
-  border-top: 1px solid var(--border);
-  margin-top: 0;
+  border-top: var(--rule-hair) solid var(--color-rule);
+  margin-top: var(--space-2xl);
+  background: var(--color-paper-3);
   padding: 2.5rem 1.75rem calc(2.5rem + env(safe-area-inset-bottom));
 }
 
@@ -25,11 +26,9 @@ nav.footer-col ul {
 
 .footer-col h4 {
   margin: 0 0 0.9rem;
-  font-size: 0.72rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  color: var(--muted-2);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--color-ink-2);
 }
 
 .footer-col ul {
@@ -49,7 +48,13 @@ nav.footer-col ul {
 }
 
 .footer-col a:hover {
-  color: var(--text);
+  color: var(--color-ink);
+}
+
+.footer-col a:focus-visible,
+.footer-link-btn:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
 }
 
 .footer-col ul a {
@@ -66,8 +71,8 @@ nav.footer-col ul {
 }
 
 .footer-logo .mark {
-  background: var(--accent);
-  color: #fff;
+  background: var(--color-accent);
+  color: var(--color-accent-ink);
   padding: 0.05em 0.35em;
   border-radius: 4px;
 }
@@ -131,5 +136,5 @@ nav.footer-col ul {
 }
 
 .footer-link-btn:hover {
-  color: #fff;
+  color: var(--color-ink);
 }

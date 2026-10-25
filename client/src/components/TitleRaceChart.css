@@ -16,19 +16,19 @@
 
 .title-race-head h3 {
   margin: 0;
-  font-size: 1rem;
-  font-weight: 900;
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  font-weight: 800;
+  line-height: 1.1;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
 }
 
 .chart-tip {
-  background: #1a1a22;
-  border: 1px solid #2a2a35;
-  border-radius: 8px;
+  background: var(--color-paper-3);
+  border: var(--rule-hair) solid var(--color-rule-2);
+  border-radius: var(--radius-pill);
   padding: 0.55rem 0.7rem;
   font-size: 0.8rem;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
 }
 
 .chart-tip-head {
@@ -50,8 +50,9 @@
 
 .chart-tip-val {
   margin-left: auto;
-  color: var(--muted);
-  font-variant-numeric: tabular-nums;
+  color: var(--color-ink-2);
+  font-family: var(--font-outlier);
+  font-variant-numeric: tabular-nums slashed-zero;
 }
 
 .chart-legend {
@@ -82,7 +83,8 @@
 }
 
 .legend-code {
-  font-weight: 800;
+  font-family: var(--font-outlier);
+  font-weight: 600;
 }
 
 .legend-name {

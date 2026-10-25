@@ -104,7 +104,7 @@ export function DriverStandingsTable({
                 </td>
                 <td className="num">{r.wins}</td>
                 <td className="num points">{r.points}</td>
-                <td className="num muted">{gap > 0 ? `-${gap}` : '—'}</td>
+                <td className="num gap">{gap > 0 ? `−${gap}` : t('home.leader')}</td>
               </tr>
             )
           })}
@@ -157,7 +157,7 @@ export function ConstructorStandingsTable({
                 </td>
                 <td className="num">{r.wins}</td>
                 <td className="num points">{r.points}</td>
-                <td className="num muted">{gap > 0 ? `-${gap}` : '—'}</td>
+                <td className="num gap">{gap > 0 ? `−${gap}` : t('home.leader')}</td>
               </tr>
             )
           })}

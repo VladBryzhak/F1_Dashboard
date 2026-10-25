@@ -368,7 +368,7 @@ const en = {
   'st.tabTitleRace': 'Title Race',
   'st.country': 'Country',
   'st.noData': 'No standings data for this season yet.',
-  'st.chartTitle': 'Title race — points by round',
+  'st.chartTitle': 'Points by round',
   'st.seasonN': '{season} season',
   'st.sampleBanner': 'Live standings API unavailable ({error}). Showing sample data so the layout is visible — real {season} standings appear automatically once the API is reachable.',
 
