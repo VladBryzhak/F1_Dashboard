@@ -242,7 +242,7 @@ export async function describePage(rawPath: string): Promise<PageMeta> {
       );
     case "telemetry":
       return generic(
-        "F1 Telemetry — Speed, Throttle & Lap Traces",
+        "F1 Telemetry: Speed, Throttle & Lap Traces",
         "Past-race Formula 1 telemetry: speed, throttle, brake, gear and DRS traces lap by lap, from 2023 onward (OpenF1).",
       );
     case "about":

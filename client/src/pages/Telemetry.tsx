@@ -15,11 +15,19 @@ import { useSeo } from '../hooks/useSeo'
 import { useI18n } from '../i18n/core'
 import './Telemetry.css'
 
+// Recharts tooltip box on the panel surface with a hairline, as the cards.
+const TOOLTIP = {
+  background: 'var(--color-paper-2)',
+  border: '1px solid var(--color-rule-2)',
+  borderRadius: 6,
+  color: 'var(--color-ink)',
+}
+
 // OpenF1 telemetry is available from 2023 onward.
 const TELEMETRY_SEASONS = ['2026', '2025', '2024', '2023']
 
 function formatLap(seconds: number | null): string {
-  if (seconds == null) return '—'
+  if (seconds == null) return ''
   const m = Math.floor(seconds / 60)
   const s = (seconds % 60).toFixed(3)
   return m > 0 ? `${m}:${s.padStart(6, '0')}` : s
@@ -31,7 +39,7 @@ export default function Telemetry() {
   const [driverNumber, setDriverNumber] = useState<number | null>(null)
 
   useSeo({
-    title: 'F1 Telemetry — Speed, Throttle & Lap Traces',
+    title: 'F1 Telemetry: Speed, Throttle & Lap Traces',
     description:
       'Past-race Formula 1 telemetry: speed, throttle, brake, gear and DRS traces lap by lap, from 2023 onward (OpenF1).',
   })
@@ -93,7 +101,7 @@ export default function Telemetry() {
   }, [fastestLap])
 
   const driver = drivers.data?.find((d) => d.driverNumber === driverNumber)
-  const teamColor = driver ? `#${driver.colour}` : '#e10600'
+  const teamColor = driver ? `#${driver.colour}` : 'var(--color-accent)'
 
   return (
     <section>
@@ -119,7 +127,7 @@ export default function Telemetry() {
           >
             {(sessions.data ?? []).map((s) => (
               <option key={s.sessionKey} value={s.sessionKey}>
-                {s.name} — {s.location}
+                {s.name}, {s.location}
               </option>
             ))}
           </select>
@@ -136,7 +144,7 @@ export default function Telemetry() {
           >
             {(drivers.data ?? []).map((d) => (
               <option key={d.driverNumber} value={d.driverNumber}>
-                #{d.driverNumber} {d.acronym} — {d.team}
+                #{d.driverNumber} {d.acronym}, {d.team}
               </option>
             ))}
           </select>
@@ -150,7 +158,7 @@ export default function Telemetry() {
           >
             {validLaps.map((l) => (
               <option key={l.lapNumber} value={l.lapNumber}>
-                {t('tel.lapN', { n: l.lapNumber })} — {formatLap(l.lapDuration)}
+                {t('tel.lapN', { n: l.lapNumber })}: {formatLap(l.lapDuration)}
                 {fastestLap?.lapNumber === l.lapNumber ? ` (${t('tel.fastest')})` : ''}
               </option>
             ))}
@@ -164,8 +172,13 @@ export default function Telemetry() {
 
       {/* Lap times across the race */}
       <div className="chart-card">
-        <h2 className="chart-title">{t('tel.lapTimes')} — {driver?.acronym ?? ''}</h2>
+        <h2 className="chart-title">
+          {t('tel.lapTimes')} <span className="chart-title-note mono">{driver?.acronym ?? ''}</span>
+        </h2>
         {laps.loading && <p className="muted">{t('common.loading')}</p>}
+        {!laps.loading && laps.error && (
+          <p className="banner">{t('tel.error', { error: laps.error })}</p>
+        )}
         {!laps.loading && validLaps.length > 0 && (
           <ResponsiveContainer width="100%" height={220}>
             <LineChart
@@ -175,21 +188,21 @@ export default function Telemetry() {
               }))}
               margin={{ top: 8, right: 16, bottom: 4, left: 8 }}
             >
-              <CartesianGrid stroke="#2a2a35" vertical={false} />
-              <XAxis dataKey="lap" stroke="#9a9aa8" fontSize={12} />
+              <CartesianGrid stroke="var(--color-rule)" vertical={false} />
+              <XAxis dataKey="lap" stroke="var(--color-muted)" fontSize={12} />
               <YAxis
-                stroke="#9a9aa8"
+                stroke="var(--color-muted)"
                 fontSize={12}
                 domain={['dataMin - 1', 'dataMax + 1']}
                 tickFormatter={(v: number) => formatLap(v)}
                 width={64}
               />
               <Tooltip
-                contentStyle={{ background: '#1a1a22', border: '1px solid #2a2a35' }}
+                contentStyle={TOOLTIP}
                 formatter={(v: number) => [formatLap(v), t('tel.lapTime')]}
               />
               {lapNumber != null && (
-                <ReferenceLine x={lapNumber} stroke="#e10600" strokeDasharray="4 3" />
+                <ReferenceLine x={lapNumber} stroke="var(--color-cool)" strokeDasharray="4 3" />
               )}
               <Line
                 type="monotone"
@@ -206,7 +219,10 @@ export default function Telemetry() {
       {/* Speed trace for the selected lap */}
       <div className="chart-card">
         <h2 className="chart-title">
-          {t('tel.speedTrace')} — {t('tel.lapN', { n: lapNumber ?? '—' })}
+          {t('tel.speedTrace')}{' '}
+          {lapNumber != null && (
+            <span className="chart-title-note">{t('tel.lapN', { n: lapNumber })}</span>
+          )}
         </h2>
         {telemetry.loading && <p className="muted">{t('common.loading')}</p>}
         {telemetry.error && (
@@ -219,16 +235,16 @@ export default function Telemetry() {
                 data={telemetry.data.points}
                 margin={{ top: 8, right: 16, bottom: 4, left: 8 }}
               >
-                <CartesianGrid stroke="#2a2a35" vertical={false} />
+                <CartesianGrid stroke="var(--color-rule)" vertical={false} />
                 <XAxis
                   dataKey="t"
-                  stroke="#9a9aa8"
+                  stroke="var(--color-muted)"
                   fontSize={12}
                   tickFormatter={(v: number) => `${v}s`}
                 />
-                <YAxis stroke="#9a9aa8" fontSize={12} unit={` ${t('tel.kmh')}`} width={70} />
+                <YAxis stroke="var(--color-muted)" fontSize={12} unit={` ${t('tel.kmh')}`} width={70} />
                 <Tooltip
-                  contentStyle={{ background: '#1a1a22', border: '1px solid #2a2a35' }}
+                  contentStyle={TOOLTIP}
                   labelFormatter={(v) => `${v}s`}
                 />
                 <Line
@@ -247,20 +263,20 @@ export default function Telemetry() {
                 data={telemetry.data.points}
                 margin={{ top: 8, right: 16, bottom: 4, left: 8 }}
               >
-                <CartesianGrid stroke="#2a2a35" vertical={false} />
+                <CartesianGrid stroke="var(--color-rule)" vertical={false} />
                 <XAxis
                   dataKey="t"
-                  stroke="#9a9aa8"
+                  stroke="var(--color-muted)"
                   fontSize={12}
                   tickFormatter={(v: number) => `${v}s`}
                 />
-                <YAxis stroke="#9a9aa8" fontSize={12} unit="%" width={48} domain={[0, 100]} />
+                <YAxis stroke="var(--color-muted)" fontSize={12} unit="%" width={48} domain={[0, 100]} />
                 <Tooltip
-                  contentStyle={{ background: '#1a1a22', border: '1px solid #2a2a35' }}
+                  contentStyle={TOOLTIP}
                   labelFormatter={(v) => `${v}s`}
                 />
-                <Line type="monotone" dataKey="throttle" name={t('tel.throttle')} stroke="#36d399" strokeWidth={2} dot={false} />
-                <Line type="monotone" dataKey="brake" name={t('tel.brake')} stroke="#e10600" strokeWidth={2} dot={false} />
+                <Line type="monotone" dataKey="throttle" name={t('tel.throttle')} stroke="var(--color-ok)" strokeWidth={2} dot={false} />
+                <Line type="monotone" dataKey="brake" name={t('tel.brake')} stroke="var(--color-bad)" strokeWidth={2} dot={false} />
               </LineChart>
             </ResponsiveContainer>
           </>
