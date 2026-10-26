@@ -53,6 +53,11 @@ Committed JSON built by one-off scripts, so the site makes no extra upstream cal
 
 Social crawlers don't run JS, so the Express SPA fallback (`server/src/services/pageHtml.ts`) fills each page's `<title>`, description, canonical and OG/Twitter tags from `describePage()` in `server/src/services/og.ts`, which also draws the 1200×630 preview served at `/og/<page path>.png` (SVG → PNG with `@resvg/resvg-js`, Saira Condensed from `server/assets/fonts`, OFL). Keep its titles/descriptions in step with the pages' `useSeo` calls. On a cold start people get the page at once with default tags; crawlers wait for the dataset.
 
+## Search engines (snapshot + sitemap)
+
+- Crawlers (the `BOT` user-agent pattern in `server/src/services/pageHtml.ts`) get a plain-HTML snapshot of the page inside `#root`: heading, a sentence or two, the key data and links to related pages (`services/snapshot.ts`, built from the same dataset). People get the empty root and the app (`createRoot` replaces the snapshot for crawlers that run JS). The response sends `Vary: User-Agent`.
+- `/sitemap.xml` is generated from the dataset (`services/sitemap.ts`, cached 6 h): static sections, standings and calendars of recent seasons, race pages of the current and previous season, drivers and teams of the last three grids plus every champion, and circuits. There is no static `client/public/sitemap.xml`. Add `/support` to `STATIC_PAGES` once the donation link is real.
+
 ## Page speed (home page)
 
 - `pageHtml()` inlines the main stylesheet into the HTML and, for `/`, inlines the home data (`window.__HOME__`, built by `services/home.ts`, same payload as `/api/home`) plus a `<link rel="preload">` for the hero photo (`imagesrcset`/`imagesizes` from the payload's `heroSrcSet`/`heroSizes`, which the `<img>` uses too — keep `HERO_SIZES` in `services/home.ts` in step with the `.hm-portrait img` size in `Home.css`). The hero URL comes from `services/portraits.ts`, a mirror of `driverPortraitUrl()` in `client/src/lib/f1meta.ts` — keep the slug maps in step.

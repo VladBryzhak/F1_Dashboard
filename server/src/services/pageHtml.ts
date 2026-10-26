@@ -3,6 +3,7 @@ import path from "path";
 import { isDatasetReady, warmDataset } from "./f1db";
 import { homePayload } from "./home";
 import { describePage, type PageMeta } from "./og";
+import { pageSnapshot } from "./snapshot";
 
 // Serves the SPA shell with this page's own <title>, description, canonical
 // URL and Open Graph / Twitter tags, so link previews show the right page
@@ -112,5 +113,11 @@ export async function pageHtml(file: string, pagePath: string, userAgent = ""): 
 
   const clean = pagePath.split("?")[0].replace(/\/+$/, "");
   if (clean === "" && isDatasetReady()) html = html.replace("</head>", `${await homeBoot()}</head>`);
+  // Crawlers also get the page's text and links in #root (see snapshot.ts);
+  // people get the empty root and the app, so their first paint is unchanged.
+  if (BOT.test(userAgent) && isDatasetReady()) {
+    const snapshot = await pageSnapshot(pagePath).catch(() => "");
+    if (snapshot) html = html.replace('<div id="root"></div>', `<div id="root">${snapshot}</div>`);
+  }
   return inlineCss(html, file);
 }

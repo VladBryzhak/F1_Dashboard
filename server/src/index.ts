@@ -14,6 +14,7 @@ import standingsRouter from "./routes/standings";
 import telemetryRouter from "./routes/telemetry";
 import { previewPng } from "./services/og";
 import { pageHtml } from "./services/pageHtml";
+import { sitemapXml } from "./services/sitemap";
 
 const app = express();
 const PORT = process.env.PORT ?? 3001;
@@ -55,6 +56,17 @@ app.use("/api", profilesRouter);
 // whole app runs as one service (one origin, no CORS, no separate frontend
 // host). The client build lives at <repo>/client/dist.
 const clientDist = path.resolve(__dirname, "../../client/dist");
+// Sitemap built from the dataset (services/sitemap.ts), ahead of the static
+// files so it is never shadowed by an old build's sitemap.xml.
+app.get("/sitemap.xml", async (_req, res, next) => {
+  try {
+    res.set("Cache-Control", "public, max-age=3600");
+    res.type("application/xml").send(await sitemapXml());
+  } catch (err) {
+    next(err);
+  }
+});
+
 // Link-preview images: /og/<page path>.png (e.g. /og/drivers/max-verstappen.png).
 app.get(/^\/og\/(.+)\.png$/, async (req, res, next) => {
   try {
@@ -97,7 +109,9 @@ if (fs.existsSync(clientDist)) {
   app.get("*", async (req, res, next) => {
     if (req.path.startsWith("/api")) return next();
     try {
+      // Crawlers get a text snapshot in the page (pageHtml), people don't.
       res
+        .vary("User-Agent")
         .type("html")
         .send(await pageHtml(path.join(clientDist, "index.html"), req.path, req.get("user-agent")));
     } catch (err) {
