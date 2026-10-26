@@ -21,3 +21,9 @@ export async function cached<T>(
   store.set(key, value, ttlSeconds);
   return value;
 }
+
+/** Drops every cached value whose key starts with one of `prefixes`. */
+export function dropCached(prefixes: string[]): void {
+  const keys = store.keys().filter((k) => prefixes.some((p) => k.startsWith(p)));
+  if (keys.length) store.del(keys);
+}

@@ -1,4 +1,5 @@
 import AdmZip from "adm-zip";
+import { dropCached } from "../cache/cache";
 import { circuitOutline } from "./circuitOutlines";
 import type {
   CalendarRace,
@@ -380,16 +381,16 @@ async function fetchLatestZip(): Promise<{ version: string; zip: AdmZip }> {
   // redirect instead of resolving it via api.github.com. The REST API caps
   // unauthenticated callers at 60 req/hr per IP, which shared hosting egress IPs
   // (e.g. Render's free tier) exhaust quickly → 403; the release-download path
-  // has no such limit.
-  const res = await fetch(LATEST_ZIP_URL, {
-    headers: { "User-Agent": "f1-dashboard" },
-  });
+  // has no such limit. Asking for the tag first and downloading that tag's file
+  // records which release we hold (the final download URL doesn't name it).
+  const tag = await latestReleaseTag().catch(() => null);
+  const url = tag
+    ? `https://github.com/f1db/f1db/releases/download/${tag}/f1db-json-splitted.zip`
+    : LATEST_ZIP_URL;
+  const res = await fetch(url, { headers: { "User-Agent": "f1-dashboard" } });
   if (!res.ok) throw new Error(`f1db download failed: ${res.status}`);
-  // The redirect chain passes through /releases/download/<tag>/…; recover the
-  // tag from the resolved URL when present, else label it "latest".
-  const version = res.url.match(/\/releases\/download\/([^/]+)\//)?.[1] ?? "latest";
   const buf = Buffer.from(await res.arrayBuffer());
-  return { version, zip: new AdmZip(buf) };
+  return { version: tag ?? "latest", zip: new AdmZip(buf) };
 }
 
 async function loadDataset(): Promise<Dataset> {
@@ -674,18 +675,24 @@ async function loadDataset(): Promise<Dataset> {
   };
 }
 
-// How often a long-lived process re-pulls the latest f1db release in the
-// background. On Render's free tier cold starts already refresh the data (a woken
-// instance is a new process that re-downloads); this keeps an always-on instance
-// current without a redeploy. Override with F1DB_REFRESH_MS; set 0 to disable.
-const REFRESH_INTERVAL_MS =
-  process.env.F1DB_REFRESH_MS !== undefined
-    ? Number(process.env.F1DB_REFRESH_MS)
-    : 12 * 60 * 60 * 1000; // 12h
+// Keeping the data current. A long-lived process holds one dataset, so it
+// would serve the same results until a restart (the site is kept awake, so
+// Render no longer restarts it). Every F1DB_CHECK_MS (default 30 min) it asks
+// GitHub which release "latest" points to, a redirect that costs no API quota,
+// and only when the tag has changed downloads it, swaps it in and drops the
+// caches built from the old one. f1db usually publishes the morning after a
+// race, so results show up within half an hour of that. Set 0 to disable.
+const CHECK_INTERVAL_MS =
+  process.env.F1DB_CHECK_MS !== undefined ? Number(process.env.F1DB_CHECK_MS) : 30 * 60 * 1000;
+
+// Cache keys built from the dataset (the f1db functions themselves read it
+// directly and need nothing dropped).
+const DATASET_CACHE_PREFIXES = ["sitemap:", "story:"];
 
 let refreshTimer: NodeJS.Timeout | null = null;
+let refreshing = false;
 
-// Cached for the process lifetime and refreshed in the background on a timer.
+// Cached for the process lifetime and refreshed in the background (above).
 let datasetReady = false;
 
 // True once the dataset has loaded (requests can then answer instantly).
@@ -715,21 +722,42 @@ function dataset(): Promise<Dataset> {
   return datasetPromise;
 }
 
-// Periodically load a fresh copy in the background and swap it in only on
-// success, so a failed refresh never replaces good data and requests are never
-// blocked waiting on it.
+// The tag the "latest release" download currently redirects to, without
+// downloading anything; null if GitHub didn't say.
+async function latestReleaseTag(): Promise<string | null> {
+  const res = await fetch(LATEST_ZIP_URL, {
+    method: "HEAD",
+    redirect: "manual",
+    headers: { "User-Agent": "f1-dashboard" },
+  });
+  const location = res.headers.get("location") ?? "";
+  return location.match(/\/releases\/download\/([^/]+)\//)?.[1] ?? null;
+}
+
+// One check: load the new release when there is one and swap it in only on
+// success, so a failed refresh never replaces good data and requests never
+// wait on it.
+async function refreshIfNewer(): Promise<void> {
+  if (refreshing || !datasetPromise) return;
+  refreshing = true;
+  try {
+    const current = (await datasetPromise).version;
+    const latest = await latestReleaseTag();
+    if (!latest || latest === current) return;
+    const fresh = await loadDataset();
+    datasetPromise = Promise.resolve(fresh);
+    dropCached(DATASET_CACHE_PREFIXES);
+    console.log(`f1db updated: ${current} -> ${fresh.version}`);
+  } catch (err) {
+    console.warn(`f1db refresh failed, keeping cached data: ${String(err)}`);
+  } finally {
+    refreshing = false;
+  }
+}
+
 function scheduleRefresh(): void {
-  if (refreshTimer || !(REFRESH_INTERVAL_MS > 0)) return;
-  refreshTimer = setInterval(() => {
-    loadDataset().then(
-      (fresh) => {
-        datasetPromise = Promise.resolve(fresh);
-      },
-      (err) => {
-        console.warn(`f1db refresh failed, keeping cached data: ${String(err)}`);
-      },
-    );
-  }, REFRESH_INTERVAL_MS);
+  if (refreshTimer || !(CHECK_INTERVAL_MS > 0)) return;
+  refreshTimer = setInterval(() => void refreshIfNewer(), CHECK_INTERVAL_MS);
   refreshTimer.unref(); // don't keep the process alive for the timer alone
 }
 
