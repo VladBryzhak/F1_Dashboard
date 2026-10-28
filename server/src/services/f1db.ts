@@ -940,6 +940,21 @@ export async function getCalendar(season: string): Promise<CalendarResponse> {
   return { season, races };
 }
 
+// A season counts towards titles only once every round has been run: until
+// then, P1 in the standings is the leader, not the champion. Worked out once
+// per dataset.
+const completeSeasons = new WeakMap<Dataset, Set<number>>();
+function seasonComplete(ds: Dataset, year: number): boolean {
+  let done = completeSeasons.get(ds);
+  if (!done) {
+    const open = new Set<number>();
+    for (const r of ds.races) if (!ds.winnerByRace.has(`${r.year}:${r.round}`)) open.add(r.year);
+    done = new Set(ds.races.map((r) => r.year).filter((y) => !open.has(y)));
+    completeSeasons.set(ds, done);
+  }
+  return done.has(year);
+}
+
 export async function getDriverProfile(
   driverId: string
 ): Promise<DriverProfile | null> {
@@ -977,7 +992,7 @@ export async function getDriverProfile(
     code: d?.abbreviation ?? null,
     firstSeason: career.firstSeason,
     lastSeason: career.lastSeason,
-    championships: rawSeasons.filter((s) => s.positionNumber === 1).length,
+    championships: rawSeasons.filter((s) => s.positionNumber === 1 && seasonComplete(ds, s.year)).length,
     wins: seasons.reduce((sum, s) => sum + s.wins, 0),
     podiums: career.podiums,
     points: rawSeasons.reduce((sum, s) => sum + s.points, 0),
@@ -1080,7 +1095,7 @@ export async function getConstructorProfile(
     countryCode: alpha2(ds, c?.countryId),
     firstSeason: career.firstSeason,
     lastSeason: career.lastSeason,
-    championships: rawSeasons.filter((s) => s.best === 1).length,
+    championships: rawSeasons.filter((s) => s.best === 1 && seasonComplete(ds, s.year)).length,
     wins: seasons.reduce((sum, s) => sum + s.wins, 0),
     podiums: career.podiums,
     points: rawSeasons.reduce((sum, s) => sum + s.points, 0),
