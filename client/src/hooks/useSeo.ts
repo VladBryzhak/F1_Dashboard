@@ -1,4 +1,5 @@
 import { useEffect } from 'react'
+import { langFromPath, localizedPath } from '../i18n/core'
 
 // Per-page SEO for the SPA: sets a unique <title>, meta description, Open Graph
 // / Twitter title+description and a canonical URL as the user navigates.
@@ -97,9 +98,13 @@ export function useSeo(
       canonical.setAttribute('rel', 'canonical')
       document.head.appendChild(canonical)
     }
+    // An override is a language-neutral path (/standings); give it this
+    // page's language prefix.
+    const lang = langFromPath(window.location.pathname)
     canonical.setAttribute(
       'href',
-      window.location.origin + (canonicalPath ?? window.location.pathname),
+      window.location.origin +
+        (canonicalPath ? localizedPath(canonicalPath, lang) : window.location.pathname),
     )
 
     // JSON-LD: keep a single hook-managed script in sync with the current route.

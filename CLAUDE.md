@@ -13,6 +13,12 @@ F1 Dashboard — a web app showing Formula 1 standings, race calendar, driver/te
 
 The **client only talks to our backend** (`/api/*`). The **server** talks to the upstream F1 APIs, normalizes their verbose shapes into the flat types in `server/src/types/f1.ts` (mirrored in `client/src/types/f1.ts`), and caches responses.
 
+## Languages and URLs
+
+- English pages live at `/…`, their Ukrainian twins at `/uk/…`. The language comes from the address (`langFromPath`/`localizedPath` in `client/src/i18n/core.ts`); Ukrainian pages run the router under the `/uk` basename (`i18n/LangRouter.tsx`), so in-app links stay plain (`<Link to="/standings">`) and keep the current language. The EN/UA switch moves to the same page in the other language and remembers the choice; an unprefixed address opens in Ukrainian for a visitor who chose it or whose browser asks for it (rewritten in place in `main.tsx`, never for crawlers).
+- Paths built for outside the router (canonical, JSON-LD, analytics) must carry the prefix: use `localizedPath(path, lang)` or `window.location.pathname`.
+- The server reads the language from the path (`isUkPath` in `server/src/services/pageHtml.ts`) and sets `<html lang>`. `/uk/…` pages are `noindex` (X-Robots-Tag) until their titles, descriptions and crawler snapshots are Ukrainian.
+
 ## Styles (client)
 
 Plain CSS, split by area (no CSS-in-JS, no CSS Modules):

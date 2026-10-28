@@ -80,8 +80,17 @@ export function previewPath(pagePath: string): string {
   return `/og${clean || "/index"}.png`;
 }
 
-export async function pageHtml(file: string, pagePath: string, userAgent = "", nonce = ""): Promise<string> {
+// Ukrainian pages live at /uk/… (the app's router basename); the server reads
+// the language from the path and looks the page up by its unprefixed path.
+const UK_PREFIX = /^\/uk(?=\/|$)/;
+export const isUkPath = (pagePath: string) => UK_PREFIX.test(pagePath);
+
+export async function pageHtml(file: string, rawPath: string, userAgent = "", nonce = ""): Promise<string> {
   let html = readShell(file);
+  const uk = isUkPath(rawPath);
+  // The page itself, without the language prefix (/uk/standings → /standings).
+  const pagePath = rawPath.replace(UK_PREFIX, "") || "/";
+  if (uk) html = html.replace('<html lang="en">', '<html lang="uk">');
   let meta: PageMeta | null = null;
   if (isDatasetReady()) {
     meta = await describePage(pagePath).catch(() => null);
@@ -93,7 +102,8 @@ export async function pageHtml(file: string, pagePath: string, userAgent = "", n
   } else {
     warmDataset();
   }
-  const url = SITE_URL + (pagePath.split("?")[0].replace(/\/+$/, "") || "/");
+  // The canonical URL keeps the page's own language prefix.
+  const url = SITE_URL + (rawPath.split("?")[0].replace(/\/+$/, "") || "/");
   const image = SITE_URL + previewPath(pagePath);
 
   if (meta) {

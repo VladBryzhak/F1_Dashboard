@@ -2,6 +2,7 @@
 // pages can show richer snippets (driver facts, event cards, breadcrumbs) and
 // are understood as entities, not just text. Each builder returns a plain object
 // that useSeo({ jsonLd }) serializes into a <script type="application/ld+json">.
+import { getLang, localizedPath } from '../i18n/core'
 import type { ConstructorProfile, DriverProfile, RaceWeekend } from '../types/f1'
 
 const BASE = 'https://f1-dashboard-bryzhak.onrender.com'
@@ -95,7 +96,7 @@ export function breadcrumbLd(
       '@type': 'ListItem',
       position: i + 1,
       name: t.name,
-      item: BASE + t.path,
+      item: BASE + localizedPath(t.path, getLang()),
     })),
   }
 }

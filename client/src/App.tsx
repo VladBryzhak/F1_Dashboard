@@ -48,7 +48,8 @@ const Support = lazyPage(() => import('./pages/Support'))
 function usePageViews() {
   const location = useLocation()
   useEffect(() => {
-    trackPageView(location.pathname + location.search)
+    // The full address (router paths leave out the /uk basename).
+    trackPageView(window.location.pathname + window.location.search)
   }, [location.pathname, location.search])
 }
 

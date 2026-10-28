@@ -2,10 +2,12 @@ import { createContext, useContext } from 'react'
 import en, { type Dict } from './en'
 import uk from './uk'
 
-// Interface language. No URL prefix: the choice lives in the browser
-// (localStorage), and a first-time visitor gets their browser's language when
-// we have it (Ukrainian), English otherwise. Search engines therefore always
-// see — and index — the English version.
+// Interface language, taken from the URL: English pages live at /…, their
+// Ukrainian twins at /uk/… (the router's basename, see main.tsx), so each
+// language has its own addresses for search engines and shared links. The
+// visitor's choice is still remembered in the browser: an unprefixed address
+// opens in Ukrainian for someone who picked it (or whose browser asks for it),
+// see preferredLang() and main.tsx.
 
 export type Lang = 'en' | 'uk'
 export type TKey = keyof Dict
@@ -16,20 +18,40 @@ export const dicts: Record<Lang, Dict> = { en, uk }
 // BCP-47 locale used for dates and numbers.
 export const locales: Record<Lang, string> = { en: 'en-GB', uk: 'uk-UA' }
 
-export function detectLang(): Lang {
+// The Ukrainian pages' path prefix (also the router basename for them).
+export const UK_BASE = '/uk'
+const UK_PREFIX = /^\/uk(?=\/|$)/
+
+// Which language a path belongs to: /uk and /uk/… are Ukrainian.
+export function langFromPath(path: string): Lang {
+  return UK_PREFIX.test(path) ? 'uk' : 'en'
+}
+
+// The same page in the given language: /standings ↔ /uk/standings, / ↔ /uk.
+export function localizedPath(path: string, lang: Lang): string {
+  const bare = path.replace(UK_PREFIX, '') || '/'
+  if (lang === 'en') return bare
+  return bare === '/' ? UK_BASE : UK_BASE + bare
+}
+
+// The language this visitor asked for: their saved choice from the EN/UA
+// switch, else their browser's language when we have it (Ukrainian), else
+// none. Used only to open an unprefixed address in Ukrainian.
+export function preferredLang(): Lang | null {
   try {
     const saved = localStorage.getItem(LANG_STORAGE_KEY)
     if (saved === 'en' || saved === 'uk') return saved
   } catch {
     // storage blocked — fall through to the browser language
   }
+  if (typeof navigator === 'undefined') return null
   const prefs = navigator.languages?.length ? navigator.languages : [navigator.language]
-  return prefs.some((l) => l?.toLowerCase().startsWith('uk')) ? 'uk' : 'en'
+  return prefs.some((l) => l?.toLowerCase().startsWith('uk')) ? 'uk' : null
 }
 
 // Module-level mirror of the current language, for plain helpers (lib/*) that
 // build text outside React components. The provider keeps it in sync.
-let current: Lang = detectLang()
+let current: Lang = typeof window === 'undefined' ? 'en' : langFromPath(window.location.pathname)
 export const getLang = (): Lang => current
 export const getLocale = (): string => locales[current]
 export const setCurrentLang = (l: Lang) => {
