@@ -1,14 +1,12 @@
 import { useEffect } from 'react'
 import { langFromPath, localizedPath } from '../i18n/core'
+import { DEFAULT_SEO } from '../lib/seoText'
 
 // Per-page SEO for the SPA: sets a unique <title>, meta description, Open Graph
 // / Twitter title+description and a canonical URL as the user navigates.
 // Google renders client-side JS, so these are picked up for indexing.
 
 const SITE = 'F1 Dashboard'
-const DEFAULT_TITLE = `${SITE} — Formula 1 Standings, Calendar & Stats`
-const BASE_DESC =
-  'Formula 1 standings, race calendar, driver & team career stats, head-to-head comparisons and past-race telemetry — every season from 1950 to today.'
 
 function upsert(selector: string, make: () => HTMLMetaElement, content: string) {
   let el = document.head.querySelector<HTMLMetaElement>(selector)
@@ -32,8 +30,10 @@ export function useSeo(
     canonicalPath?: string
   } = {},
 ) {
-  const title = opts.title ? `${opts.title} · ${SITE}` : DEFAULT_TITLE
-  const description = opts.description ?? BASE_DESC
+  // Defaults in the page's language (from its address).
+  const fallback = DEFAULT_SEO[langFromPath(window.location.pathname)]
+  const title = opts.title ? `${opts.title} · ${SITE}` : fallback.title
+  const description = opts.description ?? fallback.description
   const canonicalPath = opts.canonicalPath
   // Serialize here so the effect has a stable primitive dependency (the object
   // identity changes every render, which would otherwise loop forever).
@@ -101,11 +101,21 @@ export function useSeo(
     // An override is a language-neutral path (/standings); give it this
     // page's language prefix.
     const lang = langFromPath(window.location.pathname)
-    canonical.setAttribute(
-      'href',
-      window.location.origin +
-        (canonicalPath ? localizedPath(canonicalPath, lang) : window.location.pathname),
-    )
+    const pagePath = canonicalPath ?? window.location.pathname
+    canonical.setAttribute('href', window.location.origin + localizedPath(pagePath, lang))
+
+    // The same page in both languages (the server sends these too; kept in
+    // step here as the app moves between pages).
+    for (const [hreflang, l] of [['en', 'en'], ['uk', 'uk'], ['x-default', 'en']] as const) {
+      let alt = document.head.querySelector<HTMLLinkElement>(`link[rel="alternate"][hreflang="${hreflang}"]`)
+      if (!alt) {
+        alt = document.createElement('link')
+        alt.setAttribute('rel', 'alternate')
+        alt.setAttribute('hreflang', hreflang)
+        document.head.appendChild(alt)
+      }
+      alt.setAttribute('href', window.location.origin + localizedPath(pagePath, l))
+    }
 
     // JSON-LD: keep a single hook-managed script in sync with the current route.
     let ld = document.head.querySelector<HTMLScriptElement>(

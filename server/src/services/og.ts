@@ -11,6 +11,8 @@ import {
   getRaceWeekend,
 } from "./f1db";
 import type { CircuitOutline } from "../types/f1";
+import { gpTitle, type Lang } from "./gpNames";
+import { UK, ukCountry, ukPlural } from "./ukText";
 
 // Link previews (Open Graph / Twitter cards). Social crawlers don't run our
 // JavaScript, so the server works out each page's title, description and a
@@ -57,8 +59,14 @@ export interface PageMeta {
   card: Card;
 }
 
-const page = (title: string | null, description: string, card: Card): PageMeta => ({
-  title: title ? `${title} · ${SITE}` : DEFAULT_TITLE,
+const DEFAULT_TITLE_UK = `${SITE}: турнірна таблиця, календар і статистика Формули-1`;
+const BASE_DESC_UK =
+  "Залік Формули-1, календар гонок, статистика кар'єри пілотів і команд, порівняння та телеметрія: кожен сезон з 1950 року до сьогодні.";
+
+// Titles and descriptions follow the page's language (Ukrainian pages live
+// at /uk/…); the preview card's text stays English for now.
+const page = (title: string | null, description: string, card: Card, lang: Lang = "en"): PageMeta => ({
+  title: title ? `${title} · ${SITE}` : lang === "uk" ? DEFAULT_TITLE_UK : DEFAULT_TITLE,
   description,
   card,
 });
@@ -68,16 +76,18 @@ const fmtDate = (iso: string) =>
   new Date(iso).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" });
 
 // Page path → meta + preview card. Unknown paths get the site defaults.
-export async function describePage(rawPath: string): Promise<PageMeta> {
+export async function describePage(rawPath: string, lang: Lang = "en"): Promise<PageMeta> {
+  const uk = lang === "uk";
+  const pg = (title: string | null, description: string, card: Card) => page(title, description, card, lang);
   const parts = rawPath.split("?")[0].split("/").filter(Boolean).map(decodeURIComponent);
   const [section, a, b] = parts;
   const current = String(await getCurrentSeason());
   const generic = (title: string, description: string, subtitle = description) =>
-    page(title, description, { kind: "default", title, subtitle });
+    pg(title, description, { kind: "default", title, subtitle });
 
   switch (section) {
     case undefined:
-      return page(null, BASE_DESC, {
+      return pg(null, uk ? BASE_DESC_UK : BASE_DESC, {
         kind: "default",
         title: "F1 Dashboard",
         subtitle: "Standings, calendar, driver & team stats, telemetry and race replays — 1950 to today.",
@@ -92,9 +102,11 @@ export async function describePage(rawPath: string): Promise<PageMeta> {
         points: d.points,
         color: teamColor(d.constructorId),
       }));
-      const title = `${season} F1 Championship Standings`;
-      const description = `Formula 1 drivers' and constructors' championship standings for the ${season} season: points, wins and gaps to the leader.`;
-      return rows.length ? page(title, description, { kind: "standings", season, rows }) : generic(title, description);
+      const title = uk ? `Залік Формули-1 ${season}: пілоти й конструктори` : `${season} F1 Championship Standings`;
+      const description = uk
+        ? `Залік пілотів і Кубок конструкторів Формули-1 сезону ${season}: очки, перемоги та відставання від лідера.`
+        : `Formula 1 drivers' and constructors' championship standings for the ${season} season: points, wins and gaps to the leader.`;
+      return rows.length ? pg(title, description, { kind: "standings", season, rows }) : generic(title, description);
     }
 
     case "calendar": {
@@ -105,9 +117,14 @@ export async function describePage(rawPath: string): Promise<PageMeta> {
           const podium = w.results
             .filter((r) => ["1", "2", "3"].includes(r.positionText))
             .map((r) => ({ pos: Number(r.positionText), name: r.driverName, team: r.constructorName, color: teamColor(r.constructorId) }));
-          return page(
-            `${w.grandPrixName} GP ${w.season}: Results, Qualifying & Practice`,
-            `${w.grandPrixName} Grand Prix ${w.season}: full race result, starting grid, qualifying times, practice sessions${w.sprintResults.length ? ", sprint" : ""}, fastest lap and Driver of the Day.`,
+          const gpUk = gpTitle(w.grandPrixName, "uk");
+          return pg(
+            uk
+              ? `${gpUk} ${w.season}: результати, кваліфікація й практики`
+              : `${w.grandPrixName} GP ${w.season}: Results, Qualifying & Practice`,
+            uk
+              ? `${gpUk} ${w.season}: повний результат гонки, стартова решітка, час кваліфікації, практики${w.sprintResults.length ? ", спринт" : ""}, найшвидше коло та пілот дня.`
+              : `${w.grandPrixName} Grand Prix ${w.season}: full race result, starting grid, qualifying times, practice sessions${w.sprintResults.length ? ", sprint" : ""}, fastest lap and Driver of the Day.`,
             {
               kind: "race",
               kicker: `${w.season} · Round ${w.round} · ${fmtDate(w.date)}`,
@@ -123,8 +140,10 @@ export async function describePage(rawPath: string): Promise<PageMeta> {
       const cal = await getCalendar(season).catch(() => null);
       const n = cal?.races.length ?? 0;
       return generic(
-        `${season} F1 Race Calendar & Results`,
-        `The ${season} Formula 1 race calendar with winners, teams and full results for every Grand Prix.`,
+        uk ? `Календар Формули-1 ${season}: гонки й результати` : `${season} F1 Race Calendar & Results`,
+        uk
+          ? `Календар гонок Формули-1 ${season} року з переможцями, командами та повними результатами кожного Гран-прі.`
+          : `The ${season} Formula 1 race calendar with winners, teams and full results for every Grand Prix.`,
         n ? `${n} Grands Prix — winners, results and weekend schedules.` : undefined,
       );
     }
@@ -134,9 +153,12 @@ export async function describePage(rawPath: string): Promise<PageMeta> {
         const p = await getDriverProfile(a).catch(() => null);
         if (p) {
           const lastTeam = p.seasons[p.seasons.length - 1]?.constructorId ?? "";
-          return page(
-            `${p.givenName} ${p.familyName}: F1 Career Stats`,
-            `${p.givenName} ${p.familyName}'s Formula 1 career: ${p.championships} title${p.championships === 1 ? "" : "s"}, ${p.wins} wins, ${p.podiums} podiums and ${p.races} races across ${p.firstSeason}–${p.lastSeason}.`,
+          const name = `${p.givenName} ${p.familyName}`;
+          return pg(
+            uk ? `${name}: статистика кар'єри у Формулі-1` : `${name}: F1 Career Stats`,
+            uk
+              ? `${name} у Формулі-1: ${ukPlural(p.championships, UK.titles)}, ${ukPlural(p.wins, UK.wins)}, ${ukPlural(p.podiums, UK.podiums)} і ${ukPlural(p.races, UK.races)} у ${p.firstSeason}-${p.lastSeason} роках.`
+              : `${name}'s Formula 1 career: ${p.championships} title${p.championships === 1 ? "" : "s"}, ${p.wins} wins, ${p.podiums} podiums and ${p.races} races from ${p.firstSeason} to ${p.lastSeason}.`,
             {
               kind: "driver",
               first: p.givenName,
@@ -156,8 +178,10 @@ export async function describePage(rawPath: string): Promise<PageMeta> {
       }
       const season = isSeason(a) ? a! : current;
       return generic(
-        `${season} F1 Drivers`,
-        `Every Formula 1 driver on the ${season} grid, plus a searchable index of every driver since 1950, with links to full career profiles.`,
+        uk ? `Пілоти Формули-1 ${season}` : `${season} F1 Drivers`,
+        uk
+          ? `Усі пілоти Формули-1 сезону ${season} і пошук серед усіх пілотів з 1950 року, з посиланнями на повну статистику кар'єри.`
+          : `Every Formula 1 driver on the ${season} grid, plus a searchable index of every driver since 1950, with links to full career profiles.`,
       );
     }
 
@@ -165,9 +189,11 @@ export async function describePage(rawPath: string): Promise<PageMeta> {
       if (a && !isSeason(a)) {
         const p = await getConstructorProfile(a).catch(() => null);
         if (p) {
-          return page(
-            `${p.name}: F1 History, Titles & Wins`,
-            `${p.name} in Formula 1: ${p.championships} constructors' title${p.championships === 1 ? "" : "s"}, ${p.wins} wins, ${p.podiums} podiums and ${p.races} races since ${p.firstSeason}.`,
+          return pg(
+            uk ? `${p.name}: історія, титули й перемоги у Формулі-1` : `${p.name}: F1 History, Titles & Wins`,
+            uk
+              ? `${p.name} у Формулі-1: ${ukPlural(p.championships, UK.ctitles)}, ${ukPlural(p.wins, UK.wins)}, ${ukPlural(p.podiums, UK.podiums)} і ${ukPlural(p.races, UK.races)} з ${p.firstSeason} року.`
+              : `${p.name} in Formula 1: ${p.championships} constructors' title${p.championships === 1 ? "" : "s"}, ${p.wins} wins, ${p.podiums} podiums and ${p.races} races since ${p.firstSeason}.`,
             {
               kind: "team",
               name: p.name,
@@ -185,8 +211,10 @@ export async function describePage(rawPath: string): Promise<PageMeta> {
       }
       const season = isSeason(a) ? a! : current;
       return generic(
-        `${season} F1 Teams & Constructors`,
-        `Formula 1 constructors on the ${season} grid, plus a searchable index of every constructor since 1950, with links to full team histories.`,
+        uk ? `Команди Формули-1 ${season}` : `${season} F1 Teams & Constructors`,
+        uk
+          ? `Усі конструктори Формули-1 сезону ${season} і пошук серед усіх команд з 1950 року, з посиланнями на повну історію кожної.`
+          : `Formula 1 constructors on the ${season} grid, plus a searchable index of every constructor since 1950, with links to full team histories.`,
       );
     }
 
@@ -202,7 +230,19 @@ export async function describePage(rawPath: string): Promise<PageMeta> {
             c.turns ? `${c.turns} turns` : null,
             `${c.racesHeld} Grands Prix`,
           ].filter((x): x is string => !!x);
-          return page(
+          const ukFacts = [
+            c.length != null ? `${String(c.length).replace(".", ",")} км` : "",
+            c.turns != null ? ukPlural(c.turns, UK.turns) : "",
+            `${c.racesHeld} Гран-прі Формули-1${c.firstYear ? ` з ${c.firstYear} року` : ""}`,
+          ].filter(Boolean);
+          if (uk) {
+            return pg(
+              `${c.name}: траса Формули-1, рекорд кола й переможці`,
+              `${c.name} (${c.placeName}${ukCountry(c.countryCode) ? `, ${ukCountry(c.countryCode)}` : ""}): ${ukFacts.join(", ")}. Рекорд кола в гонці, найуспішніші пілоти й команди та всі переможці.`,
+              { kind: "circuit", country, place: c.placeName, name: c.name, facts, record: c.lapRecord ? `Lap record ${c.lapRecord.time} — ${c.lapRecord.driverName}, ${c.lapRecord.year}` : null, outline: c.outline },
+            );
+          }
+          return pg(
             `${c.name}: F1 Circuit Guide, Lap Record & Winners`,
             `${c.name} (${c.placeName}): ${[
               c.length != null ? `${c.length} km` : "",
@@ -223,50 +263,62 @@ export async function describePage(rawPath: string): Promise<PageMeta> {
           );
         }
       }
-      return generic(
-        "F1 Circuits: Track Maps, Lap Records & Winners",
-        "Formula 1 circuits on the current calendar and classic tracks: track maps, length, turns, race lap records, layouts and every winner at each venue.",
-      );
+      return uk
+        ? generic(
+            "Траси Формули-1: схеми, рекорди кола й переможці",
+            "Траси Формули-1 з поточного календаря та класичні: схеми, довжина, повороти, рекорди кола, конфігурації та всі переможці на кожній.",
+          )
+        : generic(
+            "F1 Circuits: Track Maps, Lap Records & Winners",
+            "Formula 1 circuits on the current calendar and classic tracks: track maps, length, turns, race lap records, layouts and every winner at each venue.",
+          );
     }
 
     case "compare":
+      if (uk) return generic("Порівняння пілотів Формули-1", "Порівняйте двох будь-яких пілотів Формули-1: титули, перемоги, подіуми, очки та очні дуелі за кар'єру або окремий сезон.");
       return generic(
         "F1 Driver Comparison: Head to Head",
         "Compare any two Formula 1 drivers head-to-head: championships, wins, podiums, points and their race-by-race record, over a career or a single season.",
       );
     case "live":
+      if (uk) return generic("Live-таймінг Формули-1", "Live-таймінг Формули-1: позиції, відставання, час кіл, сектори, мінісектори та шини з деталями по кожному пілоту.", "Live-таймінг і повтори гонок з мапою траси: кожна сесія з 2023 року.");
       return generic(
         "Live Timing",
         "Live Formula 1 timing board: positions, gaps, lap times, sectors, mini-sectors and tyres, with expandable per-driver detail.",
         "Live timing and race replays with a track map — every session since 2023.",
       );
     case "telemetry":
+      if (uk) return generic("Телеметрія Формули-1: швидкість, газ і гальма", "Телеметрія гонок Формули-1: швидкість, газ, гальма, передача та DRS по колах, з 2023 року (OpenF1).");
       return generic(
         "F1 Telemetry: Speed, Throttle & Lap Traces",
         "Past-race Formula 1 telemetry: speed, throttle, brake, gear and DRS traces lap by lap, from 2023 onward (OpenF1).",
       );
     case "about":
+      if (uk) return generic("Про проєкт", "Про F1 Dashboard: незалежний фанатський сайт зі статистикою Формули-1, звідки дані (f1db, OpenF1, Wikimedia Commons), точність і незалежність.", "Незалежний фанатський сайт зі статистикою Формули-1.");
       return generic(
         "About",
         "About F1 Dashboard: an independent, fan-made Formula 1 statistics site: where the data comes from (f1db, OpenF1, Wikimedia Commons), accuracy and independence.",
         "An independent, fan-made Formula 1 statistics site.",
       );
     case "privacy":
+      if (uk) return generic("Політика конфіденційності", "Як F1 Dashboard працює з даними: Google Analytics, що зберігається у браузері, форма відгуку, сторонній контент і хостинг.", "Як F1 Dashboard працює з даними.");
       return generic(
         "Privacy Policy",
         "How F1 Dashboard handles data: Google Analytics, what is stored in your browser, the feedback form, third-party content and hosting.",
         "How F1 Dashboard handles data.",
       );
     case "support":
+      if (uk) return generic("Підтримати F1 Dashboard", "F1 Dashboard безкоштовний, без реклами й облікових записів. Донати допомагають оплачувати хостинг і розробку.", "Безкоштовно, без реклами й облікових записів.");
       return generic(
         "Support F1 Dashboard",
         "F1 Dashboard is free, with no ads and no accounts. Donations help pay for hosting and development.",
         "Free, no ads, no accounts — donations keep it running.",
       );
     case "feedback":
+      if (uk) return generic("Відгук", "Надішліть відгук, повідомте про помилку чи запропонуйте функцію для F1 Dashboard.");
       return generic("Feedback", "Send feedback, report a bug or suggest a feature for F1 Dashboard.");
     default:
-      return page(null, BASE_DESC, { kind: "default", title: "F1 Dashboard", subtitle: "Formula 1 stats, 1950 to today." });
+      return pg(null, uk ? BASE_DESC_UK : BASE_DESC, { kind: "default", title: "F1 Dashboard", subtitle: "Formula 1 stats, 1950 to today." });
   }
 }
 

@@ -20,6 +20,7 @@ import type {
 } from '../types/f1'
 import { gpTitle } from '../lib/gpNames'
 import './RaceWeekend.css'
+import { seoText } from '../lib/seoText'
 
 type Tab = 'race' | 'sprint' | 'quali' | 'practice' | 'strategy'
 
@@ -220,20 +221,15 @@ export default function RaceWeekend() {
   const story = useAsync(() => api.raceStory(season, Number(round)), [season, round])
 
   useSeo({
-    title: data
-      ? `${data.grandPrixName} GP ${data.season}: Results, Qualifying & Practice`
-      : undefined,
-    description: data
-      ? `${data.grandPrixName} Grand Prix ${data.season}: full race result, starting grid, qualifying times, practice sessions${data.sprintResults.length ? ', sprint' : ''}, fastest lap and Driver of the Day.`
-      : undefined,
+    ...(data ? seoText.race(data, lang) : {}),
     jsonLd: data
       ? [
           raceLd(data),
           breadcrumbLd([
-            { name: 'Home', path: '/' },
-            { name: 'Calendar', path: '/calendar' },
+            { name: t('nav.home'), path: '/' },
+            { name: t('nav.calendar'), path: '/calendar' },
             {
-              name: `${data.grandPrixName} GP ${data.season}`,
+              name: `${gpTitle(data.grandPrixName, lang)} ${data.season}`,
               path: `/calendar/${data.season}/${data.round}`,
             },
           ]),

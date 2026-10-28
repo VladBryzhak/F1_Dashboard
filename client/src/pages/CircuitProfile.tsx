@@ -12,6 +12,7 @@ import { breadcrumbLd } from '../lib/jsonld'
 import type { CircuitTally } from '../types/f1'
 import { gpShort, gpTitle } from '../lib/gpNames'
 import './CircuitProfile.css'
+import { seoText } from '../lib/seoText'
 
 function Tally({
   title,
@@ -51,16 +52,7 @@ export default function CircuitProfile() {
   const { data: c, loading, error } = useAsync(() => api.circuitProfile(circuitId), [circuitId])
 
   useSeo({
-    title: c ? `${c.name}: F1 Circuit Guide, Lap Record & Winners` : undefined,
-    description: c
-      ? `${c.name} (${c.placeName}): ${[
-          c.length != null ? `${c.length} km` : '',
-          c.turns != null ? `${c.turns} turns` : '',
-          `${c.racesHeld} Formula 1 Grands Prix${c.firstYear ? ` since ${c.firstYear}` : ''}`,
-        ]
-          .filter(Boolean)
-          .join(', ')}. Race lap record, most successful drivers and teams, and every winner.`
-      : undefined,
+    ...(c ? seoText.circuit(c, lang) : {}),
     jsonLd: c
       ? [
           {
@@ -73,8 +65,8 @@ export default function CircuitProfile() {
               : {}),
           },
           breadcrumbLd([
-            { name: 'Home', path: '/' },
-            { name: 'Circuits', path: '/circuits' },
+            { name: t('nav.home'), path: '/' },
+            { name: t('nav.circuits'), path: '/circuits' },
             { name: c.name, path: `/circuits/${c.circuitId}` },
           ]),
         ]

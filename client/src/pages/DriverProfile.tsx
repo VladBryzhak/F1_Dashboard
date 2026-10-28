@@ -14,6 +14,7 @@ import { gpShort } from '../lib/gpNames'
 import { driverSummary } from '../lib/summaries'
 import type { DriverProfile as Profile } from '../types/f1'
 import '../styles/profile.css'
+import { seoText } from '../lib/seoText'
 
 // Whole years between two yyyy-mm-dd dates (to today when `to` is null).
 function yearsBetween(from: string, to: string | null): number | null {
@@ -85,18 +86,13 @@ export default function DriverProfile() {
   const color = teamColor(lastTeamId)
 
   useSeo({
-    title: profile
-      ? `${profile.givenName} ${profile.familyName}: F1 Career Stats`
-      : undefined,
-    description: profile
-      ? `${profile.givenName} ${profile.familyName}'s Formula 1 career: ${profile.championships} title${profile.championships === 1 ? '' : 's'}, ${profile.wins} wins, ${profile.podiums} podiums and ${profile.races} races from ${profile.firstSeason} to ${profile.lastSeason}.`
-      : undefined,
+    ...(profile ? seoText.driver(profile, lang) : {}),
     jsonLd: profile
       ? [
           driverLd(profile),
           breadcrumbLd([
-            { name: 'Home', path: '/' },
-            { name: 'Drivers', path: '/drivers' },
+            { name: t('nav.home'), path: '/' },
+            { name: t('nav.drivers'), path: '/drivers' },
             {
               name: `${profile.givenName} ${profile.familyName}`,
               path: `/drivers/${profile.driverId}`,

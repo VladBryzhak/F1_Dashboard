@@ -3,6 +3,7 @@ import Breadcrumbs from '../components/Breadcrumbs'
 import { useSeo } from '../hooks/useSeo'
 import { useI18n } from '../i18n/core'
 import './Doc.css'
+import { seoText } from '../lib/seoText'
 
 // Bump when the text below changes.
 const UPDATED = '2026-10-23'
@@ -184,9 +185,7 @@ function PrivacyUk({ updated }: { updated: string }) {
 export default function Privacy() {
   const { t, lang, fmtDate } = useI18n()
   useSeo({
-    title: 'Privacy Policy',
-    description:
-      'How F1 Dashboard handles data: Google Analytics, what is stored in your browser, the feedback form, third-party content and hosting.',
+    ...seoText.privacy(lang),
   })
   const updated = fmtDate(UPDATED, { day: 'numeric', month: 'long', year: 'numeric' })
   return (

@@ -13,6 +13,7 @@ import { breadcrumbLd, teamLd } from '../lib/jsonld'
 import { teamColor } from '../lib/f1meta'
 import { teamSummary } from '../lib/summaries'
 import '../styles/profile.css'
+import { seoText } from '../lib/seoText'
 
 export default function TeamProfile() {
   const { slug: constructorId } = useParams<{ slug: string }>()
@@ -26,16 +27,13 @@ export default function TeamProfile() {
   const color = teamColor(constructorId ?? '')
 
   useSeo({
-    title: profile ? `${profile.name}: F1 History, Titles & Wins` : undefined,
-    description: profile
-      ? `${profile.name} in Formula 1: ${profile.championships} constructors' title${profile.championships === 1 ? '' : 's'}, ${profile.wins} wins, ${profile.podiums} podiums and ${profile.races} races since ${profile.firstSeason}.`
-      : undefined,
+    ...(profile ? seoText.team(profile, lang) : {}),
     jsonLd: profile
       ? [
           teamLd(profile),
           breadcrumbLd([
-            { name: 'Home', path: '/' },
-            { name: 'Teams', path: '/teams' },
+            { name: t('nav.home'), path: '/' },
+            { name: t('nav.teams'), path: '/teams' },
             {
               name: profile.name,
               path: `/teams/${profile.constructorId}`,

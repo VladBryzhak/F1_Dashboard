@@ -92,11 +92,12 @@ export async function pageHtml(file: string, rawPath: string, userAgent = "", no
   const pagePath = rawPath.replace(UK_PREFIX, "") || "/";
   if (uk) html = html.replace('<html lang="en">', '<html lang="uk">');
   let meta: PageMeta | null = null;
+  const lang = uk ? "uk" : "en";
   if (isDatasetReady()) {
-    meta = await describePage(pagePath).catch(() => null);
+    meta = await describePage(pagePath, lang).catch(() => null);
   } else if (BOT.test(userAgent)) {
     meta = await Promise.race<PageMeta | null>([
-      describePage(pagePath).catch(() => null),
+      describePage(pagePath, lang).catch(() => null),
       new Promise((r) => setTimeout(() => r(null), BOT_WAIT_MS)),
     ]);
   } else {
@@ -121,12 +122,27 @@ export async function pageHtml(file: string, rawPath: string, userAgent = "", no
   html = setTag(html, 'property="og:image:height"', "630");
   html = setTag(html, 'name="twitter:image"', image);
 
+  // The page in both languages, so search engines pair them (English is the
+  // default for everyone else).
+  const bare = pagePath.split("?")[0].replace(/\/+$/, "");
+  const enUrl = SITE_URL + (bare || "/");
+  const ukUrl = SITE_URL + "/uk" + bare;
+  html = html.replace(
+    "</head>",
+    `<link rel="alternate" hreflang="en" href="${attr(enUrl)}" />` +
+      `<link rel="alternate" hreflang="uk" href="${attr(ukUrl)}" />` +
+      `<link rel="alternate" hreflang="x-default" href="${attr(enUrl)}" />` +
+      `<meta property="og:locale" content="${uk ? "uk_UA" : "en_GB"}" />` +
+      `<meta property="og:locale:alternate" content="${uk ? "en_GB" : "uk_UA"}" />` +
+      "</head>",
+  );
+
   const clean = pagePath.split("?")[0].replace(/\/+$/, "");
   if (clean === "" && isDatasetReady()) html = html.replace("</head>", `${await homeBoot()}</head>`);
   // Crawlers also get the page's text and links in #root (see snapshot.ts);
   // people get the empty root and the app, so their first paint is unchanged.
   if (BOT.test(userAgent) && isDatasetReady()) {
-    const snapshot = await pageSnapshot(pagePath).catch(() => "");
+    const snapshot = await pageSnapshot(pagePath, lang).catch(() => "");
     if (snapshot) html = html.replace('<div id="root"></div>', `<div id="root">${snapshot}</div>`);
   }
   // Every <script> of ours (the app bundle, the inlined home data) carries the

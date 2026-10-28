@@ -12,6 +12,7 @@ import { useI18n } from '../i18n/core'
 import { teamColor } from '../lib/f1meta'
 import { gpShort, gpTitle } from '../lib/gpNames'
 import './Calendar.css'
+import { seoText } from '../lib/seoText'
 
 export default function Calendar() {
   const { season: seasonParam } = useParams()
@@ -31,8 +32,7 @@ export default function Calendar() {
   const [subOpen, setSubOpen] = useState(false)
 
   useSeo({
-    title: `${season} F1 Race Calendar & Results`,
-    description: `The ${season} Formula 1 race calendar with winners, teams and full results for every Grand Prix.`,
+    ...seoText.calendar(season, lang),
     canonicalPath,
   })
   const { data, loading, error } = useAsync(() => api.calendar(season), [season])

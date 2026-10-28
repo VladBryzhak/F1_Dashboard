@@ -13,7 +13,7 @@ import standingsRouter from "./routes/standings";
 import telemetryRouter from "./routes/telemetry";
 import { previewPng } from "./services/og";
 import { cspHeader, newNonce } from "./services/csp";
-import { isUkPath, pageHtml } from "./services/pageHtml";
+import { pageHtml } from "./services/pageHtml";
 import { sitemapXml } from "./services/sitemap";
 
 const app = express();
@@ -112,9 +112,6 @@ if (fs.existsSync(clientDist)) {
       // Crawlers get a text snapshot in the page (pageHtml), people don't.
       const nonce = newNonce();
       const html = await pageHtml(path.join(clientDist, "index.html"), req.path, req.get("user-agent"), nonce);
-      // Ukrainian pages stay out of search results until their titles,
-      // descriptions and crawler text are in Ukrainian too.
-      if (isUkPath(req.path)) res.set("X-Robots-Tag", "noindex");
       res.vary("User-Agent").set("Content-Security-Policy", cspHeader(nonce)).type("html").send(html);
     } catch (err) {
       next(err);

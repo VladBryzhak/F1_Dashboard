@@ -9,6 +9,7 @@ import { useSeasonRoute } from '../hooks/useSeasonRoute'
 import { useSeo } from '../hooks/useSeo'
 import { SAMPLE_CONSTRUCTOR_STANDINGS } from '../lib/sampleData'
 import { useI18n } from '../i18n/core'
+import { seoText } from '../lib/seoText'
 
 type View = 'grid' | 'search'
 
@@ -19,11 +20,10 @@ export default function Teams() {
     slug,
   )
   const [view, setView] = useState<View>('grid')
-  const { t } = useI18n()
+  const { t, lang } = useI18n()
 
   useSeo({
-    title: `${season} F1 Teams & Constructors`,
-    description: `Formula 1 constructors on the ${season} grid, plus a searchable index of every constructor since 1950, with links to full team histories.`,
+    ...seoText.teams(season, lang),
     canonicalPath,
   })
   const { data, loading, error } = useAsync(

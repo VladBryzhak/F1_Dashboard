@@ -7,16 +7,15 @@ import { trackEvent } from '../lib/analytics'
 import { MONO_JAR_URL, SUPPORT_READY } from '../lib/support'
 import './Doc.css'
 import './Support.css'
+import { seoText } from '../lib/seoText'
 
 // "Support the project": a Monobank jar (any bank card, Apple / Google Pay)
 // as a plain link plus a QR code for scanning from a desktop screen. No
 // third-party widgets or scripts — the payment happens on monobank's page.
 export default function Support() {
-  const { t } = useI18n()
+  const { t, lang } = useI18n()
   useSeo({
-    title: 'Support F1 Dashboard',
-    description:
-      'F1 Dashboard is free, with no ads and no accounts. Donations help pay for hosting and development.',
+    ...seoText.support(lang),
   })
 
   return (

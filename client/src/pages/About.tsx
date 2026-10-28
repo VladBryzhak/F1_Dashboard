@@ -4,6 +4,7 @@ import { useSeo } from '../hooks/useSeo'
 import { useI18n } from '../i18n/core'
 import { SHOW_SUPPORT_LINKS } from '../lib/support'
 import './Doc.css'
+import { seoText } from '../lib/seoText'
 
 function Ext({ href, children }: { href: string; children: React.ReactNode }) {
   return (
@@ -175,9 +176,7 @@ function AboutUk() {
 export default function About() {
   const { t, lang } = useI18n()
   useSeo({
-    title: 'About',
-    description:
-      'About F1 Dashboard: an independent, fan-made Formula 1 statistics site: where the data comes from (f1db, OpenF1, Wikimedia Commons), accuracy and independence.',
+    ...seoText.about(lang),
   })
   return (
     <section className="doc">

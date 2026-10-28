@@ -14,6 +14,10 @@ import { SITE_URL } from "./pageHtml";
 // (profiles, races, circuits, standings and calendars of recent seasons) and
 // leaves out the per-year driver/team lists, which repeat the standings, and
 // /<section>/<current year>, which is the same page as /<section>.
+// Ukrainian twins (/uk/…) are listed for the current season's pages only (the
+// sections, this season's races, today's grid and calendar circuits), so a
+// young site's crawl isn't spread over twice as many pages at once; the pages
+// pair the two languages with hreflang either way.
 
 const RECENT_SEASONS = 10; // standings + calendar pages per year
 const RACE_SEASONS = 2; // seasons whose race pages are listed
@@ -35,13 +39,19 @@ async function entries(): Promise<Entry[]> {
     seen.add(path);
     out.push({ path, lastmod });
   };
+  const ukPaths: Entry[] = [];
+  const addUk = (path: string, lastmod?: string) => ukPaths.push({ path: path === "/" ? "/uk" : `/uk${path}`, lastmod });
 
   // The latest race run (the date the current-season pages last changed).
   const currentCal = await getCalendar(String(current));
   const done = currentCal.races.filter((r) => r.winnerDriverId);
   const lastRun = done.length ? done[done.length - 1].date : undefined;
 
-  for (const p of STATIC_PAGES) add(p, ["/", "/standings", "/calendar", "/drivers", "/teams"].includes(p) ? lastRun : undefined);
+  for (const p of STATIC_PAGES) {
+    const lastmod = ["/", "/standings", "/calendar", "/drivers", "/teams"].includes(p) ? lastRun : undefined;
+    add(p, lastmod);
+    addUk(p, lastmod);
+  }
 
   for (let y = current - 1; y > current - RECENT_SEASONS; y--) {
     add(`/standings/${y}`);
@@ -51,7 +61,11 @@ async function entries(): Promise<Entry[]> {
   // Race pages: every round run in the current and previous seasons.
   for (let y = current; y > current - RACE_SEASONS; y--) {
     const cal = y === current ? currentCal : await getCalendar(String(y));
-    for (const r of cal.races) if (r.winnerDriverId) add(`/calendar/${y}/${r.round}`, r.date);
+    for (const r of cal.races) {
+      if (!r.winnerDriverId) continue;
+      add(`/calendar/${y}/${r.round}`, r.date);
+      if (y === current) addUk(`/calendar/${y}/${r.round}`, r.date);
+    }
   }
 
   // Drivers and teams: the recent grids, then every champion.
@@ -61,6 +75,10 @@ async function entries(): Promise<Entry[]> {
     const [d, c] = await Promise.all([getDriverStandings(String(y)), getConstructorStandings(String(y))]);
     d.standings.forEach((s) => drivers.add(s.driverId));
     c.standings.forEach((s) => teams.add(s.constructorId));
+    if (y === current) {
+      d.standings.forEach((s) => addUk(`/drivers/${s.driverId}`));
+      c.standings.forEach((s) => addUk(`/teams/${s.constructorId}`));
+    }
   }
   for (let y = 1950; y < current; y++) {
     const [d, c] = await Promise.all([
@@ -78,8 +96,9 @@ async function entries(): Promise<Entry[]> {
   // Circuits: the current calendar and the classic tracks the site draws.
   for (const c of await getCircuits()) {
     if (c.onCurrentCalendar || c.outline) add(`/circuits/${c.circuitId}`);
+    if (c.onCurrentCalendar) addUk(`/circuits/${c.circuitId}`);
   }
-  return out;
+  return [...out, ...ukPaths];
 }
 
 const xmlEsc = (s: string) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;");

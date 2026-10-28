@@ -168,6 +168,8 @@ const en = {
   'circ.next': 'Next race here: {gp}, {date}',
   'circ.hostedGps': 'Grands Prix: {list}',
   'circ.viewCircuit': 'Circuit guide',
+  'plural.turns_one': '{n} turn',
+  'plural.turns_other': '{n} turns',
   'plural.races_one': '{n} race',
   'plural.races_other': '{n} races',
 

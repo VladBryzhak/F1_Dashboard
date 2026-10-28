@@ -17,6 +17,7 @@ import {
 } from '../lib/live'
 import type { LiveBoard, LiveDriverDetail, LiveLap } from '../types/f1'
 import './Live.css'
+import { seoText } from '../lib/seoText'
 
 const REFRESH_MS = 7000
 
@@ -134,14 +135,12 @@ function DriverDetail({
 }
 
 export default function Live() {
+  const { t, lang } = useI18n()
   useSeo({
-    title: 'Live Timing',
-    description:
-      'Live Formula 1 timing board: positions, gaps, lap times, sectors, mini-sectors and tyres, with expandable per-driver detail.',
+    ...seoText.live(lang),
   })
 
   const status = useLiveStatus(30000)
-  const { t } = useI18n()
   const sessionName = (name: string) => sessionLabel(name, t)
   const now = useNow()
   const [mode, setMode] = useState<'live' | 'replay'>('live')

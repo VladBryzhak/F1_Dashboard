@@ -14,6 +14,7 @@ import { useAsync } from '../hooks/useAsync'
 import { useSeo } from '../hooks/useSeo'
 import { useI18n } from '../i18n/core'
 import './Telemetry.css'
+import { seoText } from '../lib/seoText'
 
 // Recharts tooltip box on the panel surface with a hairline, as the cards.
 const TOOLTIP = {
@@ -38,13 +39,11 @@ export default function Telemetry() {
   const [sessionKey, setSessionKey] = useState<number | null>(null)
   const [driverNumber, setDriverNumber] = useState<number | null>(null)
 
+  const { t, lang } = useI18n()
   useSeo({
-    title: 'F1 Telemetry: Speed, Throttle & Lap Traces',
-    description:
-      'Past-race Formula 1 telemetry: speed, throttle, brake, gear and DRS traces lap by lap, from 2023 onward (OpenF1).',
+    ...seoText.telemetry(lang),
   })
   const [lapNumber, setLapNumber] = useState<number | null>(null)
-  const { t } = useI18n()
 
   const sessions = useAsync(() => api.telemetrySessions(season), [season])
   const drivers = useAsync(

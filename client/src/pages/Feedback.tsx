@@ -3,14 +3,14 @@ import { api } from '../api/client'
 import { useSeo } from '../hooks/useSeo'
 import { useI18n } from '../i18n/core'
 import './Feedback.css'
+import { seoText } from '../lib/seoText'
 
 type Status = 'idle' | 'sending' | 'sent' | 'error'
 
 export default function Feedback() {
+  const { t, lang } = useI18n()
   useSeo({
-    title: 'Feedback',
-    description:
-      'Send feedback, report a bug or suggest a feature for F1 Dashboard.',
+    ...seoText.feedback(lang),
   })
 
   const [message, setMessage] = useState('')
@@ -18,7 +18,6 @@ export default function Feedback() {
   const [website, setWebsite] = useState('') // honeypot: real users leave it empty
   const [status, setStatus] = useState<Status>('idle')
   const [error, setError] = useState('')
-  const { t } = useI18n()
 
   async function onSubmit(e: FormEvent) {
     e.preventDefault()

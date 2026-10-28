@@ -8,6 +8,7 @@ import { driverPortraitUrl, teamColor } from '../lib/f1meta'
 import type { DriverProfile, SeasonComparison as SeasonCmp } from '../types/f1'
 import { useI18n } from '../i18n/core'
 import './Compare.css'
+import { seoText } from '../lib/seoText'
 
 type View = 'career' | 'season'
 
@@ -246,10 +247,9 @@ function SeasonComparison({ data, photoA, photoB }: { data: SeasonCmp; photoA?: 
 }
 
 export default function Compare() {
+  const { t, lang } = useI18n()
   useSeo({
-    title: 'F1 Driver Comparison: Head to Head',
-    description:
-      'Compare any two Formula 1 drivers head-to-head: championships, wins, podiums, points and their race-by-race record, over a career or a single season.',
+    ...seoText.compare(lang),
   })
   const drivers = useAsync(() => api.drivers(), [])
   // Wikimedia driver photos (shared map, cached server-side). Optional: a
@@ -259,7 +259,6 @@ export default function Compare() {
   const [idB, setIdB] = useState(DEFAULT_B)
   const [view, setView] = useState<View>('career')
   const [season, setSeason] = useState<number | null>(null)
-  const { t } = useI18n()
 
   const cmp = useAsync(
     () => api.compareDrivers(idA, idB),

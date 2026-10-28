@@ -9,6 +9,7 @@ import { useI18n, type TKey } from '../i18n/core'
 import { countryName } from '../lib/countries'
 import type { CircuitSummary } from '../types/f1'
 import './Circuits.css'
+import { seoText } from '../lib/seoText'
 
 function CircuitTile({ c }: { c: CircuitSummary }) {
   const { t, tn, locale } = useI18n()
@@ -42,11 +43,9 @@ function CircuitTile({ c }: { c: CircuitSummary }) {
 }
 
 export default function Circuits() {
-  const { t, locale } = useI18n()
+  const { t, locale, lang } = useI18n()
   useSeo({
-    title: 'F1 Circuits: Track Maps, Lap Records & Winners',
-    description:
-      'Formula 1 circuits on the current calendar and classic tracks: track maps, length, turns, race lap records, layouts and every winner at each venue.',
+    ...seoText.circuits(lang),
   })
   const { data, loading, error } = useAsync(() => api.circuits(), [])
   const [q, setQ] = useState('')

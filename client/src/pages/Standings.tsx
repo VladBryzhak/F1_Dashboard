@@ -16,6 +16,7 @@ import {
   SAMPLE_CONSTRUCTOR_STANDINGS,
   SAMPLE_DRIVER_STANDINGS,
 } from '../lib/sampleData'
+import { seoText } from '../lib/seoText'
 
 type Tab = 'drivers' | 'constructors' | 'progression'
 
@@ -29,8 +30,7 @@ export default function Standings() {
   const { t, lang } = useI18n()
 
   useSeo({
-    title: `${season} F1 Championship Standings`,
-    description: `Formula 1 drivers' and constructors' championship standings for the ${season} season: points, wins and gaps to the leader.`,
+    ...seoText.standings(season, lang),
     canonicalPath,
   })
 
