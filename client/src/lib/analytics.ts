@@ -51,11 +51,14 @@ function loadGtag(granted: boolean): void {
   if (loaded) return
   loaded = true
   window.dataLayer = window.dataLayer || []
-  // gtag pushes the raw `arguments` object onto dataLayer; with a rest param we
-  // push the equivalent arguments array, which GA reads the same way.
-  window.gtag = function gtag(...args: unknown[]) {
-    window.dataLayer.push(args)
-  }
+  // Must push the real `arguments` object, exactly like Google's snippet:
+  // gtag.js only treats Arguments objects as gtag commands. A plain array
+  // (what a rest parameter gives) is read as something else, so consent,
+  // config and every event were silently ignored and nothing reached GA.
+  window.gtag = function gtag() {
+    // eslint-disable-next-line prefer-rest-params
+    window.dataLayer.push(arguments)
+  } as Window['gtag']
   // The default must be set before config so the first hit respects it.
   window.gtag('consent', 'default', {
     analytics_storage: granted ? 'granted' : 'denied',
