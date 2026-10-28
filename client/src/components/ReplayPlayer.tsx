@@ -46,7 +46,8 @@ interface Row {
   position: number | null
   last: number | null
   best: number | null
-  gl: string | null
+  gl: string | null // gap to the leader
+  iv: string | null // interval to the car ahead
   tyreCompound: string | null
   tyreAge: number | null
   sectors: Sector[]
@@ -198,6 +199,7 @@ function buildBoard(
       last: lastDone?.d ?? null,
       best,
       gl: lastDone?.gl ?? null,
+      iv: lastDone?.iv ?? null,
       tyreCompound: st?.compound ?? null,
       tyreAge: age,
       sectors,
@@ -224,6 +226,16 @@ function buildBoard(
   }
 
   rows.sort((a, b) => (a.position ?? 99) - (b.position ?? 99))
+  // Practice and qualifying: the interval is the best-lap difference to the
+  // driver ranked just above.
+  if (timed) {
+    rows.forEach((r, i) => {
+      const ahead = rows[i - 1]
+      r.iv = i > 0 && r.position != null && r.best != null && ahead?.best != null
+        ? `+${(r.best - ahead.best).toFixed(3)}`
+        : null
+    })
+  }
   return { rows, lap: maxLap }
 }
 
@@ -554,6 +566,7 @@ export default function ReplayPlayer() {
               <span className="rp-num rp-last">{tr('rp.last')}</span>
               <span className="rp-num rp-best">{tr('rp.best')}</span>
               <span className="rp-num rp-gap">{tr('wk.colGap')}</span>
+              <span className="rp-num rp-int">{tr('live.interval')}</span>
               <span>{tr('rp.tyre')}</span>
             </div>
             {board.rows.map((r) => {
@@ -595,6 +608,7 @@ export default function ReplayPlayer() {
                     <span className="rp-num rp-last mono">{fmtTime(r.last)}</span>
                     <span className="rp-num rp-best mono">{fmtTime(r.best)}</span>
                     <span className="rp-num rp-gap mono">{r.gl ?? ''}</span>
+                    <span className="rp-num rp-int mono">{r.iv ?? ''}</span>
                     <span className="rp-tyre">
                       <span className={`tyre tyre-${ty.cls}`}>{ty.label}</span>
                       {r.tyreAge != null && (
