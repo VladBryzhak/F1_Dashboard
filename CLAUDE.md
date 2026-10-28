@@ -58,7 +58,7 @@ Committed JSON built by one-off scripts, so the site makes no extra upstream cal
 
 ## Link previews (Open Graph)
 
-Social crawlers don't run JS, so the Express SPA fallback (`server/src/services/pageHtml.ts`) fills each page's `<title>`, description, canonical and OG/Twitter tags from `describePage()` in `server/src/services/og.ts`, which also draws the 1200×630 preview served at `/og/<page path>.png` (SVG → PNG with `@resvg/resvg-js`, Saira Condensed from `server/assets/fonts`, OFL). Keep its titles/descriptions in step with the pages' `useSeo` calls. On a cold start people get the page at once with default tags; crawlers wait for the dataset.
+Social crawlers don't run JS, so the Express SPA fallback (`server/src/services/pageHtml.ts`) fills each page's `<title>`, description, canonical and OG/Twitter tags from `describePage()` in `server/src/services/og.ts`, which also draws the 1200×630 preview served at `/og/<page path>.png` (SVG → PNG with `@resvg/resvg-js`, Saira Condensed from `server/assets/fonts`, OFL). Ukrainian pages get `/og/uk/<page path>.png` with Ukrainian text set in Fira Sans Extra Condensed (also OFL, in the same folder), since Saira has no Cyrillic. Keep its titles/descriptions in step with the pages' `useSeo` calls. On a cold start people get the page at once with default tags; crawlers wait for the dataset.
 
 ## Search engines (snapshot + sitemap)
 

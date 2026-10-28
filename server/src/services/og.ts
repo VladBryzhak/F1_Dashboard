@@ -51,7 +51,7 @@ type Card =
   | { kind: "race"; kicker: string; title: string; podium: { pos: number; name: string; team: string; color: string }[]; note: string | null; outline: CircuitOutline | null }
   | { kind: "driver"; first: string; last: string; meta: string; number: string | null; color: string; stats: [string, string][] }
   | { kind: "team"; name: string; meta: string; color: string; stats: [string, string][] }
-  | { kind: "standings"; season: string; rows: { pos: number; name: string; points: number; color: string }[] };
+  | { kind: "standings"; heading: string; rows: { pos: number; name: string; points: number; color: string }[] };
 
 export interface PageMeta {
   title: string; // full <title>
@@ -90,7 +90,9 @@ export async function describePage(rawPath: string, lang: Lang = "en"): Promise<
       return pg(null, uk ? BASE_DESC_UK : BASE_DESC, {
         kind: "default",
         title: "F1 Dashboard",
-        subtitle: "Standings, calendar, driver & team stats, telemetry and race replays — 1950 to today.",
+        subtitle: uk
+          ? "Залік, календар, статистика пілотів і команд, телеметрія та повтори гонок з 1950 року до сьогодні."
+          : "Standings, calendar, driver & team stats, telemetry and race replays — 1950 to today.",
       });
 
     case "standings": {
@@ -106,7 +108,7 @@ export async function describePage(rawPath: string, lang: Lang = "en"): Promise<
       const description = uk
         ? `Залік пілотів і Кубок конструкторів Формули-1 сезону ${season}: очки, перемоги та відставання від лідера.`
         : `Formula 1 drivers' and constructors' championship standings for the ${season} season: points, wins and gaps to the leader.`;
-      return rows.length ? pg(title, description, { kind: "standings", season, rows }) : generic(title, description);
+      return rows.length ? pg(title, description, { kind: "standings", heading: uk ? `Чемпіонат ${season}` : `${season} championship`, rows }) : generic(title, description);
     }
 
     case "calendar": {
@@ -127,8 +129,10 @@ export async function describePage(rawPath: string, lang: Lang = "en"): Promise<
               : `${w.grandPrixName} Grand Prix ${w.season}: full race result, starting grid, qualifying times, practice sessions${w.sprintResults.length ? ", sprint" : ""}, fastest lap and Driver of the Day.`,
             {
               kind: "race",
-              kicker: `${w.season} · Round ${w.round} · ${fmtDate(w.date)}`,
-              title: `${w.grandPrixName} GP`,
+              kicker: uk
+                ? `${w.season} · Етап ${w.round} · ${new Date(w.date).toLocaleDateString("uk-UA", { day: "numeric", month: "long" })}`
+                : `${w.season} · Round ${w.round} · ${fmtDate(w.date)}`,
+              title: uk ? gpUk : `${w.grandPrixName} GP`,
               podium,
               note: podium.length ? null : w.circuitName,
               outline,
@@ -163,14 +167,14 @@ export async function describePage(rawPath: string, lang: Lang = "en"): Promise<
               kind: "driver",
               first: p.givenName,
               last: p.familyName,
-              meta: [p.nationality, `${p.firstSeason}–${p.lastSeason}`].filter(Boolean).join(" · "),
+              meta: [uk ? ukCountry(p.countryCode) : p.nationality, `${p.firstSeason}–${p.lastSeason}`].filter(Boolean).join(" · "),
               number: p.permanentNumber,
               color: teamColor(lastTeam),
               stats: [
-                ["Titles", String(p.championships)],
-                ["Wins", String(p.wins)],
-                ["Podiums", String(p.podiums)],
-                ["Races", String(p.races)],
+                [uk ? "Титули" : "Titles", String(p.championships)],
+                [uk ? "Перемоги" : "Wins", String(p.wins)],
+                [uk ? "Подіуми" : "Podiums", String(p.podiums)],
+                [uk ? "Гонки" : "Races", String(p.races)],
               ],
             },
           );
@@ -197,13 +201,13 @@ export async function describePage(rawPath: string, lang: Lang = "en"): Promise<
             {
               kind: "team",
               name: p.name,
-              meta: [p.nationality, `${p.firstSeason}–${p.lastSeason}`].filter(Boolean).join(" · "),
+              meta: [uk ? ukCountry(p.countryCode) : p.nationality, `${p.firstSeason}–${p.lastSeason}`].filter(Boolean).join(" · "),
               color: teamColor(p.constructorId),
               stats: [
-                ["Titles", String(p.championships)],
-                ["Wins", String(p.wins)],
-                ["Podiums", String(p.podiums)],
-                ["Races", String(p.races)],
+                [uk ? "Кубки" : "Titles", String(p.championships)],
+                [uk ? "Перемоги" : "Wins", String(p.wins)],
+                [uk ? "Подіуми" : "Podiums", String(p.podiums)],
+                [uk ? "Гонки" : "Races", String(p.races)],
               ],
             },
           );
@@ -239,7 +243,15 @@ export async function describePage(rawPath: string, lang: Lang = "en"): Promise<
             return pg(
               `${c.name}: траса Формули-1, рекорд кола й переможці`,
               `${c.name} (${c.placeName}${ukCountry(c.countryCode) ? `, ${ukCountry(c.countryCode)}` : ""}): ${ukFacts.join(", ")}. Рекорд кола в гонці, найуспішніші пілоти й команди та всі переможці.`,
-              { kind: "circuit", country, place: c.placeName, name: c.name, facts, record: c.lapRecord ? `Lap record ${c.lapRecord.time} — ${c.lapRecord.driverName}, ${c.lapRecord.year}` : null, outline: c.outline },
+              {
+                kind: "circuit",
+                country: ukCountry(c.countryCode),
+                place: c.placeName,
+                name: c.name,
+                facts: ukFacts.map((f) => f.replace(/ Гран-прі Формули-1.*$/, " Гран-прі")),
+                record: c.lapRecord ? `Рекорд кола ${c.lapRecord.time}, ${c.lapRecord.driverName}, ${c.lapRecord.year}` : null,
+                outline: c.outline,
+              },
             );
           }
           return pg(
@@ -318,7 +330,11 @@ export async function describePage(rawPath: string, lang: Lang = "en"): Promise<
       if (uk) return generic("Відгук", "Надішліть відгук, повідомте про помилку чи запропонуйте функцію для F1 Dashboard.");
       return generic("Feedback", "Send feedback, report a bug or suggest a feature for F1 Dashboard.");
     default:
-      return pg(null, uk ? BASE_DESC_UK : BASE_DESC, { kind: "default", title: "F1 Dashboard", subtitle: "Formula 1 stats, 1950 to today." });
+      return pg(null, uk ? BASE_DESC_UK : BASE_DESC, {
+        kind: "default",
+        title: "F1 Dashboard",
+        subtitle: uk ? "Статистика Формули-1 з 1950 року до сьогодні." : "Formula 1 stats, 1950 to today.",
+      });
   }
 }
 
@@ -350,7 +366,7 @@ function wrap(text: string, max: number, maxLines: number): string[] {
   if (line) lines.push(line);
   if (lines.length > maxLines) {
     lines.length = maxLines;
-    lines[maxLines - 1] = lines[maxLines - 1].replace(/\s*\S*$/, "") + "…";
+    lines[maxLines - 1] = lines[maxLines - 1].replace(/\s*\S*$/, "").replace(/[,:;]$/, "") + "…";
   }
   return lines;
 }
@@ -397,11 +413,15 @@ function statTiles(stats: [string, string][], x: number, y: number, w: number): 
     .join("");
 }
 
-function draw(card: Card): string {
+function draw(card: Card, lang: Lang): string {
   switch (card.kind) {
     case "default": {
-      const lines = wrap(card.title.toUpperCase(), 22, 3);
-      const sub = wrap(card.subtitle, 58, 3);
+      // Wrap so the title clears the circuit drawings on the right
+      // (Cyrillic capitals run wider, so sooner in Ukrainian).
+      const lines = wrap(card.title.toUpperCase(), lang === "uk" ? 15 : 18, 3);
+      // Three title lines leave room for one line of subtitle above the
+      // site address.
+      const sub = wrap(card.subtitle, 58, lines.length >= 3 ? 1 : 3);
       const decor = ["monaco", "silverstone", "suzuka", "spa-francorchamps"]
         .map((id) => circuitOutline(id))
         .filter((o): o is CircuitOutline => !!o)
@@ -430,7 +450,13 @@ function draw(card: Card): string {
       `);
     }
     case "race": {
-      const title = wrap(card.title.toUpperCase(), 16, 2);
+      // Short titles fill one big line; long ones (Ukrainian "Гран-прі
+      // Великої Британії") take two smaller lines that clear the podium.
+      const upper = card.title.toUpperCase();
+      const oneLine = upper.length <= (lang === "uk" ? 12 : 16);
+      const title = oneLine ? [upper] : wrap(upper, lang === "uk" ? 18 : 22, 2);
+      const tSize = oneLine ? 88 : 60;
+      const tY = oneLine ? 230 : 205;
       const podium = card.podium
         .map((p, i) => {
           const y = 330 + i * 64;
@@ -442,7 +468,7 @@ function draw(card: Card): string {
         .join("");
       return frame(`
         ${text(64, 150, card.kicker.toUpperCase(), 26, 700, MUTED, 'letter-spacing="2"')}
-        ${title.map((l, i) => text(64, 230 + i * 84, l, 88, 800, TEXT)).join("")}
+        ${title.map((l, i) => text(64, tY + i * (tSize + 2), l, tSize, 800, TEXT)).join("")}
         ${podium || (card.note ? text(64, 360, card.note, 34, 600, MUTED) : "")}
         ${card.outline ? outlineInBox(card.outline, 700, 120, 436, 420) : ""}
       `);
@@ -487,7 +513,7 @@ function draw(card: Card): string {
         })
         .join("");
       return frame(`
-        ${text(64, 160, `${card.season} CHAMPIONSHIP`, 64, 800, TEXT)}
+        ${text(64, 160, card.heading.toUpperCase(), 64, 800, TEXT)}
         ${rows}
       `);
     }
@@ -495,12 +521,21 @@ function draw(card: Card): string {
 }
 
 const FONT_DIR = path.resolve(__dirname, "../../assets/fonts");
-const FONTS = ["Medium", "SemiBold", "Bold", "ExtraBold"].map((w) => path.join(FONT_DIR, `SairaCondensed-${w}.ttf`));
+const WEIGHTS = ["Medium", "SemiBold", "Bold", "ExtraBold"];
+// Saira Condensed has no Cyrillic, so Ukrainian cards are set in Fira Sans
+// Extra Condensed (OFL, assets/fonts/OFL-FiraSansExtraCondensed.txt), a
+// condensed sans of the same build.
+const FONT_UK = "Fira Sans Extra Condensed";
+const FONTS = [
+  ...WEIGHTS.map((w) => path.join(FONT_DIR, `SairaCondensed-${w}.ttf`)),
+  ...WEIGHTS.map((w) => path.join(FONT_DIR, `FiraSansExtraCondensed-${w}.ttf`)),
+];
 
-export function renderCard(card: Card): Buffer {
-  const svg = draw(card);
+export function renderCard(card: Card, lang: Lang = "en"): Buffer {
+  let svg = draw(card, lang);
+  if (lang === "uk") svg = svg.split(`font-family="${FONT}"`).join(`font-family="${FONT_UK}"`);
   const png = new Resvg(svg, {
-    font: { fontFiles: FONTS, loadSystemFonts: false, defaultFontFamily: FONT },
+    font: { fontFiles: FONTS, loadSystemFonts: false, defaultFontFamily: lang === "uk" ? FONT_UK : FONT },
     fitTo: { mode: "width", value: W },
   })
     .render()
@@ -513,11 +548,14 @@ const cache = new Map<string, { at: number; png: Buffer }>();
 const TTL = 6 * 3600 * 1000;
 const MAX = 300;
 
+// pagePath may carry the /uk prefix: the Ukrainian page's card.
 export async function previewPng(pagePath: string): Promise<Buffer> {
   const hit = cache.get(pagePath);
   if (hit && Date.now() - hit.at < TTL) return hit.png;
-  const meta = await describePage(pagePath);
-  const png = renderCard(meta.card);
+  const lang: Lang = /^\/uk(?=\/|$)/.test(pagePath) ? "uk" : "en";
+  const bare = pagePath.replace(/^\/uk(?=\/|$)/, "") || "/";
+  const meta = await describePage(bare, lang);
+  const png = renderCard(meta.card, lang);
   if (cache.size >= MAX) cache.delete(cache.keys().next().value as string);
   cache.set(pagePath, { at: Date.now(), png });
   return png;

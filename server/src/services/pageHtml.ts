@@ -105,7 +105,8 @@ export async function pageHtml(file: string, rawPath: string, userAgent = "", no
   }
   // The canonical URL keeps the page's own language prefix.
   const url = SITE_URL + (rawPath.split("?")[0].replace(/\/+$/, "") || "/");
-  const image = SITE_URL + previewPath(pagePath);
+  // The preview card in the page's language (/og/uk/… for Ukrainian pages).
+  const image = SITE_URL + previewPath(rawPath);
 
   if (meta) {
     html = html.replace(/<title>[^<]*<\/title>/, `<title>${attr(meta.title)}</title>`);
