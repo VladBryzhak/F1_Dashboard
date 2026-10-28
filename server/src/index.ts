@@ -12,6 +12,7 @@ import profilesRouter from "./routes/profiles";
 import standingsRouter from "./routes/standings";
 import telemetryRouter from "./routes/telemetry";
 import { previewPng } from "./services/og";
+import { cspHeader, newNonce } from "./services/csp";
 import { pageHtml } from "./services/pageHtml";
 import { sitemapXml } from "./services/sitemap";
 
@@ -19,9 +20,8 @@ const app = express();
 const PORT = process.env.PORT ?? 3001;
 
 // Security headers. HSTS + clickjacking/MIME/referrer protection are on; the
-// Content-Security-Policy is left off here and added as a separate, tailored
-// step (it must allow our external sources: formula1.com images,
-// flagcdn, OpenF1). CORP stays cross-origin so other sites may still show our
+// Content-Security-Policy is set per HTML page by the SPA fallback below
+// (services/csp.ts), since it carries a fresh nonce for each response. CORP stays cross-origin so other sites may still show our
 // link-preview images.
 // No CORS middleware: the site and its API share one origin, so browsers on
 // other sites can't read the API (it is not meant as a public API).
@@ -110,10 +110,9 @@ if (fs.existsSync(clientDist)) {
     if (req.path.startsWith("/api")) return next();
     try {
       // Crawlers get a text snapshot in the page (pageHtml), people don't.
-      res
-        .vary("User-Agent")
-        .type("html")
-        .send(await pageHtml(path.join(clientDist, "index.html"), req.path, req.get("user-agent")));
+      const nonce = newNonce();
+      const html = await pageHtml(path.join(clientDist, "index.html"), req.path, req.get("user-agent"), nonce);
+      res.vary("User-Agent").set("Content-Security-Policy", cspHeader(nonce)).type("html").send(html);
     } catch (err) {
       next(err);
     }

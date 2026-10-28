@@ -80,7 +80,7 @@ export function previewPath(pagePath: string): string {
   return `/og${clean || "/index"}.png`;
 }
 
-export async function pageHtml(file: string, pagePath: string, userAgent = ""): Promise<string> {
+export async function pageHtml(file: string, pagePath: string, userAgent = "", nonce = ""): Promise<string> {
   let html = readShell(file);
   let meta: PageMeta | null = null;
   if (isDatasetReady()) {
@@ -119,5 +119,8 @@ export async function pageHtml(file: string, pagePath: string, userAgent = ""): 
     const snapshot = await pageSnapshot(pagePath).catch(() => "");
     if (snapshot) html = html.replace('<div id="root"></div>', `<div id="root">${snapshot}</div>`);
   }
+  // Every <script> of ours (the app bundle, the inlined home data) carries the
+  // response's CSP nonce (see services/csp.ts).
+  if (nonce) html = html.replace(/<script(?![^>]*\bnonce=)/g, `<script nonce="${nonce}"`);
   return inlineCss(html, file);
 }
