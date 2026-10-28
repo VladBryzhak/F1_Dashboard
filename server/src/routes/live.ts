@@ -8,6 +8,7 @@ import {
   getReplay,
 } from "../services/live";
 
+import { DRIVER_NUMBER_MAX, SESSION_KEY_MAX, intParam } from "./params";
 const router = Router();
 
 // GET /api/live/status — is a session live now, what's next, what was last, and
@@ -33,8 +34,8 @@ router.get("/replays", async (_req, res, next) => {
 // GET /api/live/:sessionKey/replay — full replay data for a completed session.
 router.get("/:sessionKey/replay", async (req, res, next) => {
   try {
-    const key = Number(req.params.sessionKey);
-    if (!Number.isFinite(key)) {
+    const key = intParam(req.params.sessionKey, 1, SESSION_KEY_MAX);
+    if (key == null) {
       return res.status(400).json({ error: "Invalid session key." });
     }
     res.json(await getReplay(key));
@@ -57,8 +58,8 @@ router.get("/session", async (_req, res, next) => {
 // GET /api/live/:sessionKey/board — the live timing board for a session.
 router.get("/:sessionKey/board", async (req, res, next) => {
   try {
-    const key = Number(req.params.sessionKey);
-    if (!Number.isFinite(key)) {
+    const key = intParam(req.params.sessionKey, 1, SESSION_KEY_MAX);
+    if (key == null) {
       return res.status(400).json({ error: "Invalid session key." });
     }
     res.json(await getBoard(key));
@@ -70,9 +71,9 @@ router.get("/:sessionKey/board", async (req, res, next) => {
 // GET /api/live/:sessionKey/driver/:num — expanded detail for one driver.
 router.get("/:sessionKey/driver/:num", async (req, res, next) => {
   try {
-    const key = Number(req.params.sessionKey);
-    const num = Number(req.params.num);
-    if (!Number.isFinite(key) || !Number.isFinite(num)) {
+    const key = intParam(req.params.sessionKey, 1, SESSION_KEY_MAX);
+    const num = intParam(req.params.num, 1, DRIVER_NUMBER_MAX);
+    if (key == null || num == null) {
       return res.status(400).json({ error: "Invalid parameters." });
     }
     res.json(await getDriverDetail(key, num));

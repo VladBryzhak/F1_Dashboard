@@ -7,6 +7,6 @@
     "start": "npm --prefix server start"
   },
   "engines": {
-    "node": ">=18"
+    "node": ">=20"
   }
 }

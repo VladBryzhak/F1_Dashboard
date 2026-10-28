@@ -68,7 +68,7 @@ Social crawlers don't run JS, so the Express SPA fallback (`server/src/services/
 
 - Add a feature by writing a `services/*.ts` (fetch + normalize), then a `routes/*.ts` (thin Express handlers that call the service and `next(err)` on failure), then mount it in `src/index.ts`.
 - Wrap any upstream call in `cached(key, ttlSeconds, producer)` from `server/src/cache/cache.ts` (in-memory TTL cache) to protect against rate limits.
-- A single error handler in `src/index.ts` turns thrown errors into `502 { error }`.
+- A single error handler in `src/index.ts` turns thrown errors into `502 { error: "Service unavailable" }` (details only in the server log). Validate route params that reach OpenF1 or cache keys with `routes/params.ts`. No CORS: the API serves this site only.
 
 ## Environment notes (this machine)
 

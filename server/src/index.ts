@@ -1,5 +1,4 @@
 import compression from "compression";
-import cors from "cors";
 import express, { NextFunction, Request, Response } from "express";
 import fs from "fs";
 import helmet from "helmet";
@@ -22,8 +21,10 @@ const PORT = process.env.PORT ?? 3001;
 // Security headers. HSTS + clickjacking/MIME/referrer protection are on; the
 // Content-Security-Policy is left off here and added as a separate, tailored
 // step (it must allow our external sources: formula1.com images,
-// flagcdn, OpenF1). CORP is cross-origin because the API is consumed by other
-// origins (the mobile app on capacitor://localhost).
+// flagcdn, OpenF1). CORP stays cross-origin so other sites may still show our
+// link-preview images.
+// No CORS middleware: the site and its API share one origin, so browsers on
+// other sites can't read the API (it is not meant as a public API).
 // gzip/deflate text responses (HTML, JS, CSS, JSON) so they aren't sent
 // uncompressed over the wire — cuts transfer size and document latency.
 app.use(compression());
@@ -35,8 +36,7 @@ app.use(
     referrerPolicy: { policy: "strict-origin-when-cross-origin" },
   })
 );
-app.use(cors());
-app.use(express.json());
+app.use(express.json({ limit: "16kb" }));
 
 app.get("/api/health", (_req, res) => {
   res.json({ status: "ok" });
@@ -120,11 +120,18 @@ if (fs.existsSync(clientDist)) {
   });
 }
 
-// Centralized error handler.
-app.use((err: unknown, _req: Request, res: Response, _next: NextFunction) => {
+// Centralized error handler. The details (upstream URLs, third-party error
+// text) go to the server log only; clients get a generic message.
+app.use((err: unknown, req: Request, res: Response, _next: NextFunction) => {
   const message = err instanceof Error ? err.message : "Unknown error";
-  console.error("[error]", message);
-  res.status(502).json({ error: message });
+  // Errors the client caused (a body too large or not valid JSON) keep their
+  // 4xx status from the body parser.
+  const status = (err as { status?: number })?.status;
+  if (typeof status === "number" && status >= 400 && status < 500) {
+    return res.status(status).json({ error: "Bad request" });
+  }
+  console.error("[error]", req.method, req.path, message);
+  res.status(502).json({ error: "Service unavailable" });
 });
 
 app.listen(PORT, () => {
