@@ -403,6 +403,24 @@
   }
 }
 
+/* Practice and qualifying have no interval column (ranked by best lap, the
+   gap already says it), so the same steps without it. */
+.rp-board--timed .rp-row {
+  grid-template-columns: 1.6rem minmax(64px, 1fr) 3.6rem 4.4rem 4.4rem 4.3rem 3rem;
+}
+
+@container (max-width: 559px) {
+  .rp-board--timed .rp-row {
+    grid-template-columns: 1.6rem minmax(60px, 1fr) 3.6rem 4.4rem 4.3rem 3rem;
+  }
+}
+
+@container (max-width: 479px) {
+  .rp-board--timed .rp-row {
+    grid-template-columns: 1.6rem minmax(56px, 1fr) 3.6rem 4.3rem 3rem;
+  }
+}
+
 @container (max-width: 399px) {
   .rp-row {
     grid-template-columns: 1.6rem minmax(52px, 1fr) 4.2rem 4.3rem 2.9rem;
