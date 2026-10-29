@@ -134,5 +134,5 @@ app.use((err: unknown, req: Request, res: Response, _next: NextFunction) => {
 });
 
 app.listen(PORT, () => {
-  console.log(`F1 Dashboard API listening on http://localhost:${PORT}`);
+  console.log(`Paddock Times API listening on http://localhost:${PORT}`);
 });

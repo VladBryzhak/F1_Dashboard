@@ -38,10 +38,10 @@ export default function Footer() {
       <div className="footer-grid">
         <div className="footer-col footer-brand">
           <div className="footer-logo">
-            <span className="mark">F1</span> DASHBOARD
+            <span className="mark">PT</span> PADDOCK TIMES
           </div>
           <p>{t('footer.tagline')}</p>
-          <p className="footer-copy">© {year} F1 Dashboard</p>
+          <p className="footer-copy">© {year} Paddock Times</p>
         </div>
 
         <nav className="footer-col" aria-label="Footer">

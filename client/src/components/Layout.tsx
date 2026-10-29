@@ -102,7 +102,7 @@ export default function Layout() {
         className={`topbar${menuOpen ? ' menu-open' : ''}`}
       >
         <Link to="/" className="brand" title={t('nav.home')}>
-          <span className="mark">F1</span> DASHBOARD
+          <span className="mark">PT</span> PADDOCK TIMES
         </Link>
         <button
           type="button"

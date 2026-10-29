@@ -1,4 +1,4 @@
-# 🏎️ F1 Dashboard
+# 🏎️ Paddock Times
 
 A full-stack Formula 1 statistics web app: championship standings, race calendar,
 driver & team profiles, head-to-head comparisons, past-race telemetry, and a
@@ -16,7 +16,7 @@ driver & team profiles, head-to-head comparisons, past-race telemetry, and a
 
 ## Overview
 
-F1 Dashboard is a monorepo with a **React SPA** and an **Express API**. The client
+Paddock Times is a monorepo with a **React SPA** and an **Express API**. The client
 only ever talks to our own backend; the backend fetches data from free public F1
 sources, normalizes their verbose shapes into flat types, and caches everything in
 memory. One deployed web service serves both the API (`/api/*`) and the built SPA.
@@ -224,7 +224,7 @@ Open http://localhost:5173 — the Vite dev server proxies `/api` to the backend
 
 # 🇺🇦 Українська версія
 
-# 🏎️ F1 Dashboard
+# 🏎️ Paddock Times
 
 Повноцінний веб-застосунок зі статистикою Формули-1: турнірні таблиці чемпіонату,
 календар гонок, профілі пілотів і команд, порівняння «голова-в-голову», телеметрія
@@ -236,7 +236,7 @@ Open http://localhost:5173 — the Vite dev server proxies `/api` to the backend
 
 ## Огляд
 
-F1 Dashboard — це монорепозиторій із **React SPA** та **Express API**. Клієнт
+Paddock Times — це монорепозиторій із **React SPA** та **Express API**. Клієнт
 спілкується виключно з нашим бекендом; бекенд отримує дані з безкоштовних публічних
 джерел F1, нормалізує їхні громіздкі формати у плоскі типи й кешує все в пам'яті. Один
 розгорнутий веб-сервіс віддає і API (`/api/*`), і зібраний SPA.

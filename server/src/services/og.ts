@@ -19,8 +19,8 @@ import { UK, ukCountry, ukPlural } from "./ukText";
 // 1200×630 preview image from the URL. `describePage` is shared by the HTML
 // meta injection and the /og/<page path>.png image route.
 
-export const SITE = "F1 Dashboard";
-const DEFAULT_TITLE = `${SITE} — Formula 1 Standings, Calendar & Stats`;
+export const SITE = "Paddock Times";
+const DEFAULT_TITLE = `${SITE}: Formula 1 Standings, Calendar & Stats`;
 const BASE_DESC =
   "Formula 1 standings, race calendar, driver & team career stats, head-to-head comparisons and past-race telemetry — every season from 1950 to today.";
 
@@ -89,7 +89,7 @@ export async function describePage(rawPath: string, lang: Lang = "en"): Promise<
     case undefined:
       return pg(null, uk ? BASE_DESC_UK : BASE_DESC, {
         kind: "default",
-        title: "F1 Dashboard",
+        title: "Paddock Times",
         subtitle: uk
           ? "Залік, календар, статистика пілотів і команд, телеметрія та повтори гонок з 1950 року до сьогодні."
           : "Standings, calendar, driver & team stats, telemetry and race replays — 1950 to today.",
@@ -306,33 +306,33 @@ export async function describePage(rawPath: string, lang: Lang = "en"): Promise<
         "Past-race Formula 1 telemetry: speed, throttle, brake, gear and DRS traces lap by lap, from 2023 onward (OpenF1).",
       );
     case "about":
-      if (uk) return generic("Про проєкт", "Про F1 Dashboard: незалежний фанатський сайт зі статистикою Формули-1, звідки дані (f1db, OpenF1, Wikimedia Commons), точність і незалежність.", "Незалежний фанатський сайт зі статистикою Формули-1.");
+      if (uk) return generic("Про проєкт", "Про Paddock Times: незалежний фанатський сайт зі статистикою Формули-1, звідки дані (f1db, OpenF1, Wikimedia Commons), точність і незалежність.", "Незалежний фанатський сайт зі статистикою Формули-1.");
       return generic(
         "About",
-        "About F1 Dashboard: an independent, fan-made Formula 1 statistics site: where the data comes from (f1db, OpenF1, Wikimedia Commons), accuracy and independence.",
+        "About Paddock Times: an independent, fan-made Formula 1 statistics site: where the data comes from (f1db, OpenF1, Wikimedia Commons), accuracy and independence.",
         "An independent, fan-made Formula 1 statistics site.",
       );
     case "privacy":
-      if (uk) return generic("Політика конфіденційності", "Як F1 Dashboard працює з даними: Google Analytics, що зберігається у браузері, форма відгуку, сторонній контент і хостинг.", "Як F1 Dashboard працює з даними.");
+      if (uk) return generic("Політика конфіденційності", "Як Paddock Times працює з даними: Google Analytics, що зберігається у браузері, форма відгуку, сторонній контент і хостинг.", "Як Paddock Times працює з даними.");
       return generic(
         "Privacy Policy",
-        "How F1 Dashboard handles data: Google Analytics, what is stored in your browser, the feedback form, third-party content and hosting.",
-        "How F1 Dashboard handles data.",
+        "How Paddock Times handles data: Google Analytics, what is stored in your browser, the feedback form, third-party content and hosting.",
+        "How Paddock Times handles data.",
       );
     case "support":
-      if (uk) return generic("Підтримати F1 Dashboard", "F1 Dashboard безкоштовний, без реклами й облікових записів. Донати допомагають оплачувати хостинг і розробку.", "Безкоштовно, без реклами й облікових записів.");
+      if (uk) return generic("Підтримати Paddock Times", "Сайт Paddock Times безкоштовний, без реклами й облікових записів. Донати допомагають оплачувати хостинг і розробку.", "Безкоштовно, без реклами й облікових записів.");
       return generic(
-        "Support F1 Dashboard",
-        "F1 Dashboard is free, with no ads and no accounts. Donations help pay for hosting and development.",
+        "Support Paddock Times",
+        "Paddock Times is free, with no ads and no accounts. Donations help pay for hosting and development.",
         "Free, no ads, no accounts — donations keep it running.",
       );
     case "feedback":
-      if (uk) return generic("Відгук", "Надішліть відгук, повідомте про помилку чи запропонуйте функцію для F1 Dashboard.");
-      return generic("Feedback", "Send feedback, report a bug or suggest a feature for F1 Dashboard.");
+      if (uk) return generic("Відгук", "Надішліть відгук, повідомте про помилку чи запропонуйте функцію для Paddock Times.");
+      return generic("Feedback", "Send feedback, report a bug or suggest a feature for Paddock Times.");
     default:
       return pg(null, uk ? BASE_DESC_UK : BASE_DESC, {
         kind: "default",
-        title: "F1 Dashboard",
+        title: "Paddock Times",
         subtitle: uk ? "Статистика Формули-1 з 1950 року до сьогодні." : "Formula 1 stats, 1950 to today.",
       });
   }
@@ -380,8 +380,8 @@ function frame(inner: string): string {
   <rect width="${W}" height="${H}" fill="${BG}"/>
   <rect x="0" y="0" width="${W}" height="8" fill="${ACCENT}"/>
   <rect x="64" y="52" width="58" height="36" rx="6" fill="${ACCENT}"/>
-  ${text(76, 80, "F1", 28, 800, "#fff", 'font-style="italic"')}
-  ${text(134, 80, "DASHBOARD", 28, 800, TEXT, 'font-style="italic" letter-spacing="1"')}
+  ${text(93, 80, "PT", 28, 800, "#fff", 'font-style="italic" text-anchor="middle"')}
+  ${text(134, 80, "PADDOCK TIMES", 28, 800, TEXT, 'font-style="italic" letter-spacing="1"')}
   ${inner}
   ${text(64, H - 44, "f1-dashboard-bryzhak.onrender.com", 22, 600, MUTED)}
 </svg>`;

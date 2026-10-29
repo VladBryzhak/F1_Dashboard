@@ -41,7 +41,7 @@ const en = {
   // Support page
   'sup.title': 'Support the project',
   'sup.lead':
-    'F1 Dashboard is free, with no ads and no accounts. One person builds and runs it in their spare time. If the site is useful to you, you can chip in for hosting and development.',
+    'Paddock Times is free, with no ads and no accounts. One person builds and runs it in their spare time. If the site is useful to you, you can chip in for hosting and development.',
   'sup.jarTitle': 'monobank jar',
   'sup.jarText':
     'Any card from any bank, Apple Pay or Google Pay, no sign-up needed. The payment happens on monobank’s own page.',
@@ -64,7 +64,7 @@ const en = {
   // Cookie banner
   'cookie.label': 'Cookie notice',
   'cookie.text':
-    'F1 Dashboard uses Google Analytics cookies to see how the site is used, only if you accept. Without consent no analytics cookies are set.',
+    'Paddock Times uses Google Analytics cookies to see how the site is used, only if you accept. Without consent no analytics cookies are set.',
   'cookie.decline': 'Decline',
   'cookie.accept': 'Accept',
   'cookie.more': 'Privacy policy',

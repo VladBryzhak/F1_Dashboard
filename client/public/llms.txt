@@ -1,4 +1,4 @@
-# F1 Dashboard
+# Paddock Times
 
 > An unofficial Formula 1 statistics app: championship standings, race calendar
 > and results, driver & team career profiles, head-to-head comparisons, past-race

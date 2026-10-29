@@ -6,7 +6,7 @@ import { DEFAULT_SEO } from '../lib/seoText'
 // / Twitter title+description and a canonical URL as the user navigates.
 // Google renders client-side JS, so these are picked up for indexing.
 
-const SITE = 'F1 Dashboard'
+const SITE = 'Paddock Times'
 
 function upsert(selector: string, make: () => HTMLMetaElement, content: string) {
   let el = document.head.querySelector<HTMLMetaElement>(selector)

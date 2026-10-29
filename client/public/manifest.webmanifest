@@ -1,6 +1,6 @@
 {
-  "name": "F1 Dashboard",
-  "short_name": "F1 Dashboard",
+  "name": "Paddock Times",
+  "short_name": "Paddock Times",
   "description": "Formula 1 standings, race calendar, driver & team profiles, and telemetry.",
   "start_url": "/",
   "scope": "/",

@@ -14,12 +14,12 @@ export interface SeoText {
 // Site-wide default (the home page uses it).
 export const DEFAULT_SEO: Record<Lang, { title: string; description: string }> = {
   en: {
-    title: 'F1 Dashboard — Formula 1 Standings, Calendar & Stats',
+    title: 'Paddock Times: Formula 1 Standings, Calendar & Stats',
     description:
       'Formula 1 standings, race calendar, driver & team career stats, head-to-head comparisons and past-race telemetry — every season from 1950 to today.',
   },
   uk: {
-    title: 'F1 Dashboard: турнірна таблиця, календар і статистика Формули-1',
+    title: 'Paddock Times: турнірна таблиця, календар і статистика Формули-1',
     description:
       "Залік Формули-1, календар гонок, статистика кар'єри пілотів і команд, порівняння та телеметрія: кожен сезон з 1950 року до сьогодні.",
   },
@@ -194,12 +194,12 @@ export const seoText = {
       ? {
           title: 'Про проєкт',
           description:
-            'Про F1 Dashboard: незалежний фанатський сайт зі статистикою Формули-1, звідки дані (f1db, OpenF1, Wikimedia Commons), точність і незалежність.',
+            'Про Paddock Times: незалежний фанатський сайт зі статистикою Формули-1, звідки дані (f1db, OpenF1, Wikimedia Commons), точність і незалежність.',
         }
       : {
           title: 'About',
           description:
-            'About F1 Dashboard: an independent, fan-made Formula 1 statistics site: where the data comes from (f1db, OpenF1, Wikimedia Commons), accuracy and independence.',
+            'About Paddock Times: an independent, fan-made Formula 1 statistics site: where the data comes from (f1db, OpenF1, Wikimedia Commons), accuracy and independence.',
         },
 
   privacy: (lang: Lang): SeoText =>
@@ -207,35 +207,35 @@ export const seoText = {
       ? {
           title: 'Політика конфіденційності',
           description:
-            'Як F1 Dashboard працює з даними: Google Analytics, що зберігається у браузері, форма відгуку, сторонній контент і хостинг.',
+            'Як Paddock Times працює з даними: Google Analytics, що зберігається у браузері, форма відгуку, сторонній контент і хостинг.',
         }
       : {
           title: 'Privacy Policy',
           description:
-            'How F1 Dashboard handles data: Google Analytics, what is stored in your browser, the feedback form, third-party content and hosting.',
+            'How Paddock Times handles data: Google Analytics, what is stored in your browser, the feedback form, third-party content and hosting.',
         },
 
   support: (lang: Lang): SeoText =>
     uk(lang)
       ? {
-          title: 'Підтримати F1 Dashboard',
+          title: 'Підтримати Paddock Times',
           description:
-            'F1 Dashboard безкоштовний, без реклами й облікових записів. Донати допомагають оплачувати хостинг і розробку.',
+            'Сайт Paddock Times безкоштовний, без реклами й облікових записів. Донати допомагають оплачувати хостинг і розробку.',
         }
       : {
-          title: 'Support F1 Dashboard',
+          title: 'Support Paddock Times',
           description:
-            'F1 Dashboard is free, with no ads and no accounts. Donations help pay for hosting and development.',
+            'Paddock Times is free, with no ads and no accounts. Donations help pay for hosting and development.',
         },
 
   feedback: (lang: Lang): SeoText =>
     uk(lang)
       ? {
           title: 'Відгук',
-          description: 'Надішліть відгук, повідомте про помилку чи запропонуйте функцію для F1 Dashboard.',
+          description: 'Надішліть відгук, повідомте про помилку чи запропонуйте функцію для Paddock Times.',
         }
       : {
           title: 'Feedback',
-          description: 'Send feedback, report a bug or suggest a feature for F1 Dashboard.',
+          description: 'Send feedback, report a bug or suggest a feature for Paddock Times.',
         },
 }

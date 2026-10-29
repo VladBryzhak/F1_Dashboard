@@ -25,7 +25,7 @@ export async function sendFeedback(
     throw new Error("Feedback is not configured on the server.");
   }
 
-  const lines = ["🏁 New F1 Dashboard feedback", "", message];
+  const lines = ["🏁 New Paddock Times feedback", "", message];
   if (contact) lines.push("", `Contact: ${contact}`);
 
   const res = await fetch(`https://api.telegram.org/bot${TOKEN}/sendMessage`, {

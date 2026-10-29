@@ -19,14 +19,14 @@ export function siteLd(): object[] {
     {
       '@context': 'https://schema.org',
       '@type': 'Organization',
-      name: 'F1 Dashboard',
+      name: 'Paddock Times',
       url: BASE,
       logo: `${BASE}/apple-touch-icon.png`,
     },
     {
       '@context': 'https://schema.org',
       '@type': 'WebSite',
-      name: 'F1 Dashboard',
+      name: 'Paddock Times',
       url: BASE,
       description:
         'Formula 1 standings, race calendar, driver & team career stats, head-to-head comparisons and telemetry.',

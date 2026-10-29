@@ -17,9 +17,9 @@ function Ext({ href, children }: { href: string; children: React.ReactNode }) {
 function AboutEn() {
   return (
     <>
-      <h1>About F1 Dashboard</h1>
+      <h1>About Paddock Times</h1>
       <p className="doc-lead">
-        F1 Dashboard is an independent, fan-made Formula 1 statistics site. It brings championship
+        Paddock Times is an independent, fan-made Formula 1 statistics site. It brings championship
         standings, the race calendar with weekend schedules, full race weekends (race, sprint,
         qualifying and practice), circuit guides, driver and team histories since 1950, head-to-head
         comparisons, telemetry, live timing and race replays together in one place.
@@ -97,9 +97,9 @@ function AboutEn() {
 function AboutUk() {
   return (
     <>
-      <h1>Про F1 Dashboard</h1>
+      <h1>Про Paddock Times</h1>
       <p className="doc-lead">
-        F1 Dashboard: незалежний фанатський сайт зі статистикою Формули-1. Тут зібрано турнірні
+        Paddock Times: незалежний фанатський сайт зі статистикою Формули-1. Тут зібрано турнірні
         таблиці, календар із розкладом вікендів, повні вікенди (гонка, спринт, кваліфікація й
         практики), путівники трасами, історію пілотів і команд з 1950 року, порівняння пілотів,
         телеметрію, live-таймінг і повтори гонок.

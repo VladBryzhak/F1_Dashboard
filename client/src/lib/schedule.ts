@@ -67,7 +67,7 @@ export function weekendIcs(
   return [
     'BEGIN:VCALENDAR',
     'VERSION:2.0',
-    'PRODID:-//F1 Dashboard//Weekend schedule//EN',
+    'PRODID:-//Paddock Times//Weekend schedule//EN',
     'CALSCALE:GREGORIAN',
     ...events,
     'END:VCALENDAR',

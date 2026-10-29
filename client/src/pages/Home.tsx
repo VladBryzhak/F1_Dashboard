@@ -282,7 +282,7 @@ function TitleFightHero() {
       <div className="hero-content">
         <p className="hero-kicker">{t('home.titleFight')}</p>
         <h1 className="hero-title">
-          F1 <span>DASHBOARD</span>
+          PADDOCK <span>TIMES</span>
         </h1>
         <div className="hero-battle">
           <div className="battle-side battle-merc">

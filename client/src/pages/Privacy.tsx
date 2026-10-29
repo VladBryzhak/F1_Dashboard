@@ -22,7 +22,7 @@ function PrivacyEn({ updated }: { updated: string }) {
       <h1>Privacy policy</h1>
       <p className="doc-updated">Last updated: {updated}</p>
       <p className="doc-lead">
-        F1 Dashboard has no accounts and no ads, and we don&apos;t sell any data. This page explains
+        Paddock Times has no accounts and no ads, and we don&apos;t sell any data. This page explains
         what is collected when you use the site and why.
       </p>
 
@@ -103,7 +103,7 @@ function PrivacyUk({ updated }: { updated: string }) {
       <h1>Політика конфіденційності</h1>
       <p className="doc-updated">Оновлено: {updated}</p>
       <p className="doc-lead">
-        У F1 Dashboard немає облікових записів і реклами, і ми не продаємо жодних даних. Тут
+        У Paddock Times немає облікових записів і реклами, і ми не продаємо жодних даних. Тут
         пояснено, що збирається під час користування сайтом і навіщо.
       </p>
 

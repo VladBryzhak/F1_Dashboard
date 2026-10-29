@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project
 
-F1 Dashboard — a web app showing Formula 1 standings, race calendar, driver/team profiles, and past-race telemetry. Monorepo with a React frontend and an Express backend that proxies and caches public F1 APIs.
+Paddock Times (repo and Render service still named F1_Dashboard / f1-dashboard) — a web app showing Formula 1 standings, race calendar, driver/team profiles, and past-race telemetry. Monorepo with a React frontend and an Express backend that proxies and caches public F1 APIs.
 
 ## Layout
 

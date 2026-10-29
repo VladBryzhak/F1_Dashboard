@@ -183,11 +183,11 @@ export async function calendarFeed(lang: FeedLang, racesOnly: boolean): Promise<
   return [
     "BEGIN:VCALENDAR",
     "VERSION:2.0",
-    "PRODID:-//F1 Dashboard//Season calendar//EN",
+    "PRODID:-//Paddock Times//Season calendar//EN",
     "CALSCALE:GREGORIAN",
     "METHOD:PUBLISH",
     `X-WR-CALNAME:${esc(name)}`,
-    `X-WR-CALDESC:${esc(`F1 Dashboard · ${SITE}`)}`,
+    `X-WR-CALDESC:${esc(`Paddock Times · ${SITE}`)}`,
     // How often subscribed apps should re-fetch (a hint; Google decides itself).
     "REFRESH-INTERVAL;VALUE=DURATION:PT12H",
     "X-PUBLISHED-TTL:PT12H",

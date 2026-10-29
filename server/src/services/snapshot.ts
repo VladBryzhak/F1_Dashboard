@@ -77,7 +77,7 @@ function frame(c: Ctx, body: string): string {
   return (
     `<header><nav aria-label="${c.uk ? "Розділи" : "Sections"}"><ul>${nav}</ul></nav></header>` +
     `<main>${body}</main>` +
-    `<footer><p>${c.a("/about", c.uk ? "Про F1 Dashboard" : "About F1 Dashboard")} ${c.a("/privacy", c.uk ? "Конфіденційність" : "Privacy")} ${c.a("/feedback", c.uk ? "Відгук" : "Feedback")}</p>` +
+    `<footer><p>${c.a("/about", c.uk ? "Про Paddock Times" : "About Paddock Times")} ${c.a("/privacy", c.uk ? "Конфіденційність" : "Privacy")} ${c.a("/feedback", c.uk ? "Відгук" : "Feedback")}</p>` +
     `<p>${c.uk ? "Дані: f1db (CC BY 4.0) і OpenF1. Не пов'язано з Formula 1." : "Data: f1db (CC BY 4.0) and OpenF1. Not affiliated with Formula 1."}</p></footer>`
   );
 }
@@ -98,10 +98,10 @@ async function home(c: Ctx): Promise<string> {
   const st = await getDriverStandings(String(h.season)).catch(() => null);
   const gp = (name: string) => (c.uk ? gpTitle(name, "uk") : `${name} Grand Prix`);
   let body = c.uk
-    ? `<h1>F1 Dashboard: турнірна таблиця, календар і статистика Формули-1</h1>` +
+    ? `<h1>Paddock Times: турнірна таблиця, календар і статистика Формули-1</h1>` +
       `<p>Залік Формули-1, календар гонок з розкладом вікендів, повні результати гонок, путівники трасами, ` +
       `історія пілотів і команд з 1950 року, порівняння пілотів, телеметрія, live-таймінг і повтори гонок.</p>`
-    : `<h1>F1 Dashboard: Formula 1 standings, calendar and stats</h1>` +
+    : `<h1>Paddock Times: Formula 1 standings, calendar and stats</h1>` +
       `<p>Formula 1 championship standings, the race calendar with weekend schedules, full race results, ` +
       `circuit guides, driver and team histories since 1950, head-to-head comparisons, telemetry, live timing and race replays.</p>`;
   const race = h.latestRace;
@@ -436,20 +436,20 @@ const STATIC: Record<string, { en: [string, string]; uk: [string, string] }> = {
     uk: ["Телеметрія Формули-1", "Швидкість, газ, гальма, передача та DRS по колах, з 2023 року."],
   },
   about: {
-    en: ["About F1 Dashboard", "An independent, fan-made Formula 1 statistics site. Data from f1db (CC BY 4.0), OpenF1 and Wikimedia Commons."],
-    uk: ["Про F1 Dashboard", "Незалежний фанатський сайт зі статистикою Формули-1. Дані з f1db (CC BY 4.0), OpenF1 і Wikimedia Commons."],
+    en: ["About Paddock Times", "An independent, fan-made Formula 1 statistics site. Data from f1db (CC BY 4.0), OpenF1 and Wikimedia Commons."],
+    uk: ["Про Paddock Times", "Незалежний фанатський сайт зі статистикою Формули-1. Дані з f1db (CC BY 4.0), OpenF1 і Wikimedia Commons."],
   },
   privacy: {
-    en: ["Privacy policy", "How F1 Dashboard handles data: analytics with consent, what is stored in your browser, the feedback form and hosting."],
-    uk: ["Політика конфіденційності", "Як F1 Dashboard працює з даними: аналітика за згодою, що зберігається у браузері, форма відгуку та хостинг."],
+    en: ["Privacy policy", "How Paddock Times handles data: analytics with consent, what is stored in your browser, the feedback form and hosting."],
+    uk: ["Політика конфіденційності", "Як Paddock Times працює з даними: аналітика за згодою, що зберігається у браузері, форма відгуку та хостинг."],
   },
   support: {
-    en: ["Support F1 Dashboard", "F1 Dashboard is free, with no ads and no accounts. Donations help pay for hosting and development."],
-    uk: ["Підтримати F1 Dashboard", "F1 Dashboard безкоштовний, без реклами й облікових записів. Донати допомагають оплачувати хостинг і розробку."],
+    en: ["Support Paddock Times", "Paddock Times is free, with no ads and no accounts. Donations help pay for hosting and development."],
+    uk: ["Підтримати Paddock Times", "Сайт Paddock Times безкоштовний, без реклами й облікових записів. Донати допомагають оплачувати хостинг і розробку."],
   },
   feedback: {
-    en: ["Feedback", "Report a bug or suggest a feature for F1 Dashboard."],
-    uk: ["Відгук", "Повідомте про помилку чи запропонуйте функцію для F1 Dashboard."],
+    en: ["Feedback", "Report a bug or suggest a feature for Paddock Times."],
+    uk: ["Відгук", "Повідомте про помилку чи запропонуйте функцію для Paddock Times."],
   },
 };
 
