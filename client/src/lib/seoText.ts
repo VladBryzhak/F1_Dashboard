@@ -19,9 +19,9 @@ export const DEFAULT_SEO: Record<Lang, { title: string; description: string }> =
       'Formula 1 standings, race calendar, driver & team career stats, head-to-head comparisons and past-race telemetry — every season from 1950 to today.',
   },
   uk: {
-    title: 'Paddock Times: турнірна таблиця, календар і статистика Формули-1',
+    title: 'Paddock Times: залік Ф1, календар і статистика Формули-1',
     description:
-      "Залік Формули-1, календар гонок, статистика кар'єри пілотів і команд, порівняння та телеметрія: кожен сезон з 1950 року до сьогодні.",
+      "Залік Формули-1 (Ф1), календар гонок, статистика кар'єри пілотів і команд, порівняння та телеметрія: кожен сезон з 1950 року до сьогодні.",
   },
 }
 
@@ -32,7 +32,7 @@ export const seoText = {
   standings: (season: string, lang: Lang): SeoText =>
     uk(lang)
       ? {
-          title: `Залік Формули-1 ${season}: пілоти й конструктори`,
+          title: `Залік Ф1 ${season}: пілоти й конструктори Формули-1`,
           description: `Залік пілотів і Кубок конструкторів Формули-1 сезону ${season}: очки, перемоги та відставання від лідера.`,
         }
       : {
@@ -43,7 +43,7 @@ export const seoText = {
   calendar: (season: string, lang: Lang): SeoText =>
     uk(lang)
       ? {
-          title: `Календар Формули-1 ${season}: гонки й результати`,
+          title: `Календар Ф1 ${season}: гонки й результати Формули-1`,
           description: `Календар гонок Формули-1 ${season} року з переможцями, командами та повними результатами кожного Гран-прі.`,
         }
       : {
@@ -55,7 +55,7 @@ export const seoText = {
     if (uk(lang)) {
       const gp = gpTitle(w.grandPrixName, 'uk')
       return {
-        title: `${gp} ${w.season}: результати, кваліфікація й практики`,
+        title: `${gp} ${w.season}: результати Ф1, кваліфікація й практики`,
         description: `${gp} ${w.season}: повний результат гонки, стартова решітка, час кваліфікації, практики${w.sprintResults.length ? ', спринт' : ''}, найшвидше коло та пілот дня.`,
       }
     }
@@ -68,7 +68,7 @@ export const seoText = {
   drivers: (season: string, lang: Lang): SeoText =>
     uk(lang)
       ? {
-          title: `Пілоти Формули-1 ${season}`,
+          title: `Пілоти Ф1 ${season}: склад Формули-1`,
           description: `Усі пілоти Формули-1 сезону ${season} і пошук серед усіх пілотів з 1950 року, з посиланнями на повну статистику кар'єри.`,
         }
       : {
@@ -80,7 +80,7 @@ export const seoText = {
     const name = `${p.givenName} ${p.familyName}`
     if (uk(lang)) {
       return {
-        title: `${name}: статистика кар'єри у Формулі-1`,
+        title: `${name}: статистика кар'єри у Ф1`,
         description: `${name} у Формулі-1: ${n('plural.titles', p.championships)}, ${n('plural.wins', p.wins)}, ${n('plural.podiums', p.podiums)} і ${n('plural.races', p.races)} у ${p.firstSeason}-${p.lastSeason} роках.`,
       }
     }
@@ -93,7 +93,7 @@ export const seoText = {
   teams: (season: string, lang: Lang): SeoText =>
     uk(lang)
       ? {
-          title: `Команди Формули-1 ${season}`,
+          title: `Команди Ф1 ${season}: конструктори Формули-1`,
           description: `Усі конструктори Формули-1 сезону ${season} і пошук серед усіх команд з 1950 року, з посиланнями на повну історію кожної.`,
         }
       : {
@@ -104,7 +104,7 @@ export const seoText = {
   team: (p: ConstructorProfile, lang: Lang): SeoText =>
     uk(lang)
       ? {
-          title: `${p.name}: історія, титули й перемоги у Формулі-1`,
+          title: `${p.name}: історія, титули й перемоги у Ф1`,
           description: `${p.name} у Формулі-1: ${n('plural.ctitles', p.championships)}, ${n('plural.wins', p.wins)}, ${n('plural.podiums', p.podiums)} і ${n('plural.races', p.races)} з ${p.firstSeason} року.`,
         }
       : {
@@ -115,7 +115,7 @@ export const seoText = {
   circuits: (lang: Lang): SeoText =>
     uk(lang)
       ? {
-          title: 'Траси Формули-1: схеми, рекорди кола й переможці',
+          title: 'Траси Ф1: схеми, рекорди кола й переможці Формули-1',
           description:
             'Траси Формули-1 з поточного календаря та класичні: схеми, довжина, повороти, рекорди кола, конфігурації та всі переможці на кожній.',
         }
@@ -134,7 +134,7 @@ export const seoText = {
         `${c.racesHeld} Гран-прі Формули-1${c.firstYear ? ` з ${c.firstYear} року` : ''}`,
       ].filter(Boolean)
       return {
-        title: `${c.name}: траса Формули-1, рекорд кола й переможці`,
+        title: `${c.name}: траса Ф1, рекорд кола й переможці`,
         description: `${c.name} (${c.placeName}${country ? `, ${country}` : ''}): ${facts.join(', ')}. Рекорд кола в гонці, найуспішніші пілоти й команди та всі переможці.`,
       }
     }
@@ -153,7 +153,7 @@ export const seoText = {
   compare: (lang: Lang): SeoText =>
     uk(lang)
       ? {
-          title: 'Порівняння пілотів Формули-1',
+          title: 'Порівняння пілотів Ф1',
           description:
             "Порівняйте двох будь-яких пілотів Формули-1: титули, перемоги, подіуми, очки та очні дуелі за кар'єру або окремий сезон.",
         }
@@ -166,7 +166,7 @@ export const seoText = {
   live: (lang: Lang): SeoText =>
     uk(lang)
       ? {
-          title: 'Live-таймінг Формули-1',
+          title: 'Live-таймінг Ф1',
           description:
             'Live-таймінг Формули-1: позиції, відставання, час кіл, сектори, мінісектори та шини з деталями по кожному пілоту.',
         }
@@ -179,7 +179,7 @@ export const seoText = {
   telemetry: (lang: Lang): SeoText =>
     uk(lang)
       ? {
-          title: 'Телеметрія Формули-1: швидкість, газ і гальма',
+          title: 'Телеметрія Ф1: швидкість, газ і гальма',
           description:
             'Телеметрія гонок Формули-1: швидкість, газ, гальма, передача та DRS по колах, з 2023 року (OpenF1).',
         }

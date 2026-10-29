@@ -59,9 +59,9 @@ export interface PageMeta {
   card: Card;
 }
 
-const DEFAULT_TITLE_UK = `${SITE}: турнірна таблиця, календар і статистика Формули-1`;
+const DEFAULT_TITLE_UK = `${SITE}: залік Ф1, календар і статистика Формули-1`;
 const BASE_DESC_UK =
-  "Залік Формули-1, календар гонок, статистика кар'єри пілотів і команд, порівняння та телеметрія: кожен сезон з 1950 року до сьогодні.";
+  "Залік Формули-1 (Ф1), календар гонок, статистика кар'єри пілотів і команд, порівняння та телеметрія: кожен сезон з 1950 року до сьогодні.";
 
 // Titles and descriptions follow the page's language (Ukrainian pages live
 // at /uk/…); the preview card's text stays English for now.
@@ -104,7 +104,7 @@ export async function describePage(rawPath: string, lang: Lang = "en"): Promise<
         points: d.points,
         color: teamColor(d.constructorId),
       }));
-      const title = uk ? `Залік Формули-1 ${season}: пілоти й конструктори` : `${season} F1 Championship Standings`;
+      const title = uk ? `Залік Ф1 ${season}: пілоти й конструктори Формули-1` : `${season} F1 Championship Standings`;
       const description = uk
         ? `Залік пілотів і Кубок конструкторів Формули-1 сезону ${season}: очки, перемоги та відставання від лідера.`
         : `Formula 1 drivers' and constructors' championship standings for the ${season} season: points, wins and gaps to the leader.`;
@@ -122,7 +122,7 @@ export async function describePage(rawPath: string, lang: Lang = "en"): Promise<
           const gpUk = gpTitle(w.grandPrixName, "uk");
           return pg(
             uk
-              ? `${gpUk} ${w.season}: результати, кваліфікація й практики`
+              ? `${gpUk} ${w.season}: результати Ф1, кваліфікація й практики`
               : `${w.grandPrixName} GP ${w.season}: Results, Qualifying & Practice`,
             uk
               ? `${gpUk} ${w.season}: повний результат гонки, стартова решітка, час кваліфікації, практики${w.sprintResults.length ? ", спринт" : ""}, найшвидше коло та пілот дня.`
@@ -144,7 +144,7 @@ export async function describePage(rawPath: string, lang: Lang = "en"): Promise<
       const cal = await getCalendar(season).catch(() => null);
       const n = cal?.races.length ?? 0;
       return generic(
-        uk ? `Календар Формули-1 ${season}: гонки й результати` : `${season} F1 Race Calendar & Results`,
+        uk ? `Календар Ф1 ${season}: гонки й результати Формули-1` : `${season} F1 Race Calendar & Results`,
         uk
           ? `Календар гонок Формули-1 ${season} року з переможцями, командами та повними результатами кожного Гран-прі.`
           : `The ${season} Formula 1 race calendar with winners, teams and full results for every Grand Prix.`,
@@ -159,7 +159,7 @@ export async function describePage(rawPath: string, lang: Lang = "en"): Promise<
           const lastTeam = p.seasons[p.seasons.length - 1]?.constructorId ?? "";
           const name = `${p.givenName} ${p.familyName}`;
           return pg(
-            uk ? `${name}: статистика кар'єри у Формулі-1` : `${name}: F1 Career Stats`,
+            uk ? `${name}: статистика кар'єри у Ф1` : `${name}: F1 Career Stats`,
             uk
               ? `${name} у Формулі-1: ${ukPlural(p.championships, UK.titles)}, ${ukPlural(p.wins, UK.wins)}, ${ukPlural(p.podiums, UK.podiums)} і ${ukPlural(p.races, UK.races)} у ${p.firstSeason}-${p.lastSeason} роках.`
               : `${name}'s Formula 1 career: ${p.championships} title${p.championships === 1 ? "" : "s"}, ${p.wins} wins, ${p.podiums} podiums and ${p.races} races from ${p.firstSeason} to ${p.lastSeason}.`,
@@ -182,7 +182,7 @@ export async function describePage(rawPath: string, lang: Lang = "en"): Promise<
       }
       const season = isSeason(a) ? a! : current;
       return generic(
-        uk ? `Пілоти Формули-1 ${season}` : `${season} F1 Drivers`,
+        uk ? `Пілоти Ф1 ${season}: склад Формули-1` : `${season} F1 Drivers`,
         uk
           ? `Усі пілоти Формули-1 сезону ${season} і пошук серед усіх пілотів з 1950 року, з посиланнями на повну статистику кар'єри.`
           : `Every Formula 1 driver on the ${season} grid, plus a searchable index of every driver since 1950, with links to full career profiles.`,
@@ -194,7 +194,7 @@ export async function describePage(rawPath: string, lang: Lang = "en"): Promise<
         const p = await getConstructorProfile(a).catch(() => null);
         if (p) {
           return pg(
-            uk ? `${p.name}: історія, титули й перемоги у Формулі-1` : `${p.name}: F1 History, Titles & Wins`,
+            uk ? `${p.name}: історія, титули й перемоги у Ф1` : `${p.name}: F1 History, Titles & Wins`,
             uk
               ? `${p.name} у Формулі-1: ${ukPlural(p.championships, UK.ctitles)}, ${ukPlural(p.wins, UK.wins)}, ${ukPlural(p.podiums, UK.podiums)} і ${ukPlural(p.races, UK.races)} з ${p.firstSeason} року.`
               : `${p.name} in Formula 1: ${p.championships} constructors' title${p.championships === 1 ? "" : "s"}, ${p.wins} wins, ${p.podiums} podiums and ${p.races} races since ${p.firstSeason}.`,
@@ -215,7 +215,7 @@ export async function describePage(rawPath: string, lang: Lang = "en"): Promise<
       }
       const season = isSeason(a) ? a! : current;
       return generic(
-        uk ? `Команди Формули-1 ${season}` : `${season} F1 Teams & Constructors`,
+        uk ? `Команди Ф1 ${season}: конструктори Формули-1` : `${season} F1 Teams & Constructors`,
         uk
           ? `Усі конструктори Формули-1 сезону ${season} і пошук серед усіх команд з 1950 року, з посиланнями на повну історію кожної.`
           : `Formula 1 constructors on the ${season} grid, plus a searchable index of every constructor since 1950, with links to full team histories.`,
@@ -241,7 +241,7 @@ export async function describePage(rawPath: string, lang: Lang = "en"): Promise<
           ].filter(Boolean);
           if (uk) {
             return pg(
-              `${c.name}: траса Формули-1, рекорд кола й переможці`,
+              `${c.name}: траса Ф1, рекорд кола й переможці`,
               `${c.name} (${c.placeName}${ukCountry(c.countryCode) ? `, ${ukCountry(c.countryCode)}` : ""}): ${ukFacts.join(", ")}. Рекорд кола в гонці, найуспішніші пілоти й команди та всі переможці.`,
               {
                 kind: "circuit",
@@ -277,7 +277,7 @@ export async function describePage(rawPath: string, lang: Lang = "en"): Promise<
       }
       return uk
         ? generic(
-            "Траси Формули-1: схеми, рекорди кола й переможці",
+            "Траси Ф1: схеми, рекорди кола й переможці Формули-1",
             "Траси Формули-1 з поточного календаря та класичні: схеми, довжина, повороти, рекорди кола, конфігурації та всі переможці на кожній.",
           )
         : generic(
@@ -287,20 +287,20 @@ export async function describePage(rawPath: string, lang: Lang = "en"): Promise<
     }
 
     case "compare":
-      if (uk) return generic("Порівняння пілотів Формули-1", "Порівняйте двох будь-яких пілотів Формули-1: титули, перемоги, подіуми, очки та очні дуелі за кар'єру або окремий сезон.");
+      if (uk) return generic("Порівняння пілотів Ф1", "Порівняйте двох будь-яких пілотів Формули-1: титули, перемоги, подіуми, очки та очні дуелі за кар'єру або окремий сезон.");
       return generic(
         "F1 Driver Comparison: Head to Head",
         "Compare any two Formula 1 drivers head-to-head: championships, wins, podiums, points and their race-by-race record, over a career or a single season.",
       );
     case "live":
-      if (uk) return generic("Live-таймінг Формули-1", "Live-таймінг Формули-1: позиції, відставання, час кіл, сектори, мінісектори та шини з деталями по кожному пілоту.", "Live-таймінг і повтори гонок з мапою траси: кожна сесія з 2023 року.");
+      if (uk) return generic("Live-таймінг Ф1", "Live-таймінг Формули-1: позиції, відставання, час кіл, сектори, мінісектори та шини з деталями по кожному пілоту.", "Live-таймінг і повтори гонок з мапою траси: кожна сесія з 2023 року.");
       return generic(
         "Live Timing",
         "Live Formula 1 timing board: positions, gaps, lap times, sectors, mini-sectors and tyres, with expandable per-driver detail.",
         "Live timing and race replays with a track map — every session since 2023.",
       );
     case "telemetry":
-      if (uk) return generic("Телеметрія Формули-1: швидкість, газ і гальма", "Телеметрія гонок Формули-1: швидкість, газ, гальма, передача та DRS по колах, з 2023 року (OpenF1).");
+      if (uk) return generic("Телеметрія Ф1: швидкість, газ і гальма", "Телеметрія гонок Формули-1: швидкість, газ, гальма, передача та DRS по колах, з 2023 року (OpenF1).");
       return generic(
         "F1 Telemetry: Speed, Throttle & Lap Traces",
         "Past-race Formula 1 telemetry: speed, throttle, brake, gear and DRS traces lap by lap, from 2023 onward (OpenF1).",

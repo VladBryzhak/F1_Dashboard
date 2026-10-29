@@ -98,7 +98,7 @@ async function home(c: Ctx): Promise<string> {
   const st = await getDriverStandings(String(h.season)).catch(() => null);
   const gp = (name: string) => (c.uk ? gpTitle(name, "uk") : `${name} Grand Prix`);
   let body = c.uk
-    ? `<h1>Paddock Times: турнірна таблиця, календар і статистика Формули-1</h1>` +
+    ? `<h1>Paddock Times: залік Ф1, календар і статистика Формули-1</h1>` +
       `<p>Залік Формули-1, календар гонок з розкладом вікендів, повні результати гонок, путівники трасами, ` +
       `історія пілотів і команд з 1950 року, порівняння пілотів, телеметрія, live-таймінг і повтори гонок.</p>`
     : `<h1>Paddock Times: Formula 1 standings, calendar and stats</h1>` +
@@ -425,7 +425,7 @@ async function circuit(c: Ctx, id: string): Promise<string | null> {
 const STATIC: Record<string, { en: [string, string]; uk: [string, string] }> = {
   compare: {
     en: ["Compare Formula 1 drivers head to head", "Championships, wins, podiums, points and race-by-race record of any two drivers, over a career or a single season."],
-    uk: ["Порівняння пілотів Формули-1", "Титули, перемоги, подіуми, очки та очні дуелі двох будь-яких пілотів за кар'єру або окремий сезон."],
+    uk: ["Порівняння пілотів Ф1", "Титули, перемоги, подіуми, очки та очні дуелі двох будь-яких пілотів за кар'єру або окремий сезон."],
   },
   live: {
     en: ["Formula 1 live timing and race replays", "Positions, gaps, lap times, sectors and tyres during a session, and replays of every session since 2023 with a track map."],
