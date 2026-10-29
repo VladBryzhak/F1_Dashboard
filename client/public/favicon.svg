@@ -1,6 +1,17 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
-  <rect width="32" height="32" rx="6" fill="#e10600"/>
-  <text x="16" y="23" text-anchor="middle" fill="#fff"
-        font-family="Arial, Helvetica, sans-serif" font-size="16"
+  <clipPath id="t"><rect width="32" height="32" rx="6"/></clipPath>
+  <g clip-path="url(#t)">
+    <rect width="32" height="32" fill="#e10600"/>
+    <g fill="#ffffff">
+      <rect x="0" y="26" width="3" height="3"/><rect x="6" y="26" width="3" height="3"/><rect x="12" y="26" width="3" height="3"/><rect x="18" y="26" width="3" height="3"/><rect x="24" y="26" width="3" height="3"/><rect x="30" y="26" width="3" height="3"/>
+      <rect x="3" y="29" width="3" height="3"/><rect x="9" y="29" width="3" height="3"/><rect x="15" y="29" width="3" height="3"/><rect x="21" y="29" width="3" height="3"/><rect x="27" y="29" width="3" height="3"/>
+    </g>
+    <g fill="#111116">
+      <rect x="3" y="26" width="3" height="3"/><rect x="9" y="26" width="3" height="3"/><rect x="15" y="26" width="3" height="3"/><rect x="21" y="26" width="3" height="3"/><rect x="27" y="26" width="3" height="3"/>
+      <rect x="0" y="29" width="3" height="3"/><rect x="6" y="29" width="3" height="3"/><rect x="12" y="29" width="3" height="3"/><rect x="18" y="29" width="3" height="3"/><rect x="24" y="29" width="3" height="3"/><rect x="30" y="29" width="3" height="3"/>
+    </g>
+  </g>
+  <text x="15.5" y="20" text-anchor="middle" fill="#fff"
+        font-family="Arial, Helvetica, sans-serif" font-size="15"
         font-weight="900" font-style="italic">PT</text>
 </svg>

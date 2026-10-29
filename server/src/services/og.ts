@@ -374,13 +374,29 @@ function wrap(text: string, max: number, maxLines: number): string[] {
 const text = (x: number, y: number, s: string, size: number, weight: number, fill: string, extra = "") =>
   `<text x="${x}" y="${y}" font-family="${FONT}" font-size="${size}" font-weight="${weight}" fill="${fill}" ${extra}>${esc(s)}</text>`;
 
+// The brand mark's chequered band: two rows of squares along the tile's foot.
+function markBand(x: number, y: number, w: number, h: number): string {
+  const sq = h / 2;
+  let out = "";
+  for (let i = 0; i * sq < w; i++) {
+    for (let j = 0; j < 2; j++) {
+      out += `<rect x="${x + i * sq}" y="${y + j * sq}" width="${sq}" height="${sq}" fill="${(i + j) % 2 ? "#111116" : "#ffffff"}"/>`;
+    }
+  }
+  return out;
+}
+
 // The shared frame: background, brand mark, red rule and the site address.
 function frame(inner: string): string {
   return `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}">
   <rect width="${W}" height="${H}" fill="${BG}"/>
   <rect x="0" y="0" width="${W}" height="8" fill="${ACCENT}"/>
-  <rect x="64" y="52" width="58" height="36" rx="6" fill="${ACCENT}"/>
-  ${text(93, 80, "PT", 28, 800, "#fff", 'font-style="italic" text-anchor="middle"')}
+  <clipPath id="mark"><rect x="64" y="50" width="58" height="44" rx="6"/></clipPath>
+  <g clip-path="url(#mark)">
+    <rect x="64" y="50" width="58" height="44" fill="${ACCENT}"/>
+    ${markBand(64, 86, 58, 8)}
+  </g>
+  ${text(93, 78, "PT", 28, 800, "#fff", 'font-style="italic" text-anchor="middle"')}
   ${text(134, 80, "PADDOCK TIMES", 28, 800, TEXT, 'font-style="italic" letter-spacing="1"')}
   ${inner}
   ${text(64, H - 44, "f1-dashboard-bryzhak.onrender.com", 22, 600, MUTED)}

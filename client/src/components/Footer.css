@@ -75,10 +75,24 @@ nav.footer-col ul {
 }
 
 .footer-logo .mark {
+  position: relative;
+  display: inline-block;
+  overflow: hidden;
   background: var(--color-accent);
   color: var(--color-accent-ink);
-  padding: 0.05em 0.35em;
+  padding: 0.05em 0.35em 0.4em;
   border-radius: 4px;
+}
+
+/* The brand mark's chequered band (as in the header). */
+.footer-logo .mark::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 0.3em;
+  background: repeating-conic-gradient(var(--color-ink) 0 25%, var(--color-ink-dark) 0 50%) 0 0 / 0.3em 0.3em;
 }
 
 .footer-brand p {

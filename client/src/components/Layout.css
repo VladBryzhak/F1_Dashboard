@@ -35,13 +35,26 @@
 }
 
 .brand .mark {
+  position: relative;
+  overflow: hidden;
   background: var(--color-accent);
   color: var(--color-accent-ink);
   font-style: italic;
   font-weight: 900;
-  padding: 2px 8px;
+  padding: 2px 8px 8px;
   border-radius: 3px;
   font-size: 0.95rem;
+}
+
+/* The brand mark: a chequered band along the foot of the red tile. */
+.brand .mark::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 6px;
+  background: repeating-conic-gradient(var(--color-ink) 0 25%, var(--color-ink-dark) 0 50%) 0 0 / 6px 6px;
 }
 
 .nav {
