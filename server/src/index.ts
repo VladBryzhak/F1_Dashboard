@@ -108,6 +108,11 @@ if (fs.existsSync(clientDist)) {
   // (react-router) works on deep links / refreshes.
   app.get("*", async (req, res, next) => {
     if (req.path.startsWith("/api")) return next();
+    // A file we don't have (an icon a phone guesses at, like
+    // /apple-touch-icon-precomposed.png or /favicon.ico from an old build) is
+    // a plain 404: answering with the page's HTML would hand an image request
+    // a web page.
+    if (/\.[a-z0-9]{2,8}$/i.test(req.path)) return res.status(404).type("text").send("Not found");
     try {
       // Crawlers get a text snapshot in the page (pageHtml), people don't.
       const nonce = newNonce();
