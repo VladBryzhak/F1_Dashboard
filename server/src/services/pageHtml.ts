@@ -16,6 +16,7 @@ export const SITE_URL = "https://f1-dashboard-bryzhak.onrender.com";
 // dataset has loaded, so a cold start never delays the first paint.
 const BOT = /bot|crawler|spider|facebookexternalhit|facebot|whatsapp|telegram|slack|discord|linkedin|skype|embedly|vkshare|pinterest|preview/i;
 const BOT_WAIT_MS = 8000;
+export const isBot = (userAgent = "") => BOT.test(userAgent);
 
 let shell: { mtime: number; html: string } | null = null;
 function readShell(file: string): string {

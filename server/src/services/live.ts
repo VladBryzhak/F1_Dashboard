@@ -1,4 +1,5 @@
-import { cached } from "../cache/cache";
+import { cached, isPending } from "../cache/cache";
+import { OpenF1Locked, inBackground, isBackground, openF1, optional, promoteBackground } from "./openf1Client";
 import { trackLine } from "./trackLines";
 import type {
   LiveBoard,
@@ -18,38 +19,14 @@ import type {
 // Live timing from OpenF1 (https://openf1.org). For the prototype this reads a
 // completed session so it's testable off-track; the same joins work on a live
 // session because those endpoints return evolving data while a session runs.
-const BASE = "https://api.openf1.org/v1";
-const TIMEOUT_MS = 20_000;
+// Every request goes through the shared, rate-limited queue (openf1Client.ts).
+const get = openF1;
 
-async function get<T>(path: string, attempt = 0): Promise<T> {
-  let res: Response;
-  try {
-    res = await fetch(`${BASE}${path}`, {
-      headers: { Accept: "application/json" },
-      signal: AbortSignal.timeout(TIMEOUT_MS),
-    });
-  } catch (err) {
-    if (err instanceof Error && err.name === "TimeoutError") {
-      throw new Error(`OpenF1 ${path} timed out`);
-    }
-    throw err;
-  }
-  // OpenF1's free tier rate-limits bursts; back off and retry on 429.
-  if (res.status === 429 && attempt < 4) {
-    const wait = 400 * 2 ** attempt + Math.random() * 300;
-    await new Promise((r) => setTimeout(r, wait));
-    return get<T>(path, attempt + 1);
-  }
-  if (!res.ok) {
-    throw new Error(`OpenF1 ${path} failed: ${res.status}`);
-  }
-  return (await res.json()) as T;
-}
-
-interface RawSession {
+export interface RawSession {
   session_key: number;
   meeting_key?: number;
   circuit_key?: number;
+  circuit_short_name?: string;
   session_name: string;
   location: string;
   country_name: string;
@@ -113,6 +90,16 @@ interface RawRaceControl {
   scope: string | null;
   sector: number | null;
   message: string | null;
+  lap_number?: number | null;
+  driver_number?: number | null;
+}
+
+// A session's race-control messages, one request shared by the replay and
+// the race story (both read them for the same race).
+function rawRaceControl(sessionKey: number): Promise<RawRaceControl[]> {
+  return cached(`of1:rc:${sessionKey}`, REPLAY_TTL, () =>
+    get<RawRaceControl[]>(`/race_control?session_key=${sessionKey}`),
+  );
 }
 
 // Keep only the newest row per driver from a dated time-series.
@@ -176,15 +163,75 @@ function toWeather(raw: RawWeather[]): WeatherSample[] {
     .sort((a, b) => a.t - b.t);
 }
 
+// Every session of a year (practice to race), one request shared by the live
+// status, the replay list, the latest race and the telemetry race list.
+// OpenF1 publishes the calendar ahead and fills in end times as sessions
+// finish, so the current year refreshes hourly; past years don't change.
+export async function getYearSessions(year: number): Promise<RawSession[]> {
+  const current = year >= new Date().getFullYear();
+  return cached(`of1:year:${year}`, current ? 3600 : 24 * 3600, () =>
+    get<RawSession[]>(`/sessions?year=${year}`),
+  );
+}
+
+// Data counts as live (and OpenF1 locks it, see OpenF1Locked) from 30
+// minutes before a session until 30 minutes after it ends.
+const LIVE_MARGIN_MS = 30 * 60 * 1000;
+
+// A session's entry from the cached year lists (saves a request per board or
+// replay), or from OpenF1 when it isn't there.
+async function findSession(sessionKey: number): Promise<RawSession | null> {
+  for (let y = new Date().getFullYear(); y >= 2023; y--) {
+    const s = (await getYearSessions(y)).find((x) => x.session_key === sessionKey);
+    if (s) return s;
+  }
+  return (await get<RawSession[]>(`/sessions?session_key=${sessionKey}`))[0] ?? null;
+}
+
+// Has this session's data stopped changing? Its board and driver detail can
+// then be kept for long instead of a few seconds.
+async function sessionIsOver(sessionKey: number): Promise<boolean> {
+  const s = await findSession(sessionKey).catch(() => null);
+  return !s || endOf(s) + LIVE_MARGIN_MS < Date.now();
+}
+
+// Keep the replays of the last week's sessions ready: a race weekend's
+// sessions are what people open, and a cold replay takes OpenF1 about 2.5 s.
+// Fetched in the queue's background lane, so it never takes a visitor's turn;
+// one at a time; a replay already cached costs nothing. Runs a minute after
+// start and every 30 minutes (a session finishing is picked up within that).
+const WARM_DAYS = 7;
+export function warmReplays(): void {
+  const run = async () => {
+    try {
+      const now = Date.now();
+      const sessions = await getYearSessions(new Date().getFullYear());
+      const recent = sessions
+        .filter((s) => REPLAYABLE.has(s.session_name))
+        .filter((s) => endOf(s) + LIVE_MARGIN_MS < now && endOf(s) > now - WARM_DAYS * 24 * 3600 * 1000)
+        .sort((a, b) => b.date_start.localeCompare(a.date_start));
+      for (const s of recent) {
+        await inBackground(() => getReplay(s.session_key)).catch((err) =>
+          console.warn(`[openf1] warming replay ${s.session_key} failed:`, err instanceof Error ? err.message : err),
+        );
+      }
+    } catch (err) {
+      console.warn("[openf1] replay warming skipped:", err instanceof Error ? err.message : err);
+    }
+  };
+  setTimeout(run, 60_000).unref();
+  setInterval(run, 30 * 60_000).unref();
+}
+const OVER_TTL = 3600;
+const RUNNING_TTL = 8;
+
 export async function getLatestSession(): Promise<LiveSessionMeta | null> {
   return cached("live:session", 3600, async () => {
     const now = Date.now();
     const thisYear = new Date().getFullYear();
     const years = [...new Set([thisYear, thisYear - 1, 2024])];
     for (const year of years) {
-      const sessions = await get<RawSession[]>(
-        `/sessions?year=${year}&session_name=Race`,
-      );
+      const sessions = (await getYearSessions(year)).filter((s) => s.session_name === "Race");
       const past = sessions
         .filter((s) => new Date(s.date_start).getTime() < now)
         .sort(
@@ -217,25 +264,29 @@ const LOCKED: LiveStatus = {
   locked: true,
 };
 
+// Worked out from the year's schedule (cached), so the status every page
+// polls costs no OpenF1 request of its own. During a session's live window
+// OpenF1 refuses free access, so the status says "locked" then.
 export async function getLiveStatus(): Promise<LiveStatus> {
-  return cached("live:status", 30, async () => {
+  return cached("live:status", (s) => (s.locked ? 300 : 30), async () => {
     const now = Date.now();
     const year = new Date().getFullYear();
     let sessions: RawSession[];
     try {
-      sessions = await get<RawSession[]>(`/sessions?year=${year}`);
+      sessions = await getYearSessions(year);
     } catch (err) {
-      // OpenF1 returns 401 for the whole API while a session is live (paid only).
-      if (err instanceof Error && err.message.includes("401")) return LOCKED;
+      if (err instanceof OpenF1Locked) return LOCKED;
       throw err;
     }
     // Near a season boundary this year may hold no upcoming session; peek ahead.
     if (!sessions.some((s) => new Date(s.date_start).getTime() > now)) {
-      const nextYear = await get<RawSession[]>(
-        `/sessions?year=${year + 1}`,
-      ).catch(() => [] as RawSession[]);
+      const nextYear = await getYearSessions(year + 1).catch(() => [] as RawSession[]);
       sessions = sessions.concat(nextYear);
     }
+    const inLiveWindow = sessions.some(
+      (s) => new Date(s.date_start).getTime() - LIVE_MARGIN_MS <= now && now <= endOf(s) + LIVE_MARGIN_MS,
+    );
+    if (inLiveWindow) return LOCKED;
 
     let live: RawSession | null = null;
     let next: RawSession | null = null;
@@ -268,28 +319,21 @@ export async function getLiveStatus(): Promise<LiveStatus> {
 }
 
 export async function getBoard(sessionKey: number): Promise<LiveBoard> {
-  return cached(`live:board:${sessionKey}`, 8, async () => {
-    // Two batches of three to keep concurrency (and OpenF1's rate limit) sane.
-    const [sessions, drivers, stints] = await Promise.all([
-      get<RawSession[]>(`/sessions?session_key=${sessionKey}`),
+  const over = await sessionIsOver(sessionKey);
+  return cached(`live:board:${sessionKey}`, over ? OVER_TTL : RUNNING_TTL, async () => {
+    // All at once: the queue (openf1Client.ts) paces them.
+    const [raw, drivers, stints, positions, intervals, laps, rawWeather] = await Promise.all([
+      findSession(sessionKey),
       get<RawDriver[]>(`/drivers?session_key=${sessionKey}`),
       get<RawStint[]>(`/stints?session_key=${sessionKey}`),
-    ]);
-    const [positions, intervals, laps] = await Promise.all([
       get<RawPosition[]>(`/position?session_key=${sessionKey}`),
-      get<RawInterval[]>(`/intervals?session_key=${sessionKey}`).catch(
-        () => [] as RawInterval[],
-      ),
+      get<RawInterval[]>(`/intervals?session_key=${sessionKey}`).catch(optional<RawInterval[]>([])),
       get<RawLap[]>(`/laps?session_key=${sessionKey}`),
+      get<RawWeather[]>(`/weather?session_key=${sessionKey}`).catch(optional<RawWeather[]>([])),
     ]);
+    const weather = toWeather(rawWeather);
 
-    const weather = toWeather(
-      await get<RawWeather[]>(`/weather?session_key=${sessionKey}`).catch(
-        () => [] as RawWeather[],
-      ),
-    );
-
-    const session = sessions[0] ? toMeta(sessions[0]) : null;
+    const session = raw ? toMeta(raw) : null;
     if (!session) throw new Error(`Session ${sessionKey} not found`);
 
     const latestPos = latestByDriver(positions);
@@ -412,7 +456,8 @@ export async function getDriverDetail(
   sessionKey: number,
   driverNumber: number,
 ): Promise<LiveDriverDetail> {
-  return cached(`live:driver:${sessionKey}:${driverNumber}`, 8, async () => {
+  const over = await sessionIsOver(sessionKey);
+  return cached(`live:driver:${sessionKey}:${driverNumber}`, over ? OVER_TTL : RUNNING_TTL, async () => {
     const [rawLaps, rawStints, rawPits] = await Promise.all([
       get<RawLap[]>(
         `/laps?session_key=${sessionKey}&driver_number=${driverNumber}`,
@@ -422,7 +467,7 @@ export async function getDriverDetail(
       ),
       get<RawPit[]>(
         `/pit?session_key=${sessionKey}&driver_number=${driverNumber}`,
-      ).catch(() => [] as RawPit[]),
+      ).catch(optional<RawPit[]>([])),
     ]);
 
     const laps: LiveLap[] = rawLaps
@@ -480,30 +525,30 @@ export async function getDriverDetail(
 // in) plus the position time-series, so the client can play the session back on
 // a virtual clock, revealing sectors one at a time. Cached long — a finished
 // session never changes.
+// A finished session's replay doesn't change: kept a week (about 360 KB
+// each), and the last week's are fetched ahead of visitors (warmReplays).
+const REPLAY_TTL = 7 * 24 * 3600;
+
 export async function getReplay(sessionKey: number): Promise<ReplayData> {
-  return cached(`live:replay:${sessionKey}`, 6 * 3600, async () => {
-    const [sessions, drivers, stints] = await Promise.all([
-      get<RawSession[]>(`/sessions?session_key=${sessionKey}`),
+  // A visitor asking for the replay the background warming is fetching right
+  // now shouldn't wait in the background lane.
+  const key = `live:replay:${sessionKey}`;
+  if (!isBackground() && isPending(key)) promoteBackground();
+  return cached(key, REPLAY_TTL, async () => {
+    // All at once: the queue (openf1Client.ts) paces them, about 2.5 s for
+    // the seven.
+    const [raw, drivers, stints, positions, rawLaps, rawRc, rawPit, rawWeather] = await Promise.all([
+      findSession(sessionKey),
       get<RawDriver[]>(`/drivers?session_key=${sessionKey}`),
       get<RawStint[]>(`/stints?session_key=${sessionKey}`),
-    ]);
-    const [positions, rawLaps] = await Promise.all([
       get<RawPosition[]>(`/position?session_key=${sessionKey}`),
       get<RawLap[]>(`/laps?session_key=${sessionKey}`),
-    ]);
-    const [rawRc, rawPit, rawWeather] = await Promise.all([
-      get<RawRaceControl[]>(`/race_control?session_key=${sessionKey}`).catch(
-        () => [] as RawRaceControl[],
-      ),
-      get<RawPit[]>(`/pit?session_key=${sessionKey}`).catch(
-        () => [] as RawPit[],
-      ),
-      get<RawWeather[]>(`/weather?session_key=${sessionKey}`).catch(
-        () => [] as RawWeather[],
-      ),
+      rawRaceControl(sessionKey).catch(optional<RawRaceControl[]>([])),
+      get<RawPit[]>(`/pit?session_key=${sessionKey}`).catch(optional<RawPit[]>([])),
+      get<RawWeather[]>(`/weather?session_key=${sessionKey}`).catch(optional<RawWeather[]>([])),
     ]);
 
-    const session = sessions[0] ? toMeta(sessions[0]) : null;
+    const session = raw ? toMeta(raw) : null;
     if (!session) throw new Error(`Session ${sessionKey} not found`);
 
     const laps: ReplayLap[] = [];
@@ -655,7 +700,7 @@ export async function getReplay(sessionKey: number): Promise<ReplayData> {
     // In-pit windows. OpenF1's `date` comes late in the drive through the pit
     // lane, so where we know the circuit, shift it by the calibrated offset to
     // the moment the car leaves the racing line and cover the whole detour.
-    const track = trackLine(sessions[0]?.circuit_key);
+    const track = trackLine(raw?.circuit_key);
     const pits = rawPit
       .filter((p) => p.date)
       .map((p) => {
@@ -726,9 +771,7 @@ export async function getReplaySessions(): Promise<ReplaySession[]> {
     const now = Date.now();
     const out: ReplaySession[] = [];
     for (let year = new Date().getFullYear(); year >= 2023; year--) {
-      const sessions = await get<RawSession[]>(`/sessions?year=${year}`).catch(
-        () => [] as RawSession[],
-      );
+      const sessions = await getYearSessions(year);
       for (const s of sessions) {
         if (!REPLAYABLE.has(s.session_name)) continue;
         if (new Date(s.date_start).getTime() >= now) continue;
@@ -757,10 +800,8 @@ export interface RaceControlMessage {
   message: string;
 }
 export async function getRaceControl(sessionKey: number): Promise<RaceControlMessage[]> {
-  return cached(`live:rc:${sessionKey}`, 6 * 3600, async () => {
-    const rows = await get<(RawRaceControl & { lap_number?: number | null; driver_number?: number | null })[]>(
-      `/race_control?session_key=${sessionKey}`,
-    );
+  return cached(`live:rc:${sessionKey}`, REPLAY_TTL, async () => {
+    const rows = await rawRaceControl(sessionKey);
     return rows
       .filter((m) => m.date)
       .sort((a, b) => a.date.localeCompare(b.date))

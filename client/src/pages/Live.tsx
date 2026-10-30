@@ -19,6 +19,9 @@ import type { LiveBoard, LiveDriverDetail, LiveLap } from '../types/f1'
 import './Live.css'
 import { seoText } from '../lib/seoText'
 
+// How often a running session's board refreshes. A finished session's board
+// doesn't change, so it loads once (OpenF1's free tier allows 30 requests a
+// minute for the whole site, and one board refresh costs seven).
 const REFRESH_MS = 7000
 
 // A clock that ticks once a second, for the countdown.
@@ -145,13 +148,14 @@ export default function Live() {
   const now = useNow()
   const [mode, setMode] = useState<'live' | 'replay'>('live')
   const sessionKey = status?.boardSessionKey ?? null
+  const running = !!status?.live && !status.locked
 
   const [board, setBoard] = useState<LiveBoard | null>(null)
   const [boardError, setBoardError] = useState<string | null>(null)
   const [expanded, setExpanded] = useState<number | null>(null)
   const [detail, setDetail] = useState<LiveDriverDetail | null>(null)
 
-  // Poll the board while a session is selected.
+  // Load the board, and keep refreshing it while the session runs.
   useEffect(() => {
     if (sessionKey == null) {
       setBoard(null)
@@ -164,14 +168,14 @@ export default function Live() {
         .then((b) => alive && (setBoard(b), setBoardError(null)))
         .catch((e) => alive && setBoardError(e instanceof Error ? e.message : 'Error'))
     load()
-    const id = setInterval(load, REFRESH_MS)
+    const id = running ? setInterval(load, REFRESH_MS) : undefined
     return () => {
       alive = false
       clearInterval(id)
     }
-  }, [sessionKey])
+  }, [sessionKey, running])
 
-  // Poll the expanded driver's detail.
+  // The expanded driver's detail, refreshed while the session runs.
   useEffect(() => {
     if (sessionKey == null || expanded == null) {
       setDetail(null)
@@ -184,12 +188,12 @@ export default function Live() {
         .then((d) => alive && setDetail(d))
         .catch(() => {})
     load()
-    const id = setInterval(load, REFRESH_MS)
+    const id = running ? setInterval(load, REFRESH_MS) : undefined
     return () => {
       alive = false
       clearInterval(id)
     }
-  }, [sessionKey, expanded])
+  }, [sessionKey, expanded, running])
 
   return (
     <section className="live">

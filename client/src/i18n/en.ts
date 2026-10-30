@@ -220,7 +220,7 @@ const en = {
   'strat.tyres': 'Tyre strategy',
   'strat.laps': 'laps {from}-{to}',
   'strat.loading': 'Loading lap data from OpenF1…',
-  'strat.error': 'Lap data is not available right now ({error}). OpenF1 may be busy; try again in a minute.',
+  'strat.error': 'Lap data is not available right now: {error}.',
   'strat.source': 'Lap and tyre data: OpenF1 (2023 onwards). Positions are the on-track order, before any penalties.',
   'tyre.SOFT': 'Soft',
   'tyre.MEDIUM': 'Medium',
@@ -519,6 +519,11 @@ const en = {
   'nf.teamsNote': 'Every constructor since 1950',
   'nf.circuitsNote': 'Track maps, lap records and winners',
   'nf.compareNote': 'Any two drivers, head to head',
+
+  // Why an API call failed (after "Could not load …:")
+  'api.busy': 'the data source (OpenF1) is busy, please try again in a minute',
+  'api.locked': 'the data source (OpenF1) is closed to free access while a session is running and reopens 30 minutes after it ends',
+  'api.server': 'the server could not get the data, please try again later',
 }
 
 export type Dict = Record<keyof typeof en, string>

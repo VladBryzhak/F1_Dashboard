@@ -8,12 +8,14 @@ import circuitsRouter from "./routes/circuits";
 import feedbackRouter from "./routes/feedback";
 import homeRouter from "./routes/home";
 import liveRouter from "./routes/live";
+import { warmReplays } from "./services/live";
 import profilesRouter from "./routes/profiles";
 import standingsRouter from "./routes/standings";
 import telemetryRouter from "./routes/telemetry";
 import { previewPng } from "./services/og";
 import { cspHeader, newNonce } from "./services/csp";
-import { pageHtml, pageStatusFor } from "./services/pageHtml";
+import { isBot, pageHtml, pageStatusFor } from "./services/pageHtml";
+import { OpenF1Busy, OpenF1Locked, runAs } from "./services/openf1Client";
 import { sitemapXml } from "./services/sitemap";
 
 const app = express();
@@ -41,6 +43,10 @@ app.use(express.json({ limit: "16kb" }));
 app.get("/api/health", (_req, res) => {
   res.json({ status: "ok" });
 });
+
+// API calls a crawler makes while rendering a page wait less for OpenF1's
+// shared budget than people's (services/openf1Client.ts).
+app.use("/api", (req, _res, next) => runAs(isBot(req.get("user-agent")), next));
 
 app.use("/api/home", homeRouter);
 app.use("/api/feedback", feedbackRouter);
@@ -138,6 +144,13 @@ if (fs.existsSync(clientDist)) {
 // Centralized error handler. The details (upstream URLs, third-party error
 // text) go to the server log only; clients get a generic message.
 app.use((err: unknown, req: Request, res: Response, _next: NextFunction) => {
+  // OpenF1 (telemetry, live timing, replays) can't answer right now: say so,
+  // with when to try again, so the app can retry or explain instead of
+  // showing a generic failure.
+  if (err instanceof OpenF1Busy) {
+    return res.set("Retry-After", String(Math.min(Math.max(err.retryAfter, 1), 60))).status(503).json({ error: "busy" });
+  }
+  if (err instanceof OpenF1Locked) return res.status(503).json({ error: "locked" });
   const message = err instanceof Error ? err.message : "Unknown error";
   // Errors the client caused (a body too large or not valid JSON) keep their
   // 4xx status from the body parser.
@@ -151,4 +164,6 @@ app.use((err: unknown, req: Request, res: Response, _next: NextFunction) => {
 
 app.listen(PORT, () => {
   console.log(`Paddock Times API listening on http://localhost:${PORT}`);
+  // Have the last week's session replays ready before people open them.
+  warmReplays();
 });

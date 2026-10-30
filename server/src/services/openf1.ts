@@ -1,4 +1,6 @@
 import { cached } from "../cache/cache";
+import { getYearSessions } from "./live";
+import { openF1 } from "./openf1Client";
 import type {
   DriverLap,
   LapTelemetry,
@@ -8,39 +10,12 @@ import type {
 } from "../types/f1";
 
 // OpenF1 provides free historical F1 telemetry from 2023 onward.
-// Docs: https://openf1.org/
-const BASE = "https://api.openf1.org/v1";
-const REQUEST_TIMEOUT_MS = 20_000;
+// Docs: https://openf1.org/ — every request goes through the shared,
+// rate-limited queue (openf1Client.ts). A finished session's data never
+// changes, so it is kept for a day.
 const MAX_TELEMETRY_POINTS = 400;
-
-async function getJson<T>(path: string): Promise<T> {
-  let res: Response;
-  try {
-    res = await fetch(`${BASE}${path}`, {
-      headers: { Accept: "application/json" },
-      signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
-    });
-  } catch (err) {
-    if (err instanceof Error && err.name === "TimeoutError") {
-      throw new Error(`OpenF1 ${path} timed out`);
-    }
-    throw err;
-  }
-  if (!res.ok) {
-    throw new Error(`OpenF1 ${path} failed: ${res.status} ${res.statusText}`);
-  }
-  return (await res.json()) as T;
-}
-
-interface RawSession {
-  session_key: number;
-  session_name: string;
-  country_name: string;
-  location: string;
-  circuit_short_name: string;
-  date_start: string;
-  year: number;
-}
+const getJson = openF1;
+const DAY = 24 * 60 * 60;
 interface RawDriver {
   driver_number: number;
   full_name: string;
@@ -70,9 +45,9 @@ interface RawCarData {
 export async function getRaceSessions(
   season: string
 ): Promise<TelemetrySession[]> {
-  return cached(`of1:sessions:${season}`, 6 * 60 * 60, async () => {
-    const rows = await getJson<RawSession[]>(
-      `/sessions?year=${season}&session_name=Race`
+  return cached(`of1:sessions:${season}`, 60 * 60, async () => {
+    const rows = (await getYearSessions(Number(season))).filter(
+      (s) => s.session_name === "Race"
     );
     return rows
       .sort((a, b) => a.date_start.localeCompare(b.date_start))
@@ -80,27 +55,44 @@ export async function getRaceSessions(
         sessionKey: s.session_key,
         name: s.country_name,
         location: s.location,
-        circuit: s.circuit_short_name,
+        circuit: s.circuit_short_name ?? s.location,
         date: s.date_start,
       }));
   });
 }
 
+// A session's drivers as OpenF1 lists them (shared by the telemetry driver
+// list and the headshots).
+function rawDrivers(sessionKey: number): Promise<RawDriver[]> {
+  return cached(`of1:rawdrivers:${sessionKey}`, DAY, () =>
+    getJson<RawDriver[]>(`/drivers?session_key=${sessionKey}`)
+  );
+}
+
+// One driver's laps in a session (shared by the lap list and the lap
+// telemetry, which needs the lap's start time).
+function rawLaps(sessionKey: number, driverNumber: number): Promise<RawLap[]> {
+  return cached(`of1:rawlaps:${sessionKey}:${driverNumber}`, DAY, () =>
+    getJson<RawLap[]>(`/laps?session_key=${sessionKey}&driver_number=${driverNumber}`)
+  );
+}
+
 /**
  * Map of driver acronym (e.g. "VER") -> official headshot URL for a season's
- * grid. Uses the season's most recent race session. Empty for pre-2023 seasons
- * (OpenF1 has no data there); callers fall back to a placeholder.
+ * grid. Uses the season's most recent race already run. Empty for pre-2023
+ * seasons (OpenF1 has no data there); callers fall back to a placeholder.
  */
 export async function getDriverHeadshots(
   season: string
 ): Promise<Record<string, string>> {
   return cached(`of1:headshots:${season}`, 12 * 60 * 60, async () => {
-    const sessions = await getRaceSessions(season);
+    const now = Date.now();
+    const sessions = (await getRaceSessions(season)).filter(
+      (s) => Date.parse(s.date) < now
+    );
     if (!sessions.length) return {};
     const latest = sessions[sessions.length - 1].sessionKey;
-    const drivers = await getJson<RawDriver[]>(
-      `/drivers?session_key=${latest}`
-    );
+    const drivers = await rawDrivers(latest);
     const out: Record<string, string> = {};
     for (const d of drivers) {
       if (d.name_acronym && d.headshot_url) out[d.name_acronym] = d.headshot_url;
@@ -112,10 +104,8 @@ export async function getDriverHeadshots(
 export async function getSessionDrivers(
   sessionKey: number
 ): Promise<SessionDriver[]> {
-  return cached(`of1:drivers:${sessionKey}`, 24 * 60 * 60, async () => {
-    const rows = await getJson<RawDriver[]>(
-      `/drivers?session_key=${sessionKey}`
-    );
+  return cached(`of1:drivers:${sessionKey}`, DAY, async () => {
+    const rows = await rawDrivers(sessionKey);
     return rows.map((d) => ({
       driverNumber: d.driver_number,
       fullName: d.full_name,
@@ -132,11 +122,9 @@ export async function getDriverLaps(
 ): Promise<DriverLap[]> {
   return cached(
     `of1:laps:${sessionKey}:${driverNumber}`,
-    24 * 60 * 60,
+    DAY,
     async () => {
-      const rows = await getJson<RawLap[]>(
-        `/laps?session_key=${sessionKey}&driver_number=${driverNumber}`
-      );
+      const rows = await rawLaps(sessionKey, driverNumber);
       return rows.map((l) => ({
         lapNumber: l.lap_number,
         lapDuration: l.lap_duration,
@@ -156,11 +144,9 @@ export async function getLapTelemetry(
 ): Promise<LapTelemetry> {
   return cached(
     `of1:tel:${sessionKey}:${driverNumber}:${lapNumber}`,
-    24 * 60 * 60,
+    DAY,
     async () => {
-      const laps = await getJson<RawLap[]>(
-        `/laps?session_key=${sessionKey}&driver_number=${driverNumber}`
-      );
+      const laps = await rawLaps(sessionKey, driverNumber);
       const lap = laps.find((l) => l.lap_number === lapNumber);
       if (!lap || !lap.date_start) {
         throw new Error(`Lap ${lapNumber} not found for driver ${driverNumber}`);

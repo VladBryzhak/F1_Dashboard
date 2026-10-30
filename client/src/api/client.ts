@@ -1,29 +1,55 @@
 // Thin typed wrapper around our backend API. All requests go to /api, which
 // Vite proxies to the Express server in dev (see vite.config.ts).
+import { dicts, langFromPath } from '../i18n/core'
 
 // A failed API call, with its HTTP status (404: the thing asked for doesn't
-// exist, which pages show as "not found" rather than as an error).
+// exist, which pages show as "not found" rather than as an error) and, for a
+// 503, why: "busy" (OpenF1's rate limit) or "locked" (a session is live and
+// OpenF1 is closed to free access).
 export class ApiError extends Error {
   constructor(
     message: string,
     readonly status: number,
+    readonly code?: string,
   ) {
     super(message)
     this.name = 'ApiError'
   }
 }
 
-async function getJson<T>(path: string): Promise<T> {
+// The reason shown in the page's error banner ("Could not load …: <reason>"),
+// in the page's language.
+function reason(status: number, code: string | undefined, fallback: string): string {
+  const d = dicts[langFromPath(window.location.pathname)]
+  if (code === 'busy') return d['api.busy']
+  if (code === 'locked') return d['api.locked']
+  if (status >= 500) return d['api.server']
+  return fallback
+}
+
+const BUSY_RETRIES = 2
+const MAX_BUSY_WAIT_S = 15
+
+async function getJson<T>(path: string, attempt = 0): Promise<T> {
   const res = await fetch(`/api${path}`)
   if (!res.ok) {
     let detail = `${res.status} ${res.statusText}`
+    let code: string | undefined
     try {
       const body = (await res.json()) as { error?: string }
       if (body.error) detail = body.error
+      if (res.status === 503) code = body.error
     } catch {
       // response had no JSON body; keep the status text
     }
-    throw new ApiError(detail, res.status)
+    // OpenF1 is busy: the server says when to try again; wait (the page keeps
+    // showing "Loading") and retry a couple of times before giving up.
+    if (code === 'busy' && attempt < BUSY_RETRIES) {
+      const after = Number(res.headers.get('Retry-After')) || 3
+      await new Promise((r) => setTimeout(r, Math.min(after, MAX_BUSY_WAIT_S) * 1000))
+      return getJson<T>(path, attempt + 1)
+    }
+    throw new ApiError(reason(res.status, code, detail), res.status, code)
   }
   return (await res.json()) as T
 }

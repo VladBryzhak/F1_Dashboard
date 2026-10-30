@@ -2,6 +2,7 @@ import { cached } from "../cache/cache";
 import type { RaceStory, StoryDriver, StoryEvent } from "../types/f1";
 import { getChampionshipAround, getRaceWeekend } from "./f1db";
 import { getRaceControl, getReplay } from "./live";
+import { isOpenF1Unavailable, optional } from "./openf1Client";
 import { getRaceStrategy } from "./strategy";
 
 // The facts of how a race unfolded, for the race page's story text and key-
@@ -19,7 +20,10 @@ export async function getRaceStory(season: string, round: string): Promise<RaceS
   const wk = await getRaceWeekend(season, round);
   if (!wk || !wk.results.length) return null;
 
-  return cached(`story:${season}:${round}`, 6 * 3600, async () => {
+  // A story built while OpenF1 was busy lacks its lap-by-lap part: keep it
+  // a minute, so the next visitor gets the full one.
+  let partial = false;
+  return cached(`story:${season}:${round}`, () => (partial ? 60 : 6 * 3600), async () => {
     const results = wk.results;
     const byCode = new Map(results.filter((r) => r.driverCode).map((r) => [r.driverCode!, r]));
     const who = (r: { driverName: string; driverCode: string | null; constructorId: string }): StoryDriver => ({
@@ -161,7 +165,7 @@ export async function getRaceStory(season: string, round: string): Promise<RaceS
         }
 
         // Race control: neutralisations and penalties.
-        const rc = await getRaceControl(strat.sessionKey).catch(() => []);
+        const rc = await getRaceControl(strat.sessionKey).catch(optional<Awaited<ReturnType<typeof getRaceControl>>>([]));
         let open: { kind: "sc" | "vsc" | "red"; from: number } | null = null;
         const close = (lap: number) => {
           if (open) story.neutralisations.push({ kind: open.kind, from: open.from, to: Math.max(open.from, lap) });
@@ -217,11 +221,12 @@ export async function getRaceStory(season: string, round: string): Promise<RaceS
           story.events.push({ lap: n.from, to: n.to, kind: n.kind });
         }
 
-        const replay = await getReplay(strat.sessionKey).catch(() => null);
+        const replay = await getReplay(strat.sessionKey).catch(optional(null));
         story.rain = !!replay?.weather.some((w) => w.rain);
       }
-    } catch {
+    } catch (err) {
       story.hasTiming = false;
+      if (isOpenF1Unavailable(err)) partial = true;
     }
 
     for (const r of story.retirements) {
