@@ -524,6 +524,15 @@ const en = {
   'api.busy': 'the data source (OpenF1) is busy, please try again in a minute',
   'api.locked': 'the data source (OpenF1) is closed to free access while a session is running and reopens 30 minutes after it ends',
   'api.server': 'the server could not get the data, please try again later',
+
+  // Error screen (a page that failed to render)
+  'err.title': 'Something went wrong',
+  'err.lead': 'This page hit an error and could not be shown. Reloading usually fixes it, and the rest of the site works as normal.',
+  'err.updateTitle': 'Paddock Times was updated',
+  'err.updateLead': 'A new version of the site is out, and this page needs it. Reload to get the new version.',
+  'err.reload': 'Reload the page',
+  'err.report': 'If it keeps happening, tell us which page you opened:',
+  'err.reportLink': 'send feedback',
 }
 
 export type Dict = Record<keyof typeof en, string>

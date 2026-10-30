@@ -88,7 +88,7 @@ export default function NotFound({
           </p>
           <div className="nf-actions">
             {layout && (
-              <button type="button" className="nf-btn nf-btn--primary" onClick={layout.openSearch}>
+              <button type="button" className="btn btn--primary" onClick={layout.openSearch}>
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
                   <circle cx="11" cy="11" r="6.5" stroke="currentColor" strokeWidth="2" />
                   <path d="M16 16l4.5 4.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
@@ -96,7 +96,7 @@ export default function NotFound({
                 {t('nf.search')}
               </button>
             )}
-            <Link to={back.to} className="nf-btn">
+            <Link to={back.to} className="btn">
               {back.label}
             </Link>
           </div>

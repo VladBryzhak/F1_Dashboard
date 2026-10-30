@@ -9,15 +9,32 @@ import { trackPageView } from './lib/analytics'
 
 // Route-level code splitting: each page becomes its own chunk, so the initial
 // load no longer ships every page (and heavy deps like recharts) up front. A
-// failed dynamic import almost always means a stale chunk after a redeploy —
-// reload once to pick up the new hashes instead of surfacing an error.
+// failed dynamic import almost always means a stale chunk after a redeploy:
+// reload to pick up the new hashes instead of surfacing an error. At most once
+// a minute, so a chunk that really can't be loaded (a network fault) ends on
+// the error screen (ErrorBoundary in Layout) instead of reloading forever.
+const RELOAD_KEY = 'chunkReloadedAt'
+const RELOAD_EVERY_MS = 60_000
+
+function reloadedRecently(): boolean {
+  try {
+    return Date.now() - Number(sessionStorage.getItem(RELOAD_KEY) ?? 0) < RELOAD_EVERY_MS
+  } catch {
+    return true // no storage to remember it: don't risk a loop
+  }
+}
+
 function lazyPage<P extends object>(
   factory: () => Promise<{ default: ComponentType<P> }>,
 ) {
   return lazy(() =>
     factory().catch((err) => {
-      if (!sessionStorage.getItem('chunkReloaded')) {
-        sessionStorage.setItem('chunkReloaded', '1')
+      if (!reloadedRecently()) {
+        try {
+          sessionStorage.setItem(RELOAD_KEY, String(Date.now()))
+        } catch {
+          throw err
+        }
         window.location.reload()
         return new Promise<{ default: ComponentType<P> }>(() => {}) // reload underway; never resolve
       }
@@ -70,12 +87,6 @@ function TeamsOrProfile() {
 
 export default function App() {
   usePageViews()
-  // Clear the stale-chunk reload guard once the app has mounted successfully, so
-  // a later deploy can trigger its own one-time reload.
-  useEffect(() => {
-    sessionStorage.removeItem('chunkReloaded')
-  }, [])
-
   return (
     <Suspense
       fallback={

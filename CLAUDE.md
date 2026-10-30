@@ -28,6 +28,12 @@ Plain CSS, split by area (no CSS-in-JS, no CSS Modules):
 - Every page/component that owns styles imports its own file next to it (`pages/Home.tsx` → `./Home.css`, `components/ReplayPlayer.tsx` → `./ReplayPlayer.css`). Driver + team profiles share `styles/profile.css`; About/Privacy share `pages/Doc.css`; driver/team search share `components/EntitySearch.css`.
 - Vite splits page CSS into the lazy route chunks, so it only loads with its page — but once loaded it stays in the document. Therefore: a class that is used by more than one page goes in `shared.css`; page files only hold classes unique to that page (prefixes like `circ-`, `sched-`, `rp-`, `cmp-`, `strat-`). Keep each `@media` rule in the same file, right after the rules it adjusts.
 
+## Errors (client)
+
+- A page that throws while rendering shows `components/ErrorScreen.tsx` inside the frame (the `ErrorBoundary` around `<Outlet>` in `Layout.tsx`, cleared by moving to another page); the boundary in `main.tsx` catches errors in the frame itself. The screen reads the language from the address and uses plain links, so it works without the router or the i18n context.
+- A page chunk that fails to load reloads the page at most once a minute (`lazyPage` in `App.tsx`); after that the error screen says the site was updated.
+- Page buttons are `.btn` / `.btn--primary` in `styles/shared.css`.
+
 ## Commands
 
 Client (`cd client`):

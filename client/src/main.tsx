@@ -5,6 +5,8 @@ import './styles/tokens.css'
 import './styles/base.css'
 import './styles/shared.css'
 import App from './App.tsx'
+import ErrorBoundary from './components/ErrorBoundary'
+import ErrorScreen from './components/ErrorScreen'
 import { langFromPath, localizedPath, preferredLang } from './i18n/core'
 import I18nProvider from './i18n/I18nProvider'
 import LangRouter from './i18n/LangRouter'
@@ -24,10 +26,14 @@ initAnalytics()
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <I18nProvider>
-      <LangRouter>
-        <App />
-      </LangRouter>
-    </I18nProvider>
+    {/* The last line of defence: an error in the frame itself (header,
+        router, language) still leaves a page with a reload. */}
+    <ErrorBoundary fallback={(error) => <ErrorScreen error={error} standalone />}>
+      <I18nProvider>
+        <LangRouter>
+          <App />
+        </LangRouter>
+      </I18nProvider>
+    </ErrorBoundary>
   </StrictMode>,
 )

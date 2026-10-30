@@ -1,0 +1,72 @@
+/* Hallmark · shape: app screen · genre: modern-minimal · theme: Console (graphite), brand kept
+ * signature: a plain reading column with the reload as the one red action
+ * axes: dark/condensed-sans/brand-red · contrast: pass */
+
+/* Error screen (components/ErrorScreen.tsx). Loaded with the app, since it
+   has to show when a page's own code fails to load. */
+
+.err {
+  max-width: 62ch;
+  display: grid;
+  gap: var(--space-md);
+  padding-block: var(--space-lg) var(--space-xl);
+}
+
+/* Outside the frame (the outermost boundary): its own gutters. */
+.err--standalone {
+  margin: 0 auto;
+  padding: var(--space-2xl) var(--space-md);
+}
+
+.err-lead {
+  margin: 0;
+  color: var(--color-ink-2);
+  font-size: 1.1rem;
+  line-height: 1.6;
+}
+
+.err-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+  margin-top: var(--space-xs);
+}
+
+.err-note {
+  margin: var(--space-xs) 0 0;
+  font-size: var(--text-sm);
+  color: var(--color-muted);
+}
+
+.err-note a {
+  color: var(--color-ink);
+  text-decoration: underline;
+  text-decoration-color: var(--color-rule-2);
+  text-underline-offset: 3px;
+  transition: text-decoration-color var(--dur-micro) var(--ease-out);
+}
+
+.err-note a:hover {
+  text-decoration-color: var(--color-accent);
+}
+
+.err-note a:active {
+  color: var(--color-accent);
+}
+
+.err-note a:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+@media (max-width: 480px) {
+  .err-actions .btn {
+    flex: 1 1 100%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .err-note a {
+    transition: none;
+  }
+}

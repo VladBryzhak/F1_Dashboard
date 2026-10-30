@@ -69,53 +69,6 @@
   margin-top: var(--space-xs);
 }
 
-/* Secondary by default (outline on the panel step); the one primary is red. */
-.nf-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: var(--space-xs);
-  min-height: 48px;
-  padding: 0 1.2rem;
-  border: var(--rule-hair) solid var(--color-rule-2);
-  border-radius: var(--radius-pill);
-  background: var(--color-paper-2);
-  color: var(--color-ink);
-  font: inherit;
-  font-size: 0.95rem;
-  font-weight: 700;
-  text-decoration: none;
-  cursor: pointer;
-  transition:
-    background-color var(--dur-micro) var(--ease-out),
-    border-color var(--dur-micro) var(--ease-out);
-}
-
-.nf-btn:hover {
-  background: var(--color-paper-3);
-  border-color: var(--color-muted-2);
-}
-
-.nf-btn--primary {
-  background: var(--color-accent);
-  border-color: var(--color-accent);
-  color: var(--color-accent-ink);
-}
-
-.nf-btn--primary:hover {
-  background: var(--color-accent-hover);
-  border-color: var(--color-accent-hover);
-}
-
-.nf-btn:active {
-  transform: translateY(1px);
-}
-
-.nf-btn:focus-visible {
-  outline: 2px solid var(--color-focus);
-  outline-offset: 3px;
-}
-
 .nf-next {
   margin: var(--space-xl) 0 var(--space-md);
   font-size: var(--text-title);
@@ -158,6 +111,10 @@
   background: var(--color-paper-3);
 }
 
+.nf-links a:active {
+  background: var(--color-track);
+}
+
 .nf-links a:focus-visible {
   outline: 2px solid var(--color-focus);
   outline-offset: -2px;
@@ -197,7 +154,7 @@
 }
 
 @media (max-width: 480px) {
-  .nf-actions .nf-btn {
+  .nf-actions .btn {
     flex: 1 1 100%;
   }
   .nf-links {
@@ -206,12 +163,8 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .nf-btn,
   .nf-links a,
   .nf-link-name {
     transition: none;
-  }
-  .nf-btn:active {
-    transform: none;
   }
 }

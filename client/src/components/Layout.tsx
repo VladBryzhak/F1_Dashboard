@@ -5,6 +5,8 @@ import { useI18n, type Lang, type TKey } from '../i18n/core'
 import CookieBanner from './CookieBanner'
 import SearchPalette from './SearchPalette'
 import Footer from './Footer'
+import ErrorBoundary from './ErrorBoundary'
+import ErrorScreen from './ErrorScreen'
 import type { LayoutContext } from './layoutContext'
 import './Layout.css'
 
@@ -159,7 +161,11 @@ export default function Layout() {
         </nav>
       </header>
       <main className="content">
-        <Outlet context={outlet} />
+        {/* A page that fails to render shows a way out inside the frame;
+            moving to another page clears it. */}
+        <ErrorBoundary resetKey={pathname} fallback={(error) => <ErrorScreen error={error} />}>
+          <Outlet context={outlet} />
+        </ErrorBoundary>
       </main>
       <Footer />
       <CookieBanner />
