@@ -21,6 +21,7 @@ import type {
 import { gpTitle } from '../lib/gpNames'
 import './RaceWeekend.css'
 import { seoText } from '../lib/seoText'
+import NotFound from './NotFound'
 
 type Tab = 'race' | 'sprint' | 'quali' | 'practice' | 'strategy'
 
@@ -212,7 +213,7 @@ export default function RaceWeekend() {
   const { season = '', round = '' } = useParams()
   const { t, lang, fmtDate } = useI18n()
   const [params, setParams] = useSearchParams()
-  const { data, loading, error } = useAsync(
+  const { data, loading, error, notFound } = useAsync(
     () => api.raceWeekend(season, Number(round)),
     [season, round],
   )
@@ -221,6 +222,7 @@ export default function RaceWeekend() {
   const story = useAsync(() => api.raceStory(season, Number(round)), [season, round])
 
   useSeo({
+    skip: notFound,
     ...(data ? seoText.race(data, lang) : {}),
     jsonLd: data
       ? [
@@ -295,6 +297,8 @@ export default function RaceWeekend() {
 
   const practice =
     data?.practices.find((p) => p.number === practiceN) ?? data?.practices[0] ?? null
+
+  if (notFound) return <NotFound kind="race" season={season} />
 
   return (
     <section>

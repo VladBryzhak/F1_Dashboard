@@ -453,6 +453,18 @@ const STATIC: Record<string, { en: [string, string]; uk: [string, string] }> = {
   },
 };
 
+// The "not found" page (an address that leads nowhere, sent with status 404):
+// what happened and the way back to the site's sections.
+export function notFoundSnapshot(lang: Lang): string {
+  const c = ctx(lang);
+  return frame(
+    c,
+    c.uk
+      ? `<h1>Сторінку не знайдено</h1><p>За цією адресою на Paddock Times нічого немає. Можливо, в ній помилка або сторінку перенесли.</p>`
+      : `<h1>Page not found</h1><p>There is no page at this address on Paddock Times. It may be mistyped, or the page has moved.</p>`,
+  );
+}
+
 // The snapshot for a page path (without the /uk prefix) in the given
 // language, or "" when there is nothing to show (an unknown path, or data
 // that failed to load).

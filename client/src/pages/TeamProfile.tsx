@@ -14,6 +14,7 @@ import { teamColor } from '../lib/f1meta'
 import { teamSummary } from '../lib/summaries'
 import '../styles/profile.css'
 import { seoText } from '../lib/seoText'
+import NotFound from './NotFound'
 
 export default function TeamProfile() {
   const { slug: constructorId } = useParams<{ slug: string }>()
@@ -22,11 +23,13 @@ export default function TeamProfile() {
     data: profile,
     loading,
     error,
+    notFound,
   } = useAsync(() => api.constructorProfile(constructorId ?? ''), [constructorId])
 
   const color = teamColor(constructorId ?? '')
 
   useSeo({
+    skip: notFound,
     ...(profile ? seoText.team(profile, lang) : {}),
     jsonLd: profile
       ? [
@@ -42,6 +45,8 @@ export default function TeamProfile() {
         ]
       : undefined,
   })
+
+  if (notFound) return <NotFound kind="team" />
 
   return (
     <section>

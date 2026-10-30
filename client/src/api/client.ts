@@ -1,6 +1,18 @@
 // Thin typed wrapper around our backend API. All requests go to /api, which
 // Vite proxies to the Express server in dev (see vite.config.ts).
 
+// A failed API call, with its HTTP status (404: the thing asked for doesn't
+// exist, which pages show as "not found" rather than as an error).
+export class ApiError extends Error {
+  constructor(
+    message: string,
+    readonly status: number,
+  ) {
+    super(message)
+    this.name = 'ApiError'
+  }
+}
+
 async function getJson<T>(path: string): Promise<T> {
   const res = await fetch(`/api${path}`)
   if (!res.ok) {
@@ -11,7 +23,7 @@ async function getJson<T>(path: string): Promise<T> {
     } catch {
       // response had no JSON body; keep the status text
     }
-    throw new Error(detail)
+    throw new ApiError(detail, res.status)
   }
   return (await res.json()) as T
 }

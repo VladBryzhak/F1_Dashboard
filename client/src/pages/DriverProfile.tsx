@@ -15,6 +15,7 @@ import { driverSummary } from '../lib/summaries'
 import type { DriverProfile as Profile } from '../types/f1'
 import '../styles/profile.css'
 import { seoText } from '../lib/seoText'
+import NotFound from './NotFound'
 
 // Whole years between two yyyy-mm-dd dates (to today when `to` is null).
 function yearsBetween(from: string, to: string | null): number | null {
@@ -79,6 +80,7 @@ export default function DriverProfile() {
     data: profile,
     loading,
     error,
+    notFound,
   } = useAsync(() => api.driverProfile(driverId ?? ''), [driverId])
 
   const seasons = profile?.seasons ?? []
@@ -86,6 +88,7 @@ export default function DriverProfile() {
   const color = teamColor(lastTeamId)
 
   useSeo({
+    skip: notFound,
     ...(profile ? seoText.driver(profile, lang) : {}),
     jsonLd: profile
       ? [
@@ -110,6 +113,8 @@ export default function DriverProfile() {
         : Promise.resolve({}),
     [profile?.lastSeason],
   )
+
+  if (notFound) return <NotFound kind="driver" />
 
   return (
     <section>

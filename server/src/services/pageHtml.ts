@@ -3,7 +3,8 @@ import path from "path";
 import { isDatasetReady, warmDataset } from "./f1db";
 import { homePayload } from "./home";
 import { describePage, type PageMeta } from "./og";
-import { pageSnapshot } from "./snapshot";
+import { pageStatus, type PageStatus } from "./pageRoutes";
+import { notFoundSnapshot, pageSnapshot } from "./snapshot";
 
 // Serves the SPA shell with this page's own <title>, description, canonical
 // URL and Open Graph / Twitter tags, so link previews show the right page
@@ -85,12 +86,87 @@ export function previewPath(pagePath: string): string {
 const UK_PREFIX = /^\/uk(?=\/|$)/;
 export const isUkPath = (pagePath: string) => UK_PREFIX.test(pagePath);
 
-export async function pageHtml(file: string, rawPath: string, userAgent = "", nonce = ""): Promise<string> {
+// What this address leads to (services/pageRoutes.ts), with a redirect's
+// location in the page's language. Crawlers wait for the dataset, as for the
+// meta tags, so they get the real answer; people on a cold start don't, and
+// the app shows its own "not found" page once the data says so.
+export async function pageStatusFor(rawPath: string, userAgent = ""): Promise<PageStatus> {
+  const pagePath = rawPath.replace(UK_PREFIX, "") || "/";
+  let status: PageStatus = { code: 200 };
+  try {
+    if (isDatasetReady() || !BOT.test(userAgent)) {
+      status = await pageStatus(pagePath, false);
+    } else {
+      let timer: NodeJS.Timeout | undefined;
+      status = await Promise.race<PageStatus>([
+        pageStatus(pagePath, true),
+        new Promise((r) => (timer = setTimeout(() => r({ code: 200 }), BOT_WAIT_MS))),
+      ]);
+      clearTimeout(timer);
+    }
+  } catch {
+    // The dataset failed to load: serve the page; the app reports the error.
+  }
+  if (status.code === 301 && isUkPath(rawPath)) return { code: 301, location: `/uk${status.location}` };
+  return status;
+}
+
+// The "not found" page's tags, kept in step with seoText.notFound in the app.
+const NOT_FOUND_META: Record<"en" | "uk", { title: string; description: string }> = {
+  en: {
+    title: "Page not found · Paddock Times",
+    description: "There is no page at this address on Paddock Times. Formula 1 standings, calendar, drivers, teams and circuits are a click away.",
+  },
+  uk: {
+    title: "Сторінку не знайдено · Paddock Times",
+    description: "За цією адресою на Paddock Times нічого немає. Залік, календар, пілоти, команди й траси Формули-1 за один клік.",
+  },
+};
+
+// The app's shell for an address that leads nowhere (sent with status 404):
+// "not found" tags, no canonical URL or language twins (there is no page to
+// point at), noindex, the default preview card, and for crawlers a short
+// snapshot with links to the site's sections.
+function notFoundHtml(file: string, html: string, uk: boolean, userAgent: string): string {
+  const meta = NOT_FOUND_META[uk ? "uk" : "en"];
+  html = html.replace(/<title>[^<]*<\/title>/, `<title>${attr(meta.title)}</title>`);
+  html = setTag(html, 'name="description"', meta.description);
+  html = setTag(html, 'property="og:title"', meta.title);
+  html = setTag(html, 'property="og:description"', meta.description);
+  html = setTag(html, 'name="twitter:title"', meta.title);
+  html = setTag(html, 'name="twitter:description"', meta.description);
+  html = html.replace(/\s*<link rel="canonical"[^>]*>/, "").replace(/\s*<meta property="og:url"[^>]*>/, "");
+  const image = SITE_URL + previewPath(uk ? "/uk" : "/");
+  html = setTag(html, 'property="og:image"', image);
+  html = setTag(html, 'name="twitter:image"', image);
+  html = html.replace(
+    "</head>",
+    `<meta name="robots" content="noindex" />` +
+      `<meta property="og:locale" content="${uk ? "uk_UA" : "en_GB"}" />` +
+      "</head>",
+  );
+  if (BOT.test(userAgent)) {
+    html = html.replace('<div id="root"></div>', `<div id="root">${notFoundSnapshot(uk ? "uk" : "en")}</div>`);
+  }
+  return inlineCss(html, file);
+}
+
+export async function pageHtml(
+  file: string,
+  rawPath: string,
+  userAgent = "",
+  nonce = "",
+  notFound = false,
+): Promise<string> {
   let html = readShell(file);
   const uk = isUkPath(rawPath);
   // The page itself, without the language prefix (/uk/standings → /standings).
   const pagePath = rawPath.replace(UK_PREFIX, "") || "/";
   if (uk) html = html.replace('<html lang="en">', '<html lang="uk">');
+  if (notFound) {
+    html = notFoundHtml(file, html, uk, userAgent);
+    return nonce ? html.replace(/<script(?![^>]*\bnonce=)/g, `<script nonce="${nonce}"`) : html;
+  }
   let meta: PageMeta | null = null;
   const lang = uk ? "uk" : "en";
   if (isDatasetReady()) {

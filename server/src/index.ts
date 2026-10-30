@@ -13,7 +13,7 @@ import standingsRouter from "./routes/standings";
 import telemetryRouter from "./routes/telemetry";
 import { previewPng } from "./services/og";
 import { cspHeader, newNonce } from "./services/csp";
-import { pageHtml } from "./services/pageHtml";
+import { pageHtml, pageStatusFor } from "./services/pageHtml";
 import { sitemapXml } from "./services/sitemap";
 
 const app = express();
@@ -104,8 +104,9 @@ if (fs.existsSync(clientDist)) {
       res.sendFile(path.join(clientDist, "ai-catalog.json"));
     }
   );
-  // SPA fallback: any non-API route returns index.html so client-side routing
-  // (react-router) works on deep links / refreshes.
+  // SPA fallback: a page address returns index.html so client-side routing
+  // (react-router) works on deep links / refreshes; one the app has no page
+  // for gets the same shell with status 404 (services/pageRoutes.ts).
   app.get("*", async (req, res, next) => {
     if (req.path.startsWith("/api")) return next();
     // A file we don't have (an icon a phone guesses at, like
@@ -115,9 +116,19 @@ if (fs.existsSync(clientDist)) {
     if (/\.[a-z0-9]{2,8}$/i.test(req.path)) return res.status(404).type("text").send("Not found");
     try {
       // Crawlers get a text snapshot in the page (pageHtml), people don't.
+      const userAgent = req.get("user-agent") ?? "";
+      // An address the app has no page for gets a real 404 (with the app's
+      // "not found" page); a season the app doesn't have moves to its section.
+      const status = await pageStatusFor(req.path, userAgent);
+      if (status.code === 301) return res.vary("User-Agent").redirect(301, status.location);
       const nonce = newNonce();
-      const html = await pageHtml(path.join(clientDist, "index.html"), req.path, req.get("user-agent"), nonce);
-      res.vary("User-Agent").set("Content-Security-Policy", cspHeader(nonce)).type("html").send(html);
+      const html = await pageHtml(path.join(clientDist, "index.html"), req.path, userAgent, nonce, status.code === 404);
+      res
+        .status(status.code)
+        .vary("User-Agent")
+        .set("Content-Security-Policy", cspHeader(nonce))
+        .type("html")
+        .send(html);
     } catch (err) {
       next(err);
     }

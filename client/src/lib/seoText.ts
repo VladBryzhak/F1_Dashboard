@@ -6,6 +6,8 @@ import type { CircuitProfile, ConstructorProfile, DriverProfile, RaceWeekend } f
 import { countryName } from './countries'
 import { gpTitle } from './gpNames'
 
+export type NotFoundKind = 'page' | 'driver' | 'team' | 'circuit' | 'race'
+
 export interface SeoText {
   title: string
   description: string
@@ -227,6 +229,30 @@ export const seoText = {
           description:
             'Paddock Times is free, with no ads and no accounts. Donations help pay for hosting and development.',
         },
+
+  // The "not found" page (an address that leads nowhere, or a driver, team,
+  // circuit or race that doesn't exist). The server sends the generic one
+  // with its 404 (NOT_FOUND_META in server/src/services/pageHtml.ts).
+  notFound: (kind: NotFoundKind, lang: Lang): SeoText => {
+    const titles: Record<NotFoundKind, [string, string]> = {
+      page: ['Page not found', 'Сторінку не знайдено'],
+      driver: ['Driver not found', 'Пілота не знайдено'],
+      team: ['Team not found', 'Команду не знайдено'],
+      circuit: ['Circuit not found', 'Трасу не знайдено'],
+      race: ['Race not found', 'Гонку не знайдено'],
+    }
+    return uk(lang)
+      ? {
+          title: titles[kind][1],
+          description:
+            'За цією адресою на Paddock Times нічого немає. Залік, календар, пілоти, команди й траси Формули-1 за один клік.',
+        }
+      : {
+          title: titles[kind][0],
+          description:
+            'There is no page at this address on Paddock Times. Formula 1 standings, calendar, drivers, teams and circuits are a click away.',
+        }
+  },
 
   feedback: (lang: Lang): SeoText =>
     uk(lang)

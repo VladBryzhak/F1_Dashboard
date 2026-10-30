@@ -493,6 +493,32 @@ const en = {
   // Replay track map
   'rp.mapLabel': 'Track map with every car',
   'rp.mapNote': 'Positions are worked out from lap, sector, pit and overtake timing, so they are close but not exact.',
+
+  // "Not found" page (an unknown address, driver, team, circuit or race)
+  'nf.page': 'Page not found',
+  'nf.driver': 'Driver not found',
+  'nf.team': 'Team not found',
+  'nf.circuit': 'Circuit not found',
+  'nf.race': 'Race not found',
+  'nf.pageLead': 'There is no page at this address. It may be mistyped, or the page has moved.',
+  'nf.driverLead': 'There is no driver at this address. Every Formula 1 driver since 1950 is in the drivers list.',
+  'nf.teamLead': 'There is no team at this address. Every constructor since 1950 is in the teams list.',
+  'nf.circuitLead': 'There is no circuit at this address. Every track that has held a Grand Prix is in the circuits list.',
+  'nf.raceLead': 'There is no race at this address. The calendar lists every round of each season.',
+  'nf.address': 'Address',
+  'nf.search': 'Search drivers, teams and races',
+  'nf.home': 'Home page',
+  'nf.allDrivers': 'All drivers',
+  'nf.allTeams': 'All teams',
+  'nf.allCircuits': 'All circuits',
+  'nf.calendarOf': '{season} calendar',
+  'nf.next': 'Where to next',
+  'nf.standingsNote': 'The {season} drivers’ and constructors’ championships',
+  'nf.calendarNote': 'Every round of {season}, with results',
+  'nf.driversNote': 'Every driver since 1950',
+  'nf.teamsNote': 'Every constructor since 1950',
+  'nf.circuitsNote': 'Track maps, lap records and winners',
+  'nf.compareNote': 'Any two drivers, head to head',
 }
 
 export type Dict = Record<keyof typeof en, string>

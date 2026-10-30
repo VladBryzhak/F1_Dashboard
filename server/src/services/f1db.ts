@@ -2007,6 +2007,24 @@ export async function getCircuitProfile(circuitId: string): Promise<CircuitProfi
   };
 }
 
+// Whether a page's subject is in the dataset, so an address that names
+// nothing gets a "not found" answer (services/pageRoutes.ts). The same tests
+// the profile and weekend lookups above make before they return null.
+export async function hasPageSubject(
+  kind: "driver" | "team" | "circuit",
+  id: string
+): Promise<boolean> {
+  const ds = await dataset();
+  if (kind === "driver") return ds.driverCareer.has(id);
+  if (kind === "team") return ds.constructorCareer.has(id);
+  return ds.circuits.has(id);
+}
+
+export async function hasRace(season: string, round: string): Promise<boolean> {
+  const ds = await dataset();
+  return ds.races.some((r) => r.year === Number(season) && r.round === Number(round));
+}
+
 // Race-day and sprint-day dates for one round (for matching OpenF1 sessions).
 export async function getRaceDates(
   season: string,

@@ -1,10 +1,11 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { Link, NavLink, Outlet, useLocation } from 'react-router-dom'
 import { useLiveStatus } from '../hooks/useLiveStatus'
 import { useI18n, type Lang, type TKey } from '../i18n/core'
 import CookieBanner from './CookieBanner'
 import SearchPalette from './SearchPalette'
 import Footer from './Footer'
+import type { LayoutContext } from './layoutContext'
 import './Layout.css'
 
 const links: { to: string; label: TKey }[] = [
@@ -55,6 +56,7 @@ export default function Layout() {
   // Phone menu: the nav becomes a dropdown opened by a burger button.
   const [menuOpen, setMenuOpen] = useState(false)
   const [searchOpen, setSearchOpen] = useState(false)
+  const outlet = useMemo<LayoutContext>(() => ({ openSearch: () => setSearchOpen(true) }), [])
 
   // ⌘K / Ctrl+K anywhere, or "/" when not typing, opens the search.
   useEffect(() => {
@@ -157,7 +159,7 @@ export default function Layout() {
         </nav>
       </header>
       <main className="content">
-        <Outlet />
+        <Outlet context={outlet} />
       </main>
       <Footer />
       <CookieBanner />

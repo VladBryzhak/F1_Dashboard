@@ -28,6 +28,14 @@ export function useSeo(
     // several URLs show the same content — e.g. /standings and
     // /standings/<currentSeason> both point at /standings.
     canonicalPath?: string
+    // A page that isn't one (the "not found" page): tell search engines not
+    // to index it, and drop the canonical URL and language twins, as the
+    // server does when it answers 404.
+    noindex?: boolean
+    // Leave the tags alone: a child sets them (a profile that shows the "not
+    // found" page in its place). Effects run child first, so the parent's
+    // would otherwise overwrite the child's tags.
+    skip?: boolean
   } = {},
 ) {
   // Defaults in the page's language (from its address).
@@ -35,6 +43,7 @@ export function useSeo(
   const title = opts.title ? `${opts.title} · ${SITE}` : fallback.title
   const description = opts.description ?? fallback.description
   const canonicalPath = opts.canonicalPath
+  const { noindex = false, skip = false } = opts
   // Serialize here so the effect has a stable primitive dependency (the object
   // identity changes every render, which would otherwise loop forever).
   const jsonLd = opts.jsonLd
@@ -44,6 +53,7 @@ export function useSeo(
     : ''
 
   useEffect(() => {
+    if (skip) return
     document.title = title
 
     upsert(
@@ -92,6 +102,23 @@ export function useSeo(
       description,
     )
 
+    if (noindex) {
+      upsert(
+        'meta[name="robots"]',
+        () => {
+          const m = document.createElement('meta')
+          m.setAttribute('name', 'robots')
+          return m
+        },
+        'noindex',
+      )
+      document.head
+        .querySelectorAll('link[rel="canonical"], link[rel="alternate"][hreflang], script[data-seo="1"]')
+        .forEach((el) => el.remove())
+      // Leaving the page (or it turning out to exist) lifts the noindex.
+      return () => document.head.querySelector('meta[name="robots"]')?.remove()
+    }
+
     let canonical = document.head.querySelector<HTMLLinkElement>('link[rel="canonical"]')
     if (!canonical) {
       canonical = document.createElement('link')
@@ -132,5 +159,5 @@ export function useSeo(
     } else if (ld) {
       ld.remove()
     }
-  }, [title, description, jsonLd, canonicalPath])
+  }, [title, description, jsonLd, canonicalPath, noindex, skip])
 }

@@ -11,15 +11,15 @@ import { trackPageView } from './lib/analytics'
 // load no longer ships every page (and heavy deps like recharts) up front. A
 // failed dynamic import almost always means a stale chunk after a redeploy —
 // reload once to pick up the new hashes instead of surfacing an error.
-function lazyPage<T extends ComponentType<unknown>>(
-  factory: () => Promise<{ default: T }>,
+function lazyPage<P extends object>(
+  factory: () => Promise<{ default: ComponentType<P> }>,
 ) {
   return lazy(() =>
     factory().catch((err) => {
       if (!sessionStorage.getItem('chunkReloaded')) {
         sessionStorage.setItem('chunkReloaded', '1')
         window.location.reload()
-        return new Promise<{ default: T }>(() => {}) // reload underway; never resolve
+        return new Promise<{ default: ComponentType<P> }>(() => {}) // reload underway; never resolve
       }
       throw err
     }),
@@ -42,6 +42,8 @@ const Feedback = lazyPage(() => import('./pages/Feedback'))
 const About = lazyPage(() => import('./pages/About'))
 const Privacy = lazyPage(() => import('./pages/Privacy'))
 const Support = lazyPage(() => import('./pages/Support'))
+// Its own small chunk, shared with the pages that show it in their place.
+const NotFound = lazyPage(() => import('./pages/NotFound'))
 
 // Reports a GA4 page_view whenever the SPA route changes (react-router keeps the
 // page mounted, so there's no real document load for GA to catch on its own).
@@ -103,6 +105,8 @@ export default function App() {
           <Route path="about" element={<About />} />
           <Route path="privacy" element={<Privacy />} />
           <Route path="support" element={<Support />} />
+          {/* Anything else: the "not found" page (the server answers 404). */}
+          <Route path="*" element={<NotFound />} />
         </Route>
       </Routes>
     </Suspense>

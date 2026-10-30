@@ -13,6 +13,7 @@ import type { CircuitTally } from '../types/f1'
 import { gpShort, gpTitle } from '../lib/gpNames'
 import './CircuitProfile.css'
 import { seoText } from '../lib/seoText'
+import NotFound from './NotFound'
 
 function Tally({
   title,
@@ -49,9 +50,10 @@ export default function CircuitProfile() {
   const { circuitId = '' } = useParams<{ circuitId: string }>()
   const navigate = useNavigate()
   const { t, lang, fmtDate, fmtNum, locale } = useI18n()
-  const { data: c, loading, error } = useAsync(() => api.circuitProfile(circuitId), [circuitId])
+  const { data: c, loading, error, notFound } = useAsync(() => api.circuitProfile(circuitId), [circuitId])
 
   useSeo({
+    skip: notFound,
     ...(c ? seoText.circuit(c, lang) : {}),
     jsonLd: c
       ? [
@@ -73,6 +75,7 @@ export default function CircuitProfile() {
       : undefined,
   })
 
+  if (notFound) return <NotFound kind="circuit" />
   if (loading) return <p className="muted">{t('common.loading')}</p>
   if (error || !c)
     return (

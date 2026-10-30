@@ -1,0 +1,217 @@
+/* Hallmark · shape: app screen · genre: modern-minimal · theme: Console (graphite), brand kept
+ * signature: the status code as a reading in instrument blue beside the heading; sections as one hairline panel with seams
+ * axes: dark/condensed-sans/brand-red · contrast: pass */
+
+/* "Not found" page (pages/NotFound.tsx). */
+
+.nf {
+  max-width: 960px;
+}
+
+.nf-main {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: var(--space-lg) var(--space-xl);
+  padding-block: var(--space-lg) var(--space-xl);
+}
+
+.nf-code {
+  margin: 0;
+  font-family: var(--font-outlier);
+  font-size: var(--text-reading);
+  font-weight: 600;
+  line-height: 1;
+  font-variant-numeric: tabular-nums slashed-zero;
+  color: var(--color-cool);
+}
+
+.nf-copy {
+  display: grid;
+  gap: var(--space-md);
+  min-width: 0;
+}
+
+.nf-lead {
+  margin: 0;
+  max-width: 56ch;
+  color: var(--color-ink-2);
+  font-size: 1.1rem;
+  line-height: 1.6;
+}
+
+.nf-address {
+  margin: 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--space-xs);
+  font-size: var(--text-sm);
+  color: var(--color-muted);
+}
+
+.nf-address code {
+  min-width: 0;
+  max-width: 100%;
+  padding: 2px var(--space-xs);
+  border: var(--rule-hair) solid var(--color-rule);
+  border-radius: var(--radius-pill);
+  background: var(--color-paper-2);
+  color: var(--color-ink);
+  font-family: var(--font-outlier);
+  overflow-wrap: anywhere;
+}
+
+.nf-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+  margin-top: var(--space-xs);
+}
+
+/* Secondary by default (outline on the panel step); the one primary is red. */
+.nf-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-xs);
+  min-height: 48px;
+  padding: 0 1.2rem;
+  border: var(--rule-hair) solid var(--color-rule-2);
+  border-radius: var(--radius-pill);
+  background: var(--color-paper-2);
+  color: var(--color-ink);
+  font: inherit;
+  font-size: 0.95rem;
+  font-weight: 700;
+  text-decoration: none;
+  cursor: pointer;
+  transition:
+    background-color var(--dur-micro) var(--ease-out),
+    border-color var(--dur-micro) var(--ease-out);
+}
+
+.nf-btn:hover {
+  background: var(--color-paper-3);
+  border-color: var(--color-muted-2);
+}
+
+.nf-btn--primary {
+  background: var(--color-accent);
+  border-color: var(--color-accent);
+  color: var(--color-accent-ink);
+}
+
+.nf-btn--primary:hover {
+  background: var(--color-accent-hover);
+  border-color: var(--color-accent-hover);
+}
+
+.nf-btn:active {
+  transform: translateY(1px);
+}
+
+.nf-btn:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 3px;
+}
+
+.nf-next {
+  margin: var(--space-xl) 0 var(--space-md);
+  font-size: var(--text-title);
+  font-weight: 800;
+  line-height: 1.05;
+  text-transform: uppercase;
+}
+
+/* One hairline panel; the 1px gaps over the rule colour draw the seams. */
+.nf-links {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--rule-hair);
+  background: var(--color-rule);
+  border: var(--rule-hair) solid var(--color-rule);
+  border-radius: var(--radius-card);
+  overflow: hidden;
+}
+
+.nf-links li {
+  display: flex;
+  background: var(--color-paper-2);
+}
+
+.nf-links a {
+  flex: 1;
+  display: grid;
+  align-content: start;
+  gap: var(--space-2xs);
+  padding: var(--space-md) var(--space-lg);
+  color: var(--color-ink);
+  text-decoration: none;
+  transition: background-color var(--dur-micro) var(--ease-out);
+}
+
+.nf-links a:hover {
+  background: var(--color-paper-3);
+}
+
+.nf-links a:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: -2px;
+}
+
+.nf-link-name {
+  font-size: 1.05rem;
+  font-weight: 700;
+  line-height: 1.3;
+  transition: color var(--dur-micro) var(--ease-out);
+}
+
+.nf-links a:hover .nf-link-name {
+  color: var(--color-accent-hover);
+}
+
+.nf-link-note {
+  font-size: var(--text-sm);
+  color: var(--color-muted);
+}
+
+@media (max-width: 768px) {
+  .nf-main {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--space-sm);
+    padding-block: 0 var(--space-lg);
+  }
+  .nf-code {
+    font-size: 4.5rem;
+  }
+  .nf-links {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .nf-links a {
+    padding: var(--space-md);
+  }
+}
+
+@media (max-width: 480px) {
+  .nf-actions .nf-btn {
+    flex: 1 1 100%;
+  }
+  .nf-links {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .nf-btn,
+  .nf-links a,
+  .nf-link-name {
+    transition: none;
+  }
+  .nf-btn:active {
+    transform: none;
+  }
+}
