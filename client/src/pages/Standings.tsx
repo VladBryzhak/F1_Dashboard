@@ -22,7 +22,7 @@ type Tab = 'drivers' | 'constructors' | 'progression'
 
 export default function Standings() {
   const { season: seasonParam } = useParams()
-  const { season, canonicalPath, goToSeason, badSeason } = useSeasonRoute(
+  const { season, canonicalPath, goToSeason, redirect } = useSeasonRoute(
     '/standings',
     seasonParam,
   )
@@ -52,7 +52,7 @@ export default function Standings() {
         ? constructors
         : progression
 
-  if (badSeason) return <Navigate to="/standings" replace />
+  if (redirect) return <Navigate to="/standings" replace />
 
   const intro = seasonSummary(
     season,

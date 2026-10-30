@@ -1,7 +1,7 @@
 import { useEffect } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { useLayout } from '../components/layoutContext'
-import { isSeason } from '../hooks/useSeasonRoute'
+import { isSeason, seasonPath } from '../hooks/useSeasonRoute'
 import { useSeo } from '../hooks/useSeo'
 import { useI18n, type TKey } from '../i18n/core'
 import { trackEvent } from '../lib/analytics'
@@ -69,7 +69,7 @@ export default function NotFound({
           ? { to: '/circuits', label: t('nf.allCircuits') }
           : kind === 'race'
             ? isSeason(season)
-              ? { to: `/calendar/${season}`, label: t('nf.calendarOf', { season }) }
+              ? { to: seasonPath('/calendar', season), label: t('nf.calendarOf', { season }) }
               : { to: '/calendar', label: t('nav.calendar') }
             : { to: '/', label: t('nf.home') }
 

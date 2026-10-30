@@ -15,7 +15,7 @@ type View = 'grid' | 'search'
 
 export default function Teams() {
   const { slug } = useParams()
-  const { season, canonicalPath, goToSeason, badSeason } = useSeasonRoute(
+  const { season, canonicalPath, goToSeason, redirect } = useSeasonRoute(
     '/teams',
     slug,
   )
@@ -33,7 +33,7 @@ export default function Teams() {
 
   const teams = data?.standings ?? SAMPLE_CONSTRUCTOR_STANDINGS
 
-  if (badSeason) return <Navigate to="/teams" replace />
+  if (redirect) return <Navigate to="/teams" replace />
 
   return (
     <section>

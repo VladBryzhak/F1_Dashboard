@@ -16,7 +16,7 @@ import { seoText } from '../lib/seoText'
 
 export default function Calendar() {
   const { season: seasonParam } = useParams()
-  const { season, canonicalPath, goToSeason, badSeason } = useSeasonRoute(
+  const { season, canonicalPath, goToSeason, redirect } = useSeasonRoute(
     '/calendar',
     seasonParam,
   )
@@ -63,7 +63,7 @@ export default function Calendar() {
     })
   }
 
-  if (badSeason) return <Navigate to="/calendar" replace />
+  if (redirect) return <Navigate to="/calendar" replace />
 
   return (
     <section>

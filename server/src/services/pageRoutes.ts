@@ -42,6 +42,9 @@ export async function pageStatus(pagePath: string, checkData: boolean): Promise<
     data ? test().then((yes) => (yes ? OK : NOT_FOUND)) : Promise.resolve(OK);
   // A season page: 1950 to the dataset's latest season.
   const seasonOk = async (y: string) => !data || (Number(y) >= 1950 && Number(y) <= (await getCurrentSeason()));
+  // The current season's page is the bare section (/standings, not
+  // /standings/2026): one address per page, as the app redirects too.
+  const isCurrent = async (y: string) => data && Number(y) === (await getCurrentSeason());
 
   switch (where) {
     case "circuits":
@@ -55,8 +58,9 @@ export async function pageStatus(pagePath: string, checkData: boolean): Promise<
         if (where !== "calendar" || !isYear(a!) || !/^\d{1,3}$/.test(b)) return NOT_FOUND;
         return exists(() => hasRace(a!, b));
       }
-      // The app sends a season it doesn't have to the section's own page.
-      if (a && !(isYear(a) && (await seasonOk(a)))) return moved(`/${where}`);
+      // The app sends a season it doesn't have, or the current one, to the
+      // section's own page.
+      if (a && (!(isYear(a) && (await seasonOk(a))) || (await isCurrent(a)))) return moved(`/${where}`);
       return OK;
 
     case "drivers":
@@ -65,7 +69,7 @@ export async function pageStatus(pagePath: string, checkData: boolean): Promise<
       if (!a) return OK;
       // /drivers/<season> is that season's grid; anything else is a profile
       // (ids are never bare years).
-      if (isYear(a) && (await seasonOk(a))) return OK;
+      if (isYear(a) && (await seasonOk(a))) return (await isCurrent(a)) ? moved(`/${where}`) : OK;
       return exists(() => hasPageSubject(where === "drivers" ? "driver" : "team", a));
 
     default:

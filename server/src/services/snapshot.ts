@@ -43,16 +43,27 @@ function table(head: string[], rows: string[][]): string {
 
 const list = (items: string[]) => (items.length ? `<ul>${items.map((i) => `<li>${i}</li>`).join("")}</ul>` : "");
 
-// One page build: its language, and links that keep that language.
+// One page build: its language, and links that keep that language (and give
+// the current season's pages their bare address: /standings, not
+// /standings/2026, which redirects there).
 interface Ctx {
   uk: boolean;
   a: (href: string, text: string) => string;
   date: (iso: string) => string;
 }
 
-function ctx(lang: Lang): Ctx {
+const SEASON_PAGE = /^\/(standings|calendar|drivers|teams)\/(\d{4})$/;
+
+function ctx(lang: Lang, current?: number): Ctx {
   const uk = lang === "uk";
-  const href = (path: string) => (uk ? (path === "/" ? "/uk" : `/uk${path}`) : path);
+  const bare = (path: string) => {
+    const m = SEASON_PAGE.exec(path);
+    return m && Number(m[2]) === current ? `/${m[1]}` : path;
+  };
+  const href = (path: string) => {
+    const p = bare(path);
+    return uk ? (p === "/" ? "/uk" : `/uk${p}`) : p;
+  };
   return {
     uk,
     a: (path, text) => `<a href="${esc(href(path))}">${esc(text)}</a>`,
@@ -469,10 +480,10 @@ export function notFoundSnapshot(lang: Lang): string {
 // language, or "" when there is nothing to show (an unknown path, or data
 // that failed to load).
 export async function pageSnapshot(rawPath: string, lang: Lang = "en"): Promise<string> {
-  const c = ctx(lang);
   const parts = rawPath.split("?")[0].split("/").filter(Boolean).map(decodeURIComponent);
   const [section, x, y] = parts;
   const current = await getCurrentSeason();
+  const c = ctx(lang, current);
   const seasonOf = (s: string | undefined) => (isSeason(s) ? Number(s) : current);
   let body: string | null = null;
   switch (section) {

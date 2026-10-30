@@ -15,7 +15,7 @@ type View = 'grid' | 'search'
 
 export default function Drivers() {
   const { slug } = useParams()
-  const { season, canonicalPath, goToSeason, badSeason } = useSeasonRoute(
+  const { season, canonicalPath, goToSeason, redirect } = useSeasonRoute(
     '/drivers',
     slug,
   )
@@ -38,7 +38,7 @@ export default function Drivers() {
 
   const drivers = data?.standings ?? SAMPLE_DRIVER_STANDINGS
 
-  if (badSeason) return <Navigate to="/drivers" replace />
+  if (redirect) return <Navigate to="/drivers" replace />
 
   return (
     <section>
