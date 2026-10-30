@@ -1160,18 +1160,16 @@ function driverName(ds: Dataset, driverId: string): string {
 // in-memory dataset — no external call. Colours stay client-side.
 export async function getHomeHighlights(): Promise<HomeHighlights> {
   const ds = await dataset();
-  const season = Math.max(...ds.races.map((r) => r.year));
-  const seasonRaces = ds.races
-    .filter((r) => r.year === season)
-    .sort((a, b) => a.round - b.round);
-
-  // Latest completed round = highest round that has a recorded winner.
-  let latestRound = 0;
-  for (const r of seasonRaces) {
-    if (ds.winnerByRace.has(`${season}:${r.round}`) && r.round > latestRound) {
-      latestRound = r.round;
-    }
-  }
+  // Every round in running order, and the latest one run (with a winner).
+  // The home page shows that race and its season's championship, so between
+  // seasons (a new season's calendar published, no race run yet) it keeps
+  // the last race and the final standings instead of an empty season.
+  const ordered = ds.races.slice().sort((a, b) => a.year - b.year || a.round - b.round);
+  let last: (typeof ordered)[number] | undefined;
+  for (const r of ordered) if (ds.winnerByRace.has(`${r.year}:${r.round}`)) last = r;
+  const season = last?.year ?? latestSeason(ds);
+  const latestRound = last?.round ?? 0;
+  const seasonRaces = ordered.filter((r) => r.year === season);
 
   let latestRace: HomeHighlights["latestRace"] = null;
   let notableRetirement: NotableRetirement | null = null;
@@ -1245,13 +1243,17 @@ export async function getHomeHighlights(): Promise<HomeHighlights> {
     };
   }
 
-  // Next race = first upcoming round after the latest completed one.
-  const upcoming = seasonRaces.find((r) => r.round > latestRound);
+  // Next race = the first round after the latest one run: in the next season
+  // once this one is over (when its calendar is out).
+  const upcoming = last
+    ? ordered.find((r) => r.year > last!.year || (r.year === last!.year && r.round > last!.round))
+    : ordered.find((r) => r.year === season);
   let nextRace: HomeHighlights["nextRace"] = null;
   if (upcoming) {
     const gp = ds.grandsPrix.get(upcoming.grandPrixId);
     const circuit = ds.circuits.get(upcoming.circuitId);
     nextRace = {
+      season: upcoming.year,
       round: upcoming.round,
       grandPrixName: gp?.name ?? upcoming.grandPrixId,
       date: upcoming.date,
@@ -1262,7 +1264,10 @@ export async function getHomeHighlights(): Promise<HomeHighlights> {
     };
   }
 
-  return { season, latestRace, notableRetirement, championshipLeader, nextRace };
+  // Every round of the shown season run: its standings are final.
+  const seasonOver = latestRound > 0 && !seasonRaces.some((r) => r.round > latestRound);
+
+  return { season, seasonOver, latestRace, notableRetirement, championshipLeader, nextRace };
 }
 
 // Per-round title-race chart: cumulative points across the season for the top

@@ -1,4 +1,4 @@
-import { useEffect, useState, type CSSProperties, type SyntheticEvent } from 'react'
+import { useEffect, useState, type CSSProperties } from 'react'
 import { Link } from 'react-router-dom'
 import CircuitOutline from '../components/CircuitOutline'
 import { Headshot } from '../components/EntityCards'
@@ -18,21 +18,6 @@ import type {
 import { gpTitle } from '../lib/gpNames'
 import { retirementReason } from '../lib/retirementReasons'
 import './Home.css'
-
-const F1 = 'https://media.formula1.com/image/upload/c_lfill,w_600/q_auto/v1740000001/common/f1'
-
-// Fallback podium photos for the off-season poster.
-const ANTONELLI_SRC = '/home-antonelli.webp'
-const ANTONELLI_FALLBACK = `${F1}/2026/mercedes/andant01/2026mercedesandant01right.webp`
-const HAMILTON_SRC = '/home-hamilton.jpg'
-const HAMILTON_FALLBACK = `${F1}/2026/ferrari/lewham01/2026ferrarilewham01left.webp`
-
-function fallbackTo(url: string) {
-  return (e: SyntheticEvent<HTMLImageElement>) => {
-    const img = e.currentTarget
-    if (!img.src.includes('media.formula1.com')) img.src = url
-  }
-}
 
 function lastName(full: string): string {
   const parts = full.trim().split(' ')
@@ -178,9 +163,12 @@ function WinnerHero({
 function ChampionshipCard({
   rows,
   season,
+  final = false,
 }: {
   rows: DriverStanding[]
   season?: number
+  // Every round of the season run: the standings are final.
+  final?: boolean
 }) {
   const { t } = useI18n()
   if (!rows.length) return null
@@ -189,7 +177,7 @@ function ChampionshipCard({
   return (
     <div className="champ-card">
       <div className="champ-head">
-        <span>{t('home.championship')}</span>
+        <span>{t(final ? 'home.finalStandings' : 'home.championship')}</span>
         <span className="champ-season">{season}</span>
       </div>
       <ol className="champ-list">
@@ -252,50 +240,20 @@ function NextRaceCard({ race }: { race: NextRace }) {
   )
 }
 
-// Off-season / no-race fallback: the static title-fight poster.
-function TitleFightHero() {
+// When the home data can't be loaded: the site's name and the way in. (Between
+// seasons the hero keeps the last race run, see getHomeHighlights.)
+function FallbackHero() {
   const { t } = useI18n()
   return (
-    <div
-      className="hero hero-fight"
-      style={{ '--merc': teamColor('mercedes'), '--fer': teamColor('ferrari') } as CSSProperties}
-    >
-      <div className="hero-side hero-left">
-        <img
-          className="hero-photo"
-          src={ANTONELLI_SRC}
-          onError={fallbackTo(ANTONELLI_FALLBACK)}
-          alt={t('home.altAntonelli')}
-        />
-      </div>
-      <div className="hero-side hero-right">
-        <img
-          className="hero-photo"
-          src={HAMILTON_SRC}
-          onError={fallbackTo(HAMILTON_FALLBACK)}
-          alt={t('home.altHamilton')}
-        />
-      </div>
-
-      <div className="hero-veil" />
-
+    <div className="hero">
       <div className="hero-content">
-        <p className="hero-kicker">{t('home.titleFight')}</p>
         <h1 className="hero-title">
           PADDOCK <span>TIMES</span>
         </h1>
-        <div className="hero-battle">
-          <div className="battle-side battle-merc">
-            <span className="battle-team">Mercedes</span>
-            <span className="battle-driver">Antonelli</span>
-          </div>
-          <span className="battle-vs">VS</span>
-          <div className="battle-side battle-fer">
-            <span className="battle-team">Ferrari</span>
-            <span className="battle-driver">Hamilton</span>
-          </div>
-        </div>
-        <p className="hero-tag">{t('home.titleFightTag')}</p>
+        <p className="hero-tag">{t('home.fallbackTag')}</p>
+        <Link to="/standings" className="hero-cta hero-cta--center">
+          {t('home.fallbackCta')}
+        </Link>
       </div>
     </div>
   )
@@ -407,11 +365,11 @@ export default function Home() {
             heroSizes={data!.heroSizes}
           />
         ) : (
-          <TitleFightHero />
+          <FallbackHero />
         )}
 
         <aside className="home-aside">
-          <ChampionshipCard rows={data?.standings ?? []} season={season} />
+          <ChampionshipCard rows={data?.standings ?? []} season={season} final={data?.highlights.seasonOver} />
           {data?.highlights.nextRace && <NextRaceCard race={data.highlights.nextRace} />}
         </aside>
       </div>

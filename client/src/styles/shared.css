@@ -32,6 +32,27 @@
   line-height: 1.6;
 }
 
+.profile-summary a {
+  color: var(--color-ink);
+  text-decoration: underline;
+  text-decoration-color: var(--color-rule-2);
+  text-underline-offset: 3px;
+  transition: text-decoration-color var(--dur-micro) var(--ease-out);
+}
+
+.profile-summary a:hover {
+  text-decoration-color: var(--color-accent);
+}
+
+.profile-summary a:active {
+  color: var(--color-accent);
+}
+
+.profile-summary a:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+}
+
 /* Breadcrumb trail on profile / race pages. */
 .breadcrumbs {
   font-size: 0.85rem;

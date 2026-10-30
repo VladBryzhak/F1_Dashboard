@@ -15,6 +15,7 @@ import { useSeo } from '../hooks/useSeo'
 import { useI18n } from '../i18n/core'
 import './Telemetry.css'
 import { seoText } from '../lib/seoText'
+import { CURRENT_SEASON } from '../lib/seasons'
 
 // Recharts tooltip box on the panel surface with a hairline, as the cards.
 const TOOLTIP = {
@@ -25,7 +26,9 @@ const TOOLTIP = {
 }
 
 // OpenF1 telemetry is available from 2023 onward.
-const TELEMETRY_SEASONS = ['2026', '2025', '2024', '2023']
+const TELEMETRY_SEASONS = Array.from({ length: Math.max(1, CURRENT_SEASON - 2022) }, (_, i) =>
+  String(CURRENT_SEASON - i),
+)
 
 function formatLap(seconds: number | null): string {
   if (seconds == null) return ''

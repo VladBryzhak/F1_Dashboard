@@ -130,8 +130,8 @@ async function home(c: Ctx): Promise<string> {
   if (h.nextRace) {
     const n = h.nextRace;
     body += c.uk
-      ? `<h2>Наступна гонка</h2><p>${esc(gp(n.grandPrixName))}, ${esc(c.date(n.date))}, траса ${c.a(`/circuits/${n.circuitId}`, n.placeName || n.circuitId)}. ${c.a(`/calendar/${h.season}`, `Календар ${h.season}`)}.</p>`
-      : `<h2>Next race</h2><p>${esc(gp(n.grandPrixName))}, ${esc(c.date(n.date))}, at ${c.a(`/circuits/${n.circuitId}`, n.placeName || n.circuitId)}. ${c.a(`/calendar/${h.season}`, `${h.season} calendar`)}.</p>`;
+      ? `<h2>Наступна гонка</h2><p>${esc(gp(n.grandPrixName))}, ${esc(c.date(n.date))}, траса ${c.a(`/circuits/${n.circuitId}`, n.placeName || n.circuitId)}. ${c.a(`/calendar/${n.season}`, `Календар ${n.season}`)}.</p>`
+      : `<h2>Next race</h2><p>${esc(gp(n.grandPrixName))}, ${esc(c.date(n.date))}, at ${c.a(`/circuits/${n.circuitId}`, n.placeName || n.circuitId)}. ${c.a(`/calendar/${n.season}`, `${n.season} calendar`)}.</p>`;
   }
   const top = (st?.standings ?? []).slice(0, 10);
   if (top.length) {

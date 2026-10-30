@@ -344,15 +344,14 @@ const en = {
   'home.wins': 'wins',
   'home.incident': 'Incident',
   'home.championship': 'Championship',
+  'home.finalStandings': 'Final standings',
+  'home.fallbackTag': 'Formula 1 standings, calendar, driver and team stats: every season since 1950.',
+  'home.fallbackCta': 'Open the standings',
   'home.podium': 'Podium',
   'home.leader': 'Leader',
   'home.news': 'Latest F1 news',
   'home.via': 'via {source}',
   'home.loadingRace': 'Loading latest race…',
-  'home.titleFight': '2026 Title Fight',
-  'home.titleFightTag': 'Silver Arrows against the Scuderia: Antonelli and Hamilton fight for the 2026 crown.',
-  'home.altAntonelli': 'Kimi Antonelli on the podium',
-  'home.altHamilton': 'Lewis Hamilton celebrating with a trophy',
 
   // Standings
   'st.title': '{season} Championship Standings',
@@ -364,6 +363,8 @@ const en = {
   'st.chartTitle': 'Points by round',
   'st.seasonN': '{season} season',
   'st.sampleBanner': 'Live standings API unavailable ({error}). Showing sample data so the layout is visible; real {season} standings appear automatically once the API is reachable.',
+  'st.notStarted': 'The {season} season hasn’t started yet, so there are no standings.',
+  'st.previousFinal': 'See the final {season} standings.',
 
   // Drivers / Teams lists & search
   'drvs.title': '{season} F1 Drivers',

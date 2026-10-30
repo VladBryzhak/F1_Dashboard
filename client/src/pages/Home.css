@@ -3,7 +3,7 @@
    everything else follows the tokens: graphite panels, hairlines, readings
    (dates, times, points) in instrument blue. */
 
-/* ---------- Hero frame and the off-season title-fight poster ---------- */
+/* ---------- Hero frame and the fallback hero (home data unavailable) ---------- */
 .hero {
   position: relative;
   min-height: 420px;
@@ -14,70 +14,6 @@
   align-items: center;
   justify-content: center;
   background: var(--color-paper-3);
-}
-
-/* Off-season poster: Mercedes in from the left, Ferrari from the right, with
-   a dark centre vignette so the banner stays legible. */
-.hero-fight {
-  background:
-    radial-gradient(72% 130% at 50% 8%, transparent 0%, color-mix(in oklch, var(--color-paper-3) 62%, transparent) 74%),
-    linear-gradient(105deg, color-mix(in oklch, var(--merc) 50%, transparent) 0%, transparent 44%),
-    linear-gradient(255deg, color-mix(in oklch, var(--fer) 50%, transparent) 0%, transparent 44%),
-    var(--color-paper-3);
-}
-
-/* Each podium photo covers its own half and fades toward the centre where the
-   battle banner sits. Faded on the inner edge (and softly top/bottom). */
-.hero-side {
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  width: 54%;
-  overflow: hidden;
-  z-index: 1;
-  pointer-events: none;
-}
-
-.hero-photo {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  opacity: 0.82;
-}
-
-.hero-left {
-  left: 0;
-}
-
-.hero-left .hero-photo {
-  object-position: 52% 22%;
-  mask-image: linear-gradient(90deg, #000 0%, #000 52%, transparent 100%);
-  -webkit-mask-image: linear-gradient(90deg, #000 0%, #000 52%, transparent 100%);
-}
-
-.hero-right {
-  right: 0;
-}
-
-.hero-right .hero-photo {
-  object-position: 62% 28%;
-  mask-image: linear-gradient(270deg, #000 0%, #000 52%, transparent 100%);
-  -webkit-mask-image: linear-gradient(270deg, #000 0%, #000 52%, transparent 100%);
-}
-
-/* Dark vignette over the photos so the central banner stays legible. */
-.hero-veil {
-  position: absolute;
-  inset: 0;
-  z-index: 2;
-  pointer-events: none;
-  background: radial-gradient(
-    62% 130% at 50% 46%,
-    color-mix(in oklch, var(--color-paper-3) 90%, transparent) 0%,
-    color-mix(in oklch, var(--color-paper-3) 90%, transparent) 24%,
-    color-mix(in oklch, var(--color-paper-3) 50%, transparent) 52%,
-    transparent 78%
-  );
 }
 
 .hero-content {
@@ -108,60 +44,7 @@
   color: var(--color-accent);
 }
 
-/* Central battle banner — the season fight between the two sides. */
-.hero-battle {
-  display: flex;
-  align-items: stretch;
-  justify-content: center;
-  gap: 0;
-  margin: 1.3rem auto 0;
-  border-radius: var(--radius-card);
-  overflow: hidden;
-  border: var(--rule-hair) solid var(--color-rule-2);
-  background: color-mix(in oklch, var(--color-paper-2) 88%, transparent);
-}
-
-.battle-side {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.15rem;
-  padding: 0.7rem 1.4rem;
-  min-width: 130px;
-}
-
-.battle-team {
-  font-size: 0.8rem;
-  font-weight: 600;
-  color: var(--color-muted);
-}
-
-.battle-driver {
-  font-size: 1.25rem;
-  font-weight: 900;
-  font-style: italic;
-  letter-spacing: 0.5px;
-}
-
-.battle-merc {
-  border-top: 3px solid var(--merc);
-}
-
-.battle-fer {
-  border-top: 3px solid var(--fer);
-}
-
-.battle-vs {
-  display: flex;
-  align-items: center;
-  padding: 0 0.9rem;
-  font-weight: 900;
-  font-style: italic;
-  font-size: 0.95rem;
-  color: var(--color-ink);
-  background: var(--color-paper-3);
-}
-
+/* Fallback hero: the site's name, a line and the way in. */
 .hero-tag {
   color: var(--color-ink-2);
   margin: 1rem auto 0;
@@ -169,6 +52,10 @@
   font-weight: 600;
   font-size: 0.9rem;
   text-shadow: 0 1px 6px var(--color-veil);
+}
+
+.hero-cta--center {
+  margin-inline: auto;
 }
 
 /* ---------- Latest-winner hero ---------- */

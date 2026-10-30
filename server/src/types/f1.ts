@@ -204,6 +204,7 @@ export interface NotableRetirement {
 }
 
 export interface NextRace {
+  season: number;
   round: number;
   grandPrixName: string;
   date: string;
@@ -222,7 +223,8 @@ export interface LeaderSummary {
 }
 
 export interface HomeHighlights {
-  season: number;
+  season: number; // the season of the latest race run (the one shown)
+  seasonOver: boolean; // every round of it has been run
   latestRace: RaceHighlight | null;
   notableRetirement: NotableRetirement | null;
   championshipLeader: LeaderSummary | null;

@@ -1,6 +1,6 @@
 import fs from "fs";
 import path from "path";
-import { isDatasetReady, warmDataset } from "./f1db";
+import { getCurrentSeason, isDatasetReady, warmDataset } from "./f1db";
 import { homePayload } from "./home";
 import { describePage, type PageMeta } from "./og";
 import { pageStatus, type PageStatus } from "./pageRoutes";
@@ -164,6 +164,11 @@ export async function pageHtml(
   // The page itself, without the language prefix (/uk/standings → /standings).
   const pagePath = rawPath.replace(UK_PREFIX, "") || "/";
   if (uk) html = html.replace('<html lang="en">', '<html lang="uk">');
+  // The current season, so the app agrees with the server on what
+  // /standings is (client/src/lib/seasons.ts).
+  if (isDatasetReady()) {
+    html = html.replace("</head>", `<script>window.__SEASON__=${await getCurrentSeason()}</script></head>`);
+  }
   if (notFound) {
     html = notFoundHtml(file, html, uk, userAgent);
     return nonce ? html.replace(/<script(?![^>]*\bnonce=)/g, `<script nonce="${nonce}"`) : html;

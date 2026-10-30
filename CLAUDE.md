@@ -79,6 +79,11 @@ Social crawlers don't run JS, so the Express SPA fallback (`server/src/services/
 
 - `pageHtml()` inlines the main stylesheet into the HTML and, for `/`, inlines the home data (`window.__HOME__`, built by `services/home.ts`, same payload as `/api/home`) plus a `<link rel="preload">` for the hero photo (`imagesrcset`/`imagesizes` from the payload's `heroSrcSet`/`heroSizes`, which the `<img>` uses too — keep `HERO_SIZES` in `services/home.ts` in step with the `.hm-portrait img` size in `Home.css`). The hero URL comes from `services/portraits.ts`, a mirror of `driverPortraitUrl()` in `client/src/lib/f1meta.ts` — keep the slug maps in step.
 - Home is imported eagerly in `App.tsx` (no chunk round trip on the landing page).
+- The home page shows the latest race run and its season's standings (`getHomeHighlights`): between seasons (a new calendar out, no race run) it keeps the last race and the final standings (`seasonOver`), and the next race comes from the new season.
+
+## Current season
+
+- The current season is the newest in the dataset (`getCurrentSeason`). `pageHtml` writes it into every page as `window.__SEASON__`, and `CURRENT_SEASON` in `client/src/lib/seasons.ts` reads it (the calendar year on a cold start), so the app and the server agree on what `/standings` is and the site moves to a new season by itself. Never hard-code a year; season lists derive from it.
 - Fonts are self-hosted in `client/public/fonts` (Saira, OFL) and loaded by a non-blocking `fonts.css`; gtag.js loads after the page's `load` event, when the browser is idle.
 
 ## Server conventions

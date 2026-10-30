@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Navigate, useParams } from 'react-router-dom'
+import { Link, Navigate, useParams } from 'react-router-dom'
 import { api } from '../api/client'
 import SeasonSelect from '../components/SeasonSelect'
 import {
@@ -9,7 +9,7 @@ import {
 import TitleRaceChart from '../components/TitleRaceChart'
 import { useAsync } from '../hooks/useAsync'
 import { useSeo } from '../hooks/useSeo'
-import { useSeasonRoute } from '../hooks/useSeasonRoute'
+import { seasonPath, useSeasonRoute } from '../hooks/useSeasonRoute'
 import { useI18n } from '../i18n/core'
 import { seasonSummary } from '../lib/summaries'
 import {
@@ -54,6 +54,12 @@ export default function Standings() {
 
   if (redirect) return <Navigate to="/standings" replace />
 
+  // A season whose calendar is out but no race run yet (between seasons):
+  // no standings to show, so point to last season's final ones.
+  const notStarted =
+    !drivers.loading && !drivers.error && drivers.data != null && drivers.data.standings.length === 0
+  const previous = String(Number(season) - 1)
+
   const intro = seasonSummary(
     season,
     drivers.data?.standings?.[0],
@@ -97,14 +103,21 @@ export default function Standings() {
         <p className="banner">{t('st.sampleBanner', { error: active.error, season })}</p>
       )}
 
-      {!active.loading && tab === 'drivers' && (
+      {notStarted && tab !== 'progression' && (
+        <p className="profile-summary">
+          {t('st.notStarted', { season })}{' '}
+          <Link to={seasonPath('/standings', previous)}>{t('st.previousFinal', { season: previous })}</Link>
+        </p>
+      )}
+
+      {!active.loading && !notStarted && tab === 'drivers' && (
         <DriverStandingsTable
           rows={drivers.data?.standings ?? SAMPLE_DRIVER_STANDINGS}
           season={season}
           headshots={headshots.data ?? undefined}
         />
       )}
-      {!active.loading && tab === 'constructors' && (
+      {!active.loading && !notStarted && tab === 'constructors' && (
         <ConstructorStandingsTable
           rows={constructors.data?.standings ?? SAMPLE_CONSTRUCTOR_STANDINGS}
         />
