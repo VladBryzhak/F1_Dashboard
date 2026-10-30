@@ -27,6 +27,7 @@ export interface RawSession {
   meeting_key?: number;
   circuit_key?: number;
   circuit_short_name?: string;
+  is_cancelled?: boolean;
   session_name: string;
   location: string;
   country_name: string;

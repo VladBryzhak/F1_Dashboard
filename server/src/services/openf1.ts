@@ -42,12 +42,20 @@ interface RawCarData {
   drs: number;
 }
 
+// The season's races already run, oldest first: only those have telemetry
+// (OpenF1 opens a session's data 30 minutes after it ends).
+const OPEN_AFTER_MS = 30 * 60 * 1000;
+
 export async function getRaceSessions(
   season: string
 ): Promise<TelemetrySession[]> {
   return cached(`of1:sessions:${season}`, 60 * 60, async () => {
+    const now = Date.now();
     const rows = (await getYearSessions(Number(season))).filter(
-      (s) => s.session_name === "Race"
+      (s) =>
+        s.session_name === "Race" &&
+        !s.is_cancelled &&
+        Date.parse(s.date_end ?? s.date_start) + OPEN_AFTER_MS < now
     );
     return rows
       .sort((a, b) => a.date_start.localeCompare(b.date_start))

@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import {
   CartesianGrid,
   Line,
@@ -38,7 +38,10 @@ function formatLap(seconds: number | null): string {
 }
 
 export default function Telemetry() {
-  const [season, setSeason] = useState('2024')
+  // Opens on the latest race run: this season's (or last season's, before
+  // this one's first race).
+  const [season, setSeason] = useState(String(CURRENT_SEASON))
+  const autoSeason = useRef(true)
   const [sessionKey, setSessionKey] = useState<number | null>(null)
   const [driverNumber, setDriverNumber] = useState<number | null>(null)
 
@@ -68,11 +71,18 @@ export default function Telemetry() {
     [sessionKey, driverNumber, lapNumber],
   )
 
-  // Cascade defaults: pick the first race, first driver, and the fastest lap.
+  // Cascade defaults: the latest race, first driver, and the fastest lap.
   useEffect(() => {
     const list = sessions.data
-    if (list && list.length) setSessionKey((k) => k ?? list[0].sessionKey)
-  }, [sessions.data])
+    // Right after a season change the list is still the previous season's.
+    if (sessions.loading || (list?.length && !list[0].date.startsWith(season))) return
+    if (list && list.length) setSessionKey((k) => k ?? list[list.length - 1].sessionKey)
+    // No race run yet this season: open last season's final race instead.
+    else if (list && autoSeason.current && Number(season) > 2023) {
+      autoSeason.current = false
+      setSeason(String(Number(season) - 1))
+    }
+  }, [sessions.data, sessions.loading, season])
   // Reset downstream selection whenever the race changes.
   useEffect(() => {
     setDriverNumber(null)
@@ -110,6 +120,7 @@ export default function Telemetry() {
       <div className="page-head">
         <h1>{t('nav.telemetry')}</h1>
         <select value={season} onChange={(e) => {
+          autoSeason.current = false
           setSeason(e.target.value)
           setSessionKey(null)
         }} aria-label={t('common.season')}>
