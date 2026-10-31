@@ -113,7 +113,9 @@ function Comparison({ a, b, h2h, photoA, photoB }: { a: DriverProfile; b: Driver
           urls={[driverPortraitUrl(a.driverId, lastConstructor(a), String(a.lastSeason)), photoA]}
           sub={`${a.firstSeason}-${a.lastSeason}`}
         />
-        <div className="cmp-vs">VS</div>
+        <div className="cmp-vs" aria-hidden="true">
+          VS
+        </div>
         <Head
           side="b"
           givenName={b.givenName}

@@ -44,7 +44,7 @@ export default function Footer() {
           <p className="footer-copy">© {year} Paddock Times</p>
         </div>
 
-        <nav className="footer-col" aria-label="Footer">
+        <nav className="footer-col" aria-label={t('footer.nav')}>
           <h2>{t('footer.explore')}</h2>
           <ul>
             {quickLinks.map((l) => (

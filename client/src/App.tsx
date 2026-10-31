@@ -5,6 +5,7 @@ import Layout from './components/Layout'
 // the first (and largest) paint.
 import Home from './pages/Home'
 import { isSeason } from './hooks/useSeasonRoute'
+import { useI18n } from './i18n/core'
 import { trackPageView } from './lib/analytics'
 
 // Route-level code splitting: each page becomes its own chunk, so the initial
@@ -85,16 +86,20 @@ function TeamsOrProfile() {
   return isSeason(slug) ? <Teams /> : <TeamProfile />
 }
 
+// While a page's code loads.
+function PageLoading() {
+  const { t } = useI18n()
+  return (
+    <p className="muted" style={{ padding: '2rem' }}>
+      {t('common.loading')}
+    </p>
+  )
+}
+
 export default function App() {
   usePageViews()
   return (
-    <Suspense
-      fallback={
-        <p className="muted" style={{ padding: '2rem' }}>
-          Loading…
-        </p>
-      }
-    >
+    <Suspense fallback={<PageLoading />}>
       <Routes>
         <Route element={<Layout />}>
           <Route index element={<Home />} />

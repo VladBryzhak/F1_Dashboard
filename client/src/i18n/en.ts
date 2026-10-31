@@ -4,6 +4,7 @@ const en = {
   // Navigation
   'nav.home': 'Home',
   'nav.skip': 'Skip to content',
+  'nav.breadcrumb': 'Breadcrumb',
   'nav.live': 'Live',
   'nav.standings': 'Standings',
   'nav.calendar': 'Calendar',
@@ -23,6 +24,7 @@ const en = {
   // Footer
   'footer.tagline': 'Formula 1 standings, calendars and career stats, from 1950 to today.',
   'footer.explore': 'Explore',
+  'footer.nav': 'Site sections',
   'footer.credits': 'Data & credits',
   'footer.dataBy': 'Data by',
   'footer.telemetryBy': 'Telemetry by',
@@ -527,6 +529,7 @@ const en = {
   'api.busy': 'the data source (OpenF1) is busy, please try again in a minute',
   'api.locked': 'the data source (OpenF1) is closed to free access while a session is running and reopens 30 minutes after it ends',
   'api.server': 'the server could not get the data, please try again later',
+  'api.noData': 'there is no data for this yet',
 
   // Error screen (a page that failed to render)
   'err.title': 'Something went wrong',

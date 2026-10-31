@@ -320,9 +320,9 @@ export async function describePage(rawPath: string, lang: Lang = "en"): Promise<
         "How Paddock Times handles data.",
       );
     case "support":
-      if (uk) return generic("Підтримати Paddock Times", "Сайт Paddock Times безкоштовний, без реклами й облікових записів. Донати допомагають оплачувати хостинг і розробку.", "Безкоштовно, без реклами й облікових записів.");
+      if (uk) return generic("Підтримати проєкт", "Сайт Paddock Times безкоштовний, без реклами й облікових записів. Донати допомагають оплачувати хостинг і розробку.", "Безкоштовно, без реклами й облікових записів.");
       return generic(
-        "Support Paddock Times",
+        "Support the project",
         "Paddock Times is free, with no ads and no accounts. Donations help pay for hosting and development.",
         "Free, no ads, no accounts — donations keep it running.",
       );

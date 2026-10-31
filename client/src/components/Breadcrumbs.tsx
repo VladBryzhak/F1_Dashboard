@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom'
+import { useI18n } from '../i18n/core'
 
 // Visible breadcrumb trail (Home › Drivers › Lewis Hamilton). Mirrors the
 // BreadcrumbList JSON-LD and gives both users and crawlers internal links back
@@ -8,8 +9,9 @@ export default function Breadcrumbs({
 }: {
   trail: { name: string; path: string }[]
 }) {
+  const { t } = useI18n()
   return (
-    <nav className="breadcrumbs" aria-label="Breadcrumb">
+    <nav className="breadcrumbs" aria-label={t('nav.breadcrumb')}>
       {trail.map((t, i) => {
         const last = i === trail.length - 1
         return (

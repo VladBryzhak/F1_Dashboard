@@ -23,6 +23,7 @@ function reason(status: number, code: string | undefined, fallback: string): str
   const d = dicts[langFromPath(window.location.pathname)]
   if (code === 'busy') return d['api.busy']
   if (code === 'locked') return d['api.locked']
+  if (status === 404) return d['api.noData']
   if (status >= 500) return d['api.server']
   return fallback
 }

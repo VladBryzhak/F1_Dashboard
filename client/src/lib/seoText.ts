@@ -220,12 +220,12 @@ export const seoText = {
   support: (lang: Lang): SeoText =>
     uk(lang)
       ? {
-          title: 'Підтримати Paddock Times',
+          title: 'Підтримати проєкт',
           description:
             'Сайт Paddock Times безкоштовний, без реклами й облікових записів. Донати допомагають оплачувати хостинг і розробку.',
         }
       : {
-          title: 'Support Paddock Times',
+          title: 'Support the project',
           description:
             'Paddock Times is free, with no ads and no accounts. Donations help pay for hosting and development.',
         },

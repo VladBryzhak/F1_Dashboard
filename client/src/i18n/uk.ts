@@ -6,6 +6,7 @@ const uk: Dict & Record<string, string> = {
   // Navigation
   'nav.home': 'Головна',
   'nav.skip': 'Перейти до вмісту',
+  'nav.breadcrumb': 'Шлях до сторінки',
   'nav.live': 'Наживо',
   'nav.standings': 'Залік',
   'nav.calendar': 'Календар',
@@ -25,6 +26,7 @@ const uk: Dict & Record<string, string> = {
   // Footer
   'footer.tagline': 'Турнірні таблиці, календарі та статистика Формули-1 з 1950 року до сьогодні.',
   'footer.explore': 'Розділи',
+  'footer.nav': 'Розділи сайту',
   'footer.credits': 'Дані та джерела',
   'footer.dataBy': 'Дані:',
   'footer.telemetryBy': 'Телеметрія:',
@@ -60,7 +62,7 @@ const uk: Dict & Record<string, string> = {
   'sup.voluntary': 'Донати добровільні й нічого не відкривають: сайт однаковий для всіх.',
   'sup.otherTitle': 'Як ще можна допомогти',
   'sup.otherText':
-    'Поділіться сайтом в F1-чаті чи з друзями, так його знайде більше людей. Ідеї та повідомлення про помилки теж вітаються через',
+    'Поділіться сайтом у Ф1-чаті чи з друзями, так його знайде більше людей. Ідеї та повідомлення про помилки теж вітаються через',
   'sup.otherFeedback': 'форму відгуку',
 
   // Cookie banner
@@ -113,7 +115,7 @@ const uk: Dict & Record<string, string> = {
   'cal.showSchedule': 'Показати розклад вікенду',
   'cal.hideSchedule': 'Сховати розклад вікенду',
   'cal.subscribe': 'Підписатися',
-  'cal.subTitle': 'Календар F1 у вашому календарі',
+  'cal.subTitle': 'Календар Ф1 у вашому календарі',
   'cal.subText':
     'Усі сесії з’являться у вашому календарі за вашим часом і оновлюватимуться самі, коли змінюється розклад або оголошують наступний сезон.',
   'cal.subAll': 'Усі сесії',
@@ -386,7 +388,7 @@ const uk: Dict & Record<string, string> = {
   'home.fallbackCta': 'Відкрити залік',
   'home.podium': 'Подіум',
   'home.leader': 'Лідер',
-  'home.news': 'Новини F1',
+  'home.news': 'Новини Ф1',
   'home.via': 'джерело: {source}',
   'home.loadingRace': 'Завантажуємо останню гонку…',
 
@@ -408,12 +410,12 @@ const uk: Dict & Record<string, string> = {
   'plural.winsShort_other': '{n} перемоги',
 
   // Drivers / Teams lists & search
-  'drvs.title': 'Пілоти F1 {season}',
+  'drvs.title': 'Пілоти Ф1 {season}',
   'drvs.findTitle': 'Знайти пілота',
   'drvs.tabGrid': 'Поточний склад',
   'drvs.tabSearch': 'Пошук пілотів',
   'drvs.sampleBanner': 'API недоступне ({error}). Показано приклад даних; справжні дані {season} з’являться автоматично, щойно API запрацює.',
-  'teams.title': 'Команди F1 {season}',
+  'teams.title': 'Команди Ф1 {season}',
   'teams.findTitle': 'Знайти команду',
   'teams.tabSearch': 'Пошук команд',
   'ds.placeholder': 'Пошук за назвою…',
@@ -580,6 +582,7 @@ const uk: Dict & Record<string, string> = {
   'api.busy': 'джерело даних (OpenF1) зараз перевантажене, спробуйте за хвилину',
   'api.locked': 'під час сесії джерело даних (OpenF1) закрите для безкоштовного доступу й відкриється через 30 хвилин після її завершення',
   'api.server': 'сервер не зміг отримати дані, спробуйте пізніше',
+  'api.noData': 'даних про це поки немає',
 
   // Екран помилки (сторінка, яку не вдалося показати)
   'err.title': 'Щось пішло не так',
