@@ -80,6 +80,7 @@ export default function TeamProfile() {
               season={String(profile.lastSeason)}
               color={color}
               alt={`${profile.name} Formula 1 car`}
+              sizes="(max-width: 768px) 300px, 380px"
               eager
             />
             <div className="profile-heading">

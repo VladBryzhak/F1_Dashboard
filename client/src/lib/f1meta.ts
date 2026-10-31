@@ -78,6 +78,18 @@ const TEAM_CAR_SLUG: Record<string, string> = {
   cadillac: 'cadillac',
 }
 
+// formula1.com's CDN resizes on request (`c_lfill,w_<width>`): the same image
+// in the widths a page may need, for <img srcset> with a `sizes` that says
+// how wide it is shown. The portraits were always fetched 600 px wide, though
+// most are shown 40 to 150 px wide (about 1 MB too much on the standings).
+const F1_WIDTHS = [80, 120, 240, 360, 480, 600, 800]
+const F1_RESIZE = /(media\.formula1\.com\/image\/upload\/c_lfill,)w_\d+/
+
+export function f1SrcSet(url: string | null | undefined): string | undefined {
+  if (!url || !F1_RESIZE.test(url)) return undefined
+  return F1_WIDTHS.map((w) => `${url.replace(F1_RESIZE, `$1w_${w}`)} ${w}w`).join(', ')
+}
+
 /**
  * Official car ("bolid") render from formula1.com's CDN for a given season.
  * Returns null for teams without a known slug; the <img> should also handle

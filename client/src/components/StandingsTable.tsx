@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { driverPortraitUrl, teamColor } from '../lib/f1meta'
+import { driverPortraitUrl, f1SrcSet, teamColor } from '../lib/f1meta'
 import type { ConstructorStanding, DriverStanding } from '../types/f1'
 import Flag from './Flag'
 import { useI18n } from '../i18n/core'
@@ -29,6 +29,9 @@ function DriverAvatar({
       <img
         className="avatar"
         src={src}
+        // A 38 px circle: the smallest portrait file is plenty.
+        srcSet={idx === 0 ? f1SrcSet(src) : undefined}
+        sizes="40px"
         alt=""
         loading="lazy"
         onError={() => setIdx((i) => i + 1)}

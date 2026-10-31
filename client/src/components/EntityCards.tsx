@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { driverPortraitUrl, teamCarUrl, teamColor } from '../lib/f1meta'
+import { driverPortraitUrl, f1SrcSet, teamCarUrl, teamColor } from '../lib/f1meta'
 import type { ConstructorStanding, DriverStanding } from '../types/f1'
 import Flag from './Flag'
 import { useI18n } from '../i18n/core'
@@ -14,6 +14,7 @@ export function CarImage({
   season,
   alt = '',
   eager = false,
+  sizes = '220px',
 }: {
   constructorId: string
   season: string
@@ -22,6 +23,8 @@ export function CarImage({
   color?: string
   alt?: string
   eager?: boolean
+  // How wide the car is shown (picks the file size from f1SrcSet).
+  sizes?: string
 }) {
   const [failed, setFailed] = useState(false)
   const url = teamCarUrl(constructorId, season)
@@ -31,6 +34,8 @@ export function CarImage({
       <img
         className="car-img"
         src={url}
+        srcSet={f1SrcSet(url)}
+        sizes={sizes}
         alt={alt}
         loading={eager ? 'eager' : 'lazy'}
         onError={() => setFailed(true)}
@@ -60,7 +65,9 @@ export function Headshot({
   color?: string
   alt?: string
   eager?: boolean
-  // Responsive variants of portraitUrl (only used while it is shown).
+  // Responsive variants of portraitUrl (only used while it is shown); by
+  // default the formula1.com widths (f1SrcSet), picked by `sizes`: how wide
+  // the portrait is shown.
   srcSet?: string | null
   sizes?: string
   // Intrinsic size of portraitUrl, so the browser reserves its box early.
@@ -79,6 +86,7 @@ export function Headshot({
   useEffect(() => setIdx(0), [key])
   const cur = candidates[idx]
   if (!cur) return null
+  const portraitSet = srcSet === undefined && sizes ? f1SrcSet(portraitUrl) : srcSet
   return (
     <div
       className={`head-wrap${cur.photo ? ' is-photo' : ''}`}
@@ -86,8 +94,8 @@ export function Headshot({
       <img
         className="head-img"
         src={cur.url}
-        srcSet={idx === 0 && cur.url === portraitUrl ? (srcSet ?? undefined) : undefined}
-        sizes={idx === 0 && cur.url === portraitUrl && srcSet ? sizes : undefined}
+        srcSet={idx === 0 && cur.url === portraitUrl ? (portraitSet ?? undefined) : undefined}
+        sizes={idx === 0 && cur.url === portraitUrl && portraitSet ? sizes : undefined}
         alt={alt}
         width={idx === 0 && cur.url === portraitUrl ? width : undefined}
         height={idx === 0 && cur.url === portraitUrl ? height : undefined}
@@ -118,6 +126,7 @@ export function DriverCard({
       <Headshot
         portraitUrl={driverPortraitUrl(d.driverId, d.constructorId, season)}
         fallbackUrl={headshot}
+        sizes="60px"
         color={color}
         alt={`${d.givenName} ${d.familyName}`}
       />
