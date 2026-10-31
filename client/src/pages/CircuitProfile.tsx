@@ -29,7 +29,7 @@ function Tally({
   if (rows.length === 0) return null
   return (
     <div className="card circ-tally">
-      <h3 className="wknd-section">{title}</h3>
+      <h2 className="wknd-section">{title}</h2>
       <ol>
         {rows.map((r, i) => (
           <li key={r.id}>
@@ -179,7 +179,7 @@ export default function CircuitProfile() {
       </div>
 
       <div className="card circ-record">
-        <h3 className="wknd-section">{t('circ.lapRecord')}</h3>
+        <h2 className="wknd-section">{t('circ.lapRecord')}</h2>
         {c.lapRecord ? (
           <div className="circ-record-body">
             <span className="circ-record-time mono">{c.lapRecord.time}</span>
@@ -214,7 +214,7 @@ export default function CircuitProfile() {
 
       {c.layouts.length > 1 && (
         <div className="card circ-block">
-          <h3 className="wknd-section">{t('circ.layouts')}</h3>
+          <h2 className="wknd-section">{t('circ.layouts')}</h2>
           <div className="table-scroll">
             <table className="standings">
               <thead>
@@ -245,7 +245,7 @@ export default function CircuitProfile() {
 
       {c.races.length > 0 && (
         <div className="card circ-block">
-          <h3 className="wknd-section">{t('circ.winners')}</h3>
+          <h2 className="wknd-section">{t('circ.winners')}</h2>
           <div className="table-scroll">
             <table className="standings">
               <thead>
@@ -255,7 +255,9 @@ export default function CircuitProfile() {
                   <th>{t('circ.colWinner')}</th>
                   <th>{t('circ.colTeam')}</th>
                   <th>{t('circ.colPole')}</th>
-                  <th></th>
+                  <th>
+                    <span className="sr-only">{t('common.details')}</span>
+                  </th>
                 </tr>
               </thead>
               <tbody>
@@ -265,7 +267,16 @@ export default function CircuitProfile() {
                     className="row-clickable"
                     onClick={() => navigate(`/calendar/${r.year}/${r.round}`)}
                   >
-                    <td className="mono">{r.year}</td>
+                    <td className="mono">
+                      {/* The keyboard's way to the race (the row is clickable for the mouse). */}
+                      <Link
+                        to={`/calendar/${r.year}/${r.round}`}
+                        className="row-link"
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        {r.year}
+                      </Link>
+                    </td>
                     {c.grandsPrix.length > 1 && <td className="muted">{gpShort(r.grandPrixName, lang)}</td>}
                     <td>
                       <span className="name">{r.winnerName ?? ''}</span>
@@ -282,7 +293,9 @@ export default function CircuitProfile() {
                       ) : null}
                     </td>
                     <td className="muted">{r.poleDriverName ?? ''}</td>
-                    <td className="muted chevron">›</td>
+                    <td className="muted chevron" aria-hidden="true">
+                      ›
+                    </td>
                   </tr>
                 ))}
               </tbody>

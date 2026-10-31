@@ -75,6 +75,7 @@
 
 .story-mark--fastest {
   background: var(--color-fastest);
+  color: var(--color-ink-dark); /* light ink is 3.6:1 on the purple */
 }
 
 .story-mark--sc {

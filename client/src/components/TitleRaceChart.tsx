@@ -105,7 +105,7 @@ export default function TitleRaceChart({ data }: { data: SeasonProgression }) {
   return (
     <div className="card title-race">
       <div className="title-race-head">
-        <h3>{t('st.chartTitle')}</h3>
+        <h2>{t('st.chartTitle')}</h2>
         <span className="muted">{t('st.seasonN', { season: data.season })}</span>
       </div>
 

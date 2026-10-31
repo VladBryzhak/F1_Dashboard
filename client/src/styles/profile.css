@@ -282,8 +282,9 @@
   color: var(--color-ink);
 }
 
+/* The lighter red: the brand red is under 4.5:1 on the panels at this size. */
 .form-chip.win {
-  color: var(--color-accent);
+  color: var(--color-accent-hover);
 }
 
 .form-chip.out {

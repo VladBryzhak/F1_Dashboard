@@ -81,7 +81,7 @@ function DriverDetail({
 
       <div className="ld-cols">
         <div className="ld-col">
-          <h4>{t('rp.best')}</h4>
+          <p className="ld-col-title">{t('rp.best')}</p>
           <div className="ld-kv">
             <span>{t('tel.lap')}</span>
             <span className="mono">{fmtTime(detail.bestLap)}</span>
@@ -103,7 +103,7 @@ function DriverDetail({
         </div>
 
         <div className="ld-col">
-          <h4>{t('rp.tyres')}</h4>
+          <p className="ld-col-title">{t('rp.tyres')}</p>
           {detail.stints.map((s) => {
             const ty = tyre(s.compound)
             const n = s.lapEnd - s.lapStart + 1
@@ -121,7 +121,7 @@ function DriverDetail({
         </div>
 
         <div className="ld-col">
-          <h4>{t('rp.pitStops')}</h4>
+          <p className="ld-col-title">{t('rp.pitStops')}</p>
           {detail.pits.length === 0 && <p className="muted">{t('rp.none')}</p>}
           {detail.pits.map((p, i) => (
             <div className="ld-kv" key={i}>
@@ -345,7 +345,7 @@ export default function Live() {
             })()}
           />
           <div className="rp-side-card">
-            <h4 className="rp-side-title">{t('rp.session')}</h4>
+            <h2 className="rp-side-title">{t('rp.session')}</h2>
             <div className="rp-kv"><span>{t('rp.session')}</span><span>{sessionName(board.session.sessionName)}</span></div>
             <div className="rp-kv"><span>{t('rp.circuit')}</span><span>{board.session.location}</span></div>
             <div className="rp-kv">

@@ -267,7 +267,7 @@ function RowDetail({ data, row }: { data: ReplayData; row: Row }) {
       <div className="ld-cols">
         {/* Phone-only: the board drops its Last/Best columns there. */}
         <div className="ld-col ld-col--phone">
-          <h4>{tr('tel.lap')}</h4>
+          <p className="ld-col-title">{tr('tel.lap')}</p>
           <div className="ld-kv">
             <span>{tr('rp.last')}</span>
             <span className="mono">{fmtTime(row.last)}</span>
@@ -278,7 +278,7 @@ function RowDetail({ data, row }: { data: ReplayData; row: Row }) {
           </div>
         </div>
         <div className="ld-col">
-          <h4>{tr('rp.speeds')}</h4>
+          <p className="ld-col-title">{tr('rp.speeds')}</p>
           <div className="ld-kv">
             <span>{tr('rp.speedTrap')}</span>
             <span className="mono">
@@ -287,7 +287,7 @@ function RowDetail({ data, row }: { data: ReplayData; row: Row }) {
           </div>
         </div>
         <div className="ld-col">
-          <h4>{tr('rp.tyres')}</h4>
+          <p className="ld-col-title">{tr('rp.tyres')}</p>
           {stints.map((s) => {
             const t = tyre(s.compound)
             return (
@@ -616,7 +616,7 @@ export default function ReplayPlayer() {
           <aside className="rp-side">
             <BestSectors sectors={bestSectors} fastest={fastest} />
             <div className="rp-side-card">
-              <h4 className="rp-side-title">{tr('rp.session')}</h4>
+              <h2 className="rp-side-title">{tr('rp.session')}</h2>
               <div className="rp-kv"><span>{tr('rp.circuit')}</span><span>{data.session.location}</span></div>
               {current && (
                 <div className="rp-kv"><span>{tr('rp.session')}</span><span>{sessionLabel(current.sessionName, tr)}</span></div>

@@ -86,9 +86,10 @@
   color: var(--color-muted);
 }
 
-/* The leader's card (first in the sorted grid) gets the red position. */
+/* The leader's card (first in the sorted grid) gets the red position (the
+   lighter red: the brand red is under 4.5:1 on the card at this size). */
 .grid > .ecard:first-child .rank {
-  color: var(--color-accent);
+  color: var(--color-accent-hover);
 }
 
 /* The car number, a reading in the corner of the art. */

@@ -150,10 +150,10 @@ export default function TeamProfile() {
             <div className="profile-cols">
               {profile.lineage.length > 1 && (
                 <div className="card">
-                  <h3 className="wknd-section">
+                  <h2 className="wknd-section">
                     {t('team.lineage')}
                     <span className="wknd-when">{t('team.lineageHint')}</span>
-                  </h3>
+                  </h2>
                   <ol className="lineage">
                     {profile.lineage.map((l) => {
                       const here = l.constructorId === profile.constructorId
@@ -177,7 +177,7 @@ export default function TeamProfile() {
               )}
               {profile.engines.length > 0 && (
                 <div className="card">
-                  <h3 className="wknd-section">{t('team.engines')}</h3>
+                  <h2 className="wknd-section">{t('team.engines')}</h2>
                   <ul className="family-list">
                     {profile.engines
                       .slice()
@@ -205,7 +205,7 @@ export default function TeamProfile() {
           />
 
           <div className="card">
-            <h3 className="wknd-section">{t('drv.career')}</h3>
+            <h2 className="wknd-section">{t('drv.career')}</h2>
             <div className="table-scroll">
             <table className="standings">
               <thead>

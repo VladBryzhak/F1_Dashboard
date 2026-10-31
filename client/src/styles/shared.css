@@ -754,3 +754,54 @@ a.sched-ics {
     transform: none;
   }
 }
+
+/* ---------- Accessibility helpers ---------- */
+/* Text for screen readers only (a column heading over a row of arrows). */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* A clickable table row's own link and toggle: the mouse can click the whole
+   row, the keyboard tabs to these. */
+.row-link {
+  color: inherit;
+  text-decoration: none;
+}
+
+.row-link:hover {
+  text-decoration: underline;
+  text-decoration-color: var(--color-rule-2);
+  text-underline-offset: 3px;
+}
+
+.row-link:active {
+  color: var(--color-accent);
+}
+
+.row-link:focus-visible,
+.row-toggle:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+.row-toggle {
+  padding: 0 var(--space-2xs);
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+
+.row-toggle:active {
+  color: var(--color-accent);
+}

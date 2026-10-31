@@ -1,5 +1,5 @@
 import { Fragment, useEffect, useRef, useState } from 'react'
-import { Navigate, useNavigate, useParams, useSearchParams } from 'react-router-dom'
+import { Link, Navigate, useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import { api } from '../api/client'
 import SubscribePanel, { SubscribeToggle } from '../components/CalendarSubscribe'
 import Flag from '../components/Flag'
@@ -88,7 +88,9 @@ export default function Calendar() {
                 <th>{t('cal.colDate')}</th>
                 <th>{t('cal.colWinner')}</th>
                 <th>{t('cal.colTeam')}</th>
-                <th></th>
+                <th>
+                  <span className="sr-only">{t('common.details')}</span>
+                </th>
               </tr>
             </thead>
             <tbody>
@@ -118,14 +120,26 @@ export default function Calendar() {
                           ? t('cal.viewWeekend', { name: gpTitle(r.name, lang) })
                           : t(open ? 'cal.hideSchedule' : 'cal.showSchedule')
                       }
-                      aria-expanded={done ? undefined : open}
                     >
                       <td>
                         <span className="entity">
                           <Flag code={r.countryCode} nationality={r.nationality} />
-                          <span className="name" style={{ marginLeft: '0.65rem' }}>
-                            {gpShort(r.name, lang)}
-                          </span>
+                          {/* The row is clickable for the mouse; the link and the
+                              schedule button below are the keyboard's way in. */}
+                          {done ? (
+                            <Link
+                              to={`/calendar/${season}/${r.round}`}
+                              className="name row-link"
+                              style={{ marginLeft: '0.65rem' }}
+                              onClick={(e) => e.stopPropagation()}
+                            >
+                              {gpShort(r.name, lang)}
+                            </Link>
+                          ) : (
+                            <span className="name" style={{ marginLeft: '0.65rem' }}>
+                              {gpShort(r.name, lang)}
+                            </span>
+                          )}
                           {r.isSprint && <span className="sprint-badge">{t('cal.sprint')}</span>}
                         </span>
                       </td>
@@ -155,7 +169,22 @@ export default function Calendar() {
                         ) : null}
                       </td>
                       <td className="muted chevron">
-                        {done ? '›' : <span className={`sched-caret${open ? ' open' : ''}`}>›</span>}
+                        {done ? (
+                          <span aria-hidden="true">›</span>
+                        ) : (
+                          <button
+                            type="button"
+                            className="row-toggle"
+                            aria-expanded={open}
+                            aria-label={t(open ? 'cal.hideSchedule' : 'cal.showSchedule')}
+                            onClick={(e) => {
+                              e.stopPropagation()
+                              toggleSchedule(r.round)
+                            }}
+                          >
+                            <span className={`sched-caret${open ? ' open' : ''}`}>›</span>
+                          </button>
+                        )}
                       </td>
                     </tr>
                     {open && (

@@ -3,6 +3,7 @@
 const en = {
   // Navigation
   'nav.home': 'Home',
+  'nav.skip': 'Skip to content',
   'nav.live': 'Live',
   'nav.standings': 'Standings',
   'nav.calendar': 'Calendar',
@@ -76,6 +77,7 @@ const en = {
   'common.season': 'Season',
   'common.round': 'Round',
   'common.next': 'Next',
+  'common.details': 'Details',
 
   // Sessions
   'session.fp1': 'Practice 1',

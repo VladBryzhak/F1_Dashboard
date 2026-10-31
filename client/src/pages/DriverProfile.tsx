@@ -238,12 +238,12 @@ export default function DriverProfile() {
             <div className="profile-cols">
               {profile.recentRaces.length > 0 && (
                 <div className="card">
-                  <h3 className="wknd-section">
+                  <h2 className="wknd-section">
                     {t('drv.form')}
                     <span className="wknd-when">
                       {t('drv.formHint', { n: profile.recentRaces.length })}
                     </span>
-                  </h3>
+                  </h2>
                   <div className="form-row">
                     {profile.recentRaces.map((r) => (
                       <FormChip key={`${r.season}-${r.round}`} r={r} />
@@ -253,7 +253,7 @@ export default function DriverProfile() {
               )}
               {profile.family.length > 0 && (
                 <div className="card">
-                  <h3 className="wknd-section">{t('drv.family')}</h3>
+                  <h2 className="wknd-section">{t('drv.family')}</h2>
                   <ul className="family-list">
                     {profile.family.map((f) => (
                       <li key={f.driverId}>
@@ -268,7 +268,7 @@ export default function DriverProfile() {
           )}
 
           <div className="card">
-            <h3 className="wknd-section">{t('drv.career')}</h3>
+            <h2 className="wknd-section">{t('drv.career')}</h2>
             <table className="standings">
               <thead>
                 <tr>

@@ -364,7 +364,7 @@
   gap: 1.5rem;
 }
 
-.ld-col h4 {
+.ld-col-title {
   margin: 0 0 0.6rem;
   font-size: var(--text-sm);
   font-weight: 600;

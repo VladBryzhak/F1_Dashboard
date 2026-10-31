@@ -45,7 +45,7 @@ export default function Footer() {
         </div>
 
         <nav className="footer-col" aria-label="Footer">
-          <h4>{t('footer.explore')}</h4>
+          <h2>{t('footer.explore')}</h2>
           <ul>
             {quickLinks.map((l) => (
               <li key={l.to}>
@@ -56,7 +56,7 @@ export default function Footer() {
         </nav>
 
         <div className="footer-col">
-          <h4>{t('footer.credits')}</h4>
+          <h2>{t('footer.credits')}</h2>
           <ul>
             <li>
               {t('footer.dataBy')} <Ext href="https://github.com/f1db/f1db">f1db</Ext> (
@@ -85,7 +85,7 @@ export default function Footer() {
         </div>
 
         <div className="footer-col footer-legal">
-          <h4>{t('footer.legal')}</h4>
+          <h2>{t('footer.legal')}</h2>
           <p>{t('footer.trademark')}</p>
           <p>{t('footer.independent')}</p>
           <p>{t('footer.analytics')}</p>

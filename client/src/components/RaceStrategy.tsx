@@ -254,11 +254,11 @@ export default function RaceStrategy({
       {!loading && data && (
         <>
           <div className="card">
-            <h3 className="wknd-section">{t('strat.lapChart')}</h3>
+            <h2 className="wknd-section">{t('strat.lapChart')}</h2>
             <LapChart data={data} />
           </div>
           <div className="card" style={{ marginTop: '1rem' }}>
-            <h3 className="wknd-section">{t('strat.tyres')}</h3>
+            <h2 className="wknd-section">{t('strat.tyres')}</h2>
             <TyreStrategy data={data} />
           </div>
           <p className="muted strat-source">{t('strat.source')}</p>

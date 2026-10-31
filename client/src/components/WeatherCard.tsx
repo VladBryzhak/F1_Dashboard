@@ -30,7 +30,7 @@ export default function WeatherCard({ sample }: { sample: WeatherSample | null }
   const deg = (n: number | null) => (n == null ? '' : `${fmtNum(n, { maximumFractionDigits: 1 })}°C`)
   return (
     <div className="rp-side-card rp-weather">
-      <h4 className="rp-side-title">{t('wx.title')}</h4>
+      <h2 className="rp-side-title">{t('wx.title')}</h2>
       <div className="rp-kv">
         <span>{t('wx.air')}</span>
         <span className="mono">{deg(sample.air)}</span>

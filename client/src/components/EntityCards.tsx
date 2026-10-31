@@ -132,9 +132,9 @@ export function DriverCard({
       />
       {d.permanentNumber ? <span className="big-num">{d.permanentNumber}</span> : null}
       <div className="rank">P{d.position}</div>
-      <h3 className="ename">
+      <h2 className="ename">
         {d.givenName} {d.familyName}
-      </h3>
+      </h2>
       <div className="esub">
         <Flag code={d.countryCode} nationality={d.nationality} />
         <span className="eswatch" style={{ background: color }} aria-hidden="true" />
@@ -169,10 +169,10 @@ export function TeamCard({
         alt={`${c.name} Formula 1 car`}
       />
       <div className="rank">P{c.position}</div>
-      <h3 className="ename">
+      <h2 className="ename">
         <span className="eswatch" style={{ background: color }} aria-hidden="true" />
         {c.name}
-      </h3>
+      </h2>
       <div className="esub">
         <Flag code={c.countryCode} nationality={c.nationality} />
         {lang === 'uk' && c.countryCode ? countryName(c.countryCode, locale) : c.nationality}

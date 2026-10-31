@@ -101,6 +101,10 @@ export default function Layout() {
 
   return (
     <div className="app">
+      {/* First stop for the keyboard: past the header to the page. */}
+      <a className="skip-link" href="#main">
+        {t('nav.skip')}
+      </a>
       <header
         ref={topbarRef}
         className={`topbar${menuOpen ? ' menu-open' : ''}`}
@@ -160,7 +164,7 @@ export default function Layout() {
           ))}
         </nav>
       </header>
-      <main className="content">
+      <main className="content" id="main" tabIndex={-1}>
         {/* A page that fails to render shows a way out inside the frame;
             moving to another page clears it. */}
         <ErrorBoundary resetKey={pathname} fallback={(error) => <ErrorScreen error={error} />}>

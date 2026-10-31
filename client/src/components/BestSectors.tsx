@@ -41,7 +41,7 @@ export default function BestSectors({
 
   return (
     <div className="rp-side-card bs-card">
-      <h4 className="rp-side-title">{t('bs.title')}</h4>
+      <h2 className="rp-side-title">{t('bs.title')}</h2>
       {empty ? (
         <p className="bs-empty">{t('bs.none')}</p>
       ) : (

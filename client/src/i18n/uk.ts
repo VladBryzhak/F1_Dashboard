@@ -5,6 +5,7 @@ import type { Dict } from './en'
 const uk: Dict & Record<string, string> = {
   // Navigation
   'nav.home': 'Головна',
+  'nav.skip': 'Перейти до вмісту',
   'nav.live': 'Наживо',
   'nav.standings': 'Залік',
   'nav.calendar': 'Календар',
@@ -77,6 +78,7 @@ const uk: Dict & Record<string, string> = {
   'common.season': 'Сезон',
   'common.round': 'Етап',
   'common.next': 'Наступна',
+  'common.details': 'Деталі',
 
   // Sessions
   'session.fp1': 'Практика 1',

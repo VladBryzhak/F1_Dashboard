@@ -5,6 +5,31 @@
 /* Site header: logo, navigation, search button, EN | UA switch, burger menu. */
 
 /* ---------- Header bar, logo and nav ---------- */
+/* Hidden until a keyboard user tabs to it. */
+.skip-link {
+  position: absolute;
+  left: var(--space-md);
+  top: -100px;
+  z-index: 100;
+  padding: var(--space-xs) var(--space-md);
+  border-radius: var(--radius-pill);
+  background: var(--color-accent);
+  color: var(--color-accent-ink);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.skip-link:focus-visible {
+  top: var(--space-xs);
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+/* The skip link's target: focusable from it, no ring on the whole page. */
+main:focus {
+  outline: none;
+}
+
 .topbar {
   display: flex;
   align-items: center;

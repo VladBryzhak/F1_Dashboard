@@ -180,7 +180,7 @@ function Duel({
 
       {duel.rounds.length > 0 && (
         <>
-          <h4 className="duel-sub">{t('duel.byRound')}</h4>
+          <h3 className="duel-sub">{t('duel.byRound')}</h3>
           <Strip duel={duel} a={a} b={b} />
           <div className="duel-legend">
             <span>
@@ -232,10 +232,10 @@ export default function TeammateDuels({
       style={{ '--team': color, '--mate': mateColor(color) } as CSSProperties}
     >
       <div className="duels-head">
-        <h3 className="wknd-section">
+        <h2 className="wknd-section">
           {t('duel.title')}
           <span className="wknd-when">{t('duel.hint', { team: teamName })}</span>
-        </h3>
+        </h2>
         {seasons.length > 0 && (
           <select
             value={season}
