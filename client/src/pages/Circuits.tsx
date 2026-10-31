@@ -23,7 +23,7 @@ function CircuitTile({ c }: { c: CircuitSummary }) {
   return (
     <Link to={`/circuits/${c.circuitId}`} className="circuit-tile">
       {c.outline && (
-        <span className="circuit-tile-art">
+        <span className="circuit-tile-art co-frame">
           <CircuitOutline outline={c.outline} label={t('circ.outlineOf', { name: c.name })} />
         </span>
       )}

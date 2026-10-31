@@ -10,6 +10,23 @@
   overflow: visible;
 }
 
+/* A frame with an aspect ratio (.co-frame, padding from --co-pad-y and
+   --co-pad-x): the drawing is placed absolutely inside the padding, so its
+   size is definite in every browser. Safari couldn't resolve height: 100%
+   against an aspect-ratio box and drew the track too big, off to one side. */
+.co-frame {
+  position: relative;
+  padding: var(--co-pad-y) var(--co-pad-x);
+}
+
+.co-frame > .circuit-outline {
+  position: absolute;
+  top: var(--co-pad-y);
+  left: var(--co-pad-x);
+  width: calc(100% - 2 * var(--co-pad-x));
+  height: calc(100% - 2 * var(--co-pad-y));
+}
+
 .circuit-outline .co-track {
   fill: none;
   stroke: var(--color-accent);

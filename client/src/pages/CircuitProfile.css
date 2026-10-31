@@ -19,8 +19,13 @@
 }
 
 .circ-map {
+  /* Full width of its column: the drawing inside is placed absolutely, so it
+     no longer gives the frame a width. */
+  width: 100%;
+  box-sizing: border-box;
   aspect-ratio: 16 / 10;
-  padding: 1.4rem 1.6rem;
+  --co-pad-y: 1.4rem;
+  --co-pad-x: 1.6rem;
   background: var(--color-paper-3);
   border: var(--rule-hair) solid var(--color-rule);
   border-radius: var(--radius-card);
@@ -42,7 +47,8 @@
   .circ-map {
     order: 2;
     margin-bottom: 1.1rem;
-    padding: 1rem 1.2rem;
+    --co-pad-y: 1rem;
+    --co-pad-x: 1.2rem;
   }
   .circ-hero.has-map .circ-actions {
     order: 3;

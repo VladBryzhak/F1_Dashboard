@@ -168,7 +168,7 @@ export default function CircuitProfile() {
           </div>
         </div>
         {c.outline && (
-          <div className="circ-map">
+          <div className="circ-map co-frame">
             <CircuitOutline
               outline={c.outline}
               label={t('circ.outlineOf', { name: c.name })}

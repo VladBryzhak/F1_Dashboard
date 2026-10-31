@@ -6,9 +6,12 @@
 
 /* Global site footer: brand + attributions + disclaimer + links, laid out as
    columns spread across the full content width. */
+/* The page column already ends with its own bottom padding, so the footer
+   adds little: 88 px of empty space opened up between a page and the footer
+   on phones before. */
 .site-footer {
   border-top: var(--rule-hair) solid var(--color-rule);
-  margin-top: var(--space-2xl);
+  margin-top: var(--space-lg);
   background: var(--color-paper-3);
   padding: 2.5rem 1.75rem calc(2.5rem + env(safe-area-inset-bottom));
 }
@@ -131,6 +134,12 @@ nav.footer-col ul {
   .footer-grid {
     grid-template-columns: 1fr;
     gap: 1.75rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .site-footer {
+    margin-top: 0;
   }
 }
 

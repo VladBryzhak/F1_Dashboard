@@ -229,7 +229,7 @@ function NextRaceCard({ race }: { race: NextRace }) {
         </span>
       </span>
       {race.outline && (
-        <span className="home-next-map">
+        <span className="home-next-map co-frame">
           <CircuitOutline
             outline={race.outline}
             label={t('circ.outlineOf', { name: race.placeName || race.grandPrixName })}

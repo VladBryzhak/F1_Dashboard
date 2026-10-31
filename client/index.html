@@ -48,6 +48,11 @@
     <!-- Self-hosted fonts (public/fonts). Fetched without blocking render, then
          applied as a stylesheet; font-display: swap shows text right away. -->
     <link rel="preload" as="style" href="/fonts/fonts.css" onload="this.onload=null;this.rel='stylesheet'" />
+    <!-- The display face's heaviest cut draws every page title and the home
+         page's big car number, which stays hidden until the face is ready (no
+         layout shift): fetch it with the HTML, not after the app has rendered
+         (on phones that was a 1 to 2 s wait for the number). -->
+    <link rel="preload" as="font" type="font/woff2" href="/fonts/saira-condensed-800-latin.woff2" crossorigin />
     <noscript><link rel="stylesheet" href="/fonts/fonts.css" /></noscript>
     <title>Paddock Times: Formula 1 Standings, Calendar & Stats</title>
   </head>

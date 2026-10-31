@@ -80,7 +80,8 @@
   display: block;
   aspect-ratio: 16 / 10;
   margin: 0 -1.05rem 0.6rem;
-  padding: 0.9rem 1.1rem;
+  --co-pad-y: 0.9rem;
+  --co-pad-x: 1.1rem;
   background: var(--color-paper-3);
   border-bottom: var(--rule-hair) solid var(--color-rule);
 }

@@ -256,11 +256,29 @@ main:focus {
     /* Add the iOS status-bar / notch inset to the top padding in standalone. */
     padding: calc(0.55rem + env(safe-area-inset-top)) max(1rem, env(safe-area-inset-right))
       0.55rem max(1rem, env(safe-area-inset-left));
-    gap: 1rem;
+    /* Logo, search, language and menu fit a 360 px phone with room to spare:
+       wider gaps pushed the menu button into the right margin on a 375 pt
+       iPhone (Safari doesn't shrink it). */
+    gap: 0.5rem;
   }
+  .brand {
+    flex-shrink: 0;
+  }
+  /* The three controls share one height (38 px), the burger too. */
   .nav-toggle {
     display: inline-flex;
+    flex-shrink: 0;
     margin-left: 0;
+    width: 38px;
+    height: 38px;
+  }
+  .nav-toggle svg {
+    width: 20px;
+    height: 20px;
+  }
+  .nav-toggle-dot {
+    top: 6px;
+    right: 6px;
   }
   .lang-switch {
     order: 0;
@@ -268,7 +286,7 @@ main:focus {
   .search-btn {
     order: 0;
     height: 38px;
-    width: 40px;
+    width: 38px;
     justify-content: center;
     padding: 0;
   }
@@ -345,9 +363,12 @@ main:focus {
   }
 }
 
-/* Header gap tweaks so search + language sit together at the right. */
-.search-btn + .lang-switch {
-  margin-left: 0.6rem;
+/* Header gap tweaks so search + language sit together at the right (wide
+   screens; phones space the controls with the header's own gap). */
+@media (min-width: 1025px) {
+  .search-btn + .lang-switch {
+    margin-left: 0.6rem;
+  }
 }
 
 /* Pressed states for the header controls. */
