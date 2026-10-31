@@ -170,7 +170,6 @@ const en = {
   'circ.previousNames': 'Previously known as {names}.',
   'circ.map': 'Open map',
   'circ.next': 'Next race here: {gp}, {date}',
-  'circ.hostedGps': 'Grands Prix: {list}',
   'circ.viewCircuit': 'Circuit guide',
   'plural.turns_one': '{n} turn',
   'plural.turns_other': '{n} turns',

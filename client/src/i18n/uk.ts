@@ -171,7 +171,6 @@ const uk: Dict & Record<string, string> = {
   'circ.previousNames': 'Попередні назви: {names}.',
   'circ.map': 'Відкрити мапу',
   'circ.next': 'Наступна гонка тут: {gp}, {date}',
-  'circ.hostedGps': 'Гран-прі: {list}',
   'circ.viewCircuit': 'Про трасу',
   'plural.turns_one': '{n} поворот',
   'plural.turns_few': '{n} повороти',

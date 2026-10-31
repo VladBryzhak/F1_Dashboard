@@ -95,9 +95,7 @@ Social crawlers don't run JS, so the Express SPA fallback (`server/src/services/
 
 ## Environment notes (this machine)
 
-This Windows machine runs **Avast antivirus with HTTPS/TLS scanning**, which re-signs all TLS traffic with the "Avast Web/Mail Shield Root" CA. Without trusting that CA, npm and Node `fetch` fail certificate verification.
-
-- npm is configured with `cafile` → `~/.certs/avast-root.pem`.
-- `NODE_EXTRA_CA_CERTS` (user env var) also points at that PEM so Node's `fetch` trusts Avast. **Node dev/build/run needs this env var set** or outbound HTTPS to data APIs fails.
-- git uses `http.sslVerify=false` for HTTPS; the `origin` remote uses SSH (`git@github.com:VladBryzhak/F1_Dashboard.git`).
-- Node is v18, so `create-vite` was pinned to v5 (v7 needs Node 20+). Node 18's global `fetch` *does* honor `NODE_EXTRA_CA_CERTS` (verified).
+- macOS. Node 20 (20.20.2) through nvm (`~/.nvm`), not system-wide; the repo and Render ask for Node >= 20.
+- git remote over SSH: `git@github.com:VladBryzhak/F1_Dashboard.git`.
+- Claude Code's preview servers come from `Сайти/.claude/launch.json` (the folder above the repo), which calls node and `npm-cli.js` by absolute nvm paths with an explicit `PATH`. After a Node upgrade those paths must be updated, or the servers fail with "No such file or directory". `F1_Dashboard/.claude/launch.json` in the repo is an older, simpler one that the preview tool doesn't use.
+- Deploys: Render builds with `npm run build` at the repo root (installs and builds client and server) and starts `npm start` (`render.yaml`); the owner deploys by hand after a push to `main`.
