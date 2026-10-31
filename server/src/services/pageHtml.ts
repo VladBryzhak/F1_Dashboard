@@ -1,10 +1,11 @@
 import fs from "fs";
 import path from "path";
-import { getCurrentSeason, isDatasetReady, warmDataset } from "./f1db";
+import { getCurrentSeason, getDriverProfile, isDatasetReady, warmDataset } from "./f1db";
 import { homePayload } from "./home";
 import { pageJsonLd } from "./jsonld";
 import { describePage, type PageMeta } from "./og";
 import { pageStatus, type PageStatus } from "./pageRoutes";
+import { driverPortraitUrl } from "./portraits";
 import { notFoundSnapshot, pageSnapshot } from "./snapshot";
 
 // Serves the SPA shell with this page's own <title>, description, canonical
@@ -67,6 +68,26 @@ async function homeBoot(): Promise<string> {
   } catch {
     return "";
   }
+}
+
+// A driver profile's portrait is its largest image: name it in the HTML for
+// an early preload, as the home page does with its hero, in the same widths
+// and sizes as the page's <img> (client/src/lib/f1meta.ts f1SrcSet, sizes in
+// pages/DriverProfile.tsx) so the browser reuses the download.
+const PORTRAIT_WIDTHS = [80, 120, 240, 360, 480, 600, 800];
+const PROFILE_PORTRAIT_SIZES = "(max-width: 860px) 250px, 170px";
+
+async function profilePreload(pagePath: string): Promise<string> {
+  const m = /^\/drivers\/([^/?]+)$/.exec(pagePath.split("?")[0]);
+  if (!m || /^\d{4}$/.test(m[1])) return "";
+  const p = await getDriverProfile(decodeURIComponent(m[1])).catch(() => null);
+  const team = p?.seasons[p.seasons.length - 1]?.constructorId;
+  if (!p || !team) return "";
+  const url = (w: number) => driverPortraitUrl(p.driverId, team, p.lastSeason, w);
+  const src = url(600);
+  if (!src) return "";
+  const set = PORTRAIT_WIDTHS.map((w) => `${url(w)} ${w}w`).join(", ");
+  return `<link rel="preload" as="image" href="${attr(src)}" imagesrcset="${attr(set)}" imagesizes="${PROFILE_PORTRAIT_SIZES}" fetchpriority="high" />`;
 }
 
 const attr = (s: string) =>
@@ -236,6 +257,10 @@ export async function pageHtml(
 
   const clean = pagePath.split("?")[0].replace(/\/+$/, "");
   if (clean === "" && isDatasetReady()) html = html.replace("</head>", `${await homeBoot()}</head>`);
+  if (meta && clean.startsWith("/drivers/")) {
+    const preload = await profilePreload(clean);
+    if (preload) html = html.replace("</head>", `${preload}</head>`);
+  }
   // Crawlers also get the page's text and links in #root (see snapshot.ts);
   // people get the empty root and the app, so their first paint is unchanged.
   if (BOT.test(userAgent) && isDatasetReady()) {

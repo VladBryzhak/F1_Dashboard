@@ -158,6 +158,8 @@ export default function DriverProfile() {
               // applied to that first candidate).
               width={450}
               height={1293}
+              // Keep in step with the server's preload (PROFILE_PORTRAIT_SIZES
+              // in server/src/services/pageHtml.ts).
               sizes="(max-width: 860px) 250px, 170px"
               color={color}
               alt={`${profile.givenName} ${profile.familyName}`}

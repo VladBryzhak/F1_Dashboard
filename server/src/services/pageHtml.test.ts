@@ -9,6 +9,10 @@ vi.mock("./f1db", () => ({
   getCurrentSeason: async () => 2026,
   hasPageSubject: async () => false,
   hasRace: async () => false,
+  getDriverProfile: async (id: string) =>
+    id === "max-verstappen"
+      ? { driverId: "max-verstappen", lastSeason: 2026, seasons: [{ constructorId: "red-bull" }] }
+      : null,
 }));
 // The page's own text and preview card don't matter here.
 vi.mock("./og", () => ({ describePage: async () => ({ title: "T", description: "D", card: {} }) }));
@@ -57,6 +61,22 @@ describe("pageHtml", () => {
     expect(html).toContain('hreflang="uk" href="https://f1-dashboard-bryzhak.onrender.com/uk/standings"');
     expect(html).toContain('href="https://f1-dashboard-bryzhak.onrender.com/uk/standings"'); // canonical
     expect(html).toContain("window.__SEASON__=2026");
+  });
+});
+
+describe("driver profile preload", () => {
+  it("names the portrait with the page's srcset and sizes", async () => {
+    const html = await pageHtml(file, "/drivers/max-verstappen", "Mozilla/5.0", "n");
+    const tag = html.match(/<link rel="preload" as="image"[^>]*>/)?.[0] ?? "";
+    expect(tag).toContain("c_lfill,w_600/");
+    expect(tag).toContain("/2026/redbullracing/maxver01/");
+    expect(tag).toContain(" 80w, ");
+    expect(tag).toContain(' imagesizes="(max-width: 860px) 250px, 170px"');
+  });
+
+  it("adds none for a season list or a driver without a portrait", async () => {
+    expect(await pageHtml(file, "/drivers/2025", "Mozilla/5.0", "n")).not.toContain('as="image"');
+    expect(await pageHtml(file, "/drivers/juan-manuel-fangio", "Mozilla/5.0", "n")).not.toContain('as="image"');
   });
 });
 
