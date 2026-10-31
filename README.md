@@ -80,7 +80,7 @@ telemetry and replays.
 
 | Layer | Stack |
 |---|---|
-| Frontend | React 18, TypeScript, Vite 5, React Router 6, Recharts |
+| Frontend | React 18, TypeScript, Vite 6, React Router 7, Recharts |
 | Backend | Node 20, Express 4, TypeScript, Helmet, node-cache |
 | Data | [f1db](https://github.com/f1db/f1db) (CC-BY 4.0), [OpenF1](https://openf1.org/), Wikimedia Commons / Wikidata |
 | Hosting | Render (single web service) |
@@ -188,7 +188,7 @@ Open http://localhost:5173 — the Vite dev server proxies `/api` to the backend
 ### Scripts
 
 **client:** `npm run dev` · `npm run build` (type-check + production build) · `npm run lint`
-**server:** `npm run dev` (ts-node-dev reload) · `npm run build` (`tsc`) · `npm start`
+**server:** `npm run dev` (tsx watch) · `npm run build` (`tsc`) · `npm start`
 
 ### Environment variables (server)
 
@@ -301,7 +301,7 @@ Paddock Times — це монорепозиторій із **React SPA** та **
 
 | Рівень | Стек |
 |---|---|
-| Фронтенд | React 18, TypeScript, Vite 5, React Router 6, Recharts |
+| Фронтенд | React 18, TypeScript, Vite 6, React Router 7, Recharts |
 | Бекенд | Node 20, Express 4, TypeScript, Helmet, node-cache |
 | Дані | [f1db](https://github.com/f1db/f1db) (CC-BY 4.0), [OpenF1](https://openf1.org/), Wikimedia Commons / Wikidata |
 | Хостинг | Render (один веб-сервіс) |
@@ -410,7 +410,7 @@ npm run dev
 ### Скрипти
 
 **client:** `npm run dev` · `npm run build` (перевірка типів + продакшн-збірка) · `npm run lint`
-**server:** `npm run dev` (ts-node-dev з перезавантаженням) · `npm run build` (`tsc`) · `npm start`
+**server:** `npm run dev` (tsx watch з перезапуском) · `npm run build` (`tsc`) · `npm start`
 
 ### Змінні середовища (сервер)
 

@@ -8,7 +8,7 @@ Paddock Times (repo and Render service still named F1_Dashboard / f1-dashboard) 
 
 ## Layout
 
-- `client/` — React 18 + Vite 5 + TypeScript. React Router for pages.
+- `client/` — React 18 + Vite 6 + TypeScript. React Router for pages.
 - `server/` — Node + Express + TypeScript. Fetches/normalizes/caches F1 data.
 
 The **client only talks to our backend** (`/api/*`). The **server** talks to the upstream F1 APIs, normalizes their verbose shapes into the flat types in `server/src/types/f1.ts` (mirrored in `client/src/types/f1.ts`), and caches responses.
@@ -42,7 +42,7 @@ Client (`cd client`):
 - `npm run lint`
 
 Server (`cd server`):
-- `npm run dev` — ts-node-dev with reload on http://localhost:3001
+- `npm run dev` — tsx watch (restarts on change) on http://localhost:3001
 - `npm run build` — `tsc` to `dist/`
 - `npm start` — run built server
 
@@ -89,6 +89,7 @@ Social crawlers don't run JS, so the Express SPA fallback (`server/src/services/
 ## Current season
 
 - The current season is the newest in the dataset (`getCurrentSeason`). `pageHtml` writes it into every page as `window.__SEASON__`, and `CURRENT_SEASON` in `client/src/lib/seasons.ts` reads it (the calendar year on a cold start), so the app and the server agree on what `/standings` is and the site moves to a new season by itself. Never hard-code a year; season lists derive from it.
+- Driver profiles get the same early preload for their portrait (`profilePreload` in `pageHtml.ts`, widths and sizes in step with `f1SrcSet` and `pages/DriverProfile.tsx`).
 - Fonts are self-hosted in `client/public/fonts` (Saira, OFL) and loaded by a non-blocking `fonts.css`; gtag.js loads after the page's `load` event, when the browser is idle.
 
 ## Server conventions
