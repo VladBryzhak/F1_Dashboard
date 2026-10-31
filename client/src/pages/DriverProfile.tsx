@@ -158,7 +158,7 @@ export default function DriverProfile() {
               // applied to that first candidate).
               width={450}
               height={1293}
-              sizes="(max-width: 768px) 110px, 170px"
+              sizes="(max-width: 860px) 250px, 170px"
               color={color}
               alt={`${profile.givenName} ${profile.familyName}`}
               eager

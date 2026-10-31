@@ -188,6 +188,15 @@
     min-height: 0;
     height: auto;
   }
+  /* The full-length render was a narrow figure (about 100 px wide) in a wide
+     frame: on phones show it from the head to the waist, larger. */
+  .profile-hero .head-wrap:not(.is-photo) .head-img {
+    width: min(64%, 250px);
+    height: 100%;
+    max-height: none;
+    object-fit: cover;
+    object-position: 50% 0;
+  }
   .profile-hero .stat-grid {
     margin: var(--space-md) 1.25rem 1.25rem;
   }
