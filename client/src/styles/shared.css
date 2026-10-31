@@ -675,6 +675,7 @@ a.sched-ics {
    both cropped from the top so the faces line up. */
 .drv-thumb {
   flex: none;
+  position: relative;
   display: grid;
   place-items: center;
   width: 88px;
@@ -685,7 +686,13 @@ a.sched-ics {
   background: var(--color-paper-3);
 }
 
+/* The photo fills the tile, cut from the top (head and shoulders). Placed
+   absolutely: as a centred grid item its height: 100% wasn't applied, so a
+   full-length render kept its own height and the tile showed its middle
+   (dark overalls, the head below the edge). */
 .drv-thumb img {
+  position: absolute;
+  inset: 0;
   width: 100%;
   height: 100%;
   object-fit: cover;

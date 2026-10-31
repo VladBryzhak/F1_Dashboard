@@ -70,12 +70,15 @@
   align-items: stretch;
 }
 
+/* Cut a little below the top: faces sit in the upper part of most photos,
+   but some have a trophy or sky above the head, which a cut from the very
+   top kept while the face fell off the bottom (Rosberg). */
 .profile-hero .head-wrap.is-photo .head-img {
   width: 100%;
   height: 100%;
   max-height: none;
   object-fit: cover;
-  object-position: top center;
+  object-position: 50% 30%;
 }
 
 .profile-hero--team .car-wrap {
