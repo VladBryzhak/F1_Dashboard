@@ -1,0 +1,36 @@
+# Checks every push and pull request: the client's lint and build (types
+# included), the server's build, and the tests (npm test at the root, see
+# vitest.config.mts). A red mark on GitHub means something broke before it
+# reaches Render.
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: |
+            package-lock.json
+            client/package-lock.json
+            server/package-lock.json
+      - name: Install
+        run: |
+          npm ci
+          npm ci --prefix client
+          npm ci --prefix server
+      - name: Client lint
+        run: npm --prefix client run lint
+      - name: Client build (type check + bundle)
+        run: npm --prefix client run build
+      - name: Server build (type check)
+        run: npm --prefix server run build
+      - name: Tests
+        run: npm test

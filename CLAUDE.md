@@ -46,6 +46,11 @@ Server (`cd server`):
 - `npm run build` — `tsc` to `dist/`
 - `npm start` — run built server
 
+Tests and checks (repo root):
+- `npm install` once at the root (Vitest lives there, not in client/server, so the Render build doesn't install it).
+- `npm test` — Vitest, `vitest.config.mts`: `server/src/**/*.test.ts` and `client/src/**/*.test.ts`, no network (f1db and OpenF1 are replaced with `vi.mock` stubs; the OpenF1 queue runs on fake timers). The builds leave `*.test.ts` out (`exclude` in `server/tsconfig.json` and `client/tsconfig.app.json`).
+- `npm run check` — client lint and build, server build, tests: what CI runs on every push (`.github/workflows/ci.yml`). Add a test next to the logic you change: page routes, redirects, the queue, titles, UA wording.
+
 Run both (two terminals): `server` then `client`. The Vite proxy (`client/vite.config.ts`) forwards `/api` to the server, so no CORS issues in dev.
 
 ## Data sources (free, no API key)

@@ -944,12 +944,20 @@ export async function getCalendar(season: string): Promise<CalendarResponse> {
 // then, P1 in the standings is the leader, not the champion. Worked out once
 // per dataset.
 const completeSeasons = new WeakMap<Dataset, Set<number>>();
+// The seasons whose every round has a winner (exported for the tests).
+export function completeSeasonsOf(
+  races: { year: number; round: number }[],
+  hasWinner: (key: string) => boolean
+): Set<number> {
+  const open = new Set<number>();
+  for (const r of races) if (!hasWinner(`${r.year}:${r.round}`)) open.add(r.year);
+  return new Set(races.map((r) => r.year).filter((y) => !open.has(y)));
+}
+
 function seasonComplete(ds: Dataset, year: number): boolean {
   let done = completeSeasons.get(ds);
   if (!done) {
-    const open = new Set<number>();
-    for (const r of ds.races) if (!ds.winnerByRace.has(`${r.year}:${r.round}`)) open.add(r.year);
-    done = new Set(ds.races.map((r) => r.year).filter((y) => !open.has(y)));
+    done = completeSeasonsOf(ds.races, (k) => ds.winnerByRace.has(k));
     completeSeasons.set(ds, done);
   }
   return done.has(year);

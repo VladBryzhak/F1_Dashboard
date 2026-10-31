@@ -4,9 +4,14 @@
   "description": "F1 Dashboard — React client + Express API, deployed as one service",
   "scripts": {
     "build": "npm --prefix client install && npm --prefix client run build && npm --prefix server install && npm --prefix server run build",
-    "start": "npm --prefix server start"
+    "start": "npm --prefix server start",
+    "test": "vitest run",
+    "check": "npm --prefix client run lint && npm --prefix client run build && npm --prefix server run build && npm test"
   },
   "engines": {
     "node": ">=20"
+  },
+  "devDependencies": {
+    "vitest": "^4.1.12"
   }
 }
