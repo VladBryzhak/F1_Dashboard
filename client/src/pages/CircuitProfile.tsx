@@ -61,7 +61,11 @@ export default function CircuitProfile() {
             '@context': 'https://schema.org',
             '@type': 'SportsActivityLocation',
             name: c.name,
-            address: { '@type': 'PostalAddress', addressLocality: c.placeName },
+            address: {
+              '@type': 'PostalAddress',
+              addressLocality: c.placeName,
+              ...(c.countryCode && { addressCountry: c.countryCode.toUpperCase() }),
+            },
             ...(c.latitude != null && c.longitude != null
               ? { geo: { '@type': 'GeoCoordinates', latitude: c.latitude, longitude: c.longitude } }
               : {}),

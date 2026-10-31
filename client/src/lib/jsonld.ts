@@ -2,6 +2,8 @@
 // pages can show richer snippets (driver facts, event cards, breadcrumbs) and
 // are understood as entities, not just text. Each builder returns a plain object
 // that useSeo({ jsonLd }) serializes into a <script type="application/ld+json">.
+// The server writes the same into the page's HTML for crawlers that don't run
+// the app (server/src/services/jsonld.ts): keep the two in step.
 import { getLang, localizedPath } from '../i18n/core'
 import type { ConstructorProfile, DriverProfile, RaceWeekend } from '../types/f1'
 
@@ -41,8 +43,21 @@ export function driverLd(p: DriverProfile): object {
     '@context': 'https://schema.org',
     '@type': 'Person',
     name,
+    givenName: p.givenName,
+    familyName: p.familyName,
     jobTitle: 'Formula One Driver',
     nationality: p.nationality,
+    ...(p.dateOfBirth && { birthDate: p.dateOfBirth }),
+    ...(p.dateOfDeath && { deathDate: p.dateOfDeath }),
+    ...(p.placeOfBirth && {
+      birthPlace: {
+        '@type': 'Place',
+        name: p.placeOfBirth,
+        ...(p.birthCountryCode && {
+          address: { '@type': 'PostalAddress', addressCountry: p.birthCountryCode.toUpperCase() },
+        }),
+      },
+    }),
     url: pageUrl(),
   }
   if (p.championships > 0) {
@@ -75,13 +90,14 @@ export function raceLd(w: RaceWeekend): object {
     sport: 'Formula One',
     startDate: w.date,
     eventStatus: 'https://schema.org/EventScheduled',
+    location: {
+      '@type': 'Place',
+      name: w.circuitName,
+      ...(w.countryCode && {
+        address: { '@type': 'PostalAddress', addressCountry: w.countryCode.toUpperCase() },
+      }),
+    },
     url: pageUrl(),
-    ...(w.grandPrixName && {
-      location: {
-        '@type': 'Place',
-        name: `${w.grandPrixName} Grand Prix`,
-      },
-    }),
   }
 }
 

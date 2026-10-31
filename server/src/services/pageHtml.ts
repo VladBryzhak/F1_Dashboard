@@ -2,6 +2,7 @@ import fs from "fs";
 import path from "path";
 import { getCurrentSeason, isDatasetReady, warmDataset } from "./f1db";
 import { homePayload } from "./home";
+import { pageJsonLd } from "./jsonld";
 import { describePage, type PageMeta } from "./og";
 import { pageStatus, type PageStatus } from "./pageRoutes";
 import { notFoundSnapshot, pageSnapshot } from "./snapshot";
@@ -219,6 +220,19 @@ export async function pageHtml(
       `<meta property="og:locale:alternate" content="${uk ? "en_GB" : "uk_UA"}" />` +
       "</head>",
   );
+
+  // The page as structured data (Person, SportsEvent… and breadcrumbs), in
+  // the HTML for search engines that don't run the app; the app keeps this
+  // same script (data-seo) in step as people move between pages.
+  if (meta) {
+    const ld = await pageJsonLd(SITE_URL, pagePath, lang).catch(() => null);
+    if (ld) {
+      html = html.replace(
+        "</head>",
+        `<script type="application/ld+json" data-seo="1">${scriptJson(ld)}</script></head>`,
+      );
+    }
+  }
 
   const clean = pagePath.split("?")[0].replace(/\/+$/, "");
   if (clean === "" && isDatasetReady()) html = html.replace("</head>", `${await homeBoot()}</head>`);
