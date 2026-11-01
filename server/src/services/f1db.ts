@@ -23,6 +23,7 @@ import type {
   ConstructorListItem,
   HeadToHead,
   HomeHighlights,
+  NextRace,
   NotableRetirement,
   PodiumEntry,
   ProgressionSeries,
@@ -1256,26 +1257,85 @@ export async function getHomeHighlights(): Promise<HomeHighlights> {
   const upcoming = last
     ? ordered.find((r) => r.year > last!.year || (r.year === last!.year && r.round > last!.round))
     : ordered.find((r) => r.year === season);
-  let nextRace: HomeHighlights["nextRace"] = null;
-  if (upcoming) {
-    const gp = ds.grandsPrix.get(upcoming.grandPrixId);
-    const circuit = ds.circuits.get(upcoming.circuitId);
-    nextRace = {
-      season: upcoming.year,
-      round: upcoming.round,
-      grandPrixName: gp?.name ?? upcoming.grandPrixId,
-      date: upcoming.date,
-      countryCode: alpha2(ds, gp?.countryId),
-      circuitId: upcoming.circuitId,
-      placeName: circuit?.placeName ?? "",
-      outline: circuitOutline(upcoming.circuitId),
-    };
-  }
+  const nextRace = upcoming ? toNextRace(ds, upcoming) : null;
 
   // Every round of the shown season run: its standings are final.
   const seasonOver = latestRound > 0 && !seasonRaces.some((r) => r.round > latestRound);
 
   return { season, seasonOver, latestRace, notableRetirement, championshipLeader, nextRace };
+}
+
+function toNextRace(ds: Dataset, r: RawRace): NextRace {
+  const gp = ds.grandsPrix.get(r.grandPrixId);
+  const circuit = ds.circuits.get(r.circuitId);
+  return {
+    season: r.year,
+    round: r.round,
+    grandPrixName: gp?.name ?? r.grandPrixId,
+    date: r.date,
+    countryCode: alpha2(ds, gp?.countryId),
+    circuitId: r.circuitId,
+    placeName: circuit?.placeName ?? "",
+    outline: circuitOutline(r.circuitId),
+  };
+}
+
+// The round after this one (the next season's first once it is out). The home
+// page asks for it when a race has finished but f1db doesn't have it yet.
+export async function getRaceAfter(season: number, round: number): Promise<NextRace | null> {
+  const ds = await dataset();
+  const next = ds.races
+    .filter((r) => r.year > season || (r.year === season && r.round > round))
+    .sort((a, b) => a.year - b.year || a.round - b.round)[0];
+  return next ? toNextRace(ds, next) : null;
+}
+
+// The round whose race falls within a day of `iso` (OpenF1's race start in
+// UTC; f1db dates are local), for placing an OpenF1 session in the calendar.
+export async function getRaceNear(
+  iso: string,
+): Promise<{ season: number; round: number; grandPrixName: string } | null> {
+  const ds = await dataset();
+  const t = Date.parse(iso.slice(0, 10));
+  const race = ds.races.find((r) => Math.abs(Date.parse(r.date) - t) <= 24 * 3600 * 1000);
+  if (!race) return null;
+  return {
+    season: race.year,
+    round: race.round,
+    grandPrixName: ds.grandsPrix.get(race.grandPrixId)?.name ?? race.grandPrixId,
+  };
+}
+
+export interface SeasonDriver {
+  driverId: string;
+  firstName: string;
+  lastName: string;
+  abbreviation: string | null;
+  constructorId: string;
+  constructorName: string;
+}
+
+// A season's drivers with their team (the one they drove most rounds for),
+// to recognise the drivers in an OpenF1 session.
+export async function getSeasonDrivers(season: number): Promise<SeasonDriver[]> {
+  const ds = await dataset();
+  const out: SeasonDriver[] = [];
+  const prefix = `${season}:`;
+  for (const [key, constructorId] of ds.teamByYearDriver) {
+    if (!key.startsWith(prefix)) continue;
+    const driverId = key.slice(prefix.length);
+    const d = ds.drivers.get(driverId);
+    if (!d) continue;
+    out.push({
+      driverId,
+      firstName: d.firstName,
+      lastName: d.lastName,
+      abbreviation: d.abbreviation,
+      constructorId,
+      constructorName: ds.constructors.get(constructorId)?.name ?? constructorId,
+    });
+  }
+  return out;
 }
 
 // Per-round title-race chart: cumulative points across the season for the top

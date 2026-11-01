@@ -278,6 +278,156 @@
   border-radius: 4px;
 }
 
+/* ---------- Session heroes ----------
+   During a race weekend the hero follows the latest session: the top three
+   after a practice (.hero-trio), the pole-sitter after qualifying (the
+   race-number hero with the pole lap), the winner after a sprint. */
+
+/* The session's name on a tag above the kicker. */
+.hero-chip {
+  display: inline-block;
+  margin-bottom: 0.55rem;
+  padding: 0.1rem 0.5rem;
+  border-radius: var(--radius-pill);
+  background: var(--color-accent);
+  color: var(--color-accent-ink);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+/* The pole lap as a reading under the headline. */
+.hero-poletime {
+  display: flex;
+  flex-direction: column;
+  margin: 0.9rem 0 0;
+}
+
+.hero-poletime span {
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-muted);
+}
+
+.hero-poletime b {
+  font-family: var(--font-outlier);
+  font-size: 2.2rem;
+  font-weight: 700;
+  line-height: 1.1;
+  font-variant-numeric: tabular-nums slashed-zero;
+  color: var(--color-cool);
+}
+
+/* Practice: headline and times on the left, the three portraits grouped on
+   the right, the fastest in front and the other two a step back. */
+.hero-trio {
+  min-height: 460px;
+}
+
+.hero-trio .hero-content--winner {
+  max-width: 50%;
+}
+
+.hero-trio .hero-content--winner .hero-title {
+  font-size: clamp(1.9rem, 2.7vw, 2.5rem);
+  overflow-wrap: normal;
+  word-break: normal;
+  hyphens: none;
+}
+
+.trio {
+  position: absolute;
+  inset: 0 0 0 40%;
+  z-index: 1;
+}
+
+.trio-p {
+  position: absolute;
+  bottom: 0;
+  height: 100%;
+  width: 46%;
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+}
+
+.trio-p img {
+  height: 175%;
+  width: auto;
+  max-width: none;
+  margin-top: 1.5rem;
+  filter: drop-shadow(0 14px 30px var(--color-veil));
+  -webkit-mask-image: linear-gradient(to bottom, #000 44%, transparent 56%);
+  mask-image: linear-gradient(to bottom, #000 44%, transparent 56%);
+}
+
+.trio-p--p1 {
+  left: 27%;
+  z-index: 3;
+}
+
+.trio-p--p2,
+.trio-p--p3 {
+  z-index: 2;
+  filter: brightness(0.82) saturate(0.95);
+}
+
+.trio-p--p2 img,
+.trio-p--p3 img {
+  height: 150%;
+  margin-top: 4.5rem;
+}
+
+.trio-p--p2 {
+  left: 0;
+}
+
+.trio-p--p3 {
+  right: 0;
+}
+
+@media (max-width: 768px) {
+  /* Phones: the three portraits across the top, the text on a dark band
+     below (as the race-number hero). */
+  .hero-trio {
+    min-height: 720px;
+    align-items: flex-end;
+    padding-bottom: 1.4rem;
+  }
+  .hero-trio::after {
+    content: '';
+    position: absolute;
+    inset: 220px 0 0;
+    z-index: 2;
+    background: linear-gradient(to bottom, transparent, var(--color-paper-3) 45%);
+    pointer-events: none;
+  }
+  /* The pole lap adds a line: a taller hero keeps the text clear of the
+     portrait. */
+  .hero.hero-num.hero-pole {
+    min-height: 740px;
+  }
+  .trio {
+    inset: 0;
+  }
+  /* A fixed height keeps the faces clear of the text below. */
+  .trio-p {
+    top: 0;
+    bottom: auto;
+    height: 300px;
+  }
+  .hero.hero-trio .hero-content--winner {
+    max-width: 100%;
+    width: 100%;
+  }
+  .hero.hero-trio .hero-content--winner .hero-title {
+    font-size: 2.3rem;
+  }
+}
+
 /* ---------- Race-number hero ----------
    The winner from the waist up, large, in front of their car number and a
    team-colour stripe. The portrait overflows the frame at the bottom and

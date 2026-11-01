@@ -344,7 +344,13 @@ const en = {
 
   // Home (rest)
   'home.viewWeekend': 'View weekend',
+  'home.weekendSchedule': 'Weekend schedule',
   'home.wins': 'wins',
+  'home.winsSprint': 'wins the sprint',
+  'home.onPole': 'on pole',
+  'home.fastest': 'fastest',
+  'home.poleTime': 'Pole lap',
+  'home.top3': 'Top three, {session}',
   'home.incident': 'Incident',
   'home.championship': 'Championship',
   'home.finalStandings': 'Final standings',

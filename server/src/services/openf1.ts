@@ -16,9 +16,11 @@ import type {
 const MAX_TELEMETRY_POINTS = 400;
 const getJson = openF1;
 const DAY = 24 * 60 * 60;
-interface RawDriver {
+export interface RawDriver {
   driver_number: number;
   full_name: string;
+  first_name?: string | null;
+  last_name?: string | null;
   name_acronym: string;
   team_name: string;
   team_colour: string | null;
@@ -71,7 +73,7 @@ export async function getRaceSessions(
 
 // A session's drivers as OpenF1 lists them (shared by the telemetry driver
 // list and the headshots).
-function rawDrivers(sessionKey: number): Promise<RawDriver[]> {
+export function rawDrivers(sessionKey: number): Promise<RawDriver[]> {
   return cached(`of1:rawdrivers:${sessionKey}`, DAY, () =>
     getJson<RawDriver[]>(`/drivers?session_key=${sessionKey}`)
   );

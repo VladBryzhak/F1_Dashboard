@@ -238,6 +238,35 @@ export interface NewsItem {
   pubDate: string; // ISO
 }
 
+// The latest finished session of the current race weekend (from OpenF1),
+// shown in the home hero until the race is in f1db: the top three of a
+// practice, the pole-sitter after qualifying, the winner of a sprint or of a
+// race f1db hasn't published yet.
+export interface SessionRow {
+  position: number;
+  driverId: string | null; // f1db id; null for a driver f1db doesn't list
+  driverName: string;
+  driverCode: string | null;
+  number: string | null; // car number in this session
+  constructorId: string | null;
+  constructorName: string;
+  // P1's lap (or race) time, the others' gap to P1 ("+0.117", "+1 lap").
+  time: string | null;
+  laps: number | null;
+  headshot: string | null; // OpenF1's small headshot, when there's no portrait
+}
+
+export interface SessionHero {
+  kind: "practice" | "qualifying" | "race";
+  sessionName: string; // OpenF1's name: "Practice 3", "Sprint Qualifying"…
+  sprint: boolean;
+  segment: string | null; // qualifying part the pole lap was set in: "Q3", "SQ3"
+  season: number;
+  round: number;
+  grandPrixName: string;
+  top: SessionRow[]; // the top three
+}
+
 export interface HomeResponse {
   highlights: HomeHighlights;
   standings: DriverStanding[]; // championship top 5
@@ -249,6 +278,7 @@ export interface HomeResponse {
   // same strings feed the preload and the image so the browser reuses it.
   heroSrcSet: string | null;
   heroSizes: string;
+  session: SessionHero | null;
 }
 
 // ----- Championship progression (title-race chart) -----

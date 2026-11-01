@@ -1,11 +1,12 @@
-import { useEffect, useState, type CSSProperties } from 'react'
+import { useEffect, useState, type CSSProperties, type ReactNode } from 'react'
 import { Link } from 'react-router-dom'
 import CircuitOutline from '../components/CircuitOutline'
 import { Headshot } from '../components/EntityCards'
 import { useSeo } from '../hooks/useSeo'
 import { siteLd } from '../lib/jsonld'
 import { api } from '../api/client'
-import { driverPortraitUrl, teamColor } from '../lib/f1meta'
+import { driverPortraitUrl, f1SrcSet, teamColor } from '../lib/f1meta'
+import { sessionLabel } from '../lib/live'
 import { useI18n } from '../i18n/core'
 import type {
   DriverStanding,
@@ -14,6 +15,8 @@ import type {
   NewsItem,
   NextRace,
   RaceHighlight,
+  SessionHero,
+  SessionRow,
 } from '../types/f1'
 import { gpTitle } from '../lib/gpNames'
 import { retirementReason } from '../lib/retirementReasons'
@@ -51,25 +54,10 @@ function numFontLoaded(): boolean {
   return false
 }
 
-// Dynamic hero focused on the latest race winner.
-function WinnerHero({
-  highlights,
-  heroImage,
-  heroSrcSet,
-  heroSizes,
-}: {
-  highlights: HomeHighlights
-  heroImage: string | null
-  heroSrcSet: string | null
-  heroSizes: string
-}) {
-  const { t, lang } = useI18n()
-  const race = highlights.latestRace as RaceHighlight
-  const winner = race.podium.find((p) => p.position === 1) ?? race.podium[0]
-  const color = teamColor(winner.constructorId)
-  // The car number is drawn in Saira Condensed, which arrives after the first
-  // paint; shown in the fallback face it would change size when the font
-  // swaps in (a layout shift), so it appears once the face is ready.
+// The car number is drawn in Saira Condensed, which arrives after the first
+// paint; shown in the fallback face it would change size when the font swaps
+// in (a layout shift), so it appears once the face is ready.
+function useNumReady(): boolean {
   const [numReady, setNumReady] = useState(numFontLoaded)
   useEffect(() => {
     if (numReady) return
@@ -83,80 +71,320 @@ function WinnerHero({
       clearTimeout(id)
     }
   }, [numReady])
-  // The server names the same photo in the HTML (preload), so prefer its URL.
-  const portrait =
-    heroImage ?? driverPortraitUrl(winner.driverId, winner.constructorId, String(race.season))
+  return numReady
+}
 
+interface HeroImage {
+  heroImage: string | null
+  heroSrcSet: string | null
+  heroSizes: string
+}
+
+// Season, round and grand prix over the headline; a session hero adds the
+// session's name on a tag above.
+function HeroKicker({
+  season,
+  round,
+  grandPrixName,
+  session,
+}: {
+  season: number
+  round: number
+  grandPrixName: string
+  session?: string
+}) {
+  const { t, lang } = useI18n()
   return (
-    <div className="hero hero-winner hero-num" style={{ '--team': color } as CSSProperties}>
-      {/* Race-number backdrop: the winner's car number, huge, behind the
-          portrait, with a team-colour stripe. */}
-      {winner.number && (
+    <>
+      {session && <span className="hero-chip">{session}</span>}
+      <p className="hero-kicker">
+        <span className="mono">{season}</span>
+        <span>
+          {t('common.round')} <span className="mono">{round}</span>
+        </span>
+        <span>{gpTitle(grandPrixName, lang)}</span>
+      </p>
+    </>
+  )
+}
+
+interface BoardRow {
+  position: number
+  driverId: string | null
+  driverName: string
+  constructorId: string | null
+  constructorName: string
+  time: string | null
+  laps?: number | null
+}
+
+// A top three as a small timing board: position, team swatch, name and team,
+// then P1's time or the gap to P1.
+function PodiumBoard({ rows, label, laps = false }: { rows: BoardRow[]; label: string; laps?: boolean }) {
+  const { tn } = useI18n()
+  return (
+    <ol className="podium-board" aria-label={label}>
+      {rows.map((p) => {
+        const name = (
+          <>
+            <b>{lastName(p.driverName)}</b>
+            <span className="pb-team">
+              {p.constructorName}
+              {laps && p.laps ? ` · ${tn('plural.lapsN', p.laps)}` : ''}
+            </span>
+          </>
+        )
+        return (
+          <li className={`pb-row pb-row--p${p.position}`} key={p.position}>
+            <span className="pb-pos">{p.position}</span>
+            <span className="pb-swatch" style={{ background: teamColor(p.constructorId ?? '') }} />
+            {p.driverId ? (
+              <Link to={`/drivers/${p.driverId}`} className="pb-name">
+                {name}
+              </Link>
+            ) : (
+              <span className="pb-name">{name}</span>
+            )}
+            <span className="pb-time">{p.time ?? ''}</span>
+          </li>
+        )
+      })}
+    </ol>
+  )
+}
+
+// The weekend's page once f1db has its results; until then (a session hero)
+// the calendar with the weekend's schedule open, as the page is still empty.
+function WeekendLink({ season, round, schedule = false }: { season: number; round: number; schedule?: boolean }) {
+  const { t } = useI18n()
+  return (
+    <Link to={schedule ? `/calendar?schedule=${round}` : `/calendar/${season}/${round}`} className="hero-cta">
+      {t(schedule ? 'home.weekendSchedule' : 'home.viewWeekend')}
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
+      </svg>
+    </Link>
+  )
+}
+
+// One driver in front of their car number and a team-colour stripe: the race
+// winner (or a sprint's) and the pole-sitter. The text column is `children`.
+function NumberHero({
+  driverId,
+  constructorId,
+  number,
+  season,
+  headshot,
+  image,
+  children,
+  className = '',
+}: {
+  driverId: string
+  constructorId: string
+  number: string | null
+  season: number
+  headshot?: string | null
+  image: HeroImage
+  children: ReactNode
+  className?: string
+}) {
+  const color = teamColor(constructorId)
+  const numReady = useNumReady()
+  // The server names the same photo in the HTML (preload), so prefer its URL.
+  const portrait = image.heroImage ?? driverPortraitUrl(driverId, constructorId, String(season))
+  return (
+    <div className={`hero hero-winner hero-num ${className}`} style={{ '--team': color } as CSSProperties}>
+      {/* Race-number backdrop: the car number, huge, behind the portrait,
+          with a team-colour stripe. */}
+      {number && (
         <span className={`hero-bignum${numReady ? ' is-ready' : ''}`} aria-hidden="true">
-          {winner.number}
+          {number}
         </span>
       )}
       <span className="hero-stripe" aria-hidden="true" />
       <Headshot
         portraitUrl={portrait}
-        srcSet={heroImage ? heroSrcSet : null}
-        sizes={heroSizes}
+        fallbackUrl={headshot ?? undefined}
+        srcSet={image.heroImage ? image.heroSrcSet : null}
+        sizes={image.heroSizes}
         // formula1.com portraits are all cut to the same tall frame.
         width={450}
         height={1293}
         color={color}
         eager
       />
-      <div className="hero-content hero-content--winner">
-        <p className="hero-kicker">
-          <span className="mono">{race.season}</span>
+      <div className="hero-content hero-content--winner">{children}</div>
+    </div>
+  )
+}
+
+// After a race: the winner, the podium and an incident worth a line. A sprint
+// (and a race f1db hasn't published yet) comes from the session result.
+function WinnerHero({
+  race,
+  retirement,
+  sprint = false,
+  fromSession = false,
+  headshot,
+  image,
+}: {
+  race: RaceHighlight
+  retirement?: HomeHighlights['notableRetirement']
+  sprint?: boolean
+  fromSession?: boolean
+  headshot?: string | null
+  image: HeroImage
+}) {
+  const { t, lang } = useI18n()
+  const winner = race.podium.find((p) => p.position === 1) ?? race.podium[0]
+  return (
+    <NumberHero
+      driverId={winner.driverId}
+      constructorId={winner.constructorId}
+      number={winner.number}
+      season={race.season}
+      headshot={headshot}
+      image={image}
+    >
+      <HeroKicker
+        season={race.season}
+        round={race.round}
+        grandPrixName={race.grandPrixName}
+        session={sprint ? t('session.sprint') : undefined}
+      />
+      <h1 className="hero-title">
+        {lastName(winner.driverName)} <span>{t(sprint ? 'home.winsSprint' : 'home.wins')}</span>
+      </h1>
+      <PodiumBoard rows={race.podium} label={t('home.podium')} />
+      {retirement && (
+        <p className="hero-note">
+          <span className="hero-note-tag">{t('home.incident')}</span>
           <span>
-            {t('common.round')} <span className="mono">{race.round}</span>
+            {retirement.driverName}: {retirementReason(retirement.reason, lang)}
           </span>
-          <span>{gpTitle(race.grandPrixName, lang)}</span>
         </p>
+      )}
+      <WeekendLink season={race.season} round={race.round} schedule={fromSession} />
+    </NumberHero>
+  )
+}
+
+// After qualifying: the pole-sitter, the pole lap and the top three.
+function PoleHero({ session, image }: { session: SessionHero; image: HeroImage }) {
+  const { t } = useI18n()
+  const pole = session.top[0]
+  const label = sessionLabel(session.sessionName, t)
+  return (
+    <NumberHero
+      driverId={pole.driverId ?? ''}
+      constructorId={pole.constructorId ?? ''}
+      number={pole.number}
+      season={session.season}
+      headshot={pole.headshot}
+      image={image}
+      className="hero-pole"
+    >
+      <HeroKicker
+        season={session.season}
+        round={session.round}
+        grandPrixName={session.grandPrixName}
+        session={label}
+      />
+      <h1 className="hero-title">
+        {lastName(pole.driverName)} <span>{t('home.onPole')}</span>
+      </h1>
+      {pole.time && (
+        <p className="hero-poletime">
+          <span>
+            {t('home.poleTime')}
+            {session.segment ? ` · ${session.segment}` : ''}
+          </span>
+          <b>{pole.time}</b>
+        </p>
+      )}
+      <PodiumBoard rows={session.top} label={t('home.top3', { session: label })} />
+      <WeekendLink season={session.season} round={session.round} schedule />
+    </NumberHero>
+  )
+}
+
+// The trio's side portraits are shown about 240 px wide (160 px on phones).
+const TRIO_SIZES = '(max-width: 768px) 160px, 240px'
+
+// After a practice: the top three, the fastest in front with the other two
+// behind on either side, and the times as a timing board.
+function PracticeHero({ session, image }: { session: SessionHero; image: HeroImage }) {
+  const { t } = useI18n()
+  const [p1, p2, p3] = session.top
+  const label = sessionLabel(session.sessionName, t)
+  const photo = (r: SessionRow) => {
+    // P1's photo is the one the server preloads.
+    if (r === p1 && image.heroImage) return { src: image.heroImage, srcSet: image.heroSrcSet ?? undefined, sizes: image.heroSizes }
+    const url = r.driverId && r.constructorId ? driverPortraitUrl(r.driverId, r.constructorId, String(session.season)) : null
+    if (url) return { src: url, srcSet: f1SrcSet(url), sizes: TRIO_SIZES }
+    return r.headshot ? { src: r.headshot } : null
+  }
+  return (
+    <div
+      className="hero hero-winner hero-trio"
+      style={{ '--team': teamColor(p1.constructorId ?? '') } as CSSProperties}
+    >
+      <div className="trio" aria-hidden="true">
+        {[p2, p1, p3].map((r) => {
+          const img = photo(r)
+          return (
+            <div className={`trio-p trio-p--p${r.position}`} key={r.position}>
+              {img && (
+                <img
+                  {...img}
+                  alt=""
+                  width={450}
+                  height={1293}
+                  ref={(el) => {
+                    if (el && r === p1) el.setAttribute('fetchpriority', 'high')
+                  }}
+                />
+              )}
+            </div>
+          )
+        })}
+      </div>
+      <div className="hero-content hero-content--winner">
+        <HeroKicker
+          season={session.season}
+          round={session.round}
+          grandPrixName={session.grandPrixName}
+          session={label}
+        />
         <h1 className="hero-title">
-          {lastName(winner.driverName)} <span>{t('home.wins')}</span>
+          {lastName(p1.driverName)} <span>{t('home.fastest')}</span>
         </h1>
-
-        {/* The podium as a small timing board: position, team swatch, name
-            and team, then the winner's race time or the gap to the winner. */}
-        <ol className="podium-board" aria-label={t('home.podium')}>
-          {race.podium.map((p) => (
-            <li className={`pb-row pb-row--p${p.position}`} key={p.position}>
-              <span className="pb-pos">{p.position}</span>
-              <span className="pb-swatch" style={{ background: teamColor(p.constructorId) }} />
-              <Link to={`/drivers/${p.driverId}`} className="pb-name">
-                <b>{lastName(p.driverName)}</b>
-                <span className="pb-team">{p.constructorName}</span>
-              </Link>
-              <span className="pb-time">{p.time ?? ''}</span>
-            </li>
-          ))}
-        </ol>
-
-        {highlights.notableRetirement && (
-          <p className="hero-note">
-            <span className="hero-note-tag">{t('home.incident')}</span>
-            <span>
-              {highlights.notableRetirement.driverName}:{' '}
-              {retirementReason(highlights.notableRetirement.reason, lang)}
-            </span>
-          </p>
-        )}
-
-        <Link
-          to={`/calendar/${race.season}/${race.round}`}
-          className="hero-cta"
-        >
-          {t('home.viewWeekend')}
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-            <path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
-          </svg>
-        </Link>
+        <PodiumBoard rows={session.top} label={t('home.top3', { session: label })} laps />
+        <WeekendLink season={session.season} round={session.round} schedule />
       </div>
     </div>
   )
+}
+
+// The latest finished session of the weekend, until the race is in f1db.
+function SessionHeroView({ session, image }: { session: SessionHero; image: HeroImage }) {
+  if (session.kind === 'practice') return <PracticeHero session={session} image={image} />
+  if (session.kind === 'qualifying') return <PoleHero session={session} image={image} />
+  const race: RaceHighlight = {
+    season: session.season,
+    round: session.round,
+    grandPrixName: session.grandPrixName,
+    date: '',
+    countryCode: null,
+    podium: session.top.map((r) => ({
+      ...r,
+      driverId: r.driverId ?? '',
+      constructorId: r.constructorId ?? '',
+      countryCode: null,
+      points: null,
+    })),
+  }
+  return <WinnerHero race={race} sprint={session.sprint} fromSession headshot={session.top[0].headshot} image={image} />
 }
 
 // Championship top 5: sits beside the hero on desktop, under it on mobile.
@@ -357,12 +585,13 @@ export default function Home() {
       <div className="home-top">
         {loading ? (
           <HeroSkeleton />
+        ) : data?.session ? (
+          <SessionHeroView session={data.session} image={data} />
         ) : hasRace ? (
           <WinnerHero
-            highlights={data!.highlights}
-            heroImage={data!.heroImage}
-            heroSrcSet={data!.heroSrcSet}
-            heroSizes={data!.heroSizes}
+            race={data!.highlights.latestRace!}
+            retirement={data!.highlights.notableRetirement}
+            image={data!}
           />
         ) : (
           <FallbackHero />

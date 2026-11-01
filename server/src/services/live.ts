@@ -177,7 +177,7 @@ export async function getYearSessions(year: number): Promise<RawSession[]> {
 
 // Data counts as live (and OpenF1 locks it, see OpenF1Locked) from 30
 // minutes before a session until 30 minutes after it ends.
-const LIVE_MARGIN_MS = 30 * 60 * 1000;
+export const LIVE_MARGIN_MS = 30 * 60 * 1000;
 
 // A session's entry from the cached year lists (saves a request per board or
 // replay), or from OpenF1 when it isn't there.
@@ -248,7 +248,7 @@ export async function getLatestSession(): Promise<LiveSessionMeta | null> {
 // Default session length when OpenF1 hasn't published date_end yet.
 const DEFAULT_LEN_MS = 2 * 60 * 60 * 1000;
 
-function endOf(s: RawSession): number {
+export function endOf(s: RawSession): number {
   return s.date_end
     ? new Date(s.date_end).getTime()
     : new Date(s.date_start).getTime() + DEFAULT_LEN_MS;

@@ -9,6 +9,7 @@ import feedbackRouter from "./routes/feedback";
 import homeRouter from "./routes/home";
 import liveRouter from "./routes/live";
 import { warmReplays } from "./services/live";
+import { warmSessionHero } from "./services/sessionHero";
 import profilesRouter from "./routes/profiles";
 import standingsRouter from "./routes/standings";
 import telemetryRouter from "./routes/telemetry";
@@ -166,4 +167,6 @@ app.listen(PORT, () => {
   console.log(`Paddock Times API listening on http://localhost:${PORT}`);
   // Have the last week's session replays ready before people open them.
   warmReplays();
+  // And the home hero's latest session result.
+  warmSessionHero();
 });
