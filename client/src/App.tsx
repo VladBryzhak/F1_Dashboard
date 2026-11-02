@@ -60,6 +60,8 @@ const Feedback = lazyPage(() => import('./pages/Feedback'))
 const About = lazyPage(() => import('./pages/About'))
 const Privacy = lazyPage(() => import('./pages/Privacy'))
 const Support = lazyPage(() => import('./pages/Support'))
+// TEMP: articles mock-ups, dev only.
+const ArticlesMock = import.meta.env.DEV ? lazyPage(() => import('./pages/ArticlesMock')) : null
 // Its own small chunk, shared with the pages that show it in their place.
 const NotFound = lazyPage(() => import('./pages/NotFound'))
 
@@ -121,6 +123,7 @@ export default function App() {
           <Route path="about" element={<About />} />
           <Route path="privacy" element={<Privacy />} />
           <Route path="support" element={<Support />} />
+          {ArticlesMock && <Route path="mock/articles" element={<ArticlesMock />} />}
           {/* Anything else: the "not found" page (the server answers 404). */}
           <Route path="*" element={<NotFound />} />
         </Route>
