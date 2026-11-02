@@ -17,7 +17,7 @@ The locked system. Every Hallmark run reads this first and pages share it. Chang
   --color-rule: oklch(29% 0.012 285);  --color-rule-2: oklch(40% 0.014 285);
   --color-accent: oklch(58% 0.235 29);  --color-accent-ink: oklch(98.5% 0.006 29);  --color-focus: oklch(66% 0.2 29);
   --color-cool: oklch(80% 0.11 235);  /* readings: gaps, dates, times */
-  --font-display: 'Saira Condensed', 'Saira', system-ui, sans-serif;  --font-body: 'Saira', system-ui, Arial, sans-serif;
+  --font-display: 'Saira Condensed', 'Fira Sans Extra Condensed', 'Saira', system-ui, sans-serif;  --font-body: 'Saira', system-ui, Arial, sans-serif;
   --font-outlier: ui-monospace, 'SF Mono', 'JetBrains Mono', Menlo, Consolas, monospace;  /* what was measured */
   --radius-card: 10px;  --radius-pill: 6px;  --rule-hair: 1px;  --shadow-card: none;
 }
@@ -35,7 +35,7 @@ Spacing (`--space-*`), type (`--text-*`), durations and easing live in `tokens.c
 - Hairline panels (1px `--color-rule`, radius 10px), seams instead of nested cards; no gradients, glows or shadows on surfaces.
 
 ## Type
-- Heads: Saira Condensed 800, uppercase, line-height 1.02 or more, no tracking.
+- Heads: Saira Condensed 800, uppercase, line-height 1.02 or more, no tracking. Cyrillic letters come from Fira Sans Extra Condensed (Saira has none).
 - Labels, table heads, captions, nav: Saira, a step smaller, sentence case, untracked.
 
 ## Controls

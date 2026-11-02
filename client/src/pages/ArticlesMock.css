@@ -802,6 +802,42 @@
   right: 46%;
 }
 
+/* Г3: the key reading over the lower part of the portrait. */
+.am-slides {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xl);
+}
+
+.am-slide-reading {
+  position: absolute;
+  right: 4%;
+  bottom: 9%;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  margin: 0;
+  padding: 0.5rem 0.9rem 0.6rem;
+  background: color-mix(in oklch, var(--color-paper-3) 82%, transparent);
+  border-bottom: 3px solid var(--team);
+  border-radius: var(--radius-pill) var(--radius-pill) 0 0;
+}
+
+.am-slide-reading-label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--color-ink-2);
+}
+
+.am-slide-reading-value {
+  font-size: clamp(2.2rem, 4vw, 3.2rem);
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -0.03em;
+  color: var(--color-ink);
+}
+
 /* ---------- Phones ---------- */
 @media (max-width: 768px) {
   .am-bar-note {
@@ -864,6 +900,11 @@
   }
   .am-rail {
     position: static;
+  }
+  .am-slide-reading {
+    top: 30%;
+    bottom: auto;
+    right: 4%;
   }
   .am-slide-big {
     top: 6%;

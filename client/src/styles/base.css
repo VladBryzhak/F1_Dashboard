@@ -5,9 +5,10 @@
 /* Design tokens (colours, fonts) and element defaults. Loaded first, on every page. */
 
 :root {
-  /* Condensed technical display face for headings; Saira for body/UI. */
+  /* Condensed technical display face for headings (its Cyrillic letters from
+     Fira Sans Extra Condensed, see public/fonts/fonts.css); Saira for body/UI. */
   --font-body: 'Saira', system-ui, Arial, sans-serif;
-  --font-display: 'Saira Condensed', 'Saira', system-ui, sans-serif;
+  --font-display: 'Saira Condensed', 'Fira Sans Extra Condensed', 'Saira', system-ui, sans-serif;
 
   font-family: var(--font-body);
   color-scheme: dark;

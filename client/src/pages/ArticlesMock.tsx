@@ -16,6 +16,7 @@ const VARIANTS: { id: string; group: string; label: string }[] = [
   { id: 'c2', group: 'Стаття', label: 'С2 Панель даних' },
   { id: 'g1', group: 'Слайд на головній', label: 'Г1 Фото' },
   { id: 'g2', group: 'Слайд на головній', label: 'Г2 Типографіка' },
+  { id: 'g3', group: 'Слайд на головній', label: 'Г3 Фото + число' },
 ]
 
 type Cover =
@@ -682,6 +683,102 @@ function SlideG2() {
   )
 }
 
+// Г3: the race-number hero with the driver, and over the lower part of the
+// portrait the article's key reading (a lap time, the points), like a
+// broadcast caption.
+function ComboSlide({
+  driverId,
+  constructorId,
+  number,
+  reading,
+  readingLabel,
+  tag,
+  minutes,
+  title,
+  accent,
+  dek,
+}: {
+  driverId: string
+  constructorId: string
+  number: string
+  reading: string
+  readingLabel: string
+  tag: string
+  minutes: number
+  title: string
+  accent: string
+  dek: string
+}) {
+  return (
+    <div className="am-slide-frame">
+      <div className="hero-slider">
+        <div
+          className="hero hero-winner hero-num am-slide-combo"
+          style={{ '--team': teamColor(constructorId) } as CSSProperties}
+        >
+          <span className="hero-bignum is-ready" aria-hidden="true">
+            {number}
+          </span>
+          <span className="hero-stripe" aria-hidden="true" />
+          <Headshot portraitUrl={driverPortraitUrl(driverId, constructorId, '2026')} width={450} height={1293} eager />
+          <div className="hero-content hero-content--winner">
+            <span className="hero-chip">Стаття</span>
+            <p className="hero-kicker">
+              <span>{tag}</span>
+              <span>
+                <span className="mono">{minutes}</span> хв читання
+              </span>
+            </p>
+            <h2 className="hero-title">
+              {title} <span>{accent}</span>
+            </h2>
+            <p className="am-slide-dek">{dek}</p>
+            <Link to="?v=c1" className="hero-cta">
+              Читати статтю <Arrow />
+            </Link>
+          </div>
+          <p className="am-slide-reading">
+            <span className="am-slide-reading-label">{readingLabel}</span>
+            <span className="am-slide-reading-value mono">{reading}</span>
+          </p>
+        </div>
+        <Dots />
+      </div>
+    </div>
+  )
+}
+
+function SlideG3() {
+  return (
+    <div className="am-slides">
+      <ComboSlide
+        driverId="lewis-hamilton"
+        constructorId="ferrari"
+        number="44"
+        reading="1:16.514"
+        readingLabel="Час поулу"
+        tag="Кваліфікація"
+        minutes={4}
+        title="Хемілтон на поулі"
+        accent="Ferrari швидка на одному колі"
+        dek="Перше місце на старті з відривом у дев’ять тисячних."
+      />
+      <ComboSlide
+        driverId="kimi-antonelli"
+        constructorId="mercedes"
+        number="12"
+        reading="380"
+        readingLabel="Очок у сезоні"
+        tag="Аналітика"
+        minutes={6}
+        title="Сезон Антонеллі"
+        accent="у п’яти цифрах"
+        dek="Титул вирішено в Мехіко. 380 очок і відрив у 119."
+      />
+    </div>
+  )
+}
+
 const VIEWS: Record<string, () => JSX.Element> = {
   a1: PageA1,
   a2: PageA2,
@@ -690,6 +787,7 @@ const VIEWS: Record<string, () => JSX.Element> = {
   c2: ArticleC2,
   g1: SlideG1,
   g2: SlideG2,
+  g3: SlideG3,
 }
 
 export default function ArticlesMock() {

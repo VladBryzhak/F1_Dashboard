@@ -1,6 +1,9 @@
 /* Saira / Saira Condensed (SIL OFL 1.1, see OFL.txt), self-hosted. Latin +
-   Latin Extended only: the family has no Cyrillic, so Ukrainian text uses the
-   fallback font. Loaded without blocking the first paint (see index.html). */
+   Latin Extended only: the family has no Cyrillic, so Ukrainian headings take
+   their letters from Fira Sans Extra Condensed (OFL, OFL-FiraSansExtraCondensed.txt),
+   cut down to Cyrillic, next in --font-display; body text keeps the system
+   font. A face downloads only when the page has its letters. Loaded without
+   blocking the first paint (see index.html). */
 
 @font-face {
   font-family: 'Saira';
@@ -72,4 +75,31 @@
   font-display: swap;
   src: url('/fonts/saira-condensed-800-latin.woff2') format('woff2');
   unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: 'Fira Sans Extra Condensed';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url('/fonts/fira-sans-extra-condensed-600-cyrillic.woff2') format('woff2');
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+
+@font-face {
+  font-family: 'Fira Sans Extra Condensed';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url('/fonts/fira-sans-extra-condensed-700-cyrillic.woff2') format('woff2');
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+
+@font-face {
+  font-family: 'Fira Sans Extra Condensed';
+  font-style: normal;
+  font-weight: 800;
+  font-display: swap;
+  src: url('/fonts/fira-sans-extra-condensed-800-cyrillic.woff2') format('woff2');
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
 }
