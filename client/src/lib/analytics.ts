@@ -1,3 +1,5 @@
+import { afterLoadIdle } from './idle'
+
 // Google Analytics 4 (gtag.js) with Google Consent Mode v2. The measurement ID
 // is public by design — it ships to every visitor's browser — so it lives in
 // the repo rather than an env var.
@@ -80,12 +82,7 @@ function loadGtag(granted: boolean): void {
     s.src = `https://www.googletagmanager.com/gtag/js?id=${measurementId}`
     document.head.appendChild(s)
   }
-  const whenIdle = () =>
-    'requestIdleCallback' in window
-      ? window.requestIdleCallback(add, { timeout: 4000 })
-      : setTimeout(add, 2000)
-  if (document.readyState === 'complete') whenIdle()
-  else window.addEventListener('load', whenIdle, { once: true })
+  afterLoadIdle(add)
 }
 
 export function initAnalytics(): void {

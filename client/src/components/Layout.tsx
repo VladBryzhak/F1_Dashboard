@@ -52,7 +52,8 @@ function LangSwitch() {
 
 export default function Layout() {
   const { t } = useI18n()
-  const status = useLiveStatus(60000)
+  // Only for the dot by "Live": asked once the page has loaded.
+  const status = useLiveStatus(60000, true)
   // A session is on whether we can read it (live) or OpenF1 has locked us out.
   const isLive = !!status?.live || !!status?.locked
 
