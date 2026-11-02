@@ -1,6 +1,6 @@
 ---
-title: Antonelli is champion: the season in five numbers
-description: Kimi Antonelli settled the 2026 title in Mexico with four races to go. Five numbers explain how, from his age to a lead nobody could close.
+title: The Champion's season in numbers
+description: Kimi Antonelli settled the 2026 title in Mexico with four races to go. The numbers explain how, from his age to a lead nobody could close.
 readingLabel: Points this season
 ---
 Kimi Antonelli is the 2026 Formula 1 world champion. Third place in Mexico was enough: with four races left, his lead was bigger than the points anyone else could still score.
