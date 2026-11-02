@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { Link, NavLink, Outlet, useLocation } from 'react-router-dom'
+import { Link, NavLink, Outlet, useLocation, useNavigationType } from 'react-router-dom'
 import { useLiveStatus } from '../hooks/useLiveStatus'
 import { useI18n, type Lang, type TKey } from '../i18n/core'
 import CookieBanner from './CookieBanner'
@@ -83,6 +83,15 @@ export default function Layout() {
 
   // Close after navigating.
   useEffect(() => setMenuOpen(false), [pathname])
+
+  // A new page opens at its top, as on any website: a link inside the app
+  // otherwise keeps the scroll position (an article's "read next" link left
+  // you at the end of the next one). Back and forward are left to the
+  // browser, and a link to a place on the page (#…) goes there itself.
+  const navigationType = useNavigationType()
+  useEffect(() => {
+    if (navigationType !== 'POP' && !window.location.hash) window.scrollTo(0, 0)
+  }, [pathname, navigationType])
 
   // Close on Escape or a click/tap outside the header.
   useEffect(() => {
