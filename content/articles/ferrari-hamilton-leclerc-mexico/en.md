@@ -14,6 +14,13 @@ title: Ferrari in Mexico
 source: f1db; grid from Motorsport.com
 ```
 
+On Saturday Ferrari shared its favourite photos from qualifying. The first one says a lot about Sunday: Leclerc in the foreground with his back to the camera, Hamilton below him, looking up.
+
+```instagram
+url: https://www.instagram.com/p/DfLi-URihjT/
+handle: scuderiaferrari
+```
+
 ## What happened on lap one
 
 George Russell, who started second, lost momentum into Turn 1, and Leclerc moved up behind his teammate. He tried the outside of Hamilton at Turn 1, then the inside at Turn 2, ran over the kerb and stayed second. At Turn 4 he went around the outside again, the space closed, and he cut across Turn 5 to come out in the lead. Hamilton ran wide in the same sequence.

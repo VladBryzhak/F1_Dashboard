@@ -22,6 +22,13 @@ São Paulo, Las Vegas, Qatar and Abu Dhabi are all normal weekends, so each driv
 
 Verstappen's season started badly. He retired in China, Monaco and the Netherlands and finished 20th at Silverstone. Then the autumn came. All three of his wins have come in the last four races: Bahrain, Singapore and Mexico, with a third place in Austin in between. That is 90 points from the last four rounds, more than anyone on the grid, the new champion included.
 
+F1 put it in one line on Instagram: four winners, four rounds to go, 16 points in it. The picture is Verstappen, smiling, fist raised.
+
+```instagram
+url: https://www.instagram.com/p/DfPcGw5gpTU/
+handle: f1
+```
+
 ## Hamilton: back on the podium, but angry
 
 Second in Mexico was Hamilton's best result since his win in Barcelona in June, and it moved him up to third. He started from pole and finished 0.799 seconds behind Verstappen. It could have been more: his teammate's move on the first lap is a separate story, and Hamilton was furious about it. Since his retirement in Spain he has scored in every race.
