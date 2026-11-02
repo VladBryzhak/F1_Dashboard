@@ -379,6 +379,16 @@ const uk: Dict & Record<string, string> = {
 
   // Home (rest)
   'home.viewWeekend': 'Відкрити вікенд',
+  'home.highlights': 'Головне',
+  'home.worldChampionship': 'Чемпіонат світу',
+  'home.champion': 'здобуває титул',
+  'home.decidedAt': 'Титул вирішено: {gp}',
+  'home.lead': 'Відрив',
+  'home.driverProfile': 'Профіль пілота',
+  'slider.carousel': 'карусель',
+  'slider.slide': 'слайд',
+  'slider.pause': 'Зупинити слайди',
+  'slider.play': 'Запустити слайди',
   'home.weekendSchedule': 'Розклад вікенду',
   'home.wins': 'перемагає',
   'home.winsSprint': 'виграє спринт',

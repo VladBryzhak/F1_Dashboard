@@ -221,12 +221,30 @@ export interface LeaderSummary {
   points: number
 }
 
+// The season's champion, from the round where the title was decided (the
+// leader ahead by more than the points left) until a new season's first race.
+export interface ChampionHighlight {
+  season: number
+  driverId: string
+  driverName: string
+  number: string | null // car number this season
+  constructorId: string
+  constructorName: string
+  points: number
+  wins: number
+  podiums: number
+  lead: number | null // points ahead of second place now
+  decidedRound: number
+  decidedGrandPrixName: string
+}
+
 export interface HomeHighlights {
   season: number // the season of the latest race run (the one shown)
   seasonOver: boolean // every round of it has been run
   latestRace: RaceHighlight | null
   notableRetirement: NotableRetirement | null
   championshipLeader: LeaderSummary | null
+  champion: ChampionHighlight | null // once the title is decided
   nextRace: NextRace | null
 }
 

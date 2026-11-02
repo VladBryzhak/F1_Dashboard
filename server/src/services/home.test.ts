@@ -29,6 +29,7 @@ const highlights = (): HomeHighlights => ({
   },
   notableRetirement: null,
   championshipLeader: null,
+  champion: null,
   nextRace: { season: 2026, round: 19, grandPrixName: "Mexico", date: "2026-11-01", countryCode: "mx", circuitId: "mexico-city", placeName: "Mexico City", outline: null },
 });
 

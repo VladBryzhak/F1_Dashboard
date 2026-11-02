@@ -22,6 +22,7 @@ import type {
   DriverListItem,
   ConstructorListItem,
   HeadToHead,
+  ChampionHighlight,
   HomeHighlights,
   NextRace,
   NotableRetirement,
@@ -1165,6 +1166,80 @@ function driverName(ds: Dataset, driverId: string): string {
   return d ? `${d.firstName} ${d.lastName}` : driverId;
 }
 
+// Most points one driver can still score at a weekend: a race win (25) and,
+// at a sprint weekend, a sprint win (8), as the points system stands today.
+const RACE_WIN_POINTS = 25;
+const SPRINT_WIN_POINTS = 8;
+
+// The round after which the title can no longer change hands: the first
+// where the leader is ahead by more than the points still to be won (or the
+// season's last round). `table` holds the standings after each round run.
+export function titleDecided(
+  rounds: { round: number; sprint: boolean }[],
+  table: Map<number, { driverId: string; points: number; positionDisplayOrder: number }[]>,
+): { round: number; driverId: string } | null {
+  for (let i = 0; i < rounds.length; i++) {
+    const rows = table.get(rounds[i].round);
+    if (!rows?.length) continue;
+    const [lead, next] = rows.slice().sort((a, b) => a.positionDisplayOrder - b.positionDisplayOrder);
+    const left = rounds
+      .slice(i + 1)
+      .reduce((sum, r) => sum + RACE_WIN_POINTS + (r.sprint ? SPRINT_WIN_POINTS : 0), 0);
+    const last = i === rounds.length - 1;
+    if (last || !next || lead.points - next.points > left) return { round: rounds[i].round, driverId: lead.driverId };
+  }
+  return null;
+}
+
+// The season's champion, once the title is decided (see titleDecided).
+function seasonChampion(ds: Dataset, season: number, seasonRaces: RawRace[]): ChampionHighlight | null {
+  const rounds = seasonRaces.map((r) => ({
+    round: r.round,
+    sprint: r.sprintRaceDate != null || ds.sprintResultsByRace.has(`${season}:${r.round}`),
+  }));
+  const table = new Map<number, RawRaceDriverStanding[]>();
+  for (const s of ds.racesDriverStandings) {
+    if (s.year !== season) continue;
+    const list = table.get(s.round) ?? [];
+    list.push(s);
+    table.set(s.round, list);
+  }
+  const decided = titleDecided(rounds, table);
+  if (!decided) return null;
+  const standings = ds.driverStandings
+    .filter((s) => s.year === season)
+    .sort((a, b) => a.positionDisplayOrder - b.positionDisplayOrder);
+  const [first, second] = standings;
+  if (!first || first.driverId !== decided.driverId) return null;
+  let wins = 0;
+  let podiums = 0;
+  let number: string | null = null;
+  for (const r of seasonRaces) {
+    const row = ds.resultsByRace.get(`${season}:${r.round}`)?.find((x) => x.driverId === first.driverId);
+    if (!row) continue;
+    if (row.positionNumber === 1) wins++;
+    if (row.positionNumber != null && row.positionNumber <= 3) podiums++;
+    if (row.driverNumber != null) number = String(row.driverNumber);
+  }
+  const d = ds.drivers.get(first.driverId);
+  const constructorId = ds.teamByYearDriver.get(`${season}:${first.driverId}`) ?? "";
+  const race = seasonRaces.find((r) => r.round === decided.round);
+  return {
+    season,
+    driverId: first.driverId,
+    driverName: driverName(ds, first.driverId),
+    number: number ?? d?.permanentNumber ?? null,
+    constructorId,
+    constructorName: ds.constructors.get(constructorId)?.name ?? constructorId,
+    points: first.points,
+    wins,
+    podiums,
+    lead: second ? first.points - second.points : null,
+    decidedRound: decided.round,
+    decidedGrandPrixName: race ? (ds.grandsPrix.get(race.grandPrixId)?.name ?? race.grandPrixId) : "",
+  };
+}
+
 // Dynamic home-page highlights derived from the latest completed race in the
 // in-memory dataset — no external call. Colours stay client-side.
 export async function getHomeHighlights(): Promise<HomeHighlights> {
@@ -1262,7 +1337,9 @@ export async function getHomeHighlights(): Promise<HomeHighlights> {
   // Every round of the shown season run: its standings are final.
   const seasonOver = latestRound > 0 && !seasonRaces.some((r) => r.round > latestRound);
 
-  return { season, seasonOver, latestRace, notableRetirement, championshipLeader, nextRace };
+  const champion = latestRound > 0 ? seasonChampion(ds, season, seasonRaces) : null;
+
+  return { season, seasonOver, latestRace, notableRetirement, championshipLeader, champion, nextRace };
 }
 
 function toNextRace(ds: Dataset, r: RawRace): NextRace {

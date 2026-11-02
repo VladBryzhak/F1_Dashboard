@@ -321,6 +321,53 @@
   color: var(--color-cool);
 }
 
+/* Champion slide: the season in numbers, two by two, on the timing board's
+   panel. */
+.champ-stats {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin: 1.2rem 0 0;
+  max-width: 320px;
+  background: color-mix(in oklch, var(--color-paper-2) 92%, transparent);
+  border: var(--rule-hair) solid var(--color-rule);
+  border-radius: var(--radius-card);
+}
+
+.champ-stats > div {
+  padding: 0.6rem 0.8rem;
+  min-width: 0;
+}
+
+.champ-stats > div:nth-child(even) {
+  border-left: var(--rule-hair) solid var(--color-rule);
+}
+
+.champ-stats > div:nth-child(n + 3) {
+  border-top: var(--rule-hair) solid var(--color-rule);
+}
+
+.champ-stats dt {
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: var(--color-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.champ-stats dd {
+  margin: 0.15rem 0 0;
+  font: 800 1.6rem / 1 var(--font-display);
+  font-variant-numeric: tabular-nums;
+  color: var(--color-cool);
+}
+
+.champ-stats > div:first-child dd {
+  color: var(--color-ink);
+}
+
 /* Practice: headline and times on the left, the three portraits grouped on
    the right, the fastest in front and the other two a step back. */
 .hero-trio {

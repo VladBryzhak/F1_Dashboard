@@ -344,6 +344,16 @@ const en = {
 
   // Home (rest)
   'home.viewWeekend': 'View weekend',
+  'home.highlights': 'Highlights',
+  'home.worldChampionship': 'World Championship',
+  'home.champion': 'world champion',
+  'home.decidedAt': 'Decided at the {gp}',
+  'home.lead': 'Lead',
+  'home.driverProfile': 'Driver profile',
+  'slider.carousel': 'carousel',
+  'slider.slide': 'slide',
+  'slider.pause': 'Pause the slides',
+  'slider.play': 'Play the slides',
   'home.weekendSchedule': 'Weekend schedule',
   'home.wins': 'wins',
   'home.winsSprint': 'wins the sprint',

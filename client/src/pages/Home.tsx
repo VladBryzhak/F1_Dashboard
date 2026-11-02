@@ -2,6 +2,7 @@ import { useEffect, useState, type CSSProperties, type ReactNode } from 'react'
 import { Link } from 'react-router-dom'
 import CircuitOutline from '../components/CircuitOutline'
 import { Headshot } from '../components/EntityCards'
+import HeroSlider from '../components/HeroSlider'
 import { useSeo } from '../hooks/useSeo'
 import { siteLd } from '../lib/jsonld'
 import { api } from '../api/client'
@@ -9,6 +10,7 @@ import { driverPortraitUrl, f1SrcSet, teamColor } from '../lib/f1meta'
 import { sessionLabel } from '../lib/live'
 import { useI18n } from '../i18n/core'
 import type {
+  ChampionHighlight,
   DriverStanding,
   HomeHighlights,
   HomeResponse,
@@ -178,6 +180,7 @@ function NumberHero({
   image,
   children,
   className = '',
+  eager = true,
 }: {
   driverId: string
   constructorId: string
@@ -187,6 +190,7 @@ function NumberHero({
   image: HeroImage
   children: ReactNode
   className?: string
+  eager?: boolean
 }) {
   const color = teamColor(constructorId)
   const numReady = useNumReady()
@@ -205,13 +209,14 @@ function NumberHero({
       <Headshot
         portraitUrl={portrait}
         fallbackUrl={headshot ?? undefined}
-        srcSet={image.heroImage ? image.heroSrcSet : null}
+        // Without the server's URL, the formula1.com widths (f1SrcSet).
+        srcSet={image.heroImage ? image.heroSrcSet : undefined}
         sizes={image.heroSizes}
         // formula1.com portraits are all cut to the same tall frame.
         width={450}
         height={1293}
         color={color}
-        eager
+        eager={eager}
       />
       <div className="hero-content hero-content--winner">{children}</div>
     </div>
@@ -363,6 +368,53 @@ function PracticeHero({ session, image }: { session: SessionHero; image: HeroIma
         <WeekendLink season={session.season} round={session.round} schedule />
       </div>
     </div>
+  )
+}
+
+// The season's champion, from the round the title was decided until a new
+// season's first race: the second slide of the home hero.
+function ChampionHero({ champion, heroSizes }: { champion: ChampionHighlight; heroSizes: string }) {
+  const { t, lang } = useI18n()
+  const stats: [string, string][] = [
+    [t('drv.points'), String(champion.points)],
+    [t('drv.wins'), String(champion.wins)],
+    [t('drv.podiums'), String(champion.podiums)],
+  ]
+  if (champion.lead != null) stats.push([t('home.lead'), `+${champion.lead}`])
+  return (
+    <NumberHero
+      driverId={champion.driverId}
+      constructorId={champion.constructorId}
+      number={champion.number}
+      season={champion.season}
+      image={{ heroImage: null, heroSrcSet: null, heroSizes }}
+      eager={false}
+      className="hero-champion"
+    >
+      <span className="hero-chip">{t('home.worldChampionship')}</span>
+      <p className="hero-kicker">
+        <span className="mono">{champion.season}</span>
+        <span>{t('home.decidedAt', { gp: gpTitle(champion.decidedGrandPrixName, lang) })}</span>
+      </p>
+      {/* The page's h1 is the first slide's headline. */}
+      <h2 className="hero-title">
+        {lastName(champion.driverName)} <span>{t('home.champion')}</span>
+      </h2>
+      <dl className="champ-stats">
+        {stats.map(([label, value]) => (
+          <div key={label}>
+            <dt>{label}</dt>
+            <dd>{value}</dd>
+          </div>
+        ))}
+      </dl>
+      <Link to={`/drivers/${champion.driverId}`} className="hero-cta">
+        {t('home.driverProfile')}
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
+        </svg>
+      </Link>
+    </NumberHero>
   )
 }
 
@@ -558,6 +610,7 @@ declare global {
 let boot: HomeResponse | null = typeof window !== 'undefined' ? (window.__HOME__ ?? null) : null
 
 export default function Home() {
+  const { t } = useI18n()
   useSeo({ jsonLd: siteLd() })
   const [data, setData] = useState<HomeResponse | null>(() => boot)
   const [failed, setFailed] = useState(false)
@@ -578,23 +631,37 @@ export default function Home() {
 
   const loading = !data && !failed
   const season = data?.highlights.season
-  const hasRace = !!data?.highlights.latestRace
+  const mainHero = data?.session ? (
+    <SessionHeroView session={data.session} image={data} />
+  ) : data?.highlights.latestRace ? (
+    <WinnerHero race={data.highlights.latestRace} retirement={data.highlights.notableRetirement} image={data} />
+  ) : (
+    <FallbackHero />
+  )
 
   return (
     <section>
       <div className="home-top">
         {loading ? (
           <HeroSkeleton />
-        ) : data?.session ? (
-          <SessionHeroView session={data.session} image={data} />
-        ) : hasRace ? (
-          <WinnerHero
-            race={data!.highlights.latestRace!}
-            retirement={data!.highlights.notableRetirement}
-            image={data!}
+        ) : data?.highlights.champion ? (
+          <HeroSlider
+            label={t('home.highlights')}
+            slides={[
+              {
+                key: 'main',
+                label: data.session ? sessionLabel(data.session.sessionName, t) : t('session.race'),
+                node: mainHero,
+              },
+              {
+                key: 'champion',
+                label: t('home.worldChampionship'),
+                node: <ChampionHero champion={data.highlights.champion} heroSizes={data.heroSizes} />,
+              },
+            ]}
           />
         ) : (
-          <FallbackHero />
+          mainHero
         )}
 
         <aside className="home-aside">
