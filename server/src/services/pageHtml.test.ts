@@ -18,6 +18,17 @@ vi.mock("./f1db", () => ({
 vi.mock("./og", () => ({ describePage: async () => ({ title: "T", description: "D", card: {} }) }));
 vi.mock("./home", () => ({ homePayload: async () => ({}) }));
 vi.mock("./jsonld", () => ({ pageJsonLd: async () => null }));
+vi.mock("./articles", () => ({
+  getArticle: async (slug: string) =>
+    slug === "antonelli-champion"
+      ? {
+          slug,
+          date: "2026-11-02",
+          season: 2026,
+          cover: { driverId: "kimi-antonelli", constructorId: "mercedes" },
+        }
+      : null,
+}));
 
 import { isUkPath, pageHtml, pageStatusFor, previewPath } from "./pageHtml";
 
@@ -27,7 +38,7 @@ const SHELL = `<!doctype html><html lang="en"><head>
 <meta property="og:url" content="https://example.test/" />
 <meta name="description" content="x" /><meta property="og:title" content="x" /><meta property="og:description" content="x" />
 <meta name="twitter:title" content="x" /><meta name="twitter:description" content="x" />
-<meta property="og:image" content="x" /><meta name="twitter:image" content="x" />
+<meta property="og:image" content="x" /><meta name="twitter:image" content="x" /><meta property="og:type" content="website" />
 <title>Paddock Times</title><script type="module" src="/assets/index.js"></script>
 </head><body><div id="root"></div></body></html>`;
 
@@ -38,6 +49,20 @@ beforeAll(() => {
 });
 
 describe("pageHtml", () => {
+  it("marks an article as one, with its date, and preloads its text and cover", async () => {
+    const html = await pageHtml(file, "/uk/articles/antonelli-champion", "Mozilla/5.0", "n");
+    expect(html).toContain('<meta property="og:type" content="article" />');
+    expect(html).toContain('<meta property="article:published_time" content="2026-11-02" />');
+    expect(html).toContain('<link rel="preload" as="fetch" href="/api/articles/antonelli-champion?lang=uk" crossorigin />');
+    expect(html).toMatch(/<link rel="preload" as="image" href="https:\/\/media\.formula1\.com\/[^"]+andant01[^"]+"/);
+  });
+
+  it("leaves other pages as websites", async () => {
+    const html = await pageHtml(file, "/standings", "Mozilla/5.0", "n");
+    expect(html).toContain('<meta property="og:type" content="website" />');
+    expect(html).not.toContain("article:published_time");
+  });
+
   it("serves a 'not found' shell: noindex, no canonical or language twins, nonce kept", async () => {
     const html = await pageHtml(file, "/uk/nonexistent", "Mozilla/5.0", "abc", true);
     expect(html).toContain('<html lang="uk">');

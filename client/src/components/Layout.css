@@ -236,13 +236,27 @@ main:focus {
 }
 
 /* ---------- Responsive header ---------- */
-/* Mid-width desktops: tighten the header so all links fit on one line. */
-@media (max-width: 1180px) {
+/* Mid-width desktops: tighten the header so all links fit on one line (the
+   Ukrainian labels are the longer ones). */
+@media (max-width: 1280px) {
   .topbar {
-    gap: 1.5rem;
+    gap: 1.75rem;
   }
   .nav {
-    gap: 1.1rem;
+    gap: 1.15rem;
+  }
+}
+
+@media (max-width: 1180px) {
+  .topbar {
+    gap: 0.75rem;
+  }
+  .nav {
+    gap: 0.75rem;
+  }
+  /* The shortcut stays in the button's tooltip. */
+  .search-kbd {
+    display: none;
   }
 }
 

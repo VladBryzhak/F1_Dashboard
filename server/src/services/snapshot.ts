@@ -10,6 +10,7 @@ import {
   getHomeHighlights,
   getRaceWeekend,
 } from "./f1db";
+import { getArticle, listArticles, TAG_LABEL } from "./articles";
 import { gpTitle, type Lang } from "./gpNames";
 import { UK, ukCountry, ukDate, ukPlural } from "./ukText";
 
@@ -73,6 +74,7 @@ function ctx(lang: Lang, current?: number): Ctx {
 
 const NAV: [string, string, string][] = [
   ["/", "Home", "Головна"],
+  ["/articles", "Articles", "Статті"],
   ["/standings", "Standings", "Залік"],
   ["/calendar", "Calendar", "Календар"],
   ["/drivers", "Drivers", "Пілоти"],
@@ -464,6 +466,34 @@ const STATIC: Record<string, { en: [string, string]; uk: [string, string] }> = {
   },
 };
 
+async function articleList(c: Ctx): Promise<string> {
+  const lang: Lang = c.uk ? "uk" : "en";
+  const items = (await listArticles(lang)).map(
+    (a) => `${c.a(`/articles/${a.slug}`, a.title)}. ${esc(c.date(a.date))}. ${esc(a.description)}`,
+  );
+  return (
+    `<h1>${c.uk ? "Статті про Формулу-1" : "Formula 1 articles"}</h1>` +
+    `<p>${c.uk ? "Розбори кожного дня гоночного вікенду, аналітика і матеріали між етапами." : "A look at every day of the race weekend, analysis and stories between rounds."}</p>` +
+    list(items)
+  );
+}
+
+// The whole article: crawlers get the same text people read.
+async function article(c: Ctx, slug: string): Promise<string | null> {
+  const lang: Lang = c.uk ? "uk" : "en";
+  const a = await getArticle(slug, lang);
+  if (!a) return null;
+  const gp = a.grandPrixName && a.round ? c.a(`/calendar/${a.season}/${a.round}`, gpTitle(a.grandPrixName, lang)) : "";
+  return (
+    `<article><h1>${esc(a.title)}</h1>` +
+    `<p>${esc(TAG_LABEL[lang][a.tag])}. ${esc(c.date(a.date))}.${gp ? ` ${gp}.` : ""}</p>` +
+    `<p>${esc(a.description)}</p>${a.html}</article>` +
+    (a.related.length
+      ? `<h2>${c.uk ? "Читайте також" : "Read next"}</h2>` + list(a.related.map((r) => c.a(`/articles/${r.slug}`, r.title)))
+      : "")
+  );
+}
+
 // The "not found" page (an address that leads nowhere, sent with status 404):
 // what happened and the way back to the site's sections.
 export function notFoundSnapshot(lang: Lang): string {
@@ -504,6 +534,9 @@ export async function pageSnapshot(rawPath: string, lang: Lang = "en"): Promise<
       break;
     case "circuits":
       body = x ? await circuit(c, x) : await circuitList(c);
+      break;
+    case "articles":
+      body = x ? await article(c, x) : await articleList(c);
       break;
     default:
       if (section && STATIC[section] && !x) {

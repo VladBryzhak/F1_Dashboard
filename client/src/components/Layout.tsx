@@ -12,6 +12,7 @@ import './Layout.css'
 
 const links: { to: string; label: TKey }[] = [
   { to: '/live', label: 'nav.live' },
+  { to: '/articles', label: 'nav.articles' },
   { to: '/standings', label: 'nav.standings' },
   { to: '/calendar', label: 'nav.calendar' },
   { to: '/circuits', label: 'nav.circuits' },

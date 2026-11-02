@@ -297,6 +297,7 @@ export interface HomeResponse {
   heroSrcSet: string | null;
   heroSizes: string;
   session: SessionHero | null;
+  article: HomeArticle | null; // the latest article, while fresh
 }
 
 // ----- Championship progression (title-race chart) -----
@@ -867,4 +868,53 @@ export interface TrackLine {
     lane: number; // the reference stop's pit-lane time
     path: [number, number, number][]; // [x, y, seconds after leaving the line]
   } | null;
+}
+
+// ----- Articles (content/articles, services/articles.ts) -----
+
+export type ArticleDay = "fri" | "sat" | "sun" | "midweek";
+export type ArticleTag = "analysis" | "race" | "sprint" | "qualifying" | "practice" | "drivers" | "teams" | "preview";
+
+// The cover: a driver over their number (driverId set), or, without a
+// photo, the article's key reading large in the team's colour. `reading` is
+// the number the article turns on (a lap time, the points), shown as a
+// caption over the photo.
+export interface ArticleCover {
+  driverId: string | null;
+  constructorId: string | null;
+  number: string | null;
+  reading: string | null;
+  readingLabel: string | null;
+  credit: string | null; // who took the cover photo
+}
+
+export interface ArticleSummary {
+  slug: string;
+  date: string; // yyyy-mm-dd, the day it was published
+  season: number;
+  round: number | null; // the race weekend it belongs to
+  grandPrixName: string | null; // f1db's English name; the app translates it
+  raceDate: string | null; // yyyy-mm-dd
+  day: ArticleDay;
+  tag: ArticleTag;
+  title: string;
+  description: string;
+  minutes: number; // reading time
+  cover: ArticleCover;
+}
+
+export interface Article extends ArticleSummary {
+  html: string; // the body, rendered on the server
+  related: ArticleSummary[];
+}
+
+// The latest article for the home slider, in both languages (the home
+// payload is the same for both).
+export interface HomeArticle {
+  slug: string;
+  date: string;
+  tag: ArticleTag;
+  cover: Omit<ArticleCover, "readingLabel">;
+  en: { title: string; description: string; minutes: number; readingLabel: string | null };
+  uk: { title: string; description: string; minutes: number; readingLabel: string | null };
 }

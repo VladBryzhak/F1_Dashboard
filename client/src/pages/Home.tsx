@@ -2,16 +2,18 @@ import { useEffect, useState, type CSSProperties, type ReactNode } from 'react'
 import { Link } from 'react-router-dom'
 import CircuitOutline from '../components/CircuitOutline'
 import { Headshot } from '../components/EntityCards'
-import HeroSlider from '../components/HeroSlider'
+import { Reading } from '../components/ArticleCover'
+import HeroSlider, { type Slide } from '../components/HeroSlider'
 import { useSeo } from '../hooks/useSeo'
 import { siteLd } from '../lib/jsonld'
 import { api } from '../api/client'
 import { driverPortraitUrl, f1SrcSet, teamColor } from '../lib/f1meta'
 import { sessionLabel } from '../lib/live'
-import { useI18n } from '../i18n/core'
+import { useI18n, type TKey } from '../i18n/core'
 import type {
   ChampionHighlight,
   DriverStanding,
+  HomeArticle,
   HomeHighlights,
   HomeResponse,
   NewsItem,
@@ -181,6 +183,7 @@ function NumberHero({
   children,
   className = '',
   eager = true,
+  overlay,
 }: {
   driverId: string
   constructorId: string
@@ -191,6 +194,8 @@ function NumberHero({
   children: ReactNode
   className?: string
   eager?: boolean
+  // Drawn over the portrait, outside the text column (an article's reading).
+  overlay?: ReactNode
 }) {
   const color = teamColor(constructorId)
   const numReady = useNumReady()
@@ -219,6 +224,7 @@ function NumberHero({
         eager={eager}
       />
       <div className="hero-content hero-content--winner">{children}</div>
+      {overlay}
     </div>
   )
 }
@@ -418,6 +424,73 @@ function ChampionHero({ champion, heroSizes }: { champion: ChampionHighlight; he
   )
 }
 
+// "Antonelli is champion: the season in numbers" → the part before the colon
+// in white, the rest in red, as the other heroes' headlines.
+function splitTitle(title: string): [string, string] {
+  const i = title.indexOf(': ')
+  return i > 0 ? [title.slice(0, i), title.slice(i + 2)] : [title, '']
+}
+
+// The latest article on the slider (Г3). With a driver on the cover it is the
+// race-number hero with the article's key reading as a caption over the
+// photo; without one, the reading fills the frame in the team's colour.
+function ArticleHero({ article, heroSizes }: { article: HomeArticle; heroSizes: string }) {
+  const { t, lang } = useI18n()
+  const text = article[lang]
+  const c = article.cover
+  const [head, rest] = splitTitle(text.title)
+  const content = (
+    <>
+      <span className="hero-chip">{t('art.badge')}</span>
+      <p className="hero-kicker">
+        <span>{t(`art.tag.${article.tag}` as TKey)}</span>
+        <span>{t('art.minRead', { n: text.minutes })}</span>
+      </p>
+      <h2 className="hero-title">
+        {head} {rest && <span>{rest}</span>}
+      </h2>
+      <p className="hero-dek">{text.description}</p>
+      <Link to={`/articles/${article.slug}`} className="hero-cta">
+        {t('art.read')}
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
+        </svg>
+      </Link>
+    </>
+  )
+  if (c.driverId && c.constructorId) {
+    return (
+      <NumberHero
+        driverId={c.driverId}
+        constructorId={c.constructorId}
+        number={c.number}
+        season={Number(article.date.slice(0, 4))}
+        image={{ heroImage: null, heroSrcSet: null, heroSizes }}
+        eager={false}
+        className="hero-article"
+        overlay={c.reading && <Reading cover={{ reading: c.reading, readingLabel: text.readingLabel }} />}
+      >
+        {content}
+      </NumberHero>
+    )
+  }
+  const reading = c.reading ?? ''
+  return (
+    <div
+      className="hero hero-winner hero-num hero-article hero-article--type"
+      style={{ '--team': c.constructorId ? teamColor(c.constructorId) : 'var(--color-accent)', '--len': reading.length || 1 } as CSSProperties}
+    >
+      <span className="hero-stripe" aria-hidden="true" />
+      {reading && (
+        <span className="hero-reading-big mono" aria-hidden="true">
+          {reading}
+        </span>
+      )}
+      <div className="hero-content hero-content--winner">{content}</div>
+    </div>
+  )
+}
+
 // The latest finished session of the weekend, until the race is in f1db.
 function SessionHeroView({ session, image }: { session: SessionHero; image: HeroImage }) {
   if (session.kind === 'practice') return <PracticeHero session={session} image={image} />
@@ -610,7 +683,7 @@ declare global {
 let boot: HomeResponse | null = typeof window !== 'undefined' ? (window.__HOME__ ?? null) : null
 
 export default function Home() {
-  const { t } = useI18n()
+  const { t, lang } = useI18n()
   useSeo({ jsonLd: siteLd() })
   const [data, setData] = useState<HomeResponse | null>(() => boot)
   const [failed, setFailed] = useState(false)
@@ -638,27 +711,36 @@ export default function Home() {
   ) : (
     <FallbackHero />
   )
+  const mainLabel = data?.session ? sessionLabel(data.session.sessionName, t) : t('session.race')
+  // The slider: the race or session first, then the latest article and the
+  // world champion when there are any (no slider for one slide).
+  const articleSlide: Slide | null = data?.article
+    ? {
+        key: 'article',
+        label: data.article[lang].title,
+        node: <ArticleHero article={data.article} heroSizes={data.heroSizes} />,
+      }
+    : null
+  const championSlide: Slide | null = data?.highlights.champion
+    ? {
+        key: 'champion',
+        label: t('home.worldChampionship'),
+        node: <ChampionHero champion={data.highlights.champion} heroSizes={data.heroSizes} />,
+      }
+    : null
+  const slides = [{ key: 'main', label: mainLabel, node: mainHero }, articleSlide, championSlide].filter(
+    (sl): sl is Slide => !!sl,
+  )
 
   return (
     <section>
       <div className="home-top">
         {loading ? (
           <HeroSkeleton />
-        ) : data?.highlights.champion ? (
+        ) : slides.length > 1 ? (
           <HeroSlider
             label={t('home.highlights')}
-            slides={[
-              {
-                key: 'main',
-                label: data.session ? sessionLabel(data.session.sessionName, t) : t('session.race'),
-                node: mainHero,
-              },
-              {
-                key: 'champion',
-                label: t('home.worldChampionship'),
-                node: <ChampionHero champion={data.highlights.champion} heroSizes={data.heroSizes} />,
-              },
-            ]}
+            slides={slides}
           />
         ) : (
           mainHero

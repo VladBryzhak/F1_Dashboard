@@ -6,6 +6,7 @@ import {
   getCurrentSeason,
   getDriverStandings,
 } from "./f1db";
+import { listArticles } from "./articles";
 import { SITE_URL } from "./pageHtml";
 
 // /sitemap.xml, built from the dataset instead of a hand-kept file, so it
@@ -28,7 +29,7 @@ interface Entry {
   lastmod?: string; // yyyy-mm-dd
 }
 
-const STATIC_PAGES = ["/", "/standings", "/calendar", "/drivers", "/teams", "/circuits", "/compare", "/live", "/telemetry", "/about", "/privacy"];
+const STATIC_PAGES = ["/", "/articles", "/standings", "/calendar", "/drivers", "/teams", "/circuits", "/compare", "/live", "/telemetry", "/about", "/privacy"];
 
 async function entries(): Promise<Entry[]> {
   const current = await getCurrentSeason();
@@ -47,10 +48,19 @@ async function entries(): Promise<Entry[]> {
   const done = currentCal.races.filter((r) => r.winnerDriverId);
   const lastRun = done.length ? done[done.length - 1].date : undefined;
 
+  // Our articles, newest first (each is written in both languages).
+  const articles = await listArticles("en");
+  const newestArticle = articles[0]?.date;
   for (const p of STATIC_PAGES) {
-    const lastmod = ["/", "/standings", "/calendar", "/drivers", "/teams"].includes(p) ? lastRun : undefined;
+    const lastmod =
+      p === "/articles" ? newestArticle : ["/", "/standings", "/calendar", "/drivers", "/teams"].includes(p) ? lastRun : undefined;
     add(p, lastmod);
     addUk(p, lastmod);
+  }
+
+  for (const a of articles) {
+    add(`/articles/${a.slug}`, a.date);
+    addUk(`/articles/${a.slug}`, a.date);
   }
 
   for (let y = current - 1; y > current - RECENT_SEASONS; y--) {

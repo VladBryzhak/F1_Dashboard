@@ -1,0 +1,348 @@
+/* /articles/:slug (С1 «Журнал»): the cover with the headline over its dark
+   side, one reading column, then three more articles. The cover and the
+   meta line are in components/ArticleCover.css; the text's own blocks
+   (stats, figure, Instagram) come from the server's HTML. */
+.art-head {
+  position: relative;
+}
+
+.art-head-cover {
+  aspect-ratio: 21 / 9;
+}
+
+.art-head-cover .head-wrap {
+  right: 12%;
+}
+
+.art-head-cover .ac-num {
+  right: 1%;
+}
+
+.art-head-text {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  max-width: 52%;
+  padding: var(--space-xl);
+}
+
+.art-title {
+  margin: 0;
+  font: 800 clamp(2rem, 1.3rem + 2.3vw, 3.2rem) / 1.02 var(--font-display);
+  text-transform: uppercase;
+  text-shadow: 0 2px 12px var(--color-veil);
+}
+
+.art-byline {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.2rem 0.7rem;
+  margin: var(--space-sm) 0 0;
+  font-size: 0.85rem;
+  color: var(--color-muted);
+}
+
+.art-byline .mono {
+  color: var(--color-cool);
+}
+
+.art-cover-credit {
+  margin: var(--space-xs) 0 0;
+  text-align: right;
+}
+
+.art-credit {
+  font-size: 0.8rem;
+  color: var(--color-muted-2);
+}
+
+.art-credit a,
+.art-prose a,
+.art-ig-open {
+  color: inherit;
+  text-decoration: underline;
+  text-decoration-color: var(--color-rule-2);
+  text-underline-offset: 3px;
+  transition: text-decoration-color var(--dur-micro) var(--ease-out);
+}
+
+.art-credit a:hover,
+.art-prose a:hover,
+.art-ig-open:hover {
+  text-decoration-color: var(--color-accent);
+}
+
+.art-prose a:focus-visible,
+.art-credit a:focus-visible,
+.art-ig-open:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+/* ---------- The text ---------- */
+.art-column {
+  max-width: 680px;
+  margin: var(--space-xl) auto 0;
+}
+
+.art-prose {
+  margin-top: var(--space-lg);
+  color: var(--color-ink-2);
+  font-size: 1.07rem;
+  line-height: 1.7;
+}
+
+.art-prose p {
+  margin: 0 0 1.1rem;
+}
+
+.art-prose a {
+  color: var(--color-ink);
+}
+
+.art-prose > p:first-child {
+  font-size: 1.2rem;
+  color: var(--color-ink);
+}
+
+.art-prose h2 {
+  margin: 2.4rem 0 0.7rem;
+  font: 800 1.6rem / 1.05 var(--font-display);
+  text-transform: uppercase;
+  color: var(--color-ink);
+}
+
+.art-prose h3 {
+  margin: 1.8rem 0 0.5rem;
+  font: 700 1.25rem / 1.1 var(--font-display);
+  text-transform: uppercase;
+  color: var(--color-ink);
+}
+
+.art-prose ul,
+.art-prose ol {
+  margin: 0 0 1.1rem;
+  padding-left: 1.3rem;
+}
+
+.art-prose li + li {
+  margin-top: 0.3rem;
+}
+
+.art-prose blockquote {
+  margin: 1.6rem 0;
+  padding: 0.2rem 0 0.2rem 1.1rem;
+  border-left: 3px solid var(--color-accent);
+  color: var(--color-ink);
+  font-size: 1.15rem;
+}
+
+.art-prose strong {
+  color: var(--color-ink);
+}
+
+/* Key numbers inside the text. */
+.art-stats {
+  margin: 2rem 0;
+  padding: var(--space-md) var(--space-lg);
+  background: var(--color-paper-2);
+  border: var(--rule-hair) solid var(--color-rule);
+  border-radius: var(--radius-card);
+}
+
+.art-prose .art-stats-title {
+  margin: 0 0 var(--space-sm);
+  font: 700 0.95rem var(--font-body);
+  text-transform: none;
+}
+
+.art-stats dl {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(0, 1fr);
+  margin: 0;
+}
+
+.art-stats dl > div {
+  min-width: 0;
+}
+
+.art-stats dl > div + div {
+  border-left: var(--rule-hair) solid var(--color-rule);
+  padding-left: var(--space-md);
+}
+
+.art-stats dt {
+  font-size: 0.75rem;
+  line-height: 1.3;
+  color: var(--color-muted);
+}
+
+.art-stats dd {
+  margin: 0;
+  font-size: 1.9rem;
+  line-height: 1.1;
+  color: var(--color-ink);
+}
+
+.art-prose .art-stats-src {
+  margin: var(--space-sm) 0 0;
+  font-size: 0.75rem;
+  color: var(--color-muted-2);
+}
+
+/* A photo with its credit. */
+.art-figure {
+  margin: 2rem 0;
+}
+
+.art-figure img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: var(--radius-card);
+  background: var(--color-paper-3);
+}
+
+.art-figure figcaption,
+.art-ig figcaption {
+  margin-top: var(--space-xs);
+  font-size: 0.85rem;
+  line-height: 1.5;
+  color: var(--color-muted);
+}
+
+/* An Instagram post: a placeholder of the post's usual height until the
+   reader asks for it, so the page doesn't jump when it loads. */
+.art-ig {
+  margin: 2rem auto;
+  max-width: 540px;
+}
+
+.art-ig-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-sm);
+  min-height: 440px;
+  padding: var(--space-xl) var(--space-lg);
+  text-align: center;
+  background: var(--color-paper-2);
+  border: var(--rule-hair) solid var(--color-rule);
+  border-radius: var(--radius-card);
+}
+
+.art-ig-label {
+  font-size: 0.85rem;
+  color: var(--color-muted);
+}
+
+.art-ig-handle {
+  font-weight: 700;
+  font-size: 1.25rem;
+  color: var(--color-ink);
+}
+
+.art-prose .art-ig-note {
+  margin: 0;
+  max-width: 36ch;
+  font-size: 0.88rem;
+  line-height: 1.5;
+  color: var(--color-muted);
+}
+
+.art-ig-open {
+  font-size: 0.85rem;
+  color: var(--color-muted);
+}
+
+.art-ig-frame {
+  display: block;
+  width: 100%;
+  height: 640px;
+  border: var(--rule-hair) solid var(--color-rule);
+  border-radius: var(--radius-card);
+  background: var(--color-paper-2);
+}
+
+/* ---------- Read next ---------- */
+.art-related {
+  margin-top: var(--space-2xl);
+}
+
+.art-related-title {
+  margin: 0 0 var(--space-lg);
+  font: 800 var(--text-title) / 1.05 var(--font-display);
+  text-transform: uppercase;
+}
+
+.art-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: var(--space-xl) var(--space-lg);
+}
+
+.art-card {
+  display: flex;
+  flex-direction: column;
+  color: var(--color-ink);
+  text-decoration: none;
+  border-radius: var(--radius-card);
+}
+
+.art-card:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 3px;
+}
+
+.art-card-body {
+  padding-top: var(--space-sm);
+}
+
+.art-card-title {
+  display: block;
+  font: 700 1.25rem / 1.08 var(--font-display);
+  text-transform: uppercase;
+  transition: color var(--dur-micro) var(--ease-out);
+}
+
+.art-card:hover .art-card-title {
+  color: var(--color-accent-hover);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .art-card-title,
+  .art-credit a,
+  .art-prose a,
+  .art-ig-open {
+    transition: none;
+  }
+}
+
+@media (max-width: 768px) {
+  .art-head-cover {
+    aspect-ratio: 4 / 3;
+  }
+  .art-head-text {
+    position: static;
+    max-width: none;
+    padding: var(--space-md) 0 0;
+  }
+  .art-title {
+    text-shadow: none;
+  }
+  .art-stats dl {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-auto-flow: row;
+    gap: var(--space-sm) 0;
+  }
+  .art-stats dl > div:nth-child(odd) {
+    border-left: 0;
+    padding-left: 0;
+  }
+  .art-stats dl > div:nth-child(even) {
+    border-left: var(--rule-hair) solid var(--color-rule);
+    padding-left: var(--space-md);
+  }
+}

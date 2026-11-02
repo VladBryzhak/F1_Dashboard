@@ -1,0 +1,137 @@
+/* Article covers (components/ArticleCover.tsx): the driver over their number
+   with a team-colour stripe, or the key reading large. Sizes follow the
+   frame's width (container units), so one cover works as a thumbnail, a card
+   and an article's header. */
+.ac {
+  position: relative;
+  overflow: hidden;
+  container-type: inline-size;
+  aspect-ratio: 16 / 10;
+  background: var(--color-paper-3);
+  border: var(--rule-hair) solid var(--color-rule);
+  border-radius: var(--radius-card);
+}
+
+.ac-num {
+  position: absolute;
+  right: -3%;
+  top: 50%;
+  transform: translateY(-50%);
+  font: 800 52cqi / 0.8 var(--font-display);
+  letter-spacing: -0.04em;
+  color: color-mix(in oklch, var(--team) 26%, transparent);
+  -webkit-text-stroke: 2px var(--team);
+  pointer-events: none;
+  user-select: none;
+}
+
+.ac-stripe {
+  position: absolute;
+  top: -10%;
+  bottom: -10%;
+  right: 52%;
+  width: 8cqi;
+  transform: skewX(-16deg);
+  background: var(--team);
+  opacity: 0.5;
+}
+
+.ac .head-wrap {
+  position: absolute;
+  top: 0;
+  right: 22%;
+  bottom: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: none !important;
+  display: flex;
+  align-items: flex-start;
+}
+
+.ac .head-img {
+  height: 175%;
+  width: auto;
+  margin-top: 5%;
+  -webkit-mask-image: linear-gradient(to bottom, #000 52%, transparent 66%);
+  mask-image: linear-gradient(to bottom, #000 52%, transparent 66%);
+}
+
+.ac-big {
+  position: absolute;
+  left: 7cqi;
+  bottom: 6cqi;
+  font-weight: 700;
+  line-height: 0.85;
+  letter-spacing: -0.04em;
+  color: color-mix(in oklch, var(--team) 26%, transparent);
+  -webkit-text-stroke: 2px var(--team);
+  white-space: nowrap;
+  user-select: none;
+}
+
+.ac-thumb {
+  border-radius: var(--radius-pill);
+}
+
+/* The key reading over the lower part of the photo, with a team-colour rule
+   under it (also on the home slider's article slide). */
+.ac-reading {
+  position: absolute;
+  right: 4%;
+  bottom: 9%;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  margin: 0;
+  padding: 0.5rem 0.9rem 0.6rem;
+  background: color-mix(in oklch, var(--color-paper-3) 82%, transparent);
+  border-bottom: 3px solid var(--team);
+  border-radius: var(--radius-pill) var(--radius-pill) 0 0;
+}
+
+.ac-reading-label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--color-ink-2);
+}
+
+.ac-reading-value {
+  font-size: clamp(2.2rem, 4vw, 3.2rem);
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -0.03em;
+  color: var(--color-ink);
+}
+
+/* ---------- Bits shared by the articles pages ---------- */
+.art-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.2rem 0.7rem;
+  margin: 0 0 0.4rem;
+  font-size: 0.8rem;
+  color: var(--color-muted);
+}
+
+.art-meta .mono {
+  color: var(--color-cool);
+}
+
+.art-day {
+  color: var(--color-ink);
+  font-weight: 700;
+}
+
+.art-dek {
+  margin: 0.4rem 0 0;
+  color: var(--color-muted);
+  line-height: 1.5;
+  font-size: 0.92rem;
+}
+
+.art-dek--lead {
+  font-size: 1.08rem;
+  color: var(--color-ink-2);
+}

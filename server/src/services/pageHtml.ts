@@ -1,6 +1,7 @@
 import fs from "fs";
 import path from "path";
 import { getCurrentSeason, getDriverProfile, isDatasetReady, warmDataset } from "./f1db";
+import { getArticle } from "./articles";
 import { homePayload } from "./home";
 import { pageJsonLd } from "./jsonld";
 import { describePage, type PageMeta } from "./og";
@@ -88,6 +89,21 @@ async function profilePreload(pagePath: string): Promise<string> {
   if (!src) return "";
   const set = PORTRAIT_WIDTHS.map((w) => `${url(w)} ${w}w`).join(", ");
   return `<link rel="preload" as="image" href="${attr(src)}" imagesrcset="${attr(set)}" imagesizes="${PROFILE_PORTRAIT_SIZES}" fetchpriority="high" />`;
+}
+
+// An article page's extra head tags: its publication date, and preloads for
+// the API call the page makes (client/src/api/client.ts) and the cover's
+// portrait (the <img> in components/ArticleCover.tsx, at its default width).
+async function articleHead(slug: string, lang: "en" | "uk"): Promise<string> {
+  const a = await getArticle(decodeURIComponent(slug), lang).catch(() => null);
+  if (!a) return "";
+  const c = a.cover;
+  const portrait = c.driverId && c.constructorId ? driverPortraitUrl(c.driverId, c.constructorId, a.season, 600) : null;
+  return (
+    `<meta property="article:published_time" content="${attr(a.date)}" />` +
+    `<link rel="preload" as="fetch" href="/api/articles/${encodeURIComponent(a.slug)}?lang=${lang}" crossorigin />` +
+    (portrait ? `<link rel="preload" as="image" href="${attr(portrait)}" fetchpriority="high" />` : "")
+  );
 }
 
 const attr = (s: string) =>
@@ -257,6 +273,13 @@ export async function pageHtml(
 
   const clean = pagePath.split("?")[0].replace(/\/+$/, "");
   if (clean === "" && isDatasetReady()) html = html.replace("</head>", `${await homeBoot()}</head>`);
+  // An article is an article to link previews, with its date; and its text
+  // and cover photo start downloading with the HTML, not after the app and
+  // the page's chunk have loaded.
+  if (meta && /^\/articles\/[^/]+$/.test(clean)) {
+    const head = await articleHead(clean.slice(10), lang);
+    if (head) html = setTag(html, 'property="og:type"', "article").replace("</head>", `${head}</head>`);
+  }
   if (meta && clean.startsWith("/drivers/")) {
     const preload = await profilePreload(clean);
     if (preload) html = html.replace("</head>", `${preload}</head>`);

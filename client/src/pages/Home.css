@@ -961,3 +961,55 @@
     transform: none;
   }
 }
+
+/* ---------- Article slide (Г3) ----------
+   The race-number hero with the article's key reading over the photo (the
+   caption is .ac-reading in components/ArticleCover.css), or, without a
+   driver, the reading large in the team's colour. */
+.hero-dek {
+  margin: 0.7rem 0 0;
+  max-width: 40ch;
+  color: var(--color-ink-2);
+  font-size: 0.95rem;
+  line-height: 1.45;
+  text-shadow: 0 1px 6px var(--color-veil);
+}
+
+.hero-article--type {
+  container-type: inline-size;
+}
+
+.hero-reading-big {
+  position: absolute;
+  right: 4%;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 0;
+  font-size: min(9rem, calc(70cqi / var(--len)));
+  font-weight: 700;
+  line-height: 0.9;
+  letter-spacing: -0.06em;
+  white-space: nowrap;
+  color: color-mix(in oklch, var(--team) 26%, transparent);
+  -webkit-text-stroke: 2px var(--team);
+  pointer-events: none;
+  user-select: none;
+}
+
+.hero-article--type .hero-stripe {
+  right: 46%;
+}
+
+@media (max-width: 768px) {
+  .hero-article .ac-reading {
+    top: 30%;
+    bottom: auto;
+  }
+  .hero-reading-big {
+    top: 6%;
+    left: 6%;
+    right: auto;
+    transform: none;
+    font-size: min(6rem, calc(150cqi / var(--len)));
+  }
+}

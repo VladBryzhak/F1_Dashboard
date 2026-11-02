@@ -2,11 +2,11 @@
 // The server builds the same text for the first HTML a visitor or crawler
 // gets (server/src/services/og.ts, describePage) — keep the two in step.
 import { plural, type Lang } from '../i18n/core'
-import type { CircuitProfile, ConstructorProfile, DriverProfile, RaceWeekend } from '../types/f1'
+import type { Article, CircuitProfile, ConstructorProfile, DriverProfile, RaceWeekend } from '../types/f1'
 import { countryName } from './countries'
 import { gpTitle } from './gpNames'
 
-export type NotFoundKind = 'page' | 'driver' | 'team' | 'circuit' | 'race'
+export type NotFoundKind = 'page' | 'driver' | 'team' | 'circuit' | 'race' | 'article'
 
 export interface SeoText {
   title: string
@@ -240,6 +240,7 @@ export const seoText = {
       team: ['Team not found', 'Команду не знайдено'],
       circuit: ['Circuit not found', 'Трасу не знайдено'],
       race: ['Race not found', 'Гонку не знайдено'],
+      article: ['Article not found', 'Статтю не знайдено'],
     }
     return uk(lang)
       ? {
@@ -253,6 +254,22 @@ export const seoText = {
             'There is no page at this address on Paddock Times. Formula 1 standings, calendar, drivers, teams and circuits are a click away.',
         }
   },
+
+  // Kept in step with describePage's "articles" case on the server.
+  articles: (lang: Lang): SeoText =>
+    uk(lang)
+      ? {
+          title: 'Статті про Формулу-1',
+          description:
+            'Статті Paddock Times про Формулу-1: розбори кожного дня гоночного вікенду, аналітика і матеріали між етапами.',
+        }
+      : {
+          title: 'Formula 1 Articles',
+          description:
+            'Paddock Times articles on Formula 1: a look at every day of the race weekend, analysis and stories between rounds.',
+        },
+
+  article: (a: Article): SeoText => ({ title: a.title, description: a.description }),
 
   feedback: (lang: Lang): SeoText =>
     uk(lang)

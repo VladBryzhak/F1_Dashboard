@@ -11,6 +11,7 @@ const f1db = vi.hoisted(() => ({
   hasRace: async (season: string, round: string) => season === "2026" && Number(round) >= 1 && Number(round) <= 24,
 }));
 vi.mock("./f1db", () => f1db);
+vi.mock("./articles", () => ({ hasArticle: async (slug: string) => slug === "antonelli-champion" }));
 
 import { pageStatus } from "./pageRoutes";
 
@@ -24,14 +25,14 @@ describe("pageStatus", () => {
   it("answers 200 for the pages the app has", async () => {
     for (const p of ["/", "/standings", "/standings/1998", "/calendar/2025", "/drivers", "/drivers/2025",
       "/drivers/max-verstappen", "/teams/mclaren", "/circuits", "/circuits/monza", "/calendar/2026/18",
-      "/calendar/2026/018", "/compare", "/telemetry", "/live", "/about", "/privacy", "/support", "/feedback"]) {
+      "/calendar/2026/018", "/articles", "/articles/antonelli-champion", "/compare", "/telemetry", "/live", "/about", "/privacy", "/support", "/feedback"]) {
       expect(await status(p), p).toEqual({ code: 200 });
     }
   });
 
   it("answers 404 for addresses that lead nowhere", async () => {
     for (const p of ["/nonexistent", "/about/x", "/calendar/2026/18/x", "/calendar/2026/99", "/calendar/abc/1",
-      "/drivers/not-a-driver", "/drivers/1949", "/teams/nope", "/circuits/nope", "/circuits/monza/x", "/%E0%A4%A"]) {
+      "/drivers/not-a-driver", "/drivers/1949", "/articles/nope", "/articles/antonelli-champion/x", "/teams/nope", "/circuits/nope", "/circuits/monza/x", "/%E0%A4%A"]) {
       expect(await status(p), p).toEqual({ code: 404 });
     }
   });

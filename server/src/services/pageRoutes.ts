@@ -1,3 +1,4 @@
+import { hasArticle } from "./articles";
 import { getCurrentSeason, hasPageSubject, hasRace, isDatasetReady } from "./f1db";
 
 // What a page address leads to, for the SPA fallback in index.ts: a page the
@@ -47,6 +48,11 @@ export async function pageStatus(pagePath: string, checkData: boolean): Promise<
   const isCurrent = async (y: string) => data && Number(y) === (await getCurrentSeason());
 
   switch (where) {
+    // Articles are files of ours: no dataset needed to know one exists.
+    case "articles":
+      if (b) return NOT_FOUND;
+      return !a || (await hasArticle(a)) ? OK : NOT_FOUND;
+
     case "circuits":
       if (b) return NOT_FOUND;
       return a ? exists(() => hasPageSubject("circuit", a)) : OK;

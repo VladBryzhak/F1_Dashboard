@@ -1,5 +1,6 @@
 import { Resvg } from "@resvg/resvg-js";
 import path from "path";
+import { getArticle, TAG_LABEL } from "./articles";
 import { circuitOutline } from "./circuitOutlines";
 import {
   getCalendar,
@@ -12,7 +13,7 @@ import {
 } from "./f1db";
 import type { CircuitOutline } from "../types/f1";
 import { gpTitle, type Lang } from "./gpNames";
-import { UK, ukCountry, ukPlural } from "./ukText";
+import { UK, ukCountry, ukDate, ukPlural } from "./ukText";
 
 // Link previews (Open Graph / Twitter cards). Social crawlers don't run our
 // JavaScript, so the server works out each page's title, description and a
@@ -51,7 +52,8 @@ type Card =
   | { kind: "race"; kicker: string; title: string; podium: { pos: number; name: string; team: string; color: string }[]; note: string | null; outline: CircuitOutline | null }
   | { kind: "driver"; first: string; last: string; meta: string; number: string | null; color: string; stats: [string, string][] }
   | { kind: "team"; name: string; meta: string; color: string; stats: [string, string][] }
-  | { kind: "standings"; heading: string; rows: { pos: number; name: string; points: number; color: string }[] };
+  | { kind: "standings"; heading: string; rows: { pos: number; name: string; points: number; color: string }[] }
+  | { kind: "article"; kicker: string; title: string; number: string | null; color: string; reading: string | null; readingLabel: string | null };
 
 export interface PageMeta {
   title: string; // full <title>
@@ -326,6 +328,29 @@ export async function describePage(rawPath: string, lang: Lang = "en"): Promise<
         "Paddock Times is free, with no ads and no accounts. Donations help pay for hosting and development.",
         "Free, no ads, no accounts — donations keep it running.",
       );
+    case "articles": {
+      if (a) {
+        const art = await getArticle(a, lang).catch(() => null);
+        if (art) {
+          const c = art.cover;
+          return pg(art.title, art.description, {
+            kind: "article",
+            kicker: `${TAG_LABEL[lang][art.tag]} · ${uk ? ukDate(art.date) : fmtDate(art.date)}`,
+            title: art.title,
+            number: c.driverId ? c.number : null,
+            color: c.constructorId ? teamColor(c.constructorId) : ACCENT,
+            reading: c.reading,
+            readingLabel: c.readingLabel,
+          });
+        }
+      }
+      if (uk) return generic("Статті про Формулу-1", "Статті Paddock Times про Формулу-1: розбори кожного дня гоночного вікенду, аналітика і матеріали між етапами.", "Розбори кожного дня гоночного вікенду.");
+      return generic(
+        "Formula 1 Articles",
+        "Paddock Times articles on Formula 1: a look at every day of the race weekend, analysis and stories between rounds.",
+        "A look at every day of the race weekend.",
+      );
+    }
     case "feedback":
       if (uk) return generic("Відгук", "Надішліть відгук, повідомте про помилку чи запропонуйте функцію для Paddock Times.");
       return generic("Feedback", "Send feedback, report a bug or suggest a feature for Paddock Times.");
@@ -514,6 +539,28 @@ function draw(card: Card, lang: Lang): string {
         ${name.map((l, i) => text(96, 214 + i * 100, l, 100, 800, TEXT)).join("")}
         ${text(96, 214 + name.length * 100 - 30, card.meta, 30, 600, MUTED)}
         ${statTiles(card.stats, 64, 400, 760)}
+      `);
+    }
+    case "article": {
+      // The driver's number in team colour on the right, as on a driver's
+      // card; the headline on the left, and the article's key reading.
+      const lines = wrap(card.title.toUpperCase(), 22, 3);
+      const size = lines.length > 2 ? 64 : 76;
+      const number = card.number
+        ? text(1136, 470, card.number, 380, 800, "none", `text-anchor="end" stroke="${card.color}" stroke-width="6" opacity="0.9"`)
+        : "";
+      const top = 230;
+      const after = top + (lines.length - 1) * (size + 6);
+      const reading = card.reading
+        ? `${card.readingLabel ? text(96, after + 78, card.readingLabel, 28, 600, MUTED) : ""}
+          ${text(96, after + (card.readingLabel ? 150 : 120), card.reading, 72, 800, TEXT)}`
+        : "";
+      return frame(`
+        ${number}
+        <rect x="64" y="${top - size}" width="10" height="${after - top + size + 14}" rx="4" fill="${card.color}"/>
+        ${text(96, 150, card.kicker.toUpperCase(), 26, 700, MUTED, 'letter-spacing="2"')}
+        ${lines.map((l, i) => text(96, top + i * (size + 6), l, size, 800, TEXT)).join("")}
+        ${reading}
       `);
     }
     case "standings": {

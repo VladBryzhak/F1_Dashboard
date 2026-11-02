@@ -39,6 +39,7 @@ vi.mock("./f1db", () => ({
   getRaceAfter: async () => ({ season: 2026, round: 20, grandPrixName: "Brazil", date: "2026-11-08", countryCode: "br", circuitId: "interlagos", placeName: "São Paulo", outline: null }),
 }));
 vi.mock("./news", () => ({ getNews: async () => [] }));
+vi.mock("./articles", () => ({ homeArticle: async () => null }));
 vi.mock("./sessionHero", () => ({ sessionHeroWithin: async () => state.session }));
 
 import { homePayload } from "./home";

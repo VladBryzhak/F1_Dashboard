@@ -75,6 +75,8 @@ async function postJson<T>(path: string, body: unknown): Promise<T> {
 }
 
 import type {
+  Article,
+  ArticleSummary,
   CalendarResponse,
   CircuitProfile,
   CircuitSummary,
@@ -110,6 +112,9 @@ import type {
 
 export const api = {
   home: () => getJson<HomeResponse>('/home'),
+  articles: (lang: string) => getJson<ArticleSummary[]>(`/articles?lang=${lang}`),
+  article: (slug: string, lang: string) =>
+    getJson<Article>(`/articles/${encodeURIComponent(slug)}?lang=${lang}`),
   driverStandings: (season: string) =>
     getJson<StandingsResponse<DriverStanding>>(`/standings/drivers/${season}`),
   seasonProgression: (season: string) =>

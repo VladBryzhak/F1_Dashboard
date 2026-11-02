@@ -1,3 +1,4 @@
+import { homeArticle } from "./articles";
 import { getDriverStandings, getHomeHighlights, getRaceAfter } from "./f1db";
 import { getNews } from "./news";
 import { driverPortraitUrl } from "./portraits";
@@ -5,7 +6,8 @@ import { sessionHeroWithin } from "./sessionHero";
 import type { HomeResponse } from "../types/f1";
 
 // Everything the home page shows above the fold, in one payload: the latest
-// race, championship top 5, next race, headlines and the hero photo URL.
+// race, championship top 5, next race, headlines, the latest article and the
+// hero photo URL.
 // Served by /api/home and, for "/", inlined into the HTML so the page renders
 // without waiting for API round trips.
 //
@@ -42,9 +44,10 @@ export async function homePayload(newsWaitMs?: number): Promise<HomeResponse> {
   ) {
     highlights.nextRace = await getRaceAfter(session.season, session.round);
   }
-  const [standings, items] = await Promise.all([
+  const [standings, items, article] = await Promise.all([
     getDriverStandings(String(highlights.season)).then((s) => s.standings.slice(0, 5)),
     news,
+    homeArticle().catch(() => null),
   ]);
   // The hero's main photo: the session's P1, or the last race's winner.
   const lead = session
@@ -62,6 +65,7 @@ export async function homePayload(newsWaitMs?: number): Promise<HomeResponse> {
     standings,
     news: items,
     session,
+    article,
     heroImage: portrait(600),
     heroSrcSet: hasPortrait ? HERO_WIDTHS.map((w) => `${portrait(w)} ${w}w`).join(", ") : null,
     heroSizes: HERO_SIZES,

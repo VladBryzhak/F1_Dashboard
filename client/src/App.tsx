@@ -60,8 +60,8 @@ const Feedback = lazyPage(() => import('./pages/Feedback'))
 const About = lazyPage(() => import('./pages/About'))
 const Privacy = lazyPage(() => import('./pages/Privacy'))
 const Support = lazyPage(() => import('./pages/Support'))
-// TEMP: articles mock-ups, dev only.
-const ArticlesMock = import.meta.env.DEV ? lazyPage(() => import('./pages/ArticlesMock')) : null
+const Articles = lazyPage(() => import('./pages/Articles'))
+const Article = lazyPage(() => import('./pages/Article'))
 // Its own small chunk, shared with the pages that show it in their place.
 const NotFound = lazyPage(() => import('./pages/NotFound'))
 
@@ -105,6 +105,8 @@ export default function App() {
       <Routes>
         <Route element={<Layout />}>
           <Route index element={<Home />} />
+          <Route path="articles" element={<Articles />} />
+          <Route path="articles/:slug" element={<Article />} />
           <Route path="standings" element={<Standings />} />
           <Route path="standings/:season" element={<Standings />} />
           <Route path="calendar" element={<Calendar />} />
@@ -123,7 +125,6 @@ export default function App() {
           <Route path="about" element={<About />} />
           <Route path="privacy" element={<Privacy />} />
           <Route path="support" element={<Support />} />
-          {ArticlesMock && <Route path="mock/articles" element={<ArticlesMock />} />}
           {/* Anything else: the "not found" page (the server answers 404). */}
           <Route path="*" element={<NotFound />} />
         </Route>

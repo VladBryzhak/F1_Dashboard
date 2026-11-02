@@ -1,6 +1,7 @@
+import { getArticle } from "./articles";
 import { getCircuitProfile, getConstructorProfile, getDriverProfile, getRaceWeekend } from "./f1db";
 import { gpTitle, type Lang } from "./gpNames";
-import type { CircuitProfile, ConstructorProfile, DriverProfile, RaceWeekend } from "../types/f1";
+import type { Article, CircuitProfile, ConstructorProfile, DriverProfile, RaceWeekend } from "../types/f1";
 
 // schema.org JSON-LD for a page, written into the HTML by pageHtml, so search
 // engines (and the ones that don't run JavaScript at all) see the page as an
@@ -78,9 +79,38 @@ export async function pageJsonLd(siteUrl: string, pagePath: string, lang: Lang):
       return [circuitLd(c), crumbs([home, { name: uk ? "Траси" : "Circuits", path: "/circuits" }, { name: c.name, path }])];
     }
 
+    case "articles": {
+      if (!a) return null;
+      const art = await getArticle(a, lang).catch(() => null);
+      if (!art) return null;
+      const path = `/articles/${art.slug}`;
+      return [
+        articleLd(art, url(path), siteUrl + (uk ? "/og/uk" : "/og") + `${path}.png`, siteUrl),
+        crumbs([home, { name: uk ? "Статті" : "Articles", path: "/articles" }, { name: art.title, path }]),
+      ];
+    }
+
     default:
       return null;
   }
+}
+
+// An article of ours as a schema.org NewsArticle (client/src/lib/jsonld.ts
+// articleLd builds the same).
+function articleLd(a: Article, pageUrl: string, image: string, siteUrl: string): object {
+  const org = { "@type": "Organization", name: "Paddock Times", url: siteUrl };
+  return {
+    "@context": CTX,
+    "@type": "NewsArticle",
+    headline: a.title,
+    description: a.description,
+    datePublished: a.date,
+    image: [image],
+    url: pageUrl,
+    mainEntityOfPage: pageUrl,
+    author: org,
+    publisher: { ...org, logo: { "@type": "ImageObject", url: `${siteUrl}/apple-touch-icon.png` } },
+  };
 }
 
 // Site-wide identity, on the home page.

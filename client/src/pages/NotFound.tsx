@@ -21,6 +21,7 @@ const LEAD: Record<NotFoundKind, TKey> = {
   team: 'nf.teamLead',
   circuit: 'nf.circuitLead',
   race: 'nf.raceLead',
+  article: 'nf.articleLead',
 }
 
 const SECTIONS: { to: string; name: TKey; note: TKey }[] = [
@@ -67,7 +68,9 @@ export default function NotFound({
         ? { to: '/teams', label: t('nf.allTeams') }
         : kind === 'circuit'
           ? { to: '/circuits', label: t('nf.allCircuits') }
-          : kind === 'race'
+          : kind === 'article'
+            ? { to: '/articles', label: t('nf.allArticles') }
+            : kind === 'race'
             ? isSeason(season)
               ? { to: seasonPath('/calendar', season), label: t('nf.calendarOf', { season }) }
               : { to: '/calendar', label: t('nav.calendar') }

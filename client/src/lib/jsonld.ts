@@ -5,7 +5,7 @@
 // The server writes the same into the page's HTML for crawlers that don't run
 // the app (server/src/services/jsonld.ts): keep the two in step.
 import { getLang, localizedPath } from '../i18n/core'
-import type { ConstructorProfile, DriverProfile, RaceWeekend } from '../types/f1'
+import type { Article, ConstructorProfile, DriverProfile, RaceWeekend } from '../types/f1'
 
 const BASE = 'https://f1-dashboard-bryzhak.onrender.com'
 
@@ -98,6 +98,25 @@ export function raceLd(w: RaceWeekend): object {
       }),
     },
     url: pageUrl(),
+  }
+}
+
+// An article of ours as a schema.org NewsArticle; its image is the page's
+// link-preview card (server/src/services/jsonld.ts articleLd builds the same).
+export function articleLd(a: Article): object {
+  const path = localizedPath(`/articles/${a.slug}`, getLang())
+  const org = { '@type': 'Organization', name: 'Paddock Times', url: BASE }
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'NewsArticle',
+    headline: a.title,
+    description: a.description,
+    datePublished: a.date,
+    image: [`${BASE}/og${path}.png`],
+    url: BASE + path,
+    mainEntityOfPage: BASE + path,
+    author: org,
+    publisher: { ...org, logo: { '@type': 'ImageObject', url: `${BASE}/apple-touch-icon.png` } },
   }
 }
 

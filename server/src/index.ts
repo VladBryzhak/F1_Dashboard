@@ -3,6 +3,7 @@ import express, { NextFunction, Request, Response } from "express";
 import fs from "fs";
 import helmet from "helmet";
 import path from "path";
+import articlesRouter from "./routes/articles";
 import calendarRouter from "./routes/calendar";
 import circuitsRouter from "./routes/circuits";
 import feedbackRouter from "./routes/feedback";
@@ -50,6 +51,7 @@ app.get("/api/health", (_req, res) => {
 app.use("/api", (req, _res, next) => runAs(isBot(req.get("user-agent")), next));
 
 app.use("/api/home", homeRouter);
+app.use("/api/articles", articlesRouter);
 app.use("/api/feedback", feedbackRouter);
 app.use("/api/live", liveRouter);
 app.use("/api/standings", standingsRouter);

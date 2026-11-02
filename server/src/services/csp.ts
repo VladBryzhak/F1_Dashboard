@@ -23,6 +23,10 @@ const GA_IMG = ["https://*.google-analytics.com", "https://*.googletagmanager.co
 // Images: formula1.com portraits and cars, flags, Wikimedia photos and logos.
 const IMG_HOSTS = ["https://media.formula1.com", "https://flagcdn.com", "https://upload.wikimedia.org"];
 
+// An Instagram post in an article, put in its frame only when the reader
+// asks for it (client/src/pages/Article.tsx).
+const FRAME_HOSTS = ["https://www.instagram.com"];
+
 export const newNonce = () => crypto.randomBytes(16).toString("base64");
 
 export function cspHeader(nonce: string): string {
@@ -35,6 +39,7 @@ export function cspHeader(nonce: string): string {
     `img-src 'self' data: blob: ${[...IMG_HOSTS, ...GA_IMG].join(" ")}`,
     "font-src 'self'",
     `connect-src 'self' ${GA_CONNECT.join(" ")}`,
+    `frame-src ${FRAME_HOSTS.join(" ")}`,
     "manifest-src 'self'",
     "object-src 'none'",
     "base-uri 'self'",

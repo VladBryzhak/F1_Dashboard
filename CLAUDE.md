@@ -63,6 +63,37 @@ Run both (two terminals): `server` then `client`. The Vite proxy (`client/vite.c
   - Never fetch OpenF1 directly, and never swallow its errors with `.catch(() => [])` on data that gets cached: use `.catch(optional(fallback))`, which still lets "busy"/"locked" through, so a result missing a part only because OpenF1 was busy isn't kept for hours. Share raw responses through `cached()` (it also shares a cold key's computation between concurrent callers, and its TTL may depend on the value). The year's sessions (`getYearSessions`) serve the live status, replay list, race lists and each session's details; a finished session's data is kept long (replays a week), a running one's for seconds.
   - `warmReplays()` (started in `index.ts`) fetches the last week's session replays every 30 min through the queue's background lane (`inBackground`), which only uses spare budget and moves to the front when a visitor asks for the same data (`promoteBackground`). A cold replay is 7 requests, about 2.5 s at OpenF1's 3 a second.
 
+## Articles (content/articles)
+
+Our own articles, kept in the repo as files and published with a deploy. Each article is a folder `content/articles/<slug>/` (lower-case words joined by hyphens, the same slug in both languages):
+
+- `meta.json` holds what both languages share:
+  - `date` (yyyy-mm-dd) and `season`;
+  - `round`: the race weekend it belongs to, or null;
+  - `day`: `fri` | `sat` | `sun` | `midweek`;
+  - `tag`: `analysis` | `race` | `sprint` | `qualifying` | `practice` | `drivers` | `teams` | `preview`;
+  - `cover`: `driverId` + `constructorId` + `number` for a driver over their number, `reading` for the key number, and an optional `credit`.
+- `en.md` and `uk.md` hold front matter (`title`, `description`, `readingLabel`: the label of the cover's reading) and the body in Markdown.
+- Rules for the body:
+  - links to our pages are written without the language (`/drivers/…`); the Ukrainian text gets `/uk/…` by itself;
+  - raw HTML shows as text.
+- Three blocks of ours, as fenced code blocks of `key: value` lines (`server/src/services/articles.ts`):
+  - `stats`: `- Label: value` rows, `title`, `source`;
+  - `figure`: `src` (`/media/articles/<slug>/…` in `client/public`, or https), `alt`, `caption`, `credit`, `creditUrl`, `width`, `height`;
+  - `instagram`: `url`, `handle`. Instagram posts are embedded only through this block: nothing is fetched from Instagram until the reader presses the button. Then the post's own embed frame replaces it; CSP `frame-src` allows www.instagram.com. Never copy an Instagram photo into the repo.
+- An article must exist in both languages, or it is left out with a warning in the server log.
+- Pages:
+  - `/articles` (`pages/Articles.tsx`): the newest on top, then the season by race weekend;
+  - `/articles/:slug` (`pages/Article.tsx`): cover with headline, one reading column, three more to read.
+- The newest article joins the home slider for 14 days (`homeArticle`, `ArticleHero` in `pages/Home.tsx`).
+- Covers are drawn (`components/ArticleCover.tsx`): the driver's formula1.com portrait over their number, or the reading large in team colour.
+- Server side:
+  - titles and preview cards come from `describePage` (card kind `article`);
+  - crawlers get the whole text in the snapshot;
+  - the sitemap lists every article in both languages;
+  - an article page gets `og:type` article, its date, a NewsArticle JSON-LD and preloads for its API call and cover portrait.
+- `npm test` covers the parser.
+
 ## Generated data (server/src/data)
 
 Committed JSON built by one-off scripts, so the site makes no extra upstream calls at runtime. Re-run when a new circuit joins the calendar:
@@ -86,13 +117,13 @@ Social crawlers don't run JS, so the Express SPA fallback (`server/src/services/
 - Home is imported eagerly in `App.tsx` (no chunk round trip on the landing page).
 - The home page shows the latest race run and its season's standings (`getHomeHighlights`): between seasons (a new calendar out, no race run) it keeps the last race and the final standings (`seasonOver`), and the next race comes from the new season.
 - During a race weekend the hero follows the latest session (`services/sessionHero.ts`, `session` in the home payload): the top three after each practice, the pole-sitter after qualifying (sprint qualifying too), the winner after a sprint, and after the race its winner from OpenF1 until f1db has it (then `session` is null and the f1db hero is back, with the next race moved on meanwhile). Results come from OpenF1's `session_result`, open 30 minutes after a session ends; drivers are matched to f1db by code, then surname (`getSeasonDrivers`); a stand-in f1db doesn't list keeps OpenF1's name and headshot. The page waits at most 2.5 s for it (`sessionHeroWithin`), keeps the last answer while OpenF1 is locked or busy, and a background check every 5 minutes has it ready. The heroes are `PracticeHero`, `PoleHero` and `WinnerHero` in `pages/Home.tsx`; the hero image the server preloads is the session's P1.
-- Once the title is decided (`titleDecided` in `f1db.ts`: the leader ahead by more than 25 a race and 8 a sprint still to run, or the last round run), `highlights.champion` is set and the hero becomes a slider (`components/HeroSlider.tsx`): the race or session hero first, the champion second (`ChampionHero`, its headline an h2), until a new season's first race. Slides cross-fade every 10 s (small grey dots centred at the bottom pick one, a swipe moves on), pause on hover, focus or a hidden tab, stay put for reduced motion, and a slide out of view is `inert`.
+- Once the title is decided (`titleDecided` in `f1db.ts`: the leader ahead by more than 25 a race and 8 a sprint still to run, or the last round run), `highlights.champion` is set until a new season's first race. With a fresh article (`article` in the home payload) or a champion, the hero becomes a slider (`components/HeroSlider.tsx`): the race or session hero first, then the article (`ArticleHero`), then the champion (`ChampionHero`); their headlines are h2s. Slides cross-fade every 10 s (small grey dots centred at the bottom pick one, a swipe moves on), pause on hover, focus or a hidden tab, stay put for reduced motion, and a slide out of view is `inert`.
 
 ## Current season
 
 - The current season is the newest in the dataset (`getCurrentSeason`). `pageHtml` writes it into every page as `window.__SEASON__`, and `CURRENT_SEASON` in `client/src/lib/seasons.ts` reads it (the calendar year on a cold start), so the app and the server agree on what `/standings` is and the site moves to a new season by itself. Never hard-code a year; season lists derive from it.
 - Driver profiles get the same early preload for their portrait (`profilePreload` in `pageHtml.ts`, widths and sizes in step with `f1SrcSet` and `pages/DriverProfile.tsx`).
-- Fonts are self-hosted in `client/public/fonts` (Saira, OFL) and loaded by a non-blocking `fonts.css`; gtag.js loads after the page's `load` event, when the browser is idle.
+- Fonts are self-hosted in `client/public/fonts` (Saira, OFL) and loaded by a non-blocking `fonts.css` (bump its `?v=` in `client/index.html` when it changes: `/fonts` is cached for 30 days). Saira has no Cyrillic, so `--font-display` falls back to Fira Sans Extra Condensed (OFL), cut down to Cyrillic, for Ukrainian headings. gtag.js loads after the page's `load` event, when the browser is idle.
 
 ## Server conventions
 
