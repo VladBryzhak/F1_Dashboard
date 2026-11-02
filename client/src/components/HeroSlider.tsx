@@ -9,14 +9,14 @@ export interface Slide {
 }
 
 // How long a slide stays before the next one comes in.
-const INTERVAL_MS = 20_000
+const INTERVAL_MS = 10_000
 
 const reducedMotion = () =>
   typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches
 
 // The home hero's slides, stacked in one place (the tallest sets the height,
 // so nothing below moves) and cross-faded. They move on by themselves every
-// 20 seconds, except while the pointer or focus is on them, while the tab is
+// 10 seconds, except while the pointer or focus is on them, while the tab is
 // hidden, or for people who ask for reduced motion. Dots at the bottom pick a
 // slide; a swipe moves one on or back.
 export default function HeroSlider({ slides, label }: { slides: Slide[]; label: string }) {
