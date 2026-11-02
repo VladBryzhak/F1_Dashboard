@@ -679,13 +679,13 @@ async function loadDataset(): Promise<Dataset> {
 
 // Keeping the data current. A long-lived process holds one dataset, so it
 // would serve the same results until a restart (the site is kept awake, so
-// Render no longer restarts it). Every F1DB_CHECK_MS (default 30 min) it asks
+// Render no longer restarts it). Every F1DB_CHECK_MS (default 10 min) it asks
 // GitHub which release "latest" points to, a redirect that costs no API quota,
 // and only when the tag has changed downloads it, swaps it in and drops the
 // caches built from the old one. f1db usually publishes the morning after a
-// race, so results show up within half an hour of that. Set 0 to disable.
+// race, so results show up within ten minutes of that. Set 0 to disable.
 const CHECK_INTERVAL_MS =
-  process.env.F1DB_CHECK_MS !== undefined ? Number(process.env.F1DB_CHECK_MS) : 30 * 60 * 1000;
+  process.env.F1DB_CHECK_MS !== undefined ? Number(process.env.F1DB_CHECK_MS) : 10 * 60 * 1000;
 
 // Cache keys built from the dataset (the f1db functions themselves read it
 // directly and need nothing dropped).
