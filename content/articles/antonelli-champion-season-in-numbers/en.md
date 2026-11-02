@@ -30,6 +30,15 @@ The title was built in spring. From China to Monaco, Antonelli won five races in
 
 The number that matters most may be this one. Antonelli has finished on the podium 16 times in 19 races. On the days he couldn't win, like Mexico, he still brought home big points, and that is what made the gap impossible to close long before the finale.
 
+## 12 titles on one podium
+
+The podium that settled it was a rare one. Max Verstappen won in Mexico, Lewis Hamilton was second and Antonelli third: seven titles for Hamilton, four for Verstappen and now one for Antonelli. Mercedes summed it up in a single line on Instagram: twelve F1 titles in one picture. In it, the two older champions lift the new one up between them. Between them, the three have won 189 Grands Prix, and Hamilton, at 41, is more than twice the new champion's age.
+
+```instagram
+url: https://www.instagram.com/p/DfN4eTGt85o/
+handle: mercedesamgf1
+```
+
 ## From seventh to first
 
 A year ago Antonelli was a rookie: seventh in the 2025 championship with 150 points and no wins. Twelve months on he has beaten everyone, his own teammate George Russell included, who is fourth on 250.
