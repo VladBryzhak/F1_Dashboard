@@ -387,8 +387,6 @@ const uk: Dict & Record<string, string> = {
   'home.driverProfile': 'Профіль пілота',
   'slider.carousel': 'карусель',
   'slider.slide': 'слайд',
-  'slider.pause': 'Зупинити слайди',
-  'slider.play': 'Запустити слайди',
   'home.weekendSchedule': 'Розклад вікенду',
   'home.wins': 'перемагає',
   'home.winsSprint': 'виграє спринт',

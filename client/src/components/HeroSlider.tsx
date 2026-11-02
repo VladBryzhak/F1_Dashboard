@@ -17,12 +17,13 @@ const reducedMotion = () =>
 // The home hero's slides, stacked in one place (the tallest sets the height,
 // so nothing below moves) and cross-faded. They move on by themselves every
 // 20 seconds, except while the pointer or focus is on them, while the tab is
-// hidden, after the pause button, or for people who ask for reduced motion.
-// Dots pick a slide; a swipe moves one on or back.
+// hidden, or for people who ask for reduced motion. Dots at the bottom pick a
+// slide; a swipe moves one on or back.
 export default function HeroSlider({ slides, label }: { slides: Slide[]; label: string }) {
   const { t } = useI18n()
   const [index, setIndex] = useState(0)
-  const [playing, setPlaying] = useState(() => !reducedMotion())
+  // People who ask for reduced motion get no automatic changes.
+  const [playing] = useState(() => !reducedMotion())
   const [hovered, setHovered] = useState(false)
   const [focused, setFocused] = useState(false)
   const [hidden, setHidden] = useState(false)
@@ -48,7 +49,7 @@ export default function HeroSlider({ slides, label }: { slides: Slide[]; label: 
 
   return (
     <div
-      className={`hero-slider${running ? ' is-running' : ''}`}
+      className="hero-slider"
       role="region"
       aria-roledescription={t('slider.carousel')}
       aria-label={label}
@@ -91,24 +92,7 @@ export default function HeroSlider({ slides, label }: { slides: Slide[]; label: 
         ))}
       </div>
 
-      <div className="hero-slider-controls">
-        <button
-          type="button"
-          className="hs-play"
-          onClick={() => setPlaying((p) => !p)}
-          aria-label={t(playing ? 'slider.pause' : 'slider.play')}
-        >
-          {playing ? (
-            <svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true">
-              <rect x="2" y="1.5" width="2.6" height="9" rx="0.6" fill="currentColor" />
-              <rect x="7.4" y="1.5" width="2.6" height="9" rx="0.6" fill="currentColor" />
-            </svg>
-          ) : (
-            <svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true">
-              <path d="M3 1.6v8.8a.6.6 0 0 0 .9.5l7-4.4a.6.6 0 0 0 0-1L3.9 1.1a.6.6 0 0 0-.9.5Z" fill="currentColor" />
-            </svg>
-          )}
-        </button>
+      <div className="hero-slider-dots">
         {slides.map((s, i) => (
           <button
             key={s.key}
@@ -117,11 +101,7 @@ export default function HeroSlider({ slides, label }: { slides: Slide[]; label: 
             onClick={() => go(i)}
             aria-label={s.label}
             aria-current={i === index}
-          >
-            {/* The active dot fills up over the slide's time (from the start
-                again after a pause, as the timer does). */}
-            {i === index && running && <span className="hs-dot-fill" />}
-          </button>
+          />
         ))}
       </div>
     </div>

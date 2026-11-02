@@ -352,8 +352,6 @@ const en = {
   'home.driverProfile': 'Driver profile',
   'slider.carousel': 'carousel',
   'slider.slide': 'slide',
-  'slider.pause': 'Pause the slides',
-  'slider.play': 'Play the slides',
   'home.weekendSchedule': 'Weekend schedule',
   'home.wins': 'wins',
   'home.winsSprint': 'wins the sprint',
