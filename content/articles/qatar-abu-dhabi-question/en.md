@@ -26,6 +26,16 @@ During the Mexico weekend F1 sent a letter to all teams. Autosport saw it: F1 st
 
 MotoGP races at Lusail, the same circuit F1 uses, this weekend, from 6 to 8 November. On Sunday Yamaha became the first manufacturer to say publicly that it will not go: Yamaha and its satellite team Pramac will boycott the race. MotoGP has threatened sanctions, and the other manufacturers are still travelling ([Autosport](https://www.autosport.com/f1/news/what-does-yamahas-shock-motogp-boycott-mean-for-f1-in-qatar-and-abu-dhabi/10870666/)). That weekend will be the first real test of how a paddock behaves in the region this autumn.
 
+```figure
+src: /media/articles/qatar-abu-dhabi-question/lusail-grandstand.jpg
+alt: The main straight and grandstand at the Lusail circuit at night, full of spectators
+caption: Lusail at night: the main straight and the grandstand during the 2013 MotoGP race. F1 is due here on 29 November.
+credit: Trinidade, CC BY-SA 3.0
+creditUrl: https://commons.wikimedia.org/wiki/File:Grand_Stand.JPG
+width: 1600
+height: 1200
+```
+
 On Tuesday GPblog reported that the Iranian agency Fars had circulated a list of possible targets that includes hotels used by F1 and MotoGP teams in Qatar and the UAE ([GPblog](https://www.gpblog.com/en/breaking-news/hotels-used-by-f1-and-motogp-teams-on-irans-list-of-potential-targets)). Neither F1 nor the FIA has commented on it.
 
 ## What the drivers say

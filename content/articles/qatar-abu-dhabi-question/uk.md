@@ -26,6 +26,16 @@ source: календар Paddock Times; дату для Імоли повідо�
 
 MotoGP з 6 по 8 листопада виступає в Лусаїлі, на тій самій трасі, де їздить Ф1. У неділю Yamaha першою з виробників публічно заявила, що не поїде: Yamaha і її клієнтська команда Pramac бойкотують гонку. MotoGP пригрозила санкціями, а решта виробників усе ж їде ([Autosport](https://www.autosport.com/f1/news/what-does-yamahas-shock-motogp-boycott-mean-for-f1-in-qatar-and-abu-dhabi/10870666/)). Цей вікенд стане першою справжньою перевіркою того, як паддок почувається в регіоні цієї осені.
 
+```figure
+src: /media/articles/qatar-abu-dhabi-question/lusail-grandstand.jpg
+alt: Головна пряма і трибуна траси Лусаїл уночі, повна глядачів
+caption: Лусаїл уночі: головна пряма і трибуна під час гонки MotoGP 2013 року. Ф1 має приїхати сюди 29 листопада.
+credit: Trinidade, CC BY-SA 3.0
+creditUrl: https://commons.wikimedia.org/wiki/File:Grand_Stand.JPG
+width: 1600
+height: 1200
+```
+
 У вівторок GPblog повідомив, що іранське агентство Fars поширило список можливих цілей, де є готелі, у яких живуть команди Ф1 і MotoGP у Катарі та ОАЕ ([GPblog](https://www.gpblog.com/en/breaking-news/hotels-used-by-f1-and-motogp-teams-on-irans-list-of-potential-targets)). Ні Ф1, ні FIA це не коментували.
 
 ## Що кажуть пілоти
