@@ -1,0 +1,465 @@
+{
+ "sessionKey": 11404,
+ "clips": [
+  {
+   "id": "HIR_50_20261101_135512",
+   "driverNumber": 50,
+   "code": "HIR",
+   "date": "2026-11-01T19:55:24.566000+00:00",
+   "url": "https://livetiming.formula1.com/static/2026/2026-11-01_Mexico_City_Grand_Prix/2026-11-01_Race/TeamRadio/HIR_50_20261101_135512.mp3",
+   "unclear": true
+  },
+  {
+   "id": "NOR_1_20261101_135842",
+   "driverNumber": 1,
+   "code": "NOR",
+   "date": "2026-11-01T19:59:28.007000+00:00",
+   "url": "https://livetiming.formula1.com/static/2026/2026-11-01_Mexico_City_Grand_Prix/2026-11-01_Race/TeamRadio/NOR_1_20261101_135842.mp3",
+   "unclear": true
+  },
+  {
+   "id": "HAM_44_20261101_140511",
+   "driverNumber": 44,
+   "code": "HAM",
+   "date": "2026-11-01T20:05:33.579000+00:00",
+   "url": "https://livetiming.formula1.com/static/2026/2026-11-01_Mexico_City_Grand_Prix/2026-11-01_Race/TeamRadio/HAM_44_20261101_140511.mp3",
+   "lines": [
+    {
+     "who": null,
+     "unclear": true
+    },
+    {
+     "who": "engineer",
+     "en": "Copy.",
+     "uk": "Прийнято.",
+     "from": 5.3,
+     "to": 5.8
+    }
+   ]
+  },
+  {
+   "id": "VER_3_20261101_142239",
+   "driverNumber": 3,
+   "code": "VER",
+   "date": "2026-11-01T20:22:50.229000+00:00",
+   "url": "https://livetiming.formula1.com/static/2026/2026-11-01_Mexico_City_Grand_Prix/2026-11-01_Race/TeamRadio/VER_3_20261101_142239.mp3",
+   "unclear": true
+  },
+  {
+   "id": "VER_3_20261101_142248",
+   "driverNumber": 3,
+   "code": "VER",
+   "date": "2026-11-01T20:23:20.330000+00:00",
+   "url": "https://livetiming.formula1.com/static/2026/2026-11-01_Mexico_City_Grand_Prix/2026-11-01_Race/TeamRadio/VER_3_20261101_142248.mp3",
+   "lines": [
+    {
+     "who": "engineer",
+     "en": "Okay, Leclerc's been given a five-second penalty. Hamilton's already five seconds behind him.",
+     "uk": "Окей, Леклер отримав п'ятисекундний штраф. Хемілтон уже на п'ять секунд позаду нього."
+    },
+    {
+     "who": null,
+     "unclear": true
+    }
+   ]
+  },
+  {
+   "id": "HAM_44_20261101_142357",
+   "driverNumber": 44,
+   "code": "HAM",
+   "date": "2026-11-01T20:24:21.569000+00:00",
+   "url": "https://livetiming.formula1.com/static/2026/2026-11-01_Mexico_City_Grand_Prix/2026-11-01_Race/TeamRadio/HAM_44_20261101_142357.mp3",
+   "lines": [
+    {
+     "who": "engineer",
+     "en": "And Charles has got a five-second penalty.",
+     "uk": "І Шарль отримав п'ятисекундний штраф.",
+     "from": 1.9,
+     "to": 4.3
+    },
+    {
+     "who": "driver",
+     "en": "The problem with the five-second penalty is he's got clean air. He doesn't have to manage like the rest of us.",
+     "uk": "Проблема з п'ятисекундним штрафом у тому, що в нього чисте повітря. Йому не треба берегти машину, як решті з нас.",
+     "from": 5.0,
+     "to": 9.8
+    },
+    {
+     "who": "driver",
+     "en": "Just give the positions back.",
+     "uk": "Просто поверніть позиції.",
+     "from": 11.1,
+     "to": 12.8
+    },
+    {
+     "who": "engineer",
+     "en": "Copy, Lewis.",
+     "uk": "Прийнято, Льюїсе.",
+     "from": 13.0,
+     "to": 13.7
+    }
+   ]
+  },
+  {
+   "id": "NOR_1_20261101_143346",
+   "driverNumber": 1,
+   "code": "NOR",
+   "date": "2026-11-01T20:34:30.833000+00:00",
+   "url": "https://livetiming.formula1.com/static/2026/2026-11-01_Mexico_City_Grand_Prix/2026-11-01_Race/TeamRadio/NOR_1_20261101_143346.mp3",
+   "lines": [
+    {
+     "who": "engineer",
+     "en": "Lando, I need an honest assessment. In free air, how much faster?",
+     "uk": "Ландо, потрібна чесна оцінка. У чистому повітрі наскільки ми швидші?"
+    },
+    {
+     "who": "driver",
+     "en": "Honestly, I think quite a lot, mate.",
+     "uk": "Чесно, думаю, що набагато, друже."
+    }
+   ]
+  },
+  {
+   "id": "HAM_44_20261101_143530",
+   "driverNumber": 44,
+   "code": "HAM",
+   "date": "2026-11-01T20:36:03.541000+00:00",
+   "url": "https://livetiming.formula1.com/static/2026/2026-11-01_Mexico_City_Grand_Prix/2026-11-01_Race/TeamRadio/HAM_44_20261101_143530.mp3",
+   "unclear": true
+  },
+  {
+   "id": "VER_3_20261101_144312",
+   "driverNumber": 3,
+   "code": "VER",
+   "date": "2026-11-01T20:43:40.771000+00:00",
+   "url": "https://livetiming.formula1.com/static/2026/2026-11-01_Mexico_City_Grand_Prix/2026-11-01_Race/TeamRadio/VER_3_20261101_144312.mp3",
+   "lines": [
+    {
+     "who": "engineer",
+     "en": "… Just do enough to keep him behind.",
+     "uk": "… Просто роби достатньо, щоб тримати його позаду."
+    }
+   ]
+  },
+  {
+   "id": "NOR_1_20261101_144425",
+   "driverNumber": 1,
+   "code": "NOR",
+   "date": "2026-11-01T20:44:41.418000+00:00",
+   "url": "https://livetiming.formula1.com/static/2026/2026-11-01_Mexico_City_Grand_Prix/2026-11-01_Race/TeamRadio/NOR_1_20261101_144425.mp3",
+   "lines": [
+    {
+     "who": "driver",
+     "en": "Is there really nothing we can do at the minute?",
+     "uk": "Невже ми зараз зовсім нічого не можемо зробити?"
+    },
+    {
+     "who": "engineer",
+     "en": "Our best bet now is to stay out for a safety car.",
+     "uk": "Наш найкращий шанс зараз: лишатися на трасі й чекати на машину безпеки."
+    }
+   ]
+  },
+  {
+   "id": "ANT_12_20261101_144649",
+   "driverNumber": 12,
+   "code": "ANT",
+   "date": "2026-11-01T20:47:13.911000+00:00",
+   "url": "https://livetiming.formula1.com/static/2026/2026-11-01_Mexico_City_Grand_Prix/2026-11-01_Race/TeamRadio/ANT_12_20261101_144649.mp3",
+   "lines": [
+    {
+     "who": null,
+     "en": "Let me know if you're happy with the pace.",
+     "uk": "Скажи, чи тебе влаштовує темп.",
+     "from": 7.3,
+     "to": 8.8
+    },
+    {
+     "who": null,
+     "en": "Let's do what you can, target plus five.",
+     "uk": "Робимо що можемо, ціль плюс п'ять.",
+     "from": 9.0,
+     "to": 11.6
+    }
+   ]
+  },
+  {
+   "id": "ANT_12_20261101_145502",
+   "driverNumber": 12,
+   "code": "ANT",
+   "date": "2026-11-01T20:55:21.002000+00:00",
+   "url": "https://livetiming.formula1.com/static/2026/2026-11-01_Mexico_City_Grand_Prix/2026-11-01_Race/TeamRadio/ANT_12_20261101_145502.mp3",
+   "unclear": true
+  },
+  {
+   "id": "ANT_12_20261101_145509",
+   "driverNumber": 12,
+   "code": "ANT",
+   "date": "2026-11-01T20:55:21.234000+00:00",
+   "url": "https://livetiming.formula1.com/static/2026/2026-11-01_Mexico_City_Grand_Prix/2026-11-01_Race/TeamRadio/ANT_12_20261101_145509.mp3",
+   "lines": [
+    {
+     "who": "engineer",
+     "en": "Still super happy with these lap times, Kimi. Just keep it up.",
+     "uk": "Ми досі дуже задоволені цими часами кола, Кімі. Так і продовжуй.",
+     "from": 4.4,
+     "to": 6.8
+    }
+   ]
+  },
+  {
+   "id": "LEC_16_20261101_150150",
+   "driverNumber": 16,
+   "code": "LEC",
+   "date": "2026-11-01T21:02:27.717000+00:00",
+   "url": "https://livetiming.formula1.com/static/2026/2026-11-01_Mexico_City_Grand_Prix/2026-11-01_Race/TeamRadio/LEC_16_20261101_150150.mp3",
+   "lines": [
+    {
+     "who": "driver",
+     "en": "Car is very difficult to drive.",
+     "uk": "Машиною дуже важко керувати.",
+     "from": 3.2,
+     "to": 4.8
+    },
+    {
+     "who": "engineer",
+     "en": "Yeah, … and also the medium is our worst tyre. Keep your head down.",
+     "uk": "Так, … і ще середні шини для нас найгірші. Не здавайся."
+    }
+   ]
+  },
+  {
+   "id": "ANT_12_20261101_150531",
+   "driverNumber": 12,
+   "code": "ANT",
+   "date": "2026-11-01T21:06:01.016000+00:00",
+   "url": "https://livetiming.formula1.com/static/2026/2026-11-01_Mexico_City_Grand_Prix/2026-11-01_Race/TeamRadio/ANT_12_20261101_150531.mp3",
+   "lines": [
+    {
+     "who": "engineer",
+     "en": "So, safety car, safety car.",
+     "uk": "Отже, машина безпеки, машина безпеки.",
+     "from": 3.1,
+     "to": 4.7
+    },
+    {
+     "who": "driver",
+     "en": "Ah, f***, man.",
+     "uk": "Ах, чорт.",
+     "from": 5.2,
+     "to": 6.4
+    }
+   ]
+  },
+  {
+   "id": "HAM_44_20261101_150819",
+   "driverNumber": 44,
+   "code": "HAM",
+   "date": "2026-11-01T21:08:33.136000+00:00",
+   "url": "https://livetiming.formula1.com/static/2026/2026-11-01_Mexico_City_Grand_Prix/2026-11-01_Race/TeamRadio/HAM_44_20261101_150819.mp3",
+   "lines": [
+    {
+     "who": "driver",
+     "en": "We've got big problems. Big, big problems.",
+     "uk": "У нас великі проблеми. Дуже великі проблеми.",
+     "from": 3.3,
+     "to": 6.4
+    }
+   ]
+  },
+  {
+   "id": "ANT_12_20261101_155443",
+   "driverNumber": 12,
+   "code": "ANT",
+   "date": "2026-11-01T21:55:13.829000+00:00",
+   "url": "https://livetiming.formula1.com/static/2026/2026-11-01_Mexico_City_Grand_Prix/2026-11-01_Race/TeamRadio/ANT_12_20261101_155443.mp3",
+   "lines": [
+    {
+     "who": "engineer",
+     "en": "Verstappen under investigation, out of position at the start. Let's stay within five seconds of him.",
+     "uk": "Ферстаппена розслідують: на старті він стояв не на своїй позиції. Тримаймося в межах п'яти секунд від нього.",
+     "from": 5.3,
+     "to": 11.0
+    }
+   ]
+  },
+  {
+   "id": "HAM_44_20261101_155823",
+   "driverNumber": 44,
+   "code": "HAM",
+   "date": "2026-11-01T21:58:49.111000+00:00",
+   "url": "https://livetiming.formula1.com/static/2026/2026-11-01_Mexico_City_Grand_Prix/2026-11-01_Race/TeamRadio/HAM_44_20261101_155823.mp3",
+   "lines": [
+    {
+     "who": "driver",
+     "en": "I got hit by Max in turn one. I don't know if I'm missing a piece. Please look into it.",
+     "uk": "Макс ударив мене в першому повороті. Не знаю, чи не бракує якоїсь деталі. Перевірте, будь ласка.",
+     "from": 2.6,
+     "to": 11.3
+    },
+    {
+     "who": "engineer",
+     "en": "Copy, come back to you. And car looks good.",
+     "uk": "Прийнято, повернемося до тебе. І машина виглядає нормально."
+    }
+   ]
+  },
+  {
+   "id": "VER_3_20261101_155949",
+   "driverNumber": 3,
+   "code": "VER",
+   "date": "2026-11-01T22:00:19.557000+00:00",
+   "url": "https://livetiming.formula1.com/static/2026/2026-11-01_Mexico_City_Grand_Prix/2026-11-01_Race/TeamRadio/VER_3_20261101_155949.mp3",
+   "lines": [
+    {
+     "who": null,
+     "unclear": true
+    },
+    {
+     "who": "engineer",
+     "en": "Copy that.",
+     "uk": "Прийнято.",
+     "from": 5.7,
+     "to": 6.3
+    }
+   ]
+  },
+  {
+   "id": "NOR_1_20261101_160351",
+   "driverNumber": 1,
+   "code": "NOR",
+   "date": "2026-11-01T22:04:23.174000+00:00",
+   "url": "https://livetiming.formula1.com/static/2026/2026-11-01_Mexico_City_Grand_Prix/2026-11-01_Race/TeamRadio/NOR_1_20261101_160351.mp3",
+   "lines": [
+    {
+     "who": "engineer",
+     "en": "So, Lando, in our photos, Leclerc has a flat spot down to the canvas.",
+     "uk": "Отже, Ландо, на наших фото в Леклера пласка пляма на шині аж до корду."
+    },
+    {
+     "who": "driver",
+     "en": "Yeah, I know that. I saw it.",
+     "uk": "Так, я знаю. Я бачив."
+    }
+   ]
+  },
+  {
+   "id": "PIA_81_20261101_160616",
+   "driverNumber": 81,
+   "code": "PIA",
+   "date": "2026-11-01T22:06:55.890000+00:00",
+   "url": "https://livetiming.formula1.com/static/2026/2026-11-01_Mexico_City_Grand_Prix/2026-11-01_Race/TeamRadio/PIA_81_20261101_160616.mp3",
+   "lines": [
+    {
+     "who": "driver",
+     "en": "Yeah, I mean, he moved under braking. And then I had to go on the outside, and he just left me no space at all.",
+     "uk": "Так, він змістився на гальмуванні. А потім мені довелося йти ззовні, і він не залишив мені місця взагалі."
+    }
+   ]
+  },
+  {
+   "id": "PIA_81_20261101_160831",
+   "driverNumber": 81,
+   "code": "PIA",
+   "date": "2026-11-01T22:08:57.860000+00:00",
+   "url": "https://livetiming.formula1.com/static/2026/2026-11-01_Mexico_City_Grand_Prix/2026-11-01_Race/TeamRadio/PIA_81_20261101_160831.mp3",
+   "lines": [
+    {
+     "who": "driver",
+     "en": "A little bit of damage or a lot of damage?",
+     "uk": "Пошкодження невеликі чи серйозні?",
+     "from": 5.3,
+     "to": 7.2
+    },
+    {
+     "who": "engineer",
+     "en": "A reasonable amount of damage, Oscar.",
+     "uk": "Доволі відчутні, Оскаре.",
+     "from": 7.6,
+     "to": 9.3
+    }
+   ]
+  },
+  {
+   "id": "LEC_16_20261101_160947",
+   "driverNumber": 16,
+   "code": "LEC",
+   "date": "2026-11-01T22:09:58.945000+00:00",
+   "url": "https://livetiming.formula1.com/static/2026/2026-11-01_Mexico_City_Grand_Prix/2026-11-01_Race/TeamRadio/LEC_16_20261101_160947.mp3",
+   "unclear": true
+  },
+  {
+   "id": "ANT_12_20261101_162426",
+   "driverNumber": 12,
+   "code": "ANT",
+   "date": "2026-11-01T22:25:12.438000+00:00",
+   "url": "https://livetiming.formula1.com/static/2026/2026-11-01_Mexico_City_Grand_Prix/2026-11-01_Race/TeamRadio/ANT_12_20261101_162426.mp3",
+   "lines": [
+    {
+     "who": "engineer",
+     "en": "Get in there, Kimi! Champion of the world!",
+     "uk": "Так, Кімі! Чемпіон світу!",
+     "from": 1.3,
+     "to": 8.6
+    },
+    {
+     "who": "engineer",
+     "en": "Kimi, we did it! World champion, we did it!",
+     "uk": "Кімі, ми це зробили! Чемпіон світу, ми це зробили!",
+     "from": 14.4,
+     "to": 17.3
+    }
+   ]
+  },
+  {
+   "id": "ANT_12_20261101_162613",
+   "driverNumber": 12,
+   "code": "ANT",
+   "date": "2026-11-01T22:26:45.964000+00:00",
+   "url": "https://livetiming.formula1.com/static/2026/2026-11-01_Mexico_City_Grand_Prix/2026-11-01_Race/TeamRadio/ANT_12_20261101_162613.mp3",
+   "lines": [
+    {
+     "who": "driver",
+     "en": "Thank you so much. We did it. We did it. Thank you so much.",
+     "uk": "Дякую вам величезне. Ми це зробили. Ми це зробили. Дякую величезне.",
+     "from": 2.5,
+     "to": 8.9
+    },
+    {
+     "who": "engineer",
+     "en": "Beautiful work, Kimi. It's been a real pleasure being part of the journey with you, mate, but yeah, this is just the first chapter. So, champ, you're going to be pulling up in the stadium section.",
+     "uk": "Чудова робота, Кімі. Було справжнім задоволенням пройти цей шлях разом з тобою, друже, але це лише перший розділ. Отже, чемпіоне, ти заїжджаєш у стадіонну секцію."
+    },
+    {
+     "who": "driver",
+     "en": "Thank you.",
+     "uk": "Дякую.",
+     "from": 22.6,
+     "to": 23.6
+    }
+   ]
+  },
+  {
+   "id": "VER_3_20261101_162901",
+   "driverNumber": 3,
+   "code": "VER",
+   "date": "2026-11-01T22:29:16.457000+00:00",
+   "url": "https://livetiming.formula1.com/static/2026/2026-11-01_Mexico_City_Grand_Prix/2026-11-01_Race/TeamRadio/VER_3_20261101_162901.mp3",
+   "unclear": true
+  },
+  {
+   "id": "BOR_5_20261101_162902",
+   "driverNumber": 5,
+   "code": "BOR",
+   "date": "2026-11-01T22:29:16.457000+00:00",
+   "url": "https://livetiming.formula1.com/static/2026/2026-11-01_Mexico_City_Grand_Prix/2026-11-01_Race/TeamRadio/BOR_5_20261101_162902.mp3",
+   "lines": [
+    {
+     "who": "driver",
+     "en": "And I guess Kimi is champion, so well done to him. It's very nice to see someone of my generation doing that, so incredible.",
+     "uk": "І, здається, Кімі чемпіон, тож молодець. Дуже приємно бачити, що це вдалося комусь мого покоління, неймовірно."
+    }
+   ]
+  }
+ ]
+}
