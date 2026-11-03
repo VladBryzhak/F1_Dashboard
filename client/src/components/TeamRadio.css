@@ -1,0 +1,204 @@
+/* Team radio in the replay (components/TeamRadio.tsx): the toast over the
+   track map, the speaker cue on a board row, and the dialogue under the board. */
+.rad-sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+.rad-stripe {
+  display: inline-block;
+  width: 4px;
+  height: 18px;
+  border-radius: 2px;
+  background: var(--team, var(--color-rule-2));
+  flex: none;
+}
+
+.rad-play {
+  display: inline-grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  margin-left: auto;
+  border: var(--rule-hair) solid var(--color-rule-2);
+  border-radius: 50%;
+  background: var(--color-paper-2);
+  color: var(--color-ink);
+  cursor: pointer;
+  flex: none;
+  transition:
+    background-color var(--dur-micro) var(--ease-out),
+    border-color var(--dur-micro) var(--ease-out);
+}
+
+.rad-play:hover {
+  border-color: var(--color-muted-2);
+}
+
+.rad-play.is-on {
+  background: var(--color-accent);
+  border-color: var(--color-accent);
+  color: var(--color-accent-ink);
+}
+
+.rad-play:focus-visible,
+.rad-lap:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+/* ---------- On the board row ---------- */
+.rad-cue {
+  display: inline-grid;
+  place-items: center;
+  width: 24px;
+  height: 22px;
+  border-radius: var(--radius-pill);
+  background: var(--color-cool-soft);
+  color: var(--color-cool);
+}
+
+/* ---------- Toast over the track map ---------- */
+.rad-toast {
+  position: absolute;
+  top: var(--space-sm);
+  right: var(--space-sm);
+  z-index: 4;
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  width: min(340px, calc(100% - 2 * var(--space-sm)));
+  padding: var(--space-xs) var(--space-xs) var(--space-xs) var(--space-sm);
+  background: var(--color-paper-2);
+  border: var(--rule-hair) solid var(--color-rule-2);
+  border-radius: var(--radius-card);
+}
+
+.rad-toast-body {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.rad-toast-name {
+  font: 800 1rem / 1.1 var(--font-display);
+}
+
+.rad-toast-text {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 0.85rem;
+  color: var(--color-ink-2);
+}
+
+/* Without a track map the toast sits above the board. */
+.rad-toast-slot {
+  position: relative;
+  min-height: 52px;
+  margin-bottom: var(--space-sm);
+}
+
+.rad-toast-slot .rad-toast {
+  position: static;
+  width: auto;
+  max-width: 420px;
+}
+
+/* ---------- Dialogue under the board ---------- */
+.rad {
+  margin-top: var(--space-xl);
+}
+
+.rad-title {
+  margin: 0 0 var(--space-md);
+  font: 800 var(--text-title) / 1.05 var(--font-display);
+  text-transform: uppercase;
+}
+
+.rad-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: var(--space-md);
+}
+
+.rad-thread {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+  padding: var(--space-md);
+  background: var(--color-paper-2);
+  border: var(--rule-hair) solid var(--color-rule);
+  border-radius: var(--radius-card);
+}
+
+.rad-head {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-xs);
+}
+
+.rad-name {
+  font: 800 1.05rem / 1 var(--font-display);
+}
+
+.rad-lap {
+  padding: 0.1rem 0.4rem;
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: none;
+  color: var(--color-cool);
+  font: 600 0.8rem var(--font-body);
+  text-decoration: underline;
+  text-decoration-color: var(--color-rule-2);
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+
+.rad-lap:hover {
+  text-decoration-color: var(--color-cool);
+}
+
+.rad-bubble {
+  align-self: flex-start;
+  max-width: 85%;
+  margin: 0;
+  padding: 0.45rem 0.7rem;
+  border-radius: var(--radius-card);
+  border-bottom-left-radius: 2px;
+  background: var(--color-paper-3);
+  color: var(--color-ink-2);
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+
+.rad-bubble.is-drv {
+  align-self: flex-end;
+  border-radius: var(--radius-card);
+  border-bottom-right-radius: 2px;
+  background: color-mix(in oklch, var(--team) 22%, var(--color-paper-3));
+  color: var(--color-ink);
+}
+
+.rad-note {
+  margin: var(--space-sm) 0 0;
+  font-size: 0.8rem;
+  color: var(--color-muted-2);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rad-play {
+    transition: none;
+  }
+}
+
+@media (max-width: 768px) {
+  .rad-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

@@ -37,7 +37,7 @@ Plain CSS, split by area (no CSS-in-JS, no CSS Modules):
 ## Commands
 
 Client (`cd client`):
-- `npm run dev` — Vite dev server on http://localhost:5173 (proxies `/api` → `:3001`)
+- `npm run dev` — Vite dev server on http://localhost:5173 (proxies `/api` → `:3001`, or `API_PORT` for a second checkout's server)
 - `npm run build` — type-check + production build
 - `npm run lint`
 
@@ -93,6 +93,29 @@ Our own articles, kept in the repo as files and published with a deploy. Each ar
   - the sitemap lists every article in both languages;
   - an article page gets `og:type` article, its date, a NewsArticle JSON-LD and preloads for its API call and cover portrait.
 - `npm test` covers the parser.
+
+## Team radio (tools/team-radio)
+
+The race replay shows the team radio the broadcast aired, with captions in both languages. They are made on the owner's Mac and committed as data. Nothing here runs on Render.
+
+- **Draft.** `tools/team-radio/radio.py draft <session_key>` (see its README) takes the session's clips from OpenF1 and:
+  - finds the speech turns (Silero VAD);
+  - tells the driver's voice from the engineer's (ECAPA voice clusters, or voiceprints learnt from earlier sessions);
+  - transcribes each turn with whisper.cpp.
+- **Review.** Claude reviews the draft by hand into `server/src/data/team-radio/<session_key>.json`:
+  - put each line on the right speaker, judged by content;
+  - fix names and terms;
+  - write `…` for a word that can't be made out, and mark a line or a clip `unclear` rather than guess;
+  - add the Ukrainian line (`uk`) next to the English (`en`).
+- **Enroll.** `enroll <session_key>` then learns the voices from the reviewed file.
+- **Serving.** `GET /api/live/:sessionKey/radio` (`services/teamRadio.ts`) serves the file, or an empty list.
+  - The audio plays from livetiming.formula1.com (CSP `media-src`) and is never stored by us.
+- **In the replay** (`components/TeamRadio.tsx`, `lib/teamRadio.ts`):
+  - a clip shows as a toast over the track map for about 7 s of real time at any speed;
+  - the driver's row gets a speaker cue;
+  - under the board every clip is a dialogue (engineer left, driver right), with a lap that jumps the replay there;
+  - clips and lines marked unclear are hidden;
+  - a clip after the flag comes up at the end of the replay.
 
 ## Generated data (server/src/data)
 

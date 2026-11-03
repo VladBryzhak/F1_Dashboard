@@ -564,6 +564,15 @@ const uk: Dict & Record<string, string> = {
   // Replay track map
   'rp.mapLabel': 'Карта траси з усіма машинами',
   'rp.mapNote': 'Положення розраховані за часом кіл, секторів, піт-стопів і обгонів: близько до реальності, але не точно.',
+  'radio.title': 'Радіо команд',
+  'radio.listen': 'Слухати: {name}',
+  'radio.stop': 'Зупинити: {name}',
+  'radio.onAir': 'На радіо',
+  'radio.driver': 'Пілот',
+  'radio.engineer': 'Інженер',
+  'radio.beforeStart': 'До старту',
+  'radio.seek': 'Перейти до цього моменту в повторі',
+  'radio.note': 'Радіоповідомлення, які показала трансляція. Звук від Formula 1; розшифровка й переклад Paddock Times.',
 
   // Сторінка «не знайдено»
   'nf.page': 'Сторінку не знайдено',

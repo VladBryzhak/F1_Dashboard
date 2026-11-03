@@ -76,6 +76,7 @@ async function postJson<T>(path: string, body: unknown): Promise<T> {
 
 import type {
   Article,
+  TeamRadio,
   ArticleSummary,
   CalendarResponse,
   CircuitProfile,
@@ -173,6 +174,7 @@ export const api = {
   liveDriver: (sessionKey: number, driverNumber: number) =>
     getJson<LiveDriverDetail>(`/live/${sessionKey}/driver/${driverNumber}`),
   replaySessions: () => getJson<ReplaySession[]>('/live/replays'),
+  teamRadio: (sessionKey: number) => getJson<TeamRadio>(`/live/${sessionKey}/radio`),
   replay: (sessionKey: number) =>
     getJson<ReplayData>(`/live/${sessionKey}/replay`),
 }

@@ -511,6 +511,15 @@ const en = {
   // Replay track map
   'rp.mapLabel': 'Track map with every car',
   'rp.mapNote': 'Positions are worked out from lap, sector, pit and overtake timing, so they are close but not exact.',
+  'radio.title': 'Team radio',
+  'radio.listen': 'Listen to {name}',
+  'radio.stop': 'Stop {name}',
+  'radio.onAir': 'On the radio',
+  'radio.driver': 'Driver',
+  'radio.engineer': 'Engineer',
+  'radio.beforeStart': 'Before the start',
+  'radio.seek': 'Go to this moment in the replay',
+  'radio.note': 'The radio messages the broadcast aired. Audio from Formula 1; transcribed and translated by Paddock Times.',
 
   // "Not found" page (an unknown address, driver, team, circuit or race)
   'nf.page': 'Page not found',

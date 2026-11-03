@@ -27,6 +27,10 @@ const IMG_HOSTS = ["https://media.formula1.com", "https://flagcdn.com", "https:/
 // asks for it (client/src/pages/Article.tsx).
 const FRAME_HOSTS = ["https://www.instagram.com"];
 
+// Team radio in the replay plays from F1's own server
+// (client/src/lib/teamRadio.ts).
+const MEDIA_HOSTS = ["https://livetiming.formula1.com"];
+
 export const newNonce = () => crypto.randomBytes(16).toString("base64");
 
 export function cspHeader(nonce: string): string {
@@ -40,6 +44,7 @@ export function cspHeader(nonce: string): string {
     "font-src 'self'",
     `connect-src 'self' ${GA_CONNECT.join(" ")}`,
     `frame-src ${FRAME_HOSTS.join(" ")}`,
+    `media-src 'self' ${MEDIA_HOSTS.join(" ")}`,
     "manifest-src 'self'",
     "object-src 'none'",
     "base-uri 'self'",

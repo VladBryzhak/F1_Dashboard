@@ -6,6 +6,8 @@ import type { ReplayData, ReplayLap, ReplaySession } from '../types/f1'
 import WeatherCard, { weatherAt } from './WeatherCard'
 import BestSectors, { type LapRecord, type SectorRecord } from './BestSectors'
 import TrackMap from './TrackMap'
+import { RadioThreads, RadioToast, SpeakerCue } from './TeamRadio'
+import { activeClip, useRadioAudio, useTeamRadio, type RadioClip } from '../lib/teamRadio'
 import { buildTrackModel } from '../lib/trackModel'
 import { useI18n, type TKey } from '../i18n/core'
 import './ReplayPlayer.css'
@@ -445,6 +447,23 @@ export default function ReplayPlayer() {
     return { time: best.d, code: drv?.code ?? String(best.num), colour: drv?.colour ?? null, lap: best.lap }
   }, [data, t])
 
+  // Team radio: the clip on air at this point of the replay, if any.
+  const radio = useTeamRadio(sessionKey, data)
+  const radioAudio = useRadioAudio()
+  // A clip picked from the list stays on screen until the replay moves on.
+  const [pinned, setPinned] = useState<RadioClip | null>(null)
+  useEffect(() => {
+    if (playing) setPinned(null)
+  }, [playing])
+  useEffect(() => setPinned(null), [sessionKey])
+  const onAir = pinned ?? (data ? activeClip(radio, data.startMs + t, speed) : null)
+  const seekTo = (clip: RadioClip) => {
+    if (!data) return
+    setT(Math.min(span, Math.max(0, clip.showAt - data.startMs)))
+    setPinned(clip)
+    window.scrollTo({ top: 0 })
+  }
+
   return (
     <div className="replay">
       <div className="rp-head">
@@ -511,7 +530,10 @@ export default function ReplayPlayer() {
               min={0}
               max={span}
               value={t}
-              onChange={(e) => setT(Number(e.target.value))}
+              onChange={(e) => {
+                setPinned(null)
+                setT(Number(e.target.value))
+              }}
               aria-label={tr('rp.timeline')}
             />
             <span className="rp-lap mono">
@@ -536,6 +558,7 @@ export default function ReplayPlayer() {
           <div className={`rp-layout${trackModel ? ' has-map' : ''}`}>
           {trackModel && (
             <div className="rp-map-slot">
+              {onAir && <RadioToast clip={onAir} audio={radioAudio} />}
               <TrackMap
                 data={data}
                 model={trackModel}
@@ -548,6 +571,11 @@ export default function ReplayPlayer() {
             </div>
           )}
           <div className="rp-main">
+          {!trackModel && onAir && (
+            <div className="rad-toast-slot">
+              <RadioToast clip={onAir} audio={radioAudio} />
+            </div>
+          )}
           <div className={`rp-board${timed ? ' rp-board--timed' : ''}`}>
             <div className="rp-row rp-head-row">
               <span>#</span>
@@ -587,6 +615,7 @@ export default function ReplayPlayer() {
                       />
                       <span className="lb-code">{r.code}</span>
                       {r.inPit && <span className="rp-pit">PIT</span>}
+                      {onAir?.driverNumber === r.num && <SpeakerCue />}
                     </span>
                     <span className="rp-sectors">
                       {r.sectors.map((s, i) => (
@@ -629,6 +658,7 @@ export default function ReplayPlayer() {
             <WeatherCard sample={weather} />
           </aside>
           </div>
+          <RadioThreads clips={radio} audio={radioAudio} onSeek={seekTo} />
         </>
       )}
     </div>

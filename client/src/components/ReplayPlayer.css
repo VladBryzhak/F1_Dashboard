@@ -454,6 +454,7 @@
 .rp-layout.has-map .rp-map-slot {
   grid-area: map;
   min-width: 0;
+  position: relative; /* the team radio toast sits over the map */
 }
 .rp-layout.has-map .rp-main {
   grid-area: main;
