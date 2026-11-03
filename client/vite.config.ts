@@ -8,7 +8,8 @@ export default defineConfig({
   server: {
     proxy: {
       '/api': {
-        target: 'http://localhost:3001',
+        // API_PORT: a second checkout's server (git worktree) next to the main one.
+        target: `http://localhost:${process.env.API_PORT ?? 3001}`,
         changeOrigin: true,
       },
     },

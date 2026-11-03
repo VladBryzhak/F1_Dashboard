@@ -918,3 +918,28 @@ export interface HomeArticle {
   en: { title: string; description: string; minutes: number; readingLabel: string | null };
   uk: { title: string; description: string; minutes: number; readingLabel: string | null };
 }
+
+// ----- Team radio (tools/team-radio, services/teamRadio.ts) -----
+
+// One line of a clip: who spoke (null when it can't be told), in English and
+// Ukrainian; both null for a part nobody could make out.
+export interface TeamRadioLine {
+  who: "driver" | "engineer" | null;
+  en: string | null;
+  uk: string | null;
+}
+
+export interface TeamRadioClip {
+  id: string;
+  driverNumber: number;
+  code: string;
+  date: string; // when it was aired (UTC ISO)
+  url: string; // the audio on F1's server
+  unclear: boolean; // no usable words at all
+  lines: TeamRadioLine[];
+}
+
+export interface TeamRadio {
+  sessionKey: number;
+  clips: TeamRadioClip[];
+}

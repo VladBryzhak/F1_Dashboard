@@ -7,6 +7,7 @@ import {
   getReplaySessions,
   getReplay,
 } from "../services/live";
+import { sessionRadio } from "../services/teamRadio";
 
 import { DRIVER_NUMBER_MAX, SESSION_KEY_MAX, intParam } from "./params";
 const router = Router();
@@ -42,6 +43,14 @@ router.get("/:sessionKey/replay", async (req, res, next) => {
   } catch (err) {
     next(err);
   }
+});
+
+// GET /api/live/:sessionKey/radio — the session's team radio with captions
+// (an empty list when it has none).
+router.get("/:sessionKey/radio", (req, res) => {
+  const key = intParam(req.params.sessionKey, 1, SESSION_KEY_MAX);
+  if (key == null) return res.status(400).json({ error: "Invalid session key." });
+  res.set("Cache-Control", "public, max-age=3600").json(sessionRadio(key));
 });
 
 // GET /api/live/session — the latest completed session (kept for compatibility).
