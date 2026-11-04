@@ -54,6 +54,7 @@ interface Row {
   tyreAge: number | null
   sectors: Sector[]
   inPit: boolean
+  out: boolean // retired (races and sprints)
   lap: ReplayLap | null
   // Direction of the driver's most recent position change, non-null only while
   // that change is still "fresh" (so the arrow + row highlight fade out).
@@ -77,7 +78,20 @@ function indexReplay(d: ReplayData) {
   }
   for (const arr of posByDriver.values()) arr.sort((a, b) => a.t - b.t)
 
-  return { lapsByDriver, posByDriver }
+  // Retirements: a driver whose last lap never ends before the chequered flag
+  // stopped on it. They count as out once that lap has run half as long again
+  // as their usual lap (no data says the exact moment).
+  const flag = d.flags.find((f) => f.s === 'chequered')?.t ?? d.endMs
+  const outAt = new Map<number, number>()
+  for (const [num, laps] of lapsByDriver) {
+    const last = laps[laps.length - 1]
+    if (last.d != null || last.t >= flag) continue
+    const done = laps.filter((l) => l.d != null).map((l) => l.d!).sort((a, b) => a - b)
+    const usual = done.length ? done[Math.floor(done.length / 2)] : 100
+    outAt.set(num, Math.min(last.t + usual * 1500, flag))
+  }
+
+  return { lapsByDriver, posByDriver, outAt }
 }
 type Indexed = ReturnType<typeof indexReplay>
 
@@ -189,7 +203,9 @@ function buildBoard(
     const age =
       st && lapNum ? (st.age ?? 0) + (Math.min(lapNum, st.end) - st.start) : null
 
-    const inPit = d.pits.some(
+    const outAt = timed ? undefined : ix.outAt.get(drv.num)
+    const out = outAt != null && absT >= outAt
+    const inPit = !out && d.pits.some(
       (p) => p.num === drv.num && absT >= p.from && absT <= p.to,
     )
 
@@ -197,15 +213,16 @@ function buildBoard(
       num: drv.num,
       code: drv.code,
       colour: drv.colour,
-      position,
+      position: out ? null : position,
       last: lastDone?.d ?? null,
       best,
-      gl: lastDone?.gl ?? null,
-      iv: lastDone?.iv ?? null,
+      gl: out ? null : lastDone?.gl ?? null,
+      iv: out ? null : lastDone?.iv ?? null,
       tyreCompound: st?.compound ?? null,
       tyreAge: age,
-      sectors,
+      sectors: out ? sectors.map((x) => ({ ...x, shown: false })) : sectors,
       inPit,
+      out,
       lap: show,
       posMove,
     }
@@ -227,7 +244,13 @@ function buildBoard(
     }
   }
 
-  rows.sort((a, b) => (a.position ?? 99) - (b.position ?? 99))
+  // Retired drivers go to the bottom, the latest to retire first.
+  rows.sort(
+    (a, b) =>
+      Number(a.out) - Number(b.out) ||
+      (a.out ? ix.outAt.get(b.num)! - ix.outAt.get(a.num)! : 0) ||
+      (a.position ?? 99) - (b.position ?? 99),
+  )
   return { rows, lap: maxLap }
 }
 
@@ -601,7 +624,7 @@ export default function ReplayPlayer() {
                   <button
                     className={`rp-row rp-row-btn${open ? ' open' : ''}${
                       r.posMove ? ` rp-move-${r.posMove}` : ''
-                    }`}
+                    }${r.out ? ' rp-row-out' : ''}`}
                     onClick={() => toggleRow(r.num)}
                     aria-expanded={open}
                   >
@@ -620,6 +643,7 @@ export default function ReplayPlayer() {
                       />
                       <span className="lb-code">{r.code}</span>
                       {r.inPit && <span className="rp-pit">PIT</span>}
+                      {r.out && <span className="rp-out" title={tr('rp.out')}>OUT</span>}
                       {onAir?.driverNumber === r.num && <SpeakerCue />}
                     </span>
                     <span className="rp-sectors">

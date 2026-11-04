@@ -481,6 +481,7 @@ const en = {
   'rp.speedTrap': 'Speed trap',
   'rp.tyres': 'Tyres',
   'rp.tyre': 'Tyre',
+  'rp.out': 'Retired',
   'rp.pitStops': 'Pit stops',
   'rp.none': 'None',
   'rp.session': 'Session',

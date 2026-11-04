@@ -315,6 +315,24 @@
   margin-left: 0.35rem;
 }
 
+/* A retired driver: the row fades and says OUT where PIT would be. */
+.rp-out {
+  font-family: var(--font-outlier);
+  font-size: 0.7rem;
+  font-weight: 700;
+  border: var(--rule-hair) solid var(--color-muted-2);
+  color: var(--color-muted-2);
+  padding: 0 0.3rem;
+  border-radius: 3px;
+  margin-left: 0.35rem;
+}
+
+.rp-row-out .lb-code,
+.rp-row-out .mono,
+.rp-row-out .rp-tyre {
+  opacity: 0.5;
+}
+
 /* The leader's position reads red, as on the home timing screen. */
 .rp-board > div:nth-child(2) .rp-pos {
   color: var(--color-accent);

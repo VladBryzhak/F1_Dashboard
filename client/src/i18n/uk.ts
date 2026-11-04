@@ -532,6 +532,7 @@ const uk: Dict & Record<string, string> = {
   'rp.speedTrap': 'Спідтрап',
   'rp.tyres': 'Шини',
   'rp.tyre': 'Шина',
+  'rp.out': 'Сходження з дистанції',
   'rp.pitStops': 'Піт-стопи',
   'rp.none': 'Немає',
   'rp.session': 'Сесія',
