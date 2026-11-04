@@ -87,9 +87,14 @@ export default function Layout() {
   // A new page opens at its top, as on any website: a link inside the app
   // otherwise keeps the scroll position (an article's "read next" link left
   // you at the end of the next one). Back and forward are left to the
-  // browser, and a link to a place on the page (#…) goes there itself.
+  // browser, and a link to a place on the page (#…) goes there itself. Only
+  // a new path counts: a page changing its own query (the calendar opening a
+  // race's schedule) stays where it is.
   const navigationType = useNavigationType()
+  const shownPath = useRef(pathname)
   useEffect(() => {
+    if (shownPath.current === pathname) return
+    shownPath.current = pathname
     if (navigationType !== 'POP' && !window.location.hash) window.scrollTo(0, 0)
   }, [pathname, navigationType])
 
