@@ -529,6 +529,8 @@ export async function getDriverDetail(
 // A finished session's replay doesn't change: kept a week (about 360 KB
 // each), and the last week's are fetched ahead of visitors (warmReplays).
 const REPLAY_TTL = 7 * 24 * 3600;
+// Longer than any pit stop: the car waited in the pit lane under a red flag.
+const LONG_LANE_S = 180;
 
 export async function getReplay(sessionKey: number): Promise<ReplayData> {
   // A visitor asking for the replay the background warming is fetching right
@@ -672,7 +674,15 @@ export async function getReplay(sessionKey: number): Promise<ReplayData> {
           if (msg.includes("DEPLOY")) sc = true;
           else if (msg.includes("IN THIS LAP") || msg.includes("ENDING")) sc = false;
         }
-        if (flag === "RED") red = true;
+        // A red flag also comes only as text, with the session aborted; the
+        // restart is the session starting again.
+        if (flag === "RED" || msg.startsWith("RED FLAG")) red = true;
+        if (m.category === "SessionStatus" && msg.includes("ABORTED")) red = true;
+        if (m.category === "SessionStatus" && msg.includes("STARTED") && red) {
+          red = false;
+          sc = false;
+          vsc = false;
+        }
         if (flag === "GREEN") {
           // A green flag ends any neutralisation, even if its end message
           // was missed.
@@ -697,10 +707,11 @@ export async function getReplay(sessionKey: number): Promise<ReplayData> {
       }
     }
 
-    // In-pit windows: from the stop time for the pit-lane duration.
     // In-pit windows. OpenF1's `date` comes late in the drive through the pit
     // lane, so where we know the circuit, shift it by the calibrated offset to
     // the moment the car leaves the racing line and cover the whole detour.
+    // A very long lane time (a red flag, cars waiting in the pit lane) is
+    // logged at the exit, so that wait lies before `date`, not after it.
     const track = trackLine(raw?.circuit_key);
     const pits = rawPit
       .filter((p) => p.date)
@@ -713,9 +724,14 @@ export async function getReplay(sessionKey: number): Promise<ReplayData> {
           const laneTime = lane ?? track.pit.lane;
           const detour = track.pit.path[track.pit.path.length - 1][2] + (laneTime - track.pit.lane);
           const from = at + track.pit.offset * 1000;
+          if (lane != null && lane > LONG_LANE_S) {
+            const to = from + track.pit.path[track.pit.path.length - 1][2] * 1000;
+            return { num: p.driver_number, from: to - detour * 1000, to, at, lane };
+          }
           return { num: p.driver_number, from, to: from + detour * 1000, at, lane };
         }
         const dur = (p.pit_duration ?? p.lane_duration ?? 25) * 1000;
+        if (lane != null && lane > LONG_LANE_S) return { num: p.driver_number, from: at - dur, to: at, at, lane };
         return { num: p.driver_number, from: at, to: at + dur, at, lane };
       })
       .filter((p) => !Number.isNaN(p.from));
