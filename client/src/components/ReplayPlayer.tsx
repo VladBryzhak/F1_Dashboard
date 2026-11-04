@@ -26,6 +26,10 @@ const SESSION_SHORT: Record<string, TKey> = {
   Race: 'session.race',
 }
 const TICK_MS = 200
+// A pit visit longer than this means the car stayed in the garage; the trip
+// down the pit lane itself takes about PIT_LANE_MS.
+const PIT_STAYED_MS = 3 * 60_000
+const PIT_LANE_MS = 30_000
 
 const STATUS: Record<string, { label: TKey; cls: string }> = {
   green: { label: 'flag.green', cls: 'green' },
@@ -79,8 +83,10 @@ function indexReplay(d: ReplayData) {
   for (const arr of posByDriver.values()) arr.sort((a, b) => a.t - b.t)
 
   // Retirements: a driver whose last lap never ends before the chequered flag
-  // stopped on it. They count as out once that lap has run half as long again
-  // as their usual lap (no data says the exact moment).
+  // stopped on it. One who drove into the pits on that lap and stayed there
+  // is out once through the pit lane; one who stopped on track counts as out once that
+  // lap has run half as long again as their usual lap (no data says the exact
+  // moment).
   const flag = d.flags.find((f) => f.s === 'chequered')?.t ?? d.endMs
   const outAt = new Map<number, number>()
   for (const [num, laps] of lapsByDriver) {
@@ -88,7 +94,14 @@ function indexReplay(d: ReplayData) {
     if (last.d != null || last.t >= flag) continue
     const done = laps.filter((l) => l.d != null).map((l) => l.d!).sort((a, b) => a - b)
     const usual = done.length ? done[Math.floor(done.length / 2)] : 100
-    outAt.set(num, Math.min(last.t + usual * 1500, flag))
+    let at = last.t + usual * 1500
+    // Only a pit entry on the last lap itself: OpenF1 sometimes pairs an
+    // earlier stop with a far later exit.
+    const stayed = d.pits.find(
+      (p) => p.num === num && p.from >= last.t && p.from < at && p.to - p.from > PIT_STAYED_MS,
+    )
+    if (stayed) at = Math.min(at, stayed.from + PIT_LANE_MS)
+    outAt.set(num, Math.min(at, flag))
   }
 
   return { lapsByDriver, posByDriver, outAt }
@@ -224,7 +237,7 @@ function buildBoard(
       inPit,
       out,
       lap: show,
-      posMove,
+      posMove: out ? null : posMove,
     }
   })
 
