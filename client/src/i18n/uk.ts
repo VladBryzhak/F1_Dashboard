@@ -572,6 +572,8 @@ const uk: Dict & Record<string, string> = {
   'radio.engineer': 'Інженер',
   'radio.beforeStart': 'До старту',
   'radio.seek': 'Перейти до цього моменту в повторі',
+  'radio.count': '{n} з {total}',
+  'radio.wait': 'Повідомлення з’являться тут, коли повтор дійде до них.',
   'radio.note': 'Радіоповідомлення, які показала трансляція. Звук від Formula 1; розшифровка й переклад Paddock Times.',
 
   // Сторінка «не знайдено»

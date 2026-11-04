@@ -120,6 +120,23 @@
   text-transform: uppercase;
 }
 
+.rad-count {
+  margin-left: var(--space-sm);
+  font: 600 0.9rem var(--font-body);
+  color: var(--color-muted-2);
+  text-transform: none;
+  font-variant-numeric: tabular-nums;
+}
+
+.rad-wait {
+  margin: 0;
+  padding: var(--space-md);
+  border: var(--rule-hair) dashed var(--color-rule-2);
+  border-radius: var(--radius-card);
+  color: var(--color-muted-2);
+  font-size: 0.9rem;
+}
+
 .rad-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
@@ -127,6 +144,7 @@
 }
 
 .rad-thread {
+  animation: rad-in var(--dur-short) var(--ease-out) both;
   display: flex;
   flex-direction: column;
   gap: var(--space-xs);
@@ -191,9 +209,20 @@
   color: var(--color-muted-2);
 }
 
+@keyframes rad-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .rad-play {
     transition: none;
+  }
+
+  .rad-thread {
+    animation: none;
   }
 }
 

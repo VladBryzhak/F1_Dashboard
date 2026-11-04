@@ -519,6 +519,8 @@ const en = {
   'radio.engineer': 'Engineer',
   'radio.beforeStart': 'Before the start',
   'radio.seek': 'Go to this moment in the replay',
+  'radio.count': '{n} of {total}',
+  'radio.wait': 'Messages appear here as the replay reaches them.',
   'radio.note': 'The radio messages the broadcast aired. Audio from Formula 1; transcribed and translated by Paddock Times.',
 
   // "Not found" page (an unknown address, driver, team, circuit or race)

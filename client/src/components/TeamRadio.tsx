@@ -6,7 +6,8 @@ import './TeamRadio.css'
 // Team radio in the race replay: the clips the broadcast aired,
 // with captions made on the owner's Mac (tools/team-radio). A clip shows as a
 // small toast over the track map while the replay passes it, the driver's row
-// gets a speaker cue, and every clip is listed under the board as a dialogue.
+// gets a speaker cue, and the clips the replay has reached are listed under
+// the board as a dialogue, the latest first.
 // Clips and lines nobody could make out are left out. The audio plays from
 // F1's own server.
 
@@ -55,24 +56,31 @@ export function RadioToast({ clip, audio }: { clip: RadioClip; audio: RadioAudio
   )
 }
 
-// Every clip under the board, as a dialogue: the engineer on the left, the
-// driver on the right in their team's colour. The lap jumps the replay there.
+// The clips the replay has reached, as a dialogue, the latest first: the
+// engineer on the left, the driver on the right in their team's colour. The
+// lap jumps the replay there. `total` counts every clip of the session.
 export function RadioThreads({
   clips,
+  total,
   audio,
   onSeek,
 }: {
   clips: RadioClip[]
+  total: number
   audio: RadioAudio
   onSeek: (clip: RadioClip) => void
 }) {
   const { t, lang } = useI18n()
-  if (!clips.length) return null
+  if (!total) return null
   return (
     <section className="rad">
-      <h2 className="rad-title">{t('radio.title')}</h2>
+      <h2 className="rad-title">
+        {t('radio.title')}
+        <span className="rad-count">{t('radio.count', { n: clips.length, total })}</span>
+      </h2>
+      {!clips.length && <p className="rad-wait">{t('radio.wait')}</p>}
       <div className="rad-grid">
-        {clips.map((c) => (
+        {[...clips].reverse().map((c) => (
           <article key={c.id} className="rad-thread" style={{ '--team': c.colour } as CSSProperties}>
             <header className="rad-head">
               <span className="rad-stripe" aria-hidden="true" />

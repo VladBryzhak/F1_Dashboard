@@ -457,6 +457,11 @@ export default function ReplayPlayer() {
   }, [playing])
   useEffect(() => setPinned(null), [sessionKey])
   const onAir = pinned ?? (data ? activeClip(radio, data.startMs + t, speed) : null)
+  // The list under the board fills up as the replay reaches each clip.
+  const heard = useMemo(
+    () => (data ? radio.filter((c) => c.showAt <= data.startMs + t) : []),
+    [radio, data, t],
+  )
   const seekTo = (clip: RadioClip) => {
     if (!data) return
     setT(Math.min(span, Math.max(0, clip.showAt - data.startMs)))
@@ -658,7 +663,7 @@ export default function ReplayPlayer() {
             <WeatherCard sample={weather} />
           </aside>
           </div>
-          <RadioThreads clips={radio} audio={radioAudio} onSeek={seekTo} />
+          <RadioThreads clips={heard} total={radio.length} audio={radioAudio} onSeek={seekTo} />
         </>
       )}
     </div>
