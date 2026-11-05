@@ -4,7 +4,7 @@ import { getCalendar } from "./f1db";
 // it, so new seasons and time changes arrive without the visitor doing
 // anything. Built from the same f1db sessions as the calendar page.
 
-const SITE = "https://f1-dashboard-bryzhak.onrender.com";
+const SITE = "https://paddocktimes.com";
 
 export type FeedLang = "en" | "uk";
 
@@ -149,6 +149,8 @@ export async function calendarFeed(lang: FeedLang, racesOnly: boolean): Promise<
       for (const s of race.sessions) {
         if (racesOnly && s.kind !== "RACE") continue;
         lines.push("BEGIN:VEVENT");
+        // The UID keeps the site's first address: calendars that already
+        // hold these events would otherwise get every one of them twice.
         lines.push(`UID:${cal.season}-${race.round}-${s.kind}@f1-dashboard-bryzhak.onrender.com`);
         lines.push(`DTSTAMP:${now}`);
         if (s.timeKnown) {

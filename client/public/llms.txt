@@ -6,14 +6,14 @@
 
 ## Pages
 
-- [Standings](https://f1-dashboard-bryzhak.onrender.com/standings): drivers' and constructors' championship tables for any season (1950–present)
-- [Calendar](https://f1-dashboard-bryzhak.onrender.com/calendar): race calendar, winners and full weekend results, including sprints
-- [Circuits](https://f1-dashboard-bryzhak.onrender.com/circuits): every F1 circuit with track length, turns, race lap record, layouts and winners
-- [Drivers](https://f1-dashboard-bryzhak.onrender.com/drivers): driver profiles with full career stats, plus a searchable index since 1950
-- [Teams](https://f1-dashboard-bryzhak.onrender.com/teams): constructor profiles and a searchable index of every team since 1950
-- [Compare](https://f1-dashboard-bryzhak.onrender.com/compare): head-to-head driver comparison, overall or for a single season
-- [Live](https://f1-dashboard-bryzhak.onrender.com/live): live timing and lap-by-lap replays of past races and sprints (2023+)
-- [Telemetry](https://f1-dashboard-bryzhak.onrender.com/telemetry): speed, throttle, brake and DRS traces from past races
+- [Standings](https://paddocktimes.com/standings): drivers' and constructors' championship tables for any season (1950–present)
+- [Calendar](https://paddocktimes.com/calendar): race calendar, winners and full weekend results, including sprints
+- [Circuits](https://paddocktimes.com/circuits): every F1 circuit with track length, turns, race lap record, layouts and winners
+- [Drivers](https://paddocktimes.com/drivers): driver profiles with full career stats, plus a searchable index since 1950
+- [Teams](https://paddocktimes.com/teams): constructor profiles and a searchable index of every team since 1950
+- [Compare](https://paddocktimes.com/compare): head-to-head driver comparison, overall or for a single season
+- [Live](https://paddocktimes.com/live): live timing and lap-by-lap replays of past races and sprints (2023+)
+- [Telemetry](https://paddocktimes.com/telemetry): speed, throttle, brake and DRS traces from past races
 
 ## Notes
 

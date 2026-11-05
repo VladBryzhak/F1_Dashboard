@@ -17,7 +17,7 @@ import { afterLoadIdle } from './idle'
 const GA_ID = 'G-VQLFDX40N4'
 const CONSENT_MODE: 'advanced' | 'basic' = 'advanced'
 
-const PROD_HOST = 'f1-dashboard-bryzhak.onrender.com'
+const PROD_HOST = 'paddocktimes.com'
 // Dev-only test hook: ?ga_test=G-XXXX loads gtag locally with a throwaway ID
 // so the consent flow can be checked without touching the real property.
 const testId =

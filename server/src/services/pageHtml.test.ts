@@ -82,9 +82,9 @@ describe("pageHtml", () => {
 
   it("pairs a page with its twin in the other language and writes the season", async () => {
     const html = await pageHtml(file, "/uk/standings", "Mozilla/5.0", "n");
-    expect(html).toContain('hreflang="en" href="https://f1-dashboard-bryzhak.onrender.com/standings"');
-    expect(html).toContain('hreflang="uk" href="https://f1-dashboard-bryzhak.onrender.com/uk/standings"');
-    expect(html).toContain('href="https://f1-dashboard-bryzhak.onrender.com/uk/standings"'); // canonical
+    expect(html).toContain('hreflang="en" href="https://paddocktimes.com/standings"');
+    expect(html).toContain('hreflang="uk" href="https://paddocktimes.com/uk/standings"');
+    expect(html).toContain('href="https://paddocktimes.com/uk/standings"'); // canonical
     expect(html).toContain("window.__SEASON__=2026");
   });
 });

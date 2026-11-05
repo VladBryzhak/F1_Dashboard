@@ -16,12 +16,23 @@ import standingsRouter from "./routes/standings";
 import telemetryRouter from "./routes/telemetry";
 import { previewPng } from "./services/og";
 import { cspHeader, newNonce } from "./services/csp";
-import { isBot, pageHtml, pageStatusFor } from "./services/pageHtml";
+import { isBot, pageHtml, pageStatusFor, SITE_URL } from "./services/pageHtml";
 import { OpenF1Busy, OpenF1Locked, runAs } from "./services/openf1Client";
 import { sitemapXml } from "./services/sitemap";
 
 const app = express();
 const PORT = process.env.PORT ?? 3001;
+
+// The site lives at paddocktimes.com. Pages asked for at the first Render
+// address or at www get a permanent redirect there; the API answers on every
+// host, so calendar apps subscribed to an old .ics feed, uptime pings and
+// pages still open at the old address keep working.
+const OLD_HOSTS = new Set(["f1-dashboard-bryzhak.onrender.com", `www.${new URL(SITE_URL).host}`]);
+app.use((req, res, next) => {
+  if (!OLD_HOSTS.has(req.hostname) || req.path.startsWith("/api/")) return next();
+  if (req.method !== "GET" && req.method !== "HEAD") return next();
+  res.redirect(301, SITE_URL + req.originalUrl);
+});
 
 // Security headers. HSTS + clickjacking/MIME/referrer protection are on; the
 // Content-Security-Policy is set per HTML page by the SPA fallback below

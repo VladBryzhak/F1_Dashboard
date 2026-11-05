@@ -55,6 +55,7 @@ export function weekendIcs(
     .map((s) =>
       [
         'BEGIN:VEVENT',
+        // The site's first address, kept so a re-added event replaces the old one.
         `UID:${season}-${race.round}-${s.kind}@f1-dashboard-bryzhak.onrender.com`,
         `DTSTAMP:${now}`,
         `DTSTART:${icsStamp(sessionStart(s))}`,

@@ -4,7 +4,7 @@ A full-stack Formula 1 statistics web app: championship standings, race calendar
 driver & team profiles, head-to-head comparisons, past-race telemetry, and a
 **session replay player** that plays back completed races lap-by-lap.
 
-**Live:** https://f1-dashboard-bryzhak.onrender.com
+**Live:** https://paddocktimes.com
 
 ![React](https://img.shields.io/badge/React-18-61DAFB?logo=react&logoColor=white)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?logo=typescript&logoColor=white)
@@ -230,7 +230,7 @@ Open http://localhost:5173 — the Vite dev server proxies `/api` to the backend
 календар гонок, профілі пілотів і команд, порівняння «голова-в-голову», телеметрія
 минулих гонок і **плеєр реплеїв сесій**, що відтворює завершені гонки коло за колом.
 
-**Онлайн:** https://f1-dashboard-bryzhak.onrender.com
+**Онлайн:** https://paddocktimes.com
 
 ---
 

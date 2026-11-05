@@ -424,7 +424,7 @@ function frame(inner: string): string {
   ${text(93, 78, "PT", 28, 800, "#fff", 'font-style="italic" text-anchor="middle"')}
   ${text(134, 80, "PADDOCK TIMES", 28, 800, TEXT, 'font-style="italic" letter-spacing="1"')}
   ${inner}
-  ${text(64, H - 44, "f1-dashboard-bryzhak.onrender.com", 22, 600, MUTED)}
+  ${text(64, H - 44, "paddocktimes.com", 22, 600, MUTED)}
 </svg>`;
 }
 

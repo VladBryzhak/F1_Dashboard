@@ -13,7 +13,7 @@ import { notFoundSnapshot, pageSnapshot } from "./snapshot";
 // URL and Open Graph / Twitter tags, so link previews show the right page
 // (crawlers don't run our JavaScript). The browser app takes over as usual.
 
-export const SITE_URL = "https://f1-dashboard-bryzhak.onrender.com";
+export const SITE_URL = "https://paddocktimes.com";
 // Link-preview crawlers get the page's own tags even on a cold start (they
 // wait); people get the page at once, with the site defaults until the
 // dataset has loaded, so a cold start never delays the first paint.

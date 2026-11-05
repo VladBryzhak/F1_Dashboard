@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://f1-dashboard-bryzhak.onrender.com/sitemap.xml
+Sitemap: https://paddocktimes.com/sitemap.xml

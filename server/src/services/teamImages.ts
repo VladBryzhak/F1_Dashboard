@@ -12,7 +12,7 @@ import type { TeamImage } from "../types/f1";
 const WIKI = "https://en.wikipedia.org/w/api.php";
 const WIKIDATA = "https://www.wikidata.org/w/api.php";
 const COMMONS = "https://commons.wikimedia.org/w/api.php";
-const UA = "F1Dashboard/1.0 (https://f1-dashboard-bryzhak.onrender.com)";
+const UA = "F1Dashboard/1.0 (https://paddocktimes.com)";
 const BATCH = 50;
 const THUMB = 200;
 

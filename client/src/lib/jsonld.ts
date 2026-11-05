@@ -7,7 +7,7 @@
 import { getLang, localizedPath } from '../i18n/core'
 import type { Article, ConstructorProfile, DriverProfile, RaceWeekend } from '../types/f1'
 
-const BASE = 'https://f1-dashboard-bryzhak.onrender.com'
+const BASE = 'https://paddocktimes.com'
 
 // Absolute URL of the page currently being rendered (no query string).
 function pageUrl(): string {

@@ -6,7 +6,7 @@ import { getAllDrivers } from "./f1db";
 // CC-BY-SA / public domain (credited in the footer). ~85% of drivers resolve,
 // including historic ones; the rest simply have no photo.
 const WIKI = "https://en.wikipedia.org/w/api.php";
-const UA = "F1Dashboard/1.0 (https://f1-dashboard-bryzhak.onrender.com)";
+const UA = "F1Dashboard/1.0 (https://paddocktimes.com)";
 const BATCH = 50; // MediaWiki allows up to 50 titles per query
 const THUMB = 400;
 
