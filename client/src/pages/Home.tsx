@@ -157,12 +157,12 @@ function PodiumBoard({ rows, label, laps = false }: { rows: BoardRow[]; label: s
   )
 }
 
-// The weekend's page once f1db has its results; until then (a session hero)
-// the calendar with the weekend's schedule open, as the page is still empty.
+// The weekend's page: its results, or before them (a session hero) its
+// preview with the schedule.
 function WeekendLink({ season, round, schedule = false }: { season: number; round: number; schedule?: boolean }) {
   const { t } = useI18n()
   return (
-    <Link to={schedule ? `/calendar?schedule=${round}` : `/calendar/${season}/${round}`} className="hero-cta">
+    <Link to={`/calendar/${season}/${round}`} className="hero-cta">
       {t(schedule ? 'home.weekendSchedule' : 'home.viewWeekend')}
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
         <path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
@@ -564,10 +564,10 @@ function NextRaceCard({ race }: { race: NextRace }) {
   const { t, lang, fmtDate } = useI18n()
   const day = fmtDate(race.date, { day: '2-digit' })
   const month = fmtDate(race.date, { month: 'short' }).replace('.', '').toUpperCase()
-  // Opens the calendar with this race's weekend schedule expanded.
+  // Opens the race's page: its preview until it has run.
   return (
     <Link
-      to={`/calendar?schedule=${race.round}`}
+      to={`/calendar/${race.season}/${race.round}`}
       className={`home-next${race.outline ? ' has-map' : ''}`}
     >
       <span className="home-next-row">

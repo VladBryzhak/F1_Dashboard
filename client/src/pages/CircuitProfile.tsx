@@ -128,7 +128,7 @@ export default function CircuitProfile() {
             {c.nextRace && (
               <Link
                 className="circ-next"
-                to={`/calendar/${c.nextRace.season}?schedule=${c.nextRace.round}`}
+                to={`/calendar/${c.nextRace.season}/${c.nextRace.round}`}
               >
                 <span className="next-tag">{t('common.next')}</span>
                 {t('circ.next', {

@@ -24,8 +24,7 @@ export default function Calendar() {
   const { t, lang, fmtDate } = useI18n()
 
   // Upcoming races expand in place to show their session schedule. The open
-  // round lives in ?schedule=N so the home page's "Next race" card can link
-  // straight to it.
+  // round lives in ?schedule=N so a link can open the calendar on it.
   const [params, setParams] = useSearchParams()
   const scheduleParam = Number(params.get('schedule')) || null
   const [openRound, setOpenRound] = useState<number | null>(scheduleParam)
