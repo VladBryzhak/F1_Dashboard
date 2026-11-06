@@ -1,0 +1,60 @@
+/* Other years at the circuit, under a race page (components/CircuitYears.tsx). */
+.cy {
+  margin-top: var(--space-xl);
+}
+
+.cy-years {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-xs);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.cy-year {
+  display: inline-block;
+  min-width: 3.4rem;
+  padding: 0.3rem 0.5rem;
+  border: var(--rule-hair) solid var(--color-rule);
+  border-radius: var(--radius-pill);
+  background: var(--color-paper-2);
+  color: var(--color-ink);
+  font-size: var(--text-sm);
+  text-align: center;
+  text-decoration: none;
+  transition:
+    border-color var(--dur-micro) var(--ease-out),
+    color var(--dur-micro) var(--ease-out);
+}
+
+a.cy-year:hover {
+  border-color: var(--color-muted-2);
+}
+
+a.cy-year:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+.cy-year.is-other {
+  color: var(--color-muted-2);
+}
+
+.cy-year.is-here {
+  border-color: var(--color-accent);
+  background: var(--color-accent);
+  color: var(--color-accent-ink);
+}
+
+.cy-note {
+  margin: var(--space-sm) 0 0;
+  font-size: 0.8rem;
+  color: var(--color-muted-2);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cy-year {
+    transition: none;
+  }
+}

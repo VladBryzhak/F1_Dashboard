@@ -1998,6 +1998,18 @@ export async function getRaceWeekend(
     sessions: raceSessions(race),
     fastestLap: toHighlight(ds.fastestLapByRace.get(key)),
     driverOfTheDay: toHighlight(ds.driverOfDayByRace.get(key)),
+    atCircuit: ds.races
+      .filter((r) => r.circuitId === race.circuitId)
+      .sort((a, b) => a.year - b.year || a.round - b.round)
+      .map((r) => {
+        const w = ds.winnerByRace.get(`${r.year}:${r.round}`);
+        return {
+          year: r.year,
+          round: r.round,
+          grandPrixName: ds.grandsPrix.get(r.grandPrixId)?.name ?? r.grandPrixId,
+          winnerName: w ? nameOf(w.driverId) : null,
+        };
+      }),
   };
 }
 

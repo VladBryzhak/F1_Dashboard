@@ -509,6 +509,14 @@ export interface WeekendHighlight {
   detail: string
 }
 
+// One race at a circuit, for the "other years here" links on a race page.
+export interface CircuitYear {
+  year: number
+  round: number
+  grandPrixName: string
+  winnerName: string | null // null until it has run
+}
+
 export interface RaceWeekend {
   season: string
   round: number
@@ -526,6 +534,7 @@ export interface RaceWeekend {
   sessions: CalendarSession[] // weekend schedule, for session order/dates
   fastestLap: WeekendHighlight | null
   driverOfTheDay: WeekendHighlight | null
+  atCircuit: CircuitYear[] // every race at this circuit, oldest first (this one included)
 }
 
 export interface TelemetrySession {

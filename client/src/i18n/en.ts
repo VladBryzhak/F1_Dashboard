@@ -253,6 +253,12 @@ const en = {
   'pv.turns': 'Turns',
   'pv.racesHeld': 'Races held',
   'pv.km': '{n} km',
+
+  // Other years at the circuit (race page)
+  'cy.title': 'This circuit in other years',
+  'cy.won': 'Winner: {name}',
+  'cy.toCome': 'still to come',
+  'cy.otherName': 'Dimmed years ran under another name: {names}.',
   'strat.lapChart': 'Lap chart',
   'strat.lapChartHint': 'Tap a driver to highlight. Grid order on the left, finish on the right.',
   'strat.clear': 'Clear',

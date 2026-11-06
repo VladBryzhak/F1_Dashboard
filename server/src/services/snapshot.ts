@@ -316,6 +316,15 @@ async function race(c: Ctx, season: string, round: string): Promise<string | nul
         w.qualifying.map((q) => [String(q.position ?? ""), c.a(`/drivers/${q.driverId}`, q.driverName), esc(q.constructorName), esc(q.q3 ?? q.q2 ?? q.q1 ?? "")]),
       );
   }
+  // Every race at this circuit, so each race page links the circuit's history.
+  const others = w.atCircuit.filter((r) => !(r.year === Number(season) && r.round === Number(round)));
+  if (others.length) {
+    body +=
+      `<h2>${c.uk ? "Ця траса в інші роки" : "This circuit in other years"}</h2>` +
+      `<p>${others
+        .map((r) => c.a(`/calendar/${r.year}/${r.round}`, `${c.uk ? gpTitle(r.grandPrixName, "uk") : `${r.grandPrixName} Grand Prix`} ${r.year}`))
+        .join(" · ")}</p>`;
+  }
   const n = Number(round);
   const rounds = (await getCalendar(season).catch(() => null))?.races.length ?? 0;
   const links = [

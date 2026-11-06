@@ -258,6 +258,12 @@ const uk: Dict & Record<string, string> = {
   'pv.turns': 'Повороти',
   'pv.racesHeld': 'Гонок тут',
   'pv.km': '{n} км',
+
+  // Other years at the circuit (race page)
+  'cy.title': 'Ця траса в інші роки',
+  'cy.won': 'Перемога: {name}',
+  'cy.toCome': 'ще попереду',
+  'cy.otherName': 'Тьмяні роки проходили під іншою назвою: {names}.',
   'strat.lapChart': 'Позиції по колах',
   'strat.lapChartHint': 'Торкніться пілота, щоб виділити. Зліва стартова решітка, справа фініш.',
   'strat.clear': 'Скинути',
