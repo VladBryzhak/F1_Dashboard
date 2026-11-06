@@ -976,6 +976,9 @@ export interface RacePreview {
     lapRecord: CircuitLapRecord | null
   }
   weather: PreviewWeatherDay[] | null // the weekend's days, when a forecast reaches them
+  // Where and for which days to ask Open-Meteo (null when no forecast reaches
+  // the weekend): the page asks itself when the server's request failed.
+  forecastFor: { lat: number; lon: number; start: string; end: string } | null
   history: PreviewPastRace[] // the last races here, newest first
   topWinners: PreviewWins[] // most wins here, all time
   gridWinners: PreviewWins[] // this season's drivers who have won here

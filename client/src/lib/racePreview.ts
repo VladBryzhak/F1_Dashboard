@@ -100,3 +100,40 @@ export function previewFacts(p: RacePreview, lang: Lang): PreviewFact[] {
     (f): f is PreviewFact => f != null,
   )
 }
+
+interface MeteoDaily {
+  time: string[]
+  temperature_2m_max: (number | null)[]
+  temperature_2m_min: (number | null)[]
+  precipitation_probability_max: (number | null)[]
+  weather_code: (number | null)[]
+}
+
+// The forecast straight from Open-Meteo, for when the server's request failed
+// (its free tier limits requests per address, and a host's address is shared).
+export async function fetchForecast(
+  q: NonNullable<RacePreview['forecastFor']>,
+): Promise<PreviewWeatherDay[] | null> {
+  const url =
+    `https://api.open-meteo.com/v1/forecast?latitude=${q.lat}&longitude=${q.lon}` +
+    '&daily=temperature_2m_max,temperature_2m_min,precipitation_probability_max,weather_code' +
+    `&timezone=auto&start_date=${q.start}&end_date=${q.end}`
+  const res = await fetch(url)
+  if (!res.ok) return null
+  const d = ((await res.json()) as { daily?: MeteoDaily }).daily
+  if (!d?.time?.length) return null
+  const days: PreviewWeatherDay[] = []
+  d.time.forEach((date, i) => {
+    const tMax = d.temperature_2m_max[i]
+    const tMin = d.temperature_2m_min[i]
+    if (tMax == null || tMin == null) return
+    days.push({
+      date,
+      tMax: Math.round(tMax),
+      tMin: Math.round(tMin),
+      rain: d.precipitation_probability_max[i] ?? 0,
+      code: d.weather_code[i] ?? 0,
+    })
+  })
+  return days.length ? days : null
+}

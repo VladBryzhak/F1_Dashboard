@@ -42,7 +42,9 @@ export function cspHeader(nonce: string): string {
     "style-src 'self' 'unsafe-inline'",
     `img-src 'self' data: blob: ${[...IMG_HOSTS, ...GA_IMG].join(" ")}`,
     "font-src 'self'",
-    `connect-src 'self' ${GA_CONNECT.join(" ")}`,
+    // Open-Meteo: an upcoming race's forecast, asked by the page when the
+    // server's request failed (components/RacePreview.tsx).
+    `connect-src 'self' https://api.open-meteo.com ${GA_CONNECT.join(" ")}`,
     `frame-src ${FRAME_HOSTS.join(" ")}`,
     `media-src 'self' ${MEDIA_HOSTS.join(" ")}`,
     "manifest-src 'self'",

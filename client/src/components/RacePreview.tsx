@@ -1,7 +1,8 @@
 import { Link } from 'react-router-dom'
+import { useAsync } from '../hooks/useAsync'
 import { useI18n } from '../i18n/core'
 import { teamColor } from '../lib/f1meta'
-import { previewFacts, skyKey, weekday } from '../lib/racePreview'
+import { fetchForecast, previewFacts, skyKey, weekday } from '../lib/racePreview'
 import type { RacePreview as Preview } from '../types/f1'
 import WeekendSchedule from './WeekendSchedule'
 import './RacePreview.css'
@@ -9,8 +10,17 @@ import './RacePreview.css'
 // An upcoming race's page before the result: three facts from the data, then
 // the weekend schedule and the circuit's forecast beside the last races here
 // with their winner and pole, and who has won here most.
-export default function RacePreview({ preview: p }: { preview: Preview }) {
+export default function RacePreview({ preview }: { preview: Preview }) {
   const { t, lang, fmtNum } = useI18n()
+  // Without the server's forecast the page asks Open-Meteo itself.
+  const q = preview.weather ? null : preview.forecastFor
+  const asked = useAsync(() => (q ? fetchForecast(q) : Promise.resolve(null)), [
+    q?.lat,
+    q?.lon,
+    q?.start,
+    q?.end,
+  ])
+  const p = preview.weather || !asked.data ? preview : { ...preview, weather: asked.data }
   const facts = previewFacts(p, lang)
   const c = p.circuit
 

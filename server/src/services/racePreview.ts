@@ -65,7 +65,10 @@ async function forecast(lat: number, lon: number, start: string, end: string): P
           headers: { "User-Agent": "PaddockTimes/1.0 (https://paddocktimes.com)" },
           signal: AbortSignal.timeout(4000),
         });
-        if (!res.ok) return null;
+        if (!res.ok) {
+          console.warn(`open-meteo: ${res.status} ${(await res.text()).slice(0, 200)}`);
+          return null;
+        }
         const d = ((await res.json()) as { daily?: MeteoDaily }).daily;
         if (!d?.time?.length) return null;
         const days: PreviewWeatherDay[] = [];
@@ -82,7 +85,8 @@ async function forecast(lat: number, lon: number, start: string, end: string): P
           });
         });
         return days.length ? days : null;
-      } catch {
+      } catch (err) {
+        console.warn(`open-meteo: ${err instanceof Error ? err.message : String(err)}`);
         return null; // no forecast is fine: the preview shows without it
       }
     },
@@ -117,10 +121,13 @@ export async function getRacePreview(
     }));
 
   const window = forecastWindow(race.date, today);
-  const weather =
+  const forecastFor =
     window && circuit.latitude != null && circuit.longitude != null
-      ? await forecast(circuit.latitude, circuit.longitude, window.start, window.end)
+      ? { lat: circuit.latitude, lon: circuit.longitude, ...window }
       : null;
+  const weather = forecastFor
+    ? await forecast(forecastFor.lat, forecastFor.lon, forecastFor.start, forecastFor.end)
+    : null;
 
   return {
     season,
@@ -135,6 +142,7 @@ export async function getRacePreview(
       lapRecord: circuit.lapRecord,
     },
     weather,
+    forecastFor,
     history,
     topWinners: winsHere(before).slice(0, TOP),
     gridWinners: winsHere(before, grid),
