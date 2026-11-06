@@ -18,7 +18,7 @@ export const DEFAULT_SEO: Record<Lang, { title: string; description: string }> =
   en: {
     title: 'Paddock Times: Formula 1 Standings, Calendar & Stats',
     description:
-      'Formula 1 standings, race calendar, driver & team career stats, head-to-head comparisons and past-race telemetry — every season from 1950 to today.',
+      'Formula 1 standings, race calendar, driver & team career stats, head-to-head comparisons and past-race telemetry: every season from 1950 to today.',
   },
   uk: {
     title: 'Paddock Times: залік Ф1, календар і статистика Формули-1',

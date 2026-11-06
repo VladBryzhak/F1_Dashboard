@@ -23,7 +23,7 @@ import { UK, ukCountry, ukDate, ukPlural } from "./ukText";
 export const SITE = "Paddock Times";
 const DEFAULT_TITLE = `${SITE}: Formula 1 Standings, Calendar & Stats`;
 const BASE_DESC =
-  "Formula 1 standings, race calendar, driver & team career stats, head-to-head comparisons and past-race telemetry — every season from 1950 to today.";
+  "Formula 1 standings, race calendar, driver & team career stats, head-to-head comparisons and past-race telemetry: every season from 1950 to today.";
 
 // Mirror of client/src/lib/f1meta.ts, keyed by f1db constructorId.
 const TEAM_COLOR: Record<string, string> = {
