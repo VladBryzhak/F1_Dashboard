@@ -122,13 +122,23 @@ export async function describePage(rawPath: string, lang: Lang = "en"): Promise<
             .filter((r) => ["1", "2", "3"].includes(r.positionText))
             .map((r) => ({ pos: Number(r.positionText), name: r.driverName, team: r.constructorName, color: teamColor(r.constructorId) }));
           const gpUk = gpTitle(w.grandPrixName, "uk");
+          // Before the result the page is the race's preview.
+          const ahead = !w.results.length;
           return pg(
-            uk
-              ? `${gpUk} ${w.season}: результати Ф1, кваліфікація й практики`
-              : `${w.grandPrixName} GP ${w.season}: Results, Qualifying & Practice`,
-            uk
-              ? `${gpUk} ${w.season}: повний результат гонки, стартова решітка, час кваліфікації, практики${w.sprintResults.length ? ", спринт" : ""}, найшвидше коло та пілот дня.`
-              : `${w.grandPrixName} Grand Prix ${w.season}: full race result, starting grid, qualifying times, practice sessions${w.sprintResults.length ? ", sprint" : ""}, fastest lap and Driver of the Day.`,
+            ahead
+              ? uk
+                ? `${gpUk} ${w.season}: анонс і розклад Ф1`
+                : `${w.grandPrixName} GP ${w.season}: Preview & Schedule`
+              : uk
+                ? `${gpUk} ${w.season}: результати Ф1, кваліфікація й практики`
+                : `${w.grandPrixName} GP ${w.season}: Results, Qualifying & Practice`,
+            ahead
+              ? uk
+                ? `${gpUk} ${w.season}, траса ${w.circuitName}: розклад сесій, прогноз погоди, переможці минулих років і рекорд кола.`
+                : `${w.grandPrixName} Grand Prix ${w.season} at ${w.circuitName}: session times, weather forecast, past winners and the lap record.`
+              : uk
+                ? `${gpUk} ${w.season}: повний результат гонки, стартова решітка, час кваліфікації, практики${w.sprintResults.length ? ", спринт" : ""}, найшвидше коло та пілот дня.`
+                : `${w.grandPrixName} Grand Prix ${w.season}: full race result, starting grid, qualifying times, practice sessions${w.sprintResults.length ? ", sprint" : ""}, fastest lap and Driver of the Day.`,
             {
               kind: "race",
               kicker: uk

@@ -943,3 +943,47 @@ export interface TeamRadio {
   sessionKey: number;
   clips: TeamRadioClip[];
 }
+
+// ---------- Race preview (an upcoming race's page, before the result) ----------
+
+export interface PreviewWeatherDay {
+  date: string; // yyyy-mm-dd, the circuit's local day
+  tMax: number; // °C
+  tMin: number;
+  rain: number; // highest chance of rain that day, %
+  code: number; // WMO weather code (Open-Meteo)
+}
+
+export interface PreviewPastRace {
+  year: number;
+  round: number;
+  winnerId: string;
+  winnerName: string;
+  winnerConstructorId: string;
+  winnerConstructorName: string;
+  poleName: string | null;
+}
+
+export interface PreviewWins {
+  id: string;
+  name: string;
+  count: number;
+}
+
+export interface RacePreview {
+  season: string;
+  round: number;
+  race: CalendarRace; // schedule
+  circuit: {
+    id: string;
+    name: string;
+    length: number | null; // km
+    turns: number | null;
+    racesHeld: number; // before this one
+    lapRecord: CircuitLapRecord | null;
+  };
+  weather: PreviewWeatherDay[] | null; // the weekend's days, when a forecast reaches them
+  history: PreviewPastRace[]; // the last races here, newest first
+  topWinners: PreviewWins[]; // most wins here, all time
+  gridWinners: PreviewWins[]; // this season's drivers who have won here
+}

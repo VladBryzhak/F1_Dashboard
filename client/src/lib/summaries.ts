@@ -153,8 +153,18 @@ export function teamSummary(p: ConstructorProfile, lang: Lang = getLang()): stri
   return text
 }
 
+// Whether a race weekend's race is still to come: no result yet and the race
+// not started (f1db only has a result the morning after).
+export function raceAhead(w: RaceWeekend, now = Date.now()): boolean {
+  if (w.results.length) return false
+  const race = w.sessions.find((s) => s.kind === 'RACE')
+  const start = race ? Date.parse(race.start) : Date.parse(w.date)
+  return Number.isNaN(start) || start > now
+}
+
 export function raceSummary(w: RaceWeekend, lang: Lang = getLang()): string {
   const winner = w.results.find((r) => r.positionText === '1')
+  const ahead = raceAhead(w)
   const pole =
     w.qualifying.find((q) => q.position === 1) ?? w.qualifying[0] ?? null
   const grid = winner
@@ -167,7 +177,7 @@ export function raceSummary(w: RaceWeekend, lang: Lang = getLang()): string {
       day: 'numeric',
       month: 'long',
     })
-    let text = `${gpTitle(w.grandPrixName, 'uk')} ${w.season} року відбулося ${date}.`
+    let text = `${gpTitle(w.grandPrixName, 'uk')} ${w.season} року ${ahead ? 'відбудеться' : 'відбулося'} ${date}.`
     if (winner) {
       text += ` Перемога: ${winner.driverName} (${winner.constructorName})`
       if (grid === 1) text += ', старт із поул-позиції'
@@ -181,7 +191,9 @@ export function raceSummary(w: RaceWeekend, lang: Lang = getLang()): string {
     return text
   }
 
-  let text = `The ${w.season} ${w.grandPrixName} Grand Prix was held on ${formatDate(w.date)}.`
+  let text = ahead
+    ? `The ${w.season} ${w.grandPrixName} Grand Prix takes place on ${formatDate(w.date)}.`
+    : `The ${w.season} ${w.grandPrixName} Grand Prix was held on ${formatDate(w.date)}.`
 
   if (winner) {
     text += ` ${winner.driverName} won the race for ${winner.constructorName}`

@@ -54,6 +54,18 @@ export const seoText = {
         },
 
   race: (w: RaceWeekend, lang: Lang): SeoText => {
+    // Before the result the page is the race's preview.
+    if (!w.results.length) {
+      return uk(lang)
+        ? {
+            title: `${gpTitle(w.grandPrixName, 'uk')} ${w.season}: анонс і розклад Ф1`,
+            description: `${gpTitle(w.grandPrixName, 'uk')} ${w.season}, траса ${w.circuitName}: розклад сесій, прогноз погоди, переможці минулих років і рекорд кола.`,
+          }
+        : {
+            title: `${w.grandPrixName} GP ${w.season}: Preview & Schedule`,
+            description: `${w.grandPrixName} Grand Prix ${w.season} at ${w.circuitName}: session times, weather forecast, past winners and the lap record.`,
+          }
+    }
     if (uk(lang)) {
       const gp = gpTitle(w.grandPrixName, 'uk')
       return {

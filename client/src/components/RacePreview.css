@@ -1,0 +1,218 @@
+/* Race preview on an upcoming race's page (components/RacePreview.tsx):
+   three facts, then the schedule and forecast beside the circuit's history. */
+.pv {
+  margin-bottom: var(--space-lg);
+}
+
+.pv-facts {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: var(--space-sm);
+  margin: 0 0 var(--space-md);
+  padding: 0;
+  list-style: none;
+}
+
+.pv-fact {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+  padding: 0.95rem 1.1rem;
+  background: var(--card);
+  border: var(--rule-hair) solid var(--border);
+  border-radius: var(--radius-card);
+}
+
+.pv-tag {
+  align-self: flex-start;
+  padding: 0.1rem 0.5rem;
+  border-radius: var(--radius-pill);
+  background: var(--color-cool-soft);
+  color: var(--color-cool);
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.pv-fact-text {
+  font-size: var(--text-md);
+  font-weight: 600;
+  line-height: 1.35;
+  color: var(--color-ink);
+}
+
+.pv-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.25fr);
+  gap: var(--space-md);
+  align-items: start;
+}
+
+.pv-col {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.pv-card {
+  padding: 1rem 1.1rem;
+  background: var(--color-paper-2);
+  border: var(--rule-hair) solid var(--color-rule);
+  border-radius: var(--radius-card);
+}
+
+.pv-card-title {
+  margin: 0 0 var(--space-sm);
+  font-size: var(--text-sm);
+  font-weight: 500;
+  color: var(--color-muted);
+}
+
+.pv-rows {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.pv-row {
+  display: grid;
+  grid-template-columns: 2.6rem minmax(0, 1fr) auto auto;
+  align-items: baseline;
+  gap: var(--space-sm);
+  padding: 0.45rem 0;
+  border-top: var(--rule-hair) solid var(--color-rule);
+  font-size: var(--text-sm);
+}
+
+.pv-row:first-child {
+  border-top: none;
+}
+
+.pv-row.is-race .pv-day,
+.pv-row.is-race .pv-sky {
+  color: var(--color-ink);
+  font-weight: 600;
+}
+
+.pv-row--past {
+  grid-template-columns: 3rem minmax(0, 1fr) auto;
+}
+
+.pv-day,
+.pv-sky,
+.pv-team,
+.pv-pole {
+  color: var(--color-muted);
+}
+
+.pv-num {
+  text-align: right;
+  color: var(--color-ink-2);
+}
+
+.pv-rain {
+  min-width: 4.5rem;
+  color: var(--color-cool);
+}
+
+.pv-winner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0 var(--space-xs);
+  min-width: 0;
+}
+
+.pv-swatch {
+  display: inline-block;
+  width: 4px;
+  height: 0.9em;
+  border-radius: 2px;
+  align-self: center;
+}
+
+.pv-team,
+.pv-pole {
+  font-size: 0.8rem;
+}
+
+.pv-card a,
+.pv-credit a {
+  color: var(--color-ink);
+  text-decoration: underline;
+  text-decoration-color: var(--color-rule-2);
+  text-underline-offset: 3px;
+}
+
+.pv-card a:hover,
+.pv-credit a:hover {
+  text-decoration-color: var(--color-accent);
+}
+
+.pv-card a:focus-visible,
+.pv-credit a:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+.pv-card a.pv-year {
+  color: var(--color-cool);
+}
+
+.pv-most {
+  margin: var(--space-md) 0 0;
+  font-size: var(--text-sm);
+  line-height: 1.6;
+  color: var(--color-ink-2);
+}
+
+.pv-most-label {
+  color: var(--color-muted);
+}
+
+.pv-circuit {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-xs) var(--space-lg);
+  margin: var(--space-md) 0 0;
+  padding-top: var(--space-sm);
+  border-top: var(--rule-hair) solid var(--color-rule);
+}
+
+.pv-circuit dt {
+  font-size: 0.75rem;
+  color: var(--color-muted);
+}
+
+.pv-circuit dd {
+  margin: 0.1rem 0 0;
+  font-size: var(--text-md);
+  color: var(--color-ink);
+}
+
+.pv-credit {
+  margin: var(--space-sm) 0 0;
+  font-size: 0.75rem;
+  color: var(--color-muted-2);
+}
+
+@media (max-width: 768px) {
+  .pv-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  /* The schedule's phone rule sizes it to the calendar's scrolling table;
+     here it simply fills the column. */
+  .pv .sched {
+    position: static;
+    width: auto;
+  }
+
+  .pv-row--past {
+    grid-template-columns: 3rem minmax(0, 1fr);
+    row-gap: 0.15rem;
+  }
+
+  .pv-row--past .pv-pole {
+    grid-column: 2;
+  }
+}

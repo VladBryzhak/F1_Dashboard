@@ -11,6 +11,7 @@ import {
   getRaceWeekend,
 } from "./f1db";
 import { getArticle, listArticles, TAG_LABEL } from "./articles";
+import { getRacePreview } from "./racePreview";
 import { gpTitle, type Lang } from "./gpNames";
 import { UK, ukCountry, ukDate, ukPlural } from "./ukText";
 
@@ -209,9 +210,72 @@ async function calendar(c: Ctx, season: number, current: number): Promise<string
   );
 }
 
+const SESSION_NAME: Record<string, [string, string]> = {
+  FP1: ["Practice 1", "Практика 1"],
+  FP2: ["Practice 2", "Практика 2"],
+  FP3: ["Practice 3", "Практика 3"],
+  SQ: ["Sprint Qualifying", "Спринт-кваліфікація"],
+  SPRINT: ["Sprint", "Спринт"],
+  Q: ["Qualifying", "Кваліфікація"],
+  RACE: ["Race", "Гонка"],
+};
+
+// An upcoming race's preview (services/racePreview.ts): the schedule, the
+// forecast, the last races at the circuit and who has won there.
+async function racePreviewHtml(c: Ctx, season: string, round: string): Promise<string> {
+  const p = await getRacePreview(season, round).catch(() => null);
+  if (!p) return "";
+  const time = (iso: string, known: boolean) =>
+    known ? `${esc(c.date(iso))}, ${esc(new Date(iso).toISOString().slice(11, 16))} UTC` : esc(c.date(iso));
+  let html =
+    `<h2>${c.uk ? "Розклад" : "Schedule"}</h2>` +
+    list(p.race.sessions.map((s) => `${esc(SESSION_NAME[s.kind]?.[c.uk ? 1 : 0] ?? s.kind)}: ${time(s.start, s.timeKnown)}`));
+  if (p.weather?.length) {
+    html +=
+      `<h2>${c.uk ? "Прогноз погоди" : "Weather forecast"}</h2>` +
+      list(
+        p.weather.map((d) =>
+          c.uk
+            ? `${esc(c.date(d.date))}: ${d.tMax}° / ${d.tMin}°, ймовірність дощу ${d.rain}%`
+            : `${esc(c.date(d.date))}: ${d.tMax}° / ${d.tMin}°, ${d.rain}% chance of rain`,
+        ),
+      ) +
+      `<p>${c.uk ? "Прогноз" : "Forecast"}: <a href="https://open-meteo.com/">Open-Meteo</a></p>`;
+  }
+  if (p.history.length) {
+    html +=
+      `<h2>${c.uk ? "Останні гонки на цій трасі" : "Last races at this circuit"}</h2>` +
+      table(
+        c.uk ? ["Рік", "Переможець", "Команда", "Поул"] : ["Year", "Winner", "Team", "Pole"],
+        p.history.map((r) => [
+          c.a(`/calendar/${r.year}/${r.round}`, String(r.year)),
+          c.a(`/drivers/${r.winnerId}`, r.winnerName),
+          c.a(`/teams/${r.winnerConstructorId}`, r.winnerConstructorName),
+          esc(r.poleName),
+        ]),
+      );
+  }
+  const facts: string[] = [];
+  if (p.topWinners.length) {
+    const top = p.topWinners.map((w) => `${c.a(`/drivers/${w.id}`, w.name)} (${w.count})`);
+    facts.push(c.uk ? `Найбільше перемог тут: ${top.join(", ")}.` : `Most wins here: ${top.join(", ")}.`);
+  }
+  if (p.circuit.lapRecord) {
+    const r = p.circuit.lapRecord;
+    facts.push(
+      c.uk
+        ? `Рекорд кола: ${esc(r.time)}, ${c.a(`/drivers/${r.driverId}`, r.driverName)}, ${r.year}.`
+        : `Lap record: ${esc(r.time)}, ${c.a(`/drivers/${r.driverId}`, r.driverName)}, ${r.year}.`,
+    );
+  }
+  facts.push(c.uk ? `Гонок на цій трасі: ${p.circuit.racesHeld}.` : `Races held at this circuit: ${p.circuit.racesHeld}.`);
+  return html + `<p>${facts.join(" ")}</p>`;
+}
+
 async function race(c: Ctx, season: string, round: string): Promise<string | null> {
   const w = await getRaceWeekend(season, round).catch(() => null);
   if (!w) return null;
+  const ahead = !w.results.length;
   const winner = w.results.find((r) => r.positionText === "1");
   const pole = w.qualifying.find((q) => q.position === 1);
   const gp = c.uk ? gpTitle(w.grandPrixName, "uk") : `${w.grandPrixName} Grand Prix`;
@@ -220,7 +284,7 @@ async function race(c: Ctx, season: string, round: string): Promise<string | nul
   if (c.uk) {
     const start = winner?.gridPosition === 1 ? ", старт із поул-позиції" : winner?.gridPosition ? `, старт із P${winner.gridPosition}` : "";
     body =
-      `<h1>${esc(gp)} ${esc(w.season)}: результати</h1>` +
+      `<h1>${esc(gp)} ${esc(w.season)}: ${ahead ? "анонс" : "результати"}</h1>` +
       `<p>Етап ${w.round} сезону ${esc(w.season)}, ${esc(c.date(w.date))}, траса ${circuit}.` +
       (winner ? ` Перемога: ${c.a(`/drivers/${winner.driverId}`, winner.driverName)} (${c.a(`/teams/${winner.constructorId}`, winner.constructorName)})${start}.` : "") +
       (pole && pole.driverId !== winner?.driverId ? ` Поул-позиція: ${c.a(`/drivers/${pole.driverId}`, pole.driverName)}.` : "") +
@@ -228,13 +292,14 @@ async function race(c: Ctx, season: string, round: string): Promise<string | nul
       `</p>`;
   } else {
     body =
-      `<h1>${esc(gp)} ${esc(w.season)}: results</h1>` +
+      `<h1>${esc(gp)} ${esc(w.season)}: ${ahead ? "preview" : "results"}</h1>` +
       `<p>Round ${w.round} of the ${esc(w.season)} season, ${esc(c.date(w.date))}, at ${circuit}.` +
       (winner ? ` ${c.a(`/drivers/${winner.driverId}`, winner.driverName)} won for ${c.a(`/teams/${winner.constructorId}`, winner.constructorName)}${winner.gridPosition === 1 ? " from pole position" : winner.gridPosition ? ` from P${winner.gridPosition} on the grid` : ""}.` : "") +
       (pole && pole.driverId !== winner?.driverId ? ` ${c.a(`/drivers/${pole.driverId}`, pole.driverName)} took pole position.` : "") +
       (w.fastestLap ? ` Fastest lap: ${c.a(`/drivers/${w.fastestLap.driverId}`, w.fastestLap.driverName)}, ${esc(w.fastestLap.detail)}.` : "") +
       `</p>`;
   }
+  if (ahead) body += await racePreviewHtml(c, season, round);
   if (w.results.length) {
     body +=
       `<h2>${c.uk ? "Результат гонки" : "Race result"}</h2>` +

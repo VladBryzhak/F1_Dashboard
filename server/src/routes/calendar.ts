@@ -5,6 +5,7 @@ import {
   getRaceWeekend,
 } from "../services/f1db";
 import { calendarFeed } from "../services/calendarFeed";
+import { getRacePreview } from "../services/racePreview";
 import { getRaceStory } from "../services/raceStory";
 import { getRaceStrategy } from "../services/strategy";
 
@@ -53,6 +54,20 @@ router.get("/:season/:round/weekend", async (req, res, next) => {
       return res.status(404).json({ error: "Race not found" });
     }
     res.json(weekend);
+  } catch (err) {
+    next(err);
+  }
+});
+
+// GET /api/calendar/:season/:round/preview -> an upcoming race's schedule,
+// forecast and history at the circuit (404 once it has a result)
+router.get("/:season/:round/preview", async (req, res, next) => {
+  try {
+    const preview = await getRacePreview(req.params.season, req.params.round);
+    if (!preview) {
+      return res.status(404).json({ error: "No preview for this race" });
+    }
+    res.json(preview);
   } catch (err) {
     next(err);
   }

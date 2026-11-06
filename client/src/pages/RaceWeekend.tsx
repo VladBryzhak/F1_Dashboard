@@ -3,6 +3,7 @@ import { Link, useParams, useSearchParams } from 'react-router-dom'
 import { api } from '../api/client'
 import Breadcrumbs from '../components/Breadcrumbs'
 import Flag from '../components/Flag'
+import RacePreview from '../components/RacePreview'
 import RaceStory from '../components/RaceStory'
 import RaceStrategy from '../components/RaceStrategy'
 import { useAsync } from '../hooks/useAsync'
@@ -220,6 +221,12 @@ export default function RaceWeekend() {
   const [practiceN, setPracticeN] = useState<number | null>(null)
   // Race story: loads alongside (OpenF1 can be slow); quietly absent on error.
   const story = useAsync(() => api.raceStory(season, Number(round)), [season, round])
+  // Before the result: the preview (schedule, forecast, history here).
+  const upcoming = !!data && data.results.length === 0
+  const preview = useAsync(
+    () => (upcoming ? api.racePreview(season, Number(round)) : Promise.resolve(null)),
+    [season, round, upcoming],
+  )
 
   useSeo({
     skip: notFound,
@@ -346,6 +353,8 @@ export default function RaceWeekend() {
           </div>
 
           <p className="profile-summary">{raceSummary(data, lang)}</p>
+
+          {upcoming && preview.data && <RacePreview preview={preview.data} />}
 
           <div className="wknd-highlights">
             {highlights.map(
