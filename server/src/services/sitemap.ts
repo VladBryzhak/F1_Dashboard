@@ -1,5 +1,7 @@
 import { cached } from "../cache/cache";
 import {
+  getAllConstructors,
+  getAllDrivers,
   getCalendar,
   getCircuits,
   getConstructorStandings,
@@ -12,17 +14,18 @@ import { SITE_URL } from "./pageHtml";
 // /sitemap.xml, built from the dataset instead of a hand-kept file, so it
 // follows the season: race pages appear as races are run, the current grid's
 // drivers and teams are always in. It lists the pages worth a search result
-// (profiles, races, circuits, standings and calendars of recent seasons) and
-// leaves out the per-year driver/team lists, which repeat the standings, and
+// (profiles, races, circuits, standings and calendars) and leaves out the
+// per-year driver/team lists, which repeat the standings, and
 // /<section>/<current year>, which is the same page as /<section>.
-// Ukrainian twins (/uk/…) are listed for the current season's pages only (the
-// sections, this season's races, today's grid and calendar circuits), so a
-// young site's crawl isn't spread over twice as many pages at once; the pages
-// pair the two languages with hreflang either way.
+// History goes in by waves, so a young site's crawl isn't spread too thin:
+// every season's standings and calendar, the races from RACES_FROM on, and
+// the drivers and teams with a podium. Search already showed old profiles
+// and seasons, and in Ukrainian these pages have little competition, so
+// they are listed in both languages (the pages pair them with hreflang).
 
-const RECENT_SEASONS = 10; // standings + calendar pages per year
-const RACE_SEASONS = 2; // seasons whose race pages are listed
-const GRID_SEASONS = 3; // drivers/teams of the last N seasons
+const FIRST_SEASON = 1950;
+const RACES_FROM = 2010; // race pages listed from this season on (wave 1)
+const GRID_SEASONS = 3; // drivers/teams of the last N seasons, podium or not
 
 interface Entry {
   path: string;
@@ -41,7 +44,12 @@ async function entries(): Promise<Entry[]> {
     out.push({ path, lastmod });
   };
   const ukPaths: Entry[] = [];
-  const addUk = (path: string, lastmod?: string) => ukPaths.push({ path: path === "/" ? "/uk" : `/uk${path}`, lastmod });
+  const addUk = (path: string, lastmod?: string) => {
+    const uk = path === "/" ? "/uk" : `/uk${path}`;
+    if (seen.has(uk)) return;
+    seen.add(uk);
+    ukPaths.push({ path: uk, lastmod });
+  };
 
   // The latest race run (the date the current-season pages last changed).
   const currentCal = await getCalendar(String(current));
@@ -63,18 +71,24 @@ async function entries(): Promise<Entry[]> {
     addUk(`/articles/${a.slug}`, a.date);
   }
 
-  for (let y = current - 1; y > current - RECENT_SEASONS; y--) {
-    add(`/standings/${y}`);
-    add(`/calendar/${y}`);
+  // Every finished season's standings and calendar.
+  for (let y = current - 1; y >= FIRST_SEASON; y--) {
+    for (const p of [`/standings/${y}`, `/calendar/${y}`]) {
+      add(p);
+      addUk(p);
+    }
   }
 
-  // Race pages: every round run in the current and previous seasons.
-  for (let y = current; y > current - RACE_SEASONS; y--) {
-    const cal = y === current ? currentCal : await getCalendar(String(y));
+  // Race pages: every round run from RACES_FROM on, and this season's next
+  // race (its page is the preview until it has run).
+  for (let y = current; y >= RACES_FROM; y--) {
+    const cal = y === current ? currentCal : await getCalendar(String(y)).catch(() => null);
+    if (!cal) continue;
+    const next = y === current ? cal.races.find((r) => !r.winnerDriverId) : undefined;
     for (const r of cal.races) {
-      if (!r.winnerDriverId) continue;
-      add(`/calendar/${y}/${r.round}`, r.date);
-      if (y === current) addUk(`/calendar/${y}/${r.round}`, r.date);
+      if (!r.winnerDriverId && r !== next) continue;
+      add(`/calendar/${y}/${r.round}`, r.winnerDriverId ? r.date : undefined);
+      addUk(`/calendar/${y}/${r.round}`, r.winnerDriverId ? r.date : undefined);
     }
   }
 
@@ -85,10 +99,6 @@ async function entries(): Promise<Entry[]> {
     const [d, c] = await Promise.all([getDriverStandings(String(y)), getConstructorStandings(String(y))]);
     d.standings.forEach((s) => drivers.add(s.driverId));
     c.standings.forEach((s) => teams.add(s.constructorId));
-    if (y === current) {
-      d.standings.forEach((s) => addUk(`/drivers/${s.driverId}`));
-      c.standings.forEach((s) => addUk(`/teams/${s.constructorId}`));
-    }
   }
   for (let y = 1950; y < current; y++) {
     const [d, c] = await Promise.all([
@@ -100,13 +110,23 @@ async function entries(): Promise<Entry[]> {
     const cChamp = c?.standings.find((s) => s.position === 1);
     if (cChamp) teams.add(cChamp.constructorId);
   }
-  drivers.forEach((id) => add(`/drivers/${id}`));
-  teams.forEach((id) => add(`/teams/${id}`));
+  // Everyone who has stood on a podium.
+  const [allDrivers, allTeams] = await Promise.all([getAllDrivers(), getAllConstructors()]);
+  allDrivers.filter((d) => d.podiums > 0).forEach((d) => drivers.add(d.driverId));
+  allTeams.filter((c) => c.podiums > 0).forEach((c) => teams.add(c.constructorId));
+  drivers.forEach((id) => {
+    add(`/drivers/${id}`);
+    addUk(`/drivers/${id}`);
+  });
+  teams.forEach((id) => {
+    add(`/teams/${id}`);
+    addUk(`/teams/${id}`);
+  });
 
   // Circuits: the current calendar and the classic tracks the site draws.
   for (const c of await getCircuits()) {
     if (c.onCurrentCalendar || c.outline) add(`/circuits/${c.circuitId}`);
-    if (c.onCurrentCalendar) addUk(`/circuits/${c.circuitId}`);
+    if (c.onCurrentCalendar || c.outline) addUk(`/circuits/${c.circuitId}`);
   }
   return [...out, ...ukPaths];
 }
