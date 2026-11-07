@@ -999,3 +999,67 @@ export interface RacePreview {
   topWinners: PreviewWins[]; // most wins here, all time
   gridWinners: PreviewWins[]; // this season's drivers who have won here
 }
+
+// ---------- Season review (/seasons/:season) ----------
+
+export interface ReviewEntrant {
+  id: string;
+  name: string;
+  constructorId: string; // the driver's team, or the team itself
+  constructorName: string;
+  points: number;
+  wins: number;
+  title: number | null; // which title of theirs this is, once it is won
+}
+
+export interface ReviewRound {
+  round: number;
+  grandPrixName: string;
+  date: string;
+  winnerId: string | null; // null until it has run
+  winnerName: string | null;
+  winnerCode: string | null;
+  constructorId: string | null;
+  constructorName: string | null;
+}
+
+export interface ReviewWins {
+  id: string;
+  name: string;
+  constructorId: string;
+  count: number;
+}
+
+export interface ReviewFirstWin {
+  id: string;
+  name: string;
+  constructorId: string;
+  round: number;
+  grandPrixName: string;
+}
+
+export interface ReviewDuel {
+  constructorId: string;
+  constructorName: string;
+  a: { id: string; name: string; code: string | null };
+  b: { id: string; name: string; code: string | null };
+  quali: { a: number; b: number };
+  race: { a: number; b: number };
+}
+
+export interface SeasonReview {
+  season: number;
+  rounds: number; // on the calendar
+  held: number; // run so far
+  final: boolean; // every round run (or the rest past their date without a result)
+  driver: ReviewEntrant | null; // champion, or the leader while it is open
+  driverDecided: boolean; // the title can no longer change hands
+  decidedAt: { round: number; grandPrixName: string } | null; // 25-point era only
+  runnerUp: { id: string; name: string; points: number } | null;
+  team: ReviewEntrant | null; // constructors' champion or leader, from 1958
+  winners: ReviewRound[]; // every round on the calendar
+  wins: ReviewWins[]; // most first
+  winningTeams: number;
+  firstWins: ReviewFirstWin[]; // first career wins this season
+  duels: ReviewDuel[];
+}

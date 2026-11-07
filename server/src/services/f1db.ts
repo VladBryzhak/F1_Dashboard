@@ -1,5 +1,5 @@
 import AdmZip from "adm-zip";
-import { dropCached } from "../cache/cache";
+import { cached, dropCached } from "../cache/cache";
 import { circuitOutline } from "./circuitOutlines";
 import type {
   CalendarRace,
@@ -42,6 +42,11 @@ import type {
   TeammateDuels,
   WeekendHighlight,
   WeekendResult,
+  ReviewDuel,
+  ReviewEntrant,
+  ReviewFirstWin,
+  ReviewRound,
+  SeasonReview,
 } from "../types/f1";
 
 // f1db ships its data as downloadable release artifacts (no live API to time
@@ -689,7 +694,7 @@ const CHECK_INTERVAL_MS =
 
 // Cache keys built from the dataset (the f1db functions themselves read it
 // directly and need nothing dropped).
-const DATASET_CACHE_PREFIXES = ["sitemap:", "story:"];
+const DATASET_CACHE_PREFIXES = ["sitemap:", "story:", "review:"];
 
 let refreshTimer: NodeJS.Timeout | null = null;
 let refreshing = false;
@@ -2244,4 +2249,161 @@ export async function getSearchIndex(): Promise<SearchIndex> {
 // The newest season in the dataset (the current calendar).
 export async function getCurrentSeason(): Promise<number> {
   return latestSeason(await dataset());
+}
+
+// ---------- Season review ----------
+
+/** Whether a season has a review page: at least one of its races has run. */
+export async function hasSeasonReview(season: number): Promise<boolean> {
+  const ds = await dataset();
+  return ds.races.some((r) => r.year === season && ds.winnerByRace.has(`${season}:${r.round}`));
+}
+
+// The review of a season (/seasons/:season): its champion (or the leader
+// while the title is open) and the constructors', how the title was decided,
+// every round's winner, first career wins and each team's teammate duel.
+// Final once every round has run, or the rest are past their date without a
+// result (a cancelled race); a season not yet started has none.
+export async function getSeasonReview(
+  season: number,
+  today = new Date().toISOString().slice(0, 10),
+): Promise<SeasonReview | null> {
+  const ds = await dataset();
+  const seasonRaces = ds.races.filter((r) => r.year === season).sort((a, b) => a.round - b.round);
+  const won = (r: RawRace) => ds.winnerByRace.has(`${season}:${r.round}`);
+  const held = seasonRaces.filter(won).length;
+  if (!held) return null;
+  const final = seasonRaces.every((r) => won(r) || r.date < today);
+  return cached(`review:${season}`, final ? 24 * 3600 : 600, () => buildReview(ds, season, seasonRaces, held, final));
+}
+
+async function buildReview(
+  ds: Dataset,
+  season: number,
+  seasonRaces: RawRace[],
+  held: number,
+  final: boolean,
+): Promise<SeasonReview> {
+  const gpName = (id: string) => ds.grandsPrix.get(id)?.name ?? id;
+  const teamName = (id: string) => ds.constructors.get(id)?.name ?? id;
+  const wins = ds.winsByYear.get(season);
+
+  // The title can't change hands any more (titleDecided counts today's
+  // points, so the round it was settled is only told from 2010 on).
+  const settled = season >= 2010 ? seasonChampion(ds, season, seasonRaces) : null;
+  const driverDecided = final || settled != null;
+
+  // Which title of theirs: champions of every finished season up to this one.
+  const titleOf = (rows: { year: number; positionDisplayOrder: number; id: string }[], id: string, decided: boolean) =>
+    decided ? rows.filter((r) => r.id === id && r.positionDisplayOrder === 1 && r.year <= season).length : null;
+  const driverTitles = ds.driverStandings
+    .filter((r) => r.year < season || (r.year === season && driverDecided))
+    .map((r) => ({ year: r.year, positionDisplayOrder: r.positionDisplayOrder, id: r.driverId }));
+  const teamTitles = ds.constructorStandings
+    .filter((r) => r.year < season || (r.year === season && final))
+    .map((r) => ({ year: r.year, positionDisplayOrder: r.positionDisplayOrder, id: r.constructorId }));
+
+  const drivers = ds.driverStandings
+    .filter((r) => r.year === season)
+    .sort((a, b) => a.positionDisplayOrder - b.positionDisplayOrder);
+  const [p1, p2] = drivers;
+  const driver: ReviewEntrant | null = p1
+    ? {
+        id: p1.driverId,
+        name: driverName(ds, p1.driverId),
+        constructorId: ds.teamByYearDriver.get(`${season}:${p1.driverId}`) ?? "",
+        constructorName: teamName(ds.teamByYearDriver.get(`${season}:${p1.driverId}`) ?? ""),
+        points: p1.points,
+        wins: wins?.drivers.get(p1.driverId) ?? 0,
+        title: titleOf(driverTitles, p1.driverId, driverDecided),
+      }
+    : null;
+  const teams = ds.constructorStandings
+    .filter((r) => r.year === season)
+    .sort((a, b) => a.positionDisplayOrder - b.positionDisplayOrder);
+  const t1 = teams[0];
+  const team: ReviewEntrant | null = t1
+    ? {
+        id: t1.constructorId,
+        name: teamName(t1.constructorId),
+        constructorId: t1.constructorId,
+        constructorName: teamName(t1.constructorId),
+        points: t1.points,
+        wins: wins?.constructors.get(t1.constructorId) ?? 0,
+        title: titleOf(teamTitles, t1.constructorId, final),
+      }
+    : null;
+
+  const winners: ReviewRound[] = seasonRaces.map((r) => {
+    const w = ds.winnerByRace.get(`${season}:${r.round}`);
+    return {
+      round: r.round,
+      grandPrixName: gpName(r.grandPrixId),
+      date: r.date,
+      winnerId: w?.driverId ?? null,
+      winnerName: w ? driverName(ds, w.driverId) : null,
+      winnerCode: w ? (ds.drivers.get(w.driverId)?.abbreviation ?? null) : null,
+      constructorId: w?.constructorId ?? null,
+      constructorName: w ? teamName(w.constructorId) : null,
+    };
+  });
+
+  const tally = new Map<string, { id: string; name: string; constructorId: string; count: number }>();
+  for (const r of winners) {
+    if (!r.winnerId) continue;
+    const t = tally.get(r.winnerId) ?? { id: r.winnerId, name: r.winnerName!, constructorId: r.constructorId!, count: 0 };
+    t.count++;
+    tally.set(r.winnerId, t);
+  }
+
+  // A driver's first career win: their earliest race won, if it is this season's.
+  const firstWin = new Map<string, { year: number; round: number }>();
+  for (const [key, w] of ds.winnerByRace) {
+    const [year, round] = key.split(":").map(Number);
+    const f = firstWin.get(w.driverId);
+    if (!f || year < f.year || (year === f.year && round < f.round)) firstWin.set(w.driverId, { year, round });
+  }
+  const firstWins: ReviewFirstWin[] = [];
+  for (const r of winners) {
+    const f = r.winnerId ? firstWin.get(r.winnerId) : undefined;
+    if (f && f.year === season && f.round === r.round) {
+      firstWins.push({ id: r.winnerId!, name: r.winnerName!, constructorId: r.constructorId!, round: r.round, grandPrixName: r.grandPrixName });
+    }
+  }
+
+  // Each team's main pairing (the duel with the most rounds), in championship order.
+  const duels: ReviewDuel[] = [];
+  for (const t of teams) {
+    const d = await getTeammateDuels(t.constructorId, season).catch(() => null);
+    if (!d?.duels.length) continue;
+    const size = (x: (typeof d.duels)[number]) => x.quali.a + x.quali.b + x.race.a + x.race.b;
+    const best = d.duels.reduce((m, x) => (size(x) > size(m) ? x : m));
+    const who = (id: string) => ({ id, name: driverName(ds, id), code: ds.drivers.get(id)?.abbreviation ?? null });
+    duels.push({
+      constructorId: t.constructorId,
+      constructorName: teamName(t.constructorId),
+      a: who(best.a),
+      b: who(best.b),
+      quali: best.quali,
+      race: best.race,
+    });
+  }
+
+  const decidedRace = settled ? seasonRaces.find((r) => r.round === settled.decidedRound) : undefined;
+  return {
+    season,
+    rounds: seasonRaces.length,
+    held,
+    final,
+    driver,
+    driverDecided,
+    decidedAt: settled && decidedRace ? { round: settled.decidedRound, grandPrixName: gpName(decidedRace.grandPrixId) } : null,
+    runnerUp: p2 ? { id: p2.driverId, name: driverName(ds, p2.driverId), points: p2.points } : null,
+    team,
+    winners,
+    wins: [...tally.values()].sort((a, b) => b.count - a.count || a.name.localeCompare(b.name)),
+    winningTeams: new Set(winners.map((w) => w.constructorId).filter(Boolean)).size,
+    firstWins,
+    duels,
+  };
 }

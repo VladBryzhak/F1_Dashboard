@@ -45,6 +45,7 @@ function lazyPage<P extends object>(
 }
 
 const Standings = lazyPage(() => import('./pages/Standings'))
+const Season = lazyPage(() => import('./pages/Season'))
 const Calendar = lazyPage(() => import('./pages/Calendar'))
 const RaceWeekend = lazyPage(() => import('./pages/RaceWeekend'))
 const Circuits = lazyPage(() => import('./pages/Circuits'))
@@ -109,6 +110,8 @@ export default function App() {
           <Route path="articles/:slug" element={<Article />} />
           <Route path="standings" element={<Standings />} />
           <Route path="standings/:season" element={<Standings />} />
+          <Route path="seasons" element={<Season />} />
+          <Route path="seasons/:season" element={<Season />} />
           <Route path="calendar" element={<Calendar />} />
           <Route path="calendar/:season" element={<Calendar />} />
           <Route path="calendar/:season/:round" element={<RaceWeekend />} />

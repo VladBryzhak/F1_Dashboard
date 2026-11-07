@@ -75,6 +75,11 @@ export default function Standings() {
       </div>
 
       {intro && <p className="profile-summary">{intro}</p>}
+      {!notStarted && drivers.data && (
+        <p className="season-link">
+          <Link to={`/seasons/${season}`}>{t('ssn.link')} {season} →</Link>
+        </p>
+      )}
 
       <div className="tabs">
         <button

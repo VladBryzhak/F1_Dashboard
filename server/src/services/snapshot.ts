@@ -9,6 +9,8 @@ import {
   getDriverStandings,
   getHomeHighlights,
   getRaceWeekend,
+  getSeasonReview,
+  hasSeasonReview,
 } from "./f1db";
 import { getArticle, listArticles, TAG_LABEL } from "./articles";
 import { getRacePreview } from "./racePreview";
@@ -336,6 +338,85 @@ async function race(c: Ctx, season: string, round: string): Promise<string | nul
   return body + `<p>${links.join(" | ")}</p>`;
 }
 
+// A season's review (services/f1db.ts getSeasonReview): champion or leader,
+// every round's winner, first wins and the teammate duels.
+async function seasonReview(c: Ctx, season: number, current: number): Promise<string | null> {
+  const r = await getSeasonReview(season).catch(() => null);
+  if (!r) return null;
+  const pts = (n: number) => ukPlural(n, ["очко", "очки", "очок", "очка"]);
+  const gp = (name: string) => (c.uk ? gpTitle(name, "uk") : `${name} Grand Prix`);
+  const team = (id: string | null, name: string | null) => (id && name ? c.a(`/teams/${id}`, name) : "");
+  let body = c.uk ? `<h1>Сезон Ф1 ${season}: підсумки</h1>` : `<h1>F1 ${season} season review</h1>`;
+  if (!r.final) {
+    body += c.uk
+      ? `<p>Попередні підсумки: етапів проведено ${r.held} із ${r.rounds}.</p>`
+      : `<p>Provisional: ${r.held} of ${r.rounds} rounds run.</p>`;
+  }
+  const d = r.driver;
+  if (d) {
+    const link = c.a(`/drivers/${d.id}`, d.name);
+    const by = d.constructorName;
+    body += c.uk
+      ? `<p>${r.driverDecided ? `Титул чемпіона світу: ${link}` : `Лідерство в чемпіонаті: ${link}`}${by ? ` (${esc(by)})` : ""}, ${pts(d.points)}, перемог: ${d.wins}.` +
+        (r.decidedAt ? ` Титул вирішено на етапі ${r.decidedAt.round}, ${esc(gp(r.decidedAt.grandPrixName))}.` : "") +
+        (r.runnerUp ? ` Друге місце: ${c.a(`/drivers/${r.runnerUp.id}`, r.runnerUp.name)}, ${pts(r.runnerUp.points)}.` : "") +
+        `</p>`
+      : `<p>${link} ${r.driverDecided ? "won the title" : "leads the championship"}${by ? ` with ${esc(by)}` : ""}: ${d.points} points, ${enPlural(d.wins, "win")}.` +
+        (r.decidedAt ? ` The title was settled at round ${r.decidedAt.round}, the ${esc(gp(r.decidedAt.grandPrixName))}.` : "") +
+        (r.runnerUp ? ` Runner-up: ${c.a(`/drivers/${r.runnerUp.id}`, r.runnerUp.name)}, ${r.runnerUp.points} points.` : "") +
+        `</p>`;
+  }
+  if (r.team) {
+    const link = c.a(`/teams/${r.team.id}`, r.team.name);
+    body += c.uk
+      ? `<p>${r.final ? "Кубок конструкторів" : "Лідерство серед конструкторів"}: ${link}, ${pts(r.team.points)}, перемог: ${r.team.wins}.</p>`
+      : `<p>Constructors' ${r.final ? "champion" : "leader"}: ${link}, ${r.team.points} points, ${enPlural(r.team.wins, "win")}.</p>`;
+  }
+  body += c.uk
+    ? `<p>Гонок: ${r.held}. Різних переможців: ${r.wins.length}. Команд із перемогами: ${r.winningTeams}.</p>`
+    : `<p>${enPlural(r.held, "race")}, ${enPlural(r.wins.length, "different winner")}, ${enPlural(r.winningTeams, "winning team")}.</p>`;
+  body +=
+    `<h2>${c.uk ? "Переможці за етапами" : "Winners by round"}</h2>` +
+    table(
+      c.uk ? ["Етап", "Гран-прі", "Переможець", "Команда"] : ["Round", "Grand Prix", "Winner", "Team"],
+      r.winners.map((w) => [
+        String(w.round),
+        c.a(`/calendar/${season}/${w.round}`, gp(w.grandPrixName)),
+        w.winnerId ? c.a(`/drivers/${w.winnerId}`, w.winnerName!) : esc(c.uk ? "ще попереду" : "to come"),
+        team(w.constructorId, w.constructorName),
+      ]),
+    );
+  if (r.firstWins.length) {
+    body +=
+      `<h2>${c.uk ? "Перші перемоги в кар'єрі" : "First career wins"}</h2>` +
+      list(r.firstWins.map((f) => `${c.a(`/drivers/${f.id}`, f.name)}: ${c.a(`/calendar/${season}/${f.round}`, gp(f.grandPrixName))}`));
+  }
+  if (r.duels.length) {
+    body +=
+      `<h2>${c.uk ? "Дуелі напарників" : "Teammate battles"}</h2>` +
+      list(
+        r.duels.map((x) =>
+          c.uk
+            ? `${c.a(`/teams/${x.constructorId}`, x.constructorName)}: ${esc(x.a.name)} проти ${esc(x.b.name)}, кваліфікації ${x.quali.a}:${x.quali.b}, гонки ${x.race.a}:${x.race.b}`
+            : `${c.a(`/teams/${x.constructorId}`, x.constructorName)}: ${esc(x.a.name)} vs ${esc(x.b.name)}, qualifying ${x.quali.a}-${x.quali.b}, races ${x.race.a}-${x.race.b}`,
+        ),
+      );
+  }
+  const links = [
+    season > 1950 ? c.a(`/seasons/${season - 1}`, c.uk ? `Сезон ${season - 1}` : `${season - 1} season`) : "",
+    season < current ? c.a(`/seasons/${season + 1}`, c.uk ? `Сезон ${season + 1}` : `${season + 1} season`) : "",
+    c.a(`/standings/${season}`, c.uk ? `Залік ${season}` : `${season} standings`),
+    c.a(`/calendar/${season}`, c.uk ? `Календар ${season}` : `${season} calendar`),
+  ].filter(Boolean);
+  return body + `<p>${links.join(" | ")}</p>`;
+}
+
+// "Season review" link under a season's standings and calendar.
+async function reviewLink(c: Ctx, season: number): Promise<string> {
+  if (!(await hasSeasonReview(season).catch(() => false))) return "";
+  return `<p>${c.a(`/seasons/${season}`, c.uk ? `Підсумки сезону ${season}` : `${season} season review`)}</p>`;
+}
+
 async function driverList(c: Ctx, season: number, current: number): Promise<string> {
   const st = await getDriverStandings(String(season)).catch(() => null);
   return (
@@ -595,10 +676,16 @@ export async function pageSnapshot(rawPath: string, lang: Lang = "en"): Promise<
       body = await home(c);
       break;
     case "standings":
-      body = await standings(c, seasonOf(x), current);
+      body = (await standings(c, seasonOf(x), current)) + (await reviewLink(c, seasonOf(x)));
+      break;
+    case "seasons":
+      body = isSeason(x) ? await seasonReview(c, Number(x), current) : null;
       break;
     case "calendar":
-      body = isSeason(x) && y && /^\d+$/.test(y) ? await race(c, x!, y) : await calendar(c, seasonOf(x), current);
+      body =
+        isSeason(x) && y && /^\d+$/.test(y)
+          ? await race(c, x!, y)
+          : (await calendar(c, seasonOf(x), current)) + (await reviewLink(c, seasonOf(x)));
       break;
     case "drivers":
       body = x && !isSeason(x) ? await driver(c, x, current) : await driverList(c, seasonOf(x), current);

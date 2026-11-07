@@ -10,6 +10,7 @@ import {
   getDriverProfile,
   getDriverStandings,
   getRaceWeekend,
+  getSeasonReview,
 } from "./f1db";
 import type { CircuitOutline } from "../types/f1";
 import { gpTitle, type Lang } from "./gpNames";
@@ -94,7 +95,7 @@ export async function describePage(rawPath: string, lang: Lang = "en"): Promise<
         title: "Paddock Times",
         subtitle: uk
           ? "Залік, календар, статистика пілотів і команд, телеметрія та повтори гонок з 1950 року до сьогодні."
-          : "Standings, calendar, driver & team stats, telemetry and race replays — 1950 to today.",
+          : "Standings, calendar, driver & team stats, telemetry and race replays, 1950 to today.",
       });
 
     case "standings": {
@@ -111,6 +112,35 @@ export async function describePage(rawPath: string, lang: Lang = "en"): Promise<
         ? `Залік пілотів і Кубок конструкторів Формули-1 сезону ${season}: очки, перемоги та відставання від лідера.`
         : `Formula 1 drivers' and constructors' championship standings for the ${season} season: points, wins and gaps to the leader.`;
       return rows.length ? pg(title, description, { kind: "standings", heading: uk ? `Чемпіонат ${season}` : `${season} championship`, rows }) : generic(title, description);
+    }
+
+    case "seasons": {
+      const review = isSeason(a) ? await getSeasonReview(Number(a)).catch(() => null) : null;
+      if (!review) return generic(uk ? "Сезон Ф1" : "F1 season", uk ? BASE_DESC_UK : BASE_DESC);
+      const season = a!;
+      const st = await getDriverStandings(season).catch(() => null);
+      const rows = (st?.standings ?? []).slice(0, 5).map((d) => ({
+        pos: d.position,
+        name: `${d.givenName} ${d.familyName}`,
+        points: d.points,
+        color: teamColor(d.constructorId),
+      }));
+      const d = review.driver;
+      const teamOf = d?.constructorName ?? "";
+      const title = uk ? `Сезон Ф1 ${season}: підсумки, чемпіон і переможці` : `F1 ${season} Season Review: Champion, Winners & Stats`;
+      const who = d
+        ? uk
+          ? review.driverDecided
+            ? `${d.name} (${teamOf}) здобуває титул, перемог: ${d.wins}`
+            : `лідерство в чемпіонаті: ${d.name} (${teamOf}), перемог: ${d.wins}`
+          : `${d.name} ${review.driverDecided ? "champion" : "leads"} with ${teamOf}, ${d.wins} ${d.wins === 1 ? "win" : "wins"}`
+        : "";
+      const description = uk
+        ? `Сезон Формули-1 ${season}: ${who}. Переможці всіх гонок, боротьба за титул, перші перемоги й дуелі напарників.`
+        : `The ${season} Formula 1 season: ${who}. Every race winner, the title race, first wins and teammate battles.`;
+      return rows.length
+        ? pg(title, description, { kind: "standings", heading: uk ? `Сезон ${season}` : `${season} season`, rows })
+        : generic(title, description);
     }
 
     case "calendar": {

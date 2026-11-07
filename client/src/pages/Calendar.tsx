@@ -74,6 +74,11 @@ export default function Calendar() {
         </div>
       </div>
       {subOpen && <SubscribePanel />}
+      {data?.races.some((r) => r.winnerDriverId) && (
+        <p className="season-link">
+          <Link to={`/seasons/${season}`}>{t('ssn.link')} {season} →</Link>
+        </p>
+      )}
 
       {loading && <p className="muted">{t('common.loading')}</p>}
       {!loading && error && <p className="banner">{t('cal.loadError', { error })}</p>}

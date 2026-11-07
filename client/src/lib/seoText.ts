@@ -2,7 +2,7 @@
 // The server builds the same text for the first HTML a visitor or crawler
 // gets (server/src/services/og.ts, describePage) — keep the two in step.
 import { plural, type Lang } from '../i18n/core'
-import type { Article, CircuitProfile, ConstructorProfile, DriverProfile, RaceWeekend } from '../types/f1'
+import type { Article, CircuitProfile, ConstructorProfile, DriverProfile, RaceWeekend, SeasonReview } from '../types/f1'
 import { countryName } from './countries'
 import { gpTitle } from './gpNames'
 
@@ -52,6 +52,28 @@ export const seoText = {
           title: `${season} F1 Race Calendar & Results`,
           description: `The ${season} Formula 1 race calendar with winners, teams and full results for every Grand Prix.`,
         },
+
+  season: (r: SeasonReview, lang: Lang): SeoText => {
+    const d = r.driver
+    if (uk(lang)) {
+      const who = d
+        ? r.driverDecided
+          ? `${d.name} (${d.constructorName}) здобуває титул, перемог: ${d.wins}`
+          : `лідерство в чемпіонаті: ${d.name} (${d.constructorName}), перемог: ${d.wins}`
+        : ''
+      return {
+        title: `Сезон Ф1 ${r.season}: підсумки, чемпіон і переможці`,
+        description: `Сезон Формули-1 ${r.season}: ${who}. Переможці всіх гонок, боротьба за титул, перші перемоги й дуелі напарників.`,
+      }
+    }
+    const who = d
+      ? `${d.name} ${r.driverDecided ? 'champion' : 'leads'} with ${d.constructorName}, ${d.wins} ${d.wins === 1 ? 'win' : 'wins'}`
+      : ''
+    return {
+      title: `F1 ${r.season} Season Review: Champion, Winners & Stats`,
+      description: `The ${r.season} Formula 1 season: ${who}. Every race winner, the title race, first wins and teammate battles.`,
+    }
+  },
 
   race: (w: RaceWeekend, lang: Lang): SeoText => {
     // Before the result the page is the race's preview.

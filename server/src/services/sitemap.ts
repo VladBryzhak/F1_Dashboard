@@ -79,6 +79,14 @@ async function entries(): Promise<Entry[]> {
     }
   }
 
+  // Every season's review, this one too once a race has run.
+  for (let y = current; y >= FIRST_SEASON; y--) {
+    if (y === current && !done.length) continue;
+    const lastmod = y === current ? lastRun : undefined;
+    add(`/seasons/${y}`, lastmod);
+    addUk(`/seasons/${y}`, lastmod);
+  }
+
   // Race pages: every round run from RACES_FROM on, and this season's next
   // race (its page is the preview until it has run).
   for (let y = current; y >= RACES_FROM; y--) {
