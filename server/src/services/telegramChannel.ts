@@ -238,7 +238,12 @@ async function check(): Promise<void> {
 
 /** Starts the channel's checks, when a channel is set up. */
 export function startChannel(): void {
-  if (!CHANNEL || (!TOKEN && !DRY_RUN)) return;
+  if (!CHANNEL || (!TOKEN && !DRY_RUN)) {
+    // Say what is missing (names only), so a channel that stays quiet is easy to fix.
+    const missing = [!CHANNEL && "TELEGRAM_CHANNEL", !TOKEN && !DRY_RUN && "TELEGRAM_BOT_TOKEN"].filter(Boolean);
+    console.log(`[telegram] channel posts off: ${missing.join(" and ")} not set`);
+    return;
+  }
   const run = () => void check().catch((err) => console.warn("[telegram] check failed:", err));
   // After the session hero's first look at OpenF1 (warmSessionHero, 5 s in).
   setTimeout(run, 60_000).unref();
