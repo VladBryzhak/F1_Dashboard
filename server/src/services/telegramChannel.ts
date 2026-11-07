@@ -27,8 +27,9 @@ import type { ArticleSummary, RacePreview, SeasonReview, SessionHero } from "../
 const TOKEN = process.env.TELEGRAM_BOT_TOKEN;
 const CHANNEL = process.env.TELEGRAM_CHANNEL;
 const DRY_RUN = process.env.TELEGRAM_DRY_RUN === "1";
-// Set for one deploy to check the channel: the first check posts the latest
-// session's result at once. Remove it after, or every restart posts it again.
+// Set for one deploy to check the channel: the latest session's result is
+// posted at once (retried each check until it goes out). Remove it after, or
+// every restart posts it again.
 const TEST_POST = process.env.TELEGRAM_TEST_POST === "1";
 
 const CHECK_MS = 5 * 60_000;
@@ -194,24 +195,33 @@ async function send(post: ChannelPost): Promise<void> {
 
 const posted = new Set<string>();
 let seeded = false;
+let testDone = false;
+
+async function testPost(): Promise<void> {
+  const hero = latestSessionHero();
+  if (!hero) {
+    console.warn("[telegram] test post: no session result yet, trying again at the next check");
+    return;
+  }
+  const p = sessionPost(hero);
+  try {
+    await send(p);
+    testDone = true;
+    posted.add(p.key);
+    console.log(`[telegram] test post sent: ${p.key}`);
+  } catch (err) {
+    testDone = true; // a refusal won't change by itself: fix the setup and redeploy
+    console.warn("[telegram] test post failed:", err instanceof Error ? err.message : err);
+  }
+}
 
 async function check(): Promise<void> {
+  if (TEST_POST && !testDone) await testPost();
   const posts = await candidates(Date.now());
   if (!seeded) {
     // Everything there at start was there before: don't post it again.
     posts.forEach((p) => posted.add(p.key));
     seeded = true;
-    const hero = TEST_POST ? latestSessionHero() : null;
-    if (TEST_POST) {
-      if (!hero) console.warn("[telegram] test post: no session result yet");
-      else {
-        const p = sessionPost(hero);
-        posted.add(p.key);
-        await send(p)
-          .then(() => console.log(`[telegram] test post sent: ${p.key}`))
-          .catch((err) => console.warn("[telegram] test post failed:", err instanceof Error ? err.message : err));
-      }
-    }
     return;
   }
   for (const p of posts) {
