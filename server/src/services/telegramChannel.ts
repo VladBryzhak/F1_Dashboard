@@ -27,6 +27,9 @@ import type { ArticleSummary, RacePreview, SeasonReview, SessionHero } from "../
 const TOKEN = process.env.TELEGRAM_BOT_TOKEN;
 const CHANNEL = process.env.TELEGRAM_CHANNEL;
 const DRY_RUN = process.env.TELEGRAM_DRY_RUN === "1";
+// Set for one deploy to check the channel: the first check posts the latest
+// session's result at once. Remove it after, or every restart posts it again.
+const TEST_POST = process.env.TELEGRAM_TEST_POST === "1";
 
 const CHECK_MS = 5 * 60_000;
 const SESSION_FRESH_MS = 3 * 3600_000; // post a session's result within 3 hours of its end
@@ -198,6 +201,17 @@ async function check(): Promise<void> {
     // Everything there at start was there before: don't post it again.
     posts.forEach((p) => posted.add(p.key));
     seeded = true;
+    const hero = TEST_POST ? latestSessionHero() : null;
+    if (TEST_POST) {
+      if (!hero) console.warn("[telegram] test post: no session result yet");
+      else {
+        const p = sessionPost(hero);
+        posted.add(p.key);
+        await send(p)
+          .then(() => console.log(`[telegram] test post sent: ${p.key}`))
+          .catch((err) => console.warn("[telegram] test post failed:", err instanceof Error ? err.message : err));
+      }
+    }
     return;
   }
   for (const p of posts) {
