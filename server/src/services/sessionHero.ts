@@ -157,12 +157,16 @@ async function build(): Promise<SessionHero | null> {
     round: weekend.round,
     grandPrixName: weekend.grandPrixName,
     top,
+    endedAt: new Date(endOf(s)).toISOString(),
   };
 }
 
 // The last answer worked out, for when OpenF1 is busy or locked (a session
 // running) and its cached data has run out.
 let lastGood: SessionHero | null = null;
+
+/** The latest answer worked out so far, without asking OpenF1 again. */
+export const latestSessionHero = (): SessionHero | null => lastGood;
 
 export async function getSessionHero(): Promise<SessionHero | null> {
   try {

@@ -117,6 +117,13 @@ The race replay shows the team radio the broadcast aired, with captions in both 
   - clips and lines marked unclear are hidden;
   - a clip after the flag comes up at the end of the replay.
 
+## Telegram channel (server/src/services/telegramChannel.ts)
+
+- The server posts to the public channel in Ukrainian with /uk links: a session's top three (from the home hero, within 3 hours of its end), the race-day preview (10 to 1 hours before the start), a new article, and the season review once final. Pictures are only Telegram's link preview of our own pages (og:image): never post others' photos.
+- Env on Render: `TELEGRAM_CHANNEL` (@username or id) beside the existing `TELEGRAM_BOT_TOKEN`; the bot must be a channel admin allowed to post. `TELEGRAM_DRY_RUN=1` logs posts instead. Without the channel nothing runs.
+- No disk on Render's free plan: the first check after a start marks all current posts as done, and a session that ended before the start is skipped, so nothing is posted twice (one can be missed during a deploy).
+- The site links the channel (footer, race pages, articles) through `client/src/lib/telegram.ts` `TELEGRAM_URL`; empty hides the links.
+
 ## Generated data (server/src/data)
 
 Committed JSON built by one-off scripts, so the site makes no extra upstream calls at runtime. Re-run when a new circuit joins the calendar:

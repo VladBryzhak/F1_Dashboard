@@ -291,6 +291,9 @@ const uk: Dict & Record<string, string> = {
   'ssn.race': 'гонки',
   'ssn.articles': 'Статті цього сезону',
   'ssn.loadError': 'Не вдалося завантажити підсумки сезону. Спробуйте за хвилину.',
+  // Telegram channel links
+  'tg.follow': 'Результати одразу після фінішу в Telegram',
+  'tg.short': 'Telegram-канал',
   'strat.lapChart': 'Позиції по колах',
   'strat.lapChartHint': 'Торкніться пілота, щоб виділити. Зліва стартова решітка, справа фініш.',
   'strat.clear': 'Скинути',

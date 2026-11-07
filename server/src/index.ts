@@ -11,6 +11,7 @@ import homeRouter from "./routes/home";
 import liveRouter from "./routes/live";
 import { warmReplays } from "./services/live";
 import { warmSessionHero } from "./services/sessionHero";
+import { startChannel } from "./services/telegramChannel";
 import profilesRouter from "./routes/profiles";
 import seasonsRouter from "./routes/seasons";
 import standingsRouter from "./routes/standings";
@@ -184,4 +185,6 @@ app.listen(PORT, () => {
   warmReplays();
   // And the home hero's latest session result.
   warmSessionHero();
+  // And post to the Telegram channel, when one is set up.
+  startChannel();
 });

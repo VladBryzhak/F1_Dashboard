@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom'
 import { useI18n, type TKey } from '../i18n/core'
 import { SHOW_SUPPORT_LINKS } from '../lib/support'
+import TelegramLink from './TelegramLink'
 import { OPEN_EVENT } from './CookieBanner'
 import './Footer.css'
 
@@ -42,6 +43,7 @@ export default function Footer() {
             <span className="mark">PT</span> PADDOCK TIMES
           </div>
           <p>{t('footer.tagline')}</p>
+          <TelegramLink short />
           <p className="footer-copy">© {year} Paddock Times</p>
         </div>
 

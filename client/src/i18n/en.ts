@@ -288,6 +288,9 @@ const en = {
   'ssn.race': 'races',
   'ssn.articles': 'Articles from this season',
   'ssn.loadError': "Couldn't load the season review. Try again in a minute.",
+  // Telegram channel links
+  'tg.follow': 'Results right after the flag, on Telegram',
+  'tg.short': 'Telegram channel',
   'strat.lapChart': 'Lap chart',
   'strat.lapChartHint': 'Tap a driver to highlight. Grid order on the left, finish on the right.',
   'strat.clear': 'Clear',

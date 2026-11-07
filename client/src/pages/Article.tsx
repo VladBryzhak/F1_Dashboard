@@ -2,6 +2,7 @@ import { useEffect, useRef } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import ArticleCover, { ArticleMeta } from '../components/ArticleCover'
 import Breadcrumbs from '../components/Breadcrumbs'
+import TelegramLink from '../components/TelegramLink'
 import { api } from '../api/client'
 import { useAsync } from '../hooks/useAsync'
 import { useSeo } from '../hooks/useSeo'
@@ -128,6 +129,8 @@ export default function Article() {
         <p className="art-dek art-dek--lead">{a.description}</p>
         <div className="art-prose" ref={body} dangerouslySetInnerHTML={{ __html: a.html }} />
       </div>
+
+      <TelegramLink className="tg-row" />
 
       {a.related.length > 0 && (
         <section className="art-related">

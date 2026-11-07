@@ -283,6 +283,7 @@ export interface SessionHero {
   round: number;
   grandPrixName: string;
   top: SessionRow[]; // the top three
+  endedAt: string; // when the session ended, ISO
 }
 
 export interface HomeResponse {

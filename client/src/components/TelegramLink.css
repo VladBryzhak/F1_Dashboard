@@ -1,0 +1,49 @@
+/* Link to the Telegram channel (components/TelegramLink.tsx). */
+.tg-link {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-xs);
+  padding: 0.45rem 0.8rem;
+  border: var(--rule-hair) solid var(--color-rule-2);
+  border-radius: var(--radius-pill);
+  color: var(--color-ink);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  text-decoration: none;
+  transition: border-color var(--dur-micro) var(--ease-out);
+}
+
+.tg-link svg {
+  color: var(--color-cool);
+  flex: none;
+}
+
+.tg-link:hover {
+  border-color: var(--color-cool);
+}
+
+.tg-link:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+.tg-link.is-short {
+  padding: 0;
+  border: none;
+  font-weight: 500;
+  color: var(--muted);
+}
+
+.tg-link.is-short:hover {
+  color: var(--color-ink);
+}
+
+.tg-row {
+  margin: var(--space-xl) 0 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tg-link {
+    transition: none;
+  }
+}

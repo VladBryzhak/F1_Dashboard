@@ -3,6 +3,7 @@ import { Link, useParams, useSearchParams } from 'react-router-dom'
 import { api } from '../api/client'
 import Breadcrumbs from '../components/Breadcrumbs'
 import CircuitYears from '../components/CircuitYears'
+import TelegramLink from '../components/TelegramLink'
 import Flag from '../components/Flag'
 import RacePreview from '../components/RacePreview'
 import RaceStory from '../components/RaceStory'
@@ -469,6 +470,8 @@ export default function RaceWeekend() {
               <PracticeTable session={practice} />
             </div>
           )}
+
+          <TelegramLink className="tg-row" />
 
           <CircuitYears weekend={data} />
         </>
