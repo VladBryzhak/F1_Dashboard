@@ -47,26 +47,92 @@ def catmull(p0, p1, p2, p3, f):
 
 
 class Path:
-    """A car's real path: Catmull-Rom through its (lightly smoothed) samples."""
+    """A car's real line, and where on it the car is at each moment.
 
-    def __init__(self, lap):
-        ts = [p[0] for p in lap["pts"]]
+    OpenF1's position timestamps wander (0.04 to 0.5 s apart, so speeds worked
+    out from them swing from 50 to 550 km/h), but the positions themselves
+    trace the line well and the reported speed is smooth. So the line comes
+    from the positions alone (in order, smoothed), and the car's place on it
+    from the speed: distance = integral of speed, scaled so the car crosses
+    the start line at 0 and again at its lap time.
+    """
+
+    def __init__(self, lap, start_point=None, start_dir=None):
         ps = [p[1] for p in lap["pts"]]
-        # light smoothing against the samples' jitter (~0.3 m)
-        sm = [ps[0]] + [(ps[i - 1] + 2 * ps[i] + ps[i + 1]) / 4 for i in range(1, len(ps) - 1)] + [ps[-1]]
-        self.t, self.p = ts, sm
+        # dense line through the samples by index, every ~0.5 m, then smoothed
+        dense = []
+        for i in range(len(ps) - 1):
+            p0, p1, p2, p3 = ps[max(i - 1, 0)], ps[i], ps[i + 1], ps[min(i + 2, len(ps) - 1)]
+            n = max(1, int((p2 - p1).length / 0.5))
+            dense += [catmull(p0, p1, p2, p3, k / n) for k in range(n)]
+        dense.append(ps[-1])
+        for _ in range(3):
+            dense = [dense[0]] + [(dense[i - 3] + dense[i - 2] + dense[i - 1] + dense[i] + dense[i + 1] + dense[i + 2] + dense[i + 3]) / 7
+                                  for i in range(3, len(dense) - 3)] + [dense[-1]]
+        self.p = dense
+        self.s = [0.0]
+        for i in range(1, len(dense)):
+            self.s.append(self.s[-1] + (dense[i] - dense[i - 1]).length)
+        # distance driven from the speed, from the first car sample
         self.ct = [c[0] for c in lap["cars"]]
         self.c = [c[1] for c in lap["cars"]]
+        self.d = [0.0]
+        for i in range(1, len(self.ct)):
+            v = (self.c[i]["speed"] + self.c[i - 1]["speed"]) / 2 / 3.6
+            self.d.append(self.d[-1] + v * max(0.0, self.ct[i] - self.ct[i - 1]))
+        self.dur = lap["duration"]
+        if start_point is None:  # this lap draws the start line where it was at time 0
+            start_point = self.raw_at(lap, 0.0)
+            start_dir = (self.raw_at(lap, 0.3) - start_point).normalized()
+        self.start_point, self.start_dir = start_point, start_dir
+        # the two crossings of the start line: lap start and lap end
+        cross = []
+        for i in range(1, len(dense)):
+            a = (dense[i - 1] - start_point).dot(start_dir)
+            b = (dense[i] - start_point).dot(start_dir)
+            if a < 0 <= b and (dense[i] - start_point).length < 40:
+                cross.append(self.s[i - 1] + (self.s[i] - self.s[i - 1]) * (-a / ((b - a) or 1)))
+        self.s0 = cross[0] if cross else 0.0
+        self.s1 = cross[-1] if len(cross) > 1 else self.s[-1]
+        self.d0, self.d1 = self._dist(0.0), self._dist(self.dur)
+
+    @staticmethod
+    def raw_at(lap, t):
+        pts = lap["pts"]
+        ts = [p[0] for p in pts]
+        i = max(0, min(len(ts) - 2, bisect.bisect_right(ts, t) - 1))
+        f = (t - ts[i]) / ((ts[i + 1] - ts[i]) or 1)
+        return pts[i][1].lerp(pts[i + 1][1], max(0.0, min(1.0, f)))
+
+    def _dist(self, t):
+        ct, d = self.ct, self.d
+        if t <= ct[0]:
+            return d[0] + (t - ct[0]) * self.c[0]["speed"] / 3.6
+        if t >= ct[-1]:
+            return d[-1] + (t - ct[-1]) * self.c[-1]["speed"] / 3.6
+        i = bisect.bisect_right(ct, t) - 1
+        f = (t - ct[i]) / ((ct[i + 1] - ct[i]) or 1)
+        return d[i] + f * (d[i + 1] - d[i])
+
+    def s_at(self, t):
+        """Distance along the line at time t (start line crossed at 0 and at the lap time)."""
+        return self.s0 + (self.s1 - self.s0) * (self._dist(t) - self.d0) / ((self.d1 - self.d0) or 1)
+
+    def frac(self, t):
+        return (self.s_at(t) - self.s0) / ((self.s1 - self.s0) or 1)
+
+    def point(self, s):
+        ss, ps = self.s, self.p
+        if s <= ss[0]:
+            return ps[0] + (ps[1] - ps[0]).normalized() * (s - ss[0])
+        if s >= ss[-1]:
+            return ps[-1] + (ps[-1] - ps[-2]).normalized() * (s - ss[-1])
+        i = bisect.bisect_right(ss, s) - 1
+        f = (s - ss[i]) / ((ss[i + 1] - ss[i]) or 1)
+        return ps[i].lerp(ps[i + 1], f)
 
     def at(self, t):
-        ts, ps = self.t, self.p
-        i = max(1, min(len(ts) - 2, bisect.bisect_right(ts, t) - 1))
-        if t <= ts[0]:  # before the samples: carry on backwards along the first step
-            return ps[0] + (ps[1] - ps[0]) * ((t - ts[0]) / (ts[1] - ts[0]))
-        if t >= ts[-1]:
-            return ps[-1] + (ps[-1] - ps[-2]) * ((t - ts[-1]) / (ts[-1] - ts[-2]))
-        f = (t - ts[i]) / ((ts[i + 1] - ts[i]) or 1)
-        return catmull(ps[i - 1], ps[i], ps[i + 1], ps[min(i + 2, len(ps) - 1)], f)
+        return self.point(self.s_at(t))
 
     def car(self, t, key):
         i = max(0, bisect.bisect_right(self.ct, t) - 1)
@@ -76,7 +142,14 @@ class Path:
         return a + (b - a) * f
 
 
-PA, PB = Path(A), Path(B)
+PA = Path(A)
+PB = Path(B, PA.start_point, PA.start_dir)  # the same start line for both
+
+if os.environ.get("GHOST_CHECK"):  # print each car's speed from frame to frame, then stop
+    for nm, pth in (("A", PA), ("B", PB)):
+        v = [round((pth.at(t + 1 / 30) - pth.at(t)).length * 30 * 3.6) for t in (k / 30 for k in range(0, 300, 3))]
+        print("CHECK", nm, "s0 %.1f s1 %.1f" % (pth.s0, pth.s1), "lap m %.0f" % (pth.s1 - pth.s0), v[:40])
+    sys.exit(0)
 
 
 # ---------------------------------------------------------------- track
@@ -101,7 +174,7 @@ def smooth_loop(v, k, n):
 
 
 # Reference: lap A over its own lap (start line to start line), every 2 m.
-ref = resample([PA.at(i * 0.05) for i in range(int(A["duration"] / 0.05) + 1)], 2.0)
+ref = resample([PA.point(PA.s0 + k * 0.5) for k in range(int((PA.s1 - PA.s0) / 0.5) + 1)], 2.0)
 ref = smooth_loop(ref, 2, 2)
 N = len(ref)
 
@@ -321,9 +394,13 @@ left_turn = lambda i: curv[i] > 0
 strip("asphalt", [lambda i: -half[i], lambda i: half[i]], M["asphalt"])
 # rubbered-in racing line: where car A actually drove
 rub_off = []
+kd_a = KDTree(len(PA.p))
+for k, q in enumerate(PA.p):
+    kd_a.insert(q, k)
+kd_a.balance()
 for i in range(N):
     p = line[i]
-    best = min(PA.p, key=lambda q: (q - p).length_squared)
+    best = PA.p[kd_a.find(p)[1]]
     rub_off.append((Vector((best.x, best.y, 0)) - Vector((p.x, p.y, 0))).dot(side[i]))
 rub_off = smooth_loop(rub_off, 4, 2)
 strip("rubber", [lambda i: rub_off[i] - 1.3, lambda i: rub_off[i] + 1.3], M["rubber"], dz=0.012)
@@ -709,7 +786,8 @@ except Exception:
 
 # ---------------------------------------------------------------- animation
 def heading(path, t):
-    d = path.at(t + 0.08) - path.at(t - 0.08)
+    st = path.s_at(t)
+    d = path.point(st + 2.0) - path.point(st - 2.0)
     return math.atan2(d.y, d.x), -math.atan2(d.z, max(0.01, math.hypot(d.x, d.y)))
 
 

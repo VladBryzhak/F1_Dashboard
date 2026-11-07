@@ -18,7 +18,9 @@ interface Raw {
   year: number; start: string; duration: number; sectors: (number | null)[]; code: string; name: string; team: string; colour: string;
   loc: { date: string; x: number; y: number }[]; car: { date: string; speed: number; throttle: number; brake: number; n_gear: number }[];
 }
-interface Lap { raw: Raw; t: number[]; x: number[]; y: number[]; frac: number[]; ct: number[]; car: Raw["car"] }
+// frac: share of the lap driven, from the integrated speed (OpenF1's position
+// timestamps wander too much to time the car by; scene.py does the same).
+interface Lap { raw: Raw; t: number[]; x: number[]; y: number[]; ct: number[]; car: Raw["car"]; dist: number[]; d0: number; d1: number }
 
 function interp(xs: number[], ys: number[], v: number): number {
   if (v <= xs[0]) return ys[0];
@@ -34,11 +36,31 @@ function load(file: string): Lap {
   const t0 = Date.parse(raw.start);
   const pts = raw.loc.filter((p) => p.x || p.y).map((p) => ({ t: (Date.parse(p.date) - t0) / 1000, x: p.x / 10, y: p.y / 10 })).sort((a, b) => a.t - b.t);
   const t = pts.map((p) => p.t), x = pts.map((p) => p.x), y = pts.map((p) => p.y);
-  const d = [0];
-  for (let i = 1; i < pts.length; i++) d.push(d[i - 1] + Math.hypot(x[i] - x[i - 1], y[i] - y[i - 1]));
-  const d0 = interp(t, d, 0), d1 = interp(t, d, raw.duration);
   const car = [...raw.car].sort((a, b) => Date.parse(a.date) - Date.parse(b.date));
-  return { raw, t, x, y, frac: d.map((v) => (v - d0) / (d1 - d0)), ct: car.map((c) => (Date.parse(c.date) - t0) / 1000), car };
+  const ct = car.map((c) => (Date.parse(c.date) - t0) / 1000);
+  const dist = [0];
+  for (let i = 1; i < car.length; i++) dist.push(dist[i - 1] + ((car[i].speed + car[i - 1].speed) / 2 / 3.6) * Math.max(0, ct[i] - ct[i - 1]));
+  const L = { raw, t, x, y, ct, car, dist, d0: 0, d1: 1 };
+  L.d0 = driven(L, 0);
+  L.d1 = driven(L, raw.duration);
+  return L;
+}
+
+function driven(L: Lap, t: number): number {
+  const { ct, dist, car } = L;
+  if (t <= ct[0]) return dist[0] + (t - ct[0]) * car[0].speed / 3.6;
+  if (t >= ct[ct.length - 1]) return dist[dist.length - 1] + (t - ct[ct.length - 1]) * car[car.length - 1].speed / 3.6;
+  return interp(ct, dist, t);
+}
+const frac = (L: Lap, t: number) => (driven(L, t) - L.d0) / (L.d1 - L.d0);
+// the time a lap reached share f (frac rises with time)
+function timeAt(L: Lap, f: number): number {
+  let lo = -2, hi = L.raw.duration + 2;
+  for (let k = 0; k < 50; k++) {
+    const m = (lo + hi) / 2;
+    if (frac(L, m) < f) lo = m; else hi = m;
+  }
+  return (lo + hi) / 2;
 }
 
 const A = load("lap_a.json"), B = load("lap_b.json");
@@ -74,8 +96,12 @@ const mapPath = A.t
     return `${k ? "L" : "M"}${px.toFixed(1)} ${py.toFixed(1)}`;
   })
   .join("") + "Z";
+const mapPts = A.t.map((t, i) => [t, i] as const).filter(([t]) => t >= 0 && t <= A.raw.duration).map(([, i]) => [A.x[i], A.y[i]]);
+const mapS = [0];
+for (let i = 1; i < mapPts.length; i++) mapS.push(mapS[i - 1] + Math.hypot(mapPts[i][0] - mapPts[i - 1][0], mapPts[i][1] - mapPts[i - 1][1]));
 const dot = (L: Lap, t: number) => {
-  const [px, py] = P(interp(L.t, L.x, t), interp(L.t, L.y, t));
+  const s = ((((frac(L, t) % 1) + 1) % 1)) * mapS[mapS.length - 1];
+  const [px, py] = P(interp(mapS, mapPts.map((q) => q[0]), s), interp(mapS, mapPts.map((q) => q[1]), s));
   return `<circle cx="${px.toFixed(1)}" cy="${py.toFixed(1)}" r="11" fill="${L.raw.colour}" stroke="#000" stroke-width="3"/>`;
 };
 
@@ -122,8 +148,8 @@ function sectors(t: number, y: number) {
 
 function frame(t: number): string {
   // gap: where B was when it had covered the share of the lap A has now
-  const fA = interp(A.t, A.frac, Math.min(t, A.raw.duration));
-  const tB = interp(B.frac, B.t, fA);
+  const fA = frac(A, Math.min(t, A.raw.duration));
+  const tB = timeAt(B, fA);
   const gap = tB - Math.min(t, A.raw.duration); // > 0: A ahead
   const lead = gap >= 0 ? A : B;
   const lapClock = Math.max(0, Math.min(t, Math.max(A.raw.duration, B.raw.duration)));
