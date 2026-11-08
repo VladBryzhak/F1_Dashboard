@@ -5,11 +5,11 @@ control and the FIA's and Sky Sports' reports, checked against the data.
   python3 quali_sao_paulo_2026.py OPENF1.json SPEC.json
 OPENF1.json: {"result": session_result, "drivers": drivers} of the session.
 """
-import json, sys
+import json, os, sys
 
 UK = {  # surnames as Ukrainian readers know them
     "NOR": "Норріс", "RUS": "Расселл", "ANT": "Антонеллі", "LEC": "Леклер", "LAW": "Лоусон", "HUL": "Гюлькенберг",
-    "HAD": "Аджар", "BEA": "Берман", "ALO": "Алонсо", "ALB": "Албон", "HAM": "Гамільтон", "PIA": "Піастрі",
+    "HAD": "Аджар", "BEA": "Берман", "ALO": "Алонсо", "ALB": "Албон", "HAM": "Хемілтон", "PIA": "Піастрі",
     "CAM": "Камара", "LIN": "Ліндблад", "SAI": "Сайнс", "VER": "Ферстаппен", "COL": "Колапінто", "GAS": "Гаслі",
     "STR": "Стролл", "BOT": "Боттас", "PER": "Перес", "BOR": "Бортолето",
 }
@@ -56,39 +56,44 @@ q3_rows = [row(r, 2, i + 1, "pole" if i == 0 else None) for i, r in enumerate(q3
 by = {code(r): r for r in res}
 col = lambda c: "#" + (drv[by[c]["driver_number"]].get("team_colour") or "888888")
 
+outline = json.load(open(os.path.join(os.path.dirname(__file__), "../../server/src/data/circuit-outlines.json")))["circuits"]["interlagos"]
+
 spec = {
-    "kicker": "КВАЛІФІКАЦІЯ · САН-ПАУЛУ 2026",
+    "session": "Кваліфікація",
+    "place": "Гран-прі Сан-Паулу 2026",
+    "outline": {"d": outline["d"], "w": float(outline["w"]), "h": float(outline["h"])},
     "scenes": [
-        {"kind": "title", "dur": 4.2, "chapter": "Розділ 1/8 · коротко", "kicker": "ГРАН-ПРІ САН-ПАУЛУ",
-         "lines": ["ЗЛИВА.", "2 ЧЕРВОНІ", "ПРАПОРИ.", "0,204 С"], "accent": 3, "sub": "Одна з найхаотичніших кваліфікацій сезону"},
-        {"kind": "clock", "dur": 6.5, "chapter": "Розділ 2/8 · злива", "label": "ЧЕРВОНИЙ ПРАПОР", "from": 0, "to": 5017,
+        {"kind": "title", "dur": 4.2, "kicker": "ГРАН-ПРІ САН-ПАУЛУ",
+         "lines": ["ЗЛИВА.", "ДВА ЧЕРВОНІ", "ПРАПОРИ.", "0,204 С"], "accent": 3, "sub": "Одна з найхаотичніших кваліфікацій сезону"},
+        {"kind": "clock", "dur": 6.5, "title": "Злива", "wipe": "#e10600", "label": "ЧЕРВОНИЙ ПРАПОР", "from": 0, "to": 5017,
          "caption": "стільки трасу тримали закритою",
          "note": "Прапор показали через 2 хв 23 с після старту Q1, ще до першого швидкого кола."},
-        {"kind": "table", "dur": 9.5, "chapter": "Розділ 3/8 · Q1", "title": "Q1", "sub": "вибувають 6",
+        {"kind": "table", "dur": 9.5, "title": "Q1", "wipe": col("BOR"), "sub": "вибувають 6",
          "rows": q1_rows, "notes": ["9 кіл видалено", "Бортолето у відбійнику"]},
-        {"kind": "table", "dur": 9.0, "chapter": "Розділ 4/8 · Q2", "title": "Q2", "sub": "вибувають 6",
+        {"kind": "table", "dur": 9.0, "title": "Q2", "wipe": col("LAW"), "sub": "вибувають 6",
          "rows": q2_rows, "notes": ["Лоусон першим на проміжних", "Аварія Камари: Q2 не відновили"]},
-        {"kind": "table", "dur": 7.5, "chapter": "Розділ 5/8 · Q3", "title": "Q3", "sub": "топ-10",
+        {"kind": "table", "dur": 7.5, "title": "Q3", "wipe": col("ALO"), "sub": "топ-10",
          "rows": q3_rows, "notes": ["Алонсо: перше Q3 для Aston Martin у сезоні"]},
-        {"kind": "big", "dur": 6.5, "chapter": "Розділ 6/8 · поул", "value": "0,204", "caption": "секунди між поулом і другим місцем",
-         "left": row(by["NOR"] if "NOR" in by else q3[0], 2, 1, "pole"), "right": row(by["RUS"], 2, 2),
+        {"kind": "big", "dur": 6.5, "title": "Поул", "wipe": col("NOR"), "value": "0,204", "caption": "секунди між поулом і другим місцем",
+         "number": "1", "colour": col("NOR"),
+         "left": row(by["NOR"], 2, 1, "pole"), "right": row(by["RUS"], 2, 2),
          "note": "Расселлу наказали перервати коло за Албоном. Потім посилився дощ, і кращого шансу вже не було."},
-        {"kind": "list", "dur": 7.5, "chapter": "Розділ 7/8 · штрафи", "title": "ШТРАФИ НА РЕШІТЦІ",
+        {"kind": "list", "dur": 7.5, "title": "Штрафи на решітці", "wipe": col("RUS"),
          "items": [
              {"colour": col("RUS"), "head": "Расселл  −5", "text": "заміна двигуна: стартує 7-м"},
              {"colour": col("LEC"), "head": "Леклер  −10", "text": "заміна двигуна: стартує 14-м"},
-             {"colour": col("HAM"), "head": "Гамільтон", "text": "нова силова установка: з кінця решітки"},
+             {"colour": col("HAM"), "head": "Хемілтон", "text": "нова силова установка: з кінця решітки"},
              {"colour": col("VER"), "head": "Ферстаппен", "text": "нова силова установка: з кінця решітки"},
              {"colour": col("PER"), "head": "Перес", "text": "Cadillac: з кінця решітки"},
          ]},
-        {"kind": "table", "dur": 8.0, "chapter": "Розділ 8/8 · старт", "title": "СТАРТОВА РЕШІТКА", "sub": "топ-10",
+        {"kind": "table", "dur": 8.0, "title": "Стартова решітка", "wipe": col("LAW"), "sub": "топ-10",
          "rows": [dict(row(by[c], 2, i + 1), time="") for i, c in enumerate(["NOR", "ANT", "LAW", "HUL", "HAD", "BEA", "RUS", "ALO", "ALB", "PIA"])],
-         "notes": ["Лоусон 3-й: повторює свій рекорд у кар'єрі", "Гамільтон 20-й, Ферстаппен 21-й"]},
-        {"kind": "outro", "dur": 4.5, "chapter": "Гонка сьогодні о 19:00", "lines": ["ПОВНИЙ РОЗБІР", "paddocktimes.com"],
-         "sub": "Telegram: @paddocktimes", "credit": "Дані: OpenF1, FIA. Paddock Times не пов'язаний з Formula 1."},
+         "notes": ["Лоусон 3-й: повторює свій рекорд у кар'єрі", "Хемілтон 20-й, Ферстаппен 21-й"]},
+        {"kind": "outro", "dur": 4.5, "wipe": "#e10600", "lines": ["Повний розбір", "paddocktimes.com"],
+         "sub": "Гонка сьогодні о 19:00 · Telegram @paddocktimes",
+         "credit": "Дані: OpenF1, FIA. Схема траси: f1-circuits (MIT). Paddock Times не пов'язаний з Formula 1."},
     ],
 }
-# the grid rows show the starting slot, so the pole highlight goes to P1
-spec["scenes"][7]["rows"][0]["mark"] = "pole"
+spec["scenes"][7]["rows"][0]["mark"] = "pole"  # the grid shows the starting slot: P1 gets the highlight
 json.dump(spec, open(sys.argv[2], "w"), ensure_ascii=False, indent=1)
 print("scenes", len(spec["scenes"]), "seconds", round(sum(s["dur"] for s in spec["scenes"]), 1))

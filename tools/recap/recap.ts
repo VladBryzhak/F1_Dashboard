@@ -1,7 +1,11 @@
 // Recap videos: a session told in animated scenes (tools/recap/README.md).
-// Reads a video spec (JSON: chrome + scenes, made by build.py from OpenF1
-// data and our own text), draws every frame as SVG with resvg and pipes the
-// frames to ffmpeg. Vertical 1080x1920 for TikTok, Reels and the channel.
+// Reads a video spec (JSON: chrome + scenes, made by a builder script from
+// OpenF1 data and our own text), draws every frame as SVG with resvg and
+// pipes the frames to ffmpeg. Vertical 1080x1920 for TikTok, Reels and the
+// channel. The look is the site's own (Console theme): graphite, the
+// circuit's outline behind everything with a car of light running round it,
+// a timing tower, the driver's number huge in team colour, the video's
+// progress as three timing sectors, team-colour wipes between scenes.
 //
 //   tsx recap.ts SPEC.json OUT.mp4 [--fps 60] [--frames a-b] [--png DIR]
 import { Resvg } from "@resvg/resvg-js";
@@ -17,162 +21,197 @@ const PNG_DIR = opt("--png"); // write PNGs of the chosen frames instead of a vi
 const FONT_DIR = path.resolve(__dirname, "../../server/assets/fonts");
 const fontFiles = fs.readdirSync(FONT_DIR).filter((f) => f.endsWith(".ttf")).map((f) => path.join(FONT_DIR, f));
 const W = 1080, H = 1920;
-const C = { bg: "#0d0c11", bg2: "#17151c", panel: "#1b1920", rule: "#2e2b35", ink: "#f4f3f7", muted: "#a19fab", accent: "#e10600", gold: "#f5c400", out: "#ff4d4d", cool: "#8cc8f0" };
+// the site's tokens (client/src/styles/tokens.css), as hex
+const C = {
+  bg: "#121117", panel: "#1b1a21", panel2: "#24222b", rule: "#34323c", ink: "#f4f3f7", ink2: "#d6d4dd", muted: "#a3a1ad",
+  accent: "#e10600", cool: "#8cc8f0", coolSoft: "#1e3446", gold: "#f5c400", out: "#ff5a5a", purple: "#b05cff", green: "#3ccf7a", yellow: "#f2c94c",
+};
 
 // ---------- spec ----------
 interface Row { pos: string; code: string; name: string; colour: string; time: string; mark?: "out" | "pole" | "hi"; note?: string }
-type Scene =
-  | { kind: "title"; dur: number; chapter: string; kicker?: string; lines: string[]; accent?: number; sub?: string }
-  | { kind: "clock"; dur: number; chapter: string; label: string; from: number; to: number; caption: string; note?: string }
-  | { kind: "table"; dur: number; chapter: string; title: string; sub: string; rows: Row[]; notes?: string[] }
-  | { kind: "big"; dur: number; chapter: string; value: string; caption: string; left?: Row; right?: Row; note?: string }
-  | { kind: "list"; dur: number; chapter: string; title: string; items: { colour: string; head: string; text: string }[] }
-  | { kind: "outro"; dur: number; chapter: string; lines: string[]; sub: string; credit?: string };
-interface Spec { kicker: string; scenes: Scene[] }
+type Base = { dur: number; title?: string; wipe?: string };
+type Scene = Base & (
+  | { kind: "title"; kicker?: string; lines: string[]; accent?: number; sub?: string }
+  | { kind: "clock"; label: string; from: number; to: number; caption: string; note?: string }
+  | { kind: "table"; sub: string; rows: Row[]; notes?: string[] }
+  | { kind: "big"; value: string; caption: string; number?: string; colour?: string; left?: Row; right?: Row; note?: string }
+  | { kind: "list"; items: { colour: string; head: string; text: string }[] }
+  | { kind: "outro"; lines: string[]; sub: string; credit?: string }
+);
+interface Spec { session: string; place: string; outline?: { d: string; w: number; h: number }; scenes: Scene[] }
 const spec: Spec = JSON.parse(fs.readFileSync(SPEC, "utf8"));
 
 // ---------- helpers ----------
 const clamp = (v: number, a = 0, b = 1) => Math.max(a, Math.min(b, v));
 const easeOut = (t: number) => 1 - Math.pow(1 - clamp(t), 3);
+const easeInOut = (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
 const esc = (s: string) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 const FONT = "Fira Sans Extra Condensed";
-const txt = (x: number, y: number, s: string, size: number, o: { w?: number; fill?: string; anchor?: string; op?: number; ls?: number } = {}) =>
-  `<text x="${x.toFixed(1)}" y="${y.toFixed(1)}" font-family="${FONT}" font-size="${size}" font-weight="${o.w ?? 800}" fill="${o.fill ?? C.ink}" text-anchor="${o.anchor ?? "start"}" opacity="${(o.op ?? 1).toFixed(3)}"${o.ls ? ` letter-spacing="${o.ls}"` : ""}>${esc(s)}</text>`;
-// an entrance: rises 40 px and fades in over 0.45 s, starting at `at` seconds into the scene
-const enter = (t: number, at: number, dur = 0.45) => easeOut((t - at) / dur);
-const g = (op: number, dy: number, inner: string) => `<g opacity="${op.toFixed(3)}" transform="translate(0 ${dy.toFixed(1)})">${inner}</g>`;
-const rise = (t: number, at: number, inner: string, dur = 0.45) => {
-  const e = enter(t, at, dur);
-  return e <= 0 ? "" : g(e, (1 - e) * 40, inner);
+const NUM = "Saira Condensed"; // figures and times
+const txt = (x: number, y: number, s: string, size: number, o: { w?: number; fill?: string; anchor?: string; op?: number; ls?: number; font?: string; extra?: string } = {}) =>
+  `<text x="${x.toFixed(1)}" y="${y.toFixed(1)}" font-family="${o.font ?? FONT}" font-size="${size}" font-weight="${o.w ?? 800}" fill="${o.fill ?? C.ink}" text-anchor="${o.anchor ?? "start"}" opacity="${(o.op ?? 1).toFixed(3)}"${o.ls ? ` letter-spacing="${o.ls}"` : ""}${o.extra ? " " + o.extra : ""}>${esc(s)}</text>`;
+// entrance from the left: slides 60 px and fades in over 0.4 s from `at` s into the scene
+const slide = (t: number, at: number, inner: string, dur = 0.4) => {
+  const e = easeOut((t - at) / dur);
+  return e <= 0 ? "" : `<g opacity="${e.toFixed(3)}" transform="translate(${((1 - e) * -60).toFixed(1)} 0)">${inner}</g>`;
 };
 
-// Background: dark, with slow diagonal red light streaks (the reference's mood).
-function background(T: number): string {
-  let s = `<rect width="${W}" height="${H}" fill="${C.bg}"/>`;
-  s += `<defs><linearGradient id="vig" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2a0705" stop-opacity="0.55"/><stop offset="0.45" stop-color="${C.bg}" stop-opacity="0"/><stop offset="1" stop-color="#1a0503" stop-opacity="0.6"/></linearGradient>` +
-    `<linearGradient id="streak" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="${C.accent}" stop-opacity="0"/><stop offset="0.5" stop-color="${C.accent}" stop-opacity="0.22"/><stop offset="1" stop-color="${C.accent}" stop-opacity="0"/></linearGradient></defs>`;
-  s += `<rect width="${W}" height="${H}" fill="url(#vig)"/>`;
-  for (let k = 0; k < 5; k++) {
-    const y = ((k * 470 + T * (22 + k * 7)) % (H + 600)) - 300;
-    s += `<rect x="-400" y="${y.toFixed(1)}" width="1900" height="${6 + k * 3}" fill="url(#streak)" transform="rotate(-24 540 ${y.toFixed(1)})"/>`;
+// ---------- the circuit behind everything ----------
+let outlineLen = 0;
+const outlinePts: [number, number][] = [];
+if (spec.outline) {
+  for (const m of spec.outline.d.matchAll(/[ML]\s*(-?[\d.]+)[ ,](-?[\d.]+)/g)) outlinePts.push([Number(m[1]), Number(m[2])]);
+  for (let i = 1; i < outlinePts.length; i++) outlineLen += Math.hypot(outlinePts[i][0] - outlinePts[i - 1][0], outlinePts[i][1] - outlinePts[i - 1][1]);
+}
+
+function circuit(T: number): string {
+  if (!spec.outline) return "";
+  const { d, w, h } = spec.outline;
+  const scale = 1250 / Math.max(w, h);
+  const cx = W / 2, cy = 1000;
+  const rot = -8 + 4 * Math.sin(T / 14); // a slow drift
+  const tf = `translate(${cx} ${cy}) rotate(${rot.toFixed(2)}) scale(${scale.toFixed(3)}) translate(${-w / 2} ${-h / 2})`;
+  // a car of light: a bright stretch of the outline running round, one lap every 9 s
+  const seg = outlineLen * 0.06;
+  const off = -((T / 9) % 1) * outlineLen;
+  return `<g transform="${tf}" fill="none" stroke-linejoin="round" stroke-linecap="round">` +
+    `<path d="${d}" stroke="#1f1d26" stroke-width="${(26 / scale).toFixed(2)}"/>` +
+    `<path d="${d}" stroke="#2c2a35" stroke-width="${(10 / scale).toFixed(2)}"/>` +
+    `<path d="${d}" stroke="${C.cool}" stroke-opacity="0.55" stroke-width="${(10 / scale).toFixed(2)}" stroke-dasharray="${seg.toFixed(2)} ${(outlineLen - seg).toFixed(2)}" stroke-dashoffset="${off.toFixed(2)}"/>` +
+    `</g>`;
+}
+
+// Header: the PT tile and name, the session chip; footer: progress as three sectors.
+function chrome(T: number, total: number): string {
+  let s = `<rect x="60" y="84" width="64" height="64" rx="14" fill="${C.accent}"/>` + txt(92, 130, "PT", 36, { anchor: "middle", fill: "#fff" }) +
+    txt(140, 130, "PADDOCK TIMES", 38, { w: 800 });
+  const chip = spec.session.toUpperCase();
+  const cw = chip.length * 17 + 44;
+  s += `<rect x="${1020 - cw}" y="88" width="${cw}" height="56" rx="12" fill="${C.coolSoft}"/>` + txt(1020 - cw / 2, 126, chip, 30, { w: 700, fill: C.cool, anchor: "middle", ls: 1 });
+  s += txt(1020, 186, spec.place, 30, { w: 600, fill: C.muted, anchor: "end" });
+  // three sectors at the bottom, coloured like timing sectors
+  const cols = [C.purple, C.green, C.yellow];
+  const p = clamp(T / total) * 3;
+  for (let k = 0; k < 3; k++) {
+    const x = 60 + k * 326, fill = clamp(p - k);
+    s += `<rect x="${x}" y="1832" width="314" height="10" rx="5" fill="${C.rule}"/>`;
+    if (fill > 0) s += `<rect x="${x}" y="1832" width="${(314 * fill).toFixed(1)}" height="10" rx="5" fill="${cols[k]}"/>`;
+    s += txt(x, 1876, `S${k + 1}`, 24, { w: 700, fill: fill >= 1 ? cols[k] : C.muted, font: NUM });
   }
+  s += txt(1020, 1876, "paddocktimes.com", 26, { w: 600, fill: C.muted, anchor: "end" });
   return s;
 }
 
-// Top chrome: brand kicker, chequered band, progress bar with the chapter.
-function chrome(T: number, total: number, chapter: string): string {
-  let s = `<rect x="60" y="96" width="10" height="52" fill="${C.accent}" transform="skewX(-14)"/>` + txt(88, 140, spec.kicker, 44, { ls: 1 });
-  // chequered band
-  for (let i = 0; i < 48; i++) {
-    for (let r = 0; r < 2; r++) {
-      if ((i + r) % 2 === 0) s += `<rect x="${60 + i * 20}" y="${170 + r * 10}" width="20" height="10" fill="${C.ink}" opacity="0.85"/>`;
-    }
-  }
-  s += txt(60, 240, chapter.toUpperCase(), 30, { w: 700, fill: C.muted, ls: 2 });
-  const sec = Math.floor(T), cs = Math.floor((T - sec) * 1000);
-  s += txt(1020, 240, `0:${String(sec).padStart(2, "0")}.${String(cs).padStart(3, "0")}`, 32, { w: 700, fill: C.gold, anchor: "end" });
-  s += `<rect x="60" y="258" width="960" height="8" rx="4" fill="${C.rule}"/><rect x="60" y="258" width="${(960 * clamp(T / total)).toFixed(1)}" height="8" rx="4" fill="${C.accent}"/>`;
-  return s;
+const heading = (t: number, title: string, sub?: string) =>
+  slide(t, 0.05, txt(60, 330, title, 76) + (sub ? txt(1020, 330, sub, 34, { w: 700, fill: C.muted, anchor: "end" }) : "") +
+    `<rect x="60" y="356" width="120" height="6" rx="3" fill="${C.cool}"/>`);
+
+// A timing-tower row: position chip, team bar, code, surname, time or gap.
+function towerRow(r: Row, y: number, h: number, size: number): string {
+  const out = r.mark === "out", pole = r.mark === "pole";
+  const op = out ? 0.62 : 1;
+  const chipFill = pole ? C.gold : out ? "none" : C.panel2;
+  const chipText = pole ? "#1a1500" : out ? C.out : C.ink;
+  let s = `<g opacity="${op}">`;
+  s += `<rect x="60" y="${y}" width="960" height="${h - 8}" rx="10" fill="${pole ? "#2b2508" : C.panel}"/>`;
+  s += `<rect x="72" y="${y + 8}" width="${h - 24}" height="${h - 24}" rx="8" fill="${chipFill}"${out ? ` stroke="${C.out}" stroke-width="2"` : ""}/>`;
+  s += txt(72 + (h - 24) / 2, y + h * 0.64, r.pos, size * 0.9, { fill: chipText, anchor: "middle", font: NUM });
+  s += `<rect x="${72 + h - 10}" y="${y + 10}" width="6" height="${h - 28}" rx="3" fill="${r.colour}"/>`;
+  const x0 = 72 + h + 12;
+  s += txt(x0, y + h * 0.64, r.code, size);
+  s += txt(x0 + size * 2.3, y + h * 0.64, r.name, size * 0.74, { w: 600, fill: C.muted });
+  if (r.note) s += `<rect x="${x0 + size * 2.3 + r.name.length * size * 0.34 + 16}" y="${y + h * 0.25}" width="${r.note.length * size * 0.36 + 24}" height="${h * 0.5}" rx="6" fill="${out ? "#3a1416" : C.coolSoft}"/>` +
+    txt(x0 + size * 2.3 + r.name.length * size * 0.34 + 28, y + h * 0.6, r.note.toUpperCase(), size * 0.52, { w: 700, fill: out ? C.out : C.cool, ls: 1 });
+  s += txt(1000, y + h * 0.64, r.time, size, { w: 700, fill: pole ? C.gold : out ? C.out : C.ink2, anchor: "end", font: NUM });
+  return s + "</g>";
 }
 
-function rowSvg(r: Row, y: number, h: number, size: number, width = 960): string {
-  const fill = r.mark === "pole" ? "#3a2f05" : r.mark === "out" ? "#3a0f10" : r.mark === "hi" ? "#22202a" : "#16141b";
-  const posFill = r.mark === "pole" ? C.gold : r.mark === "out" ? C.out : C.muted;
-  return `<rect x="60" y="${y}" width="${width}" height="${h - 6}" rx="8" fill="${fill}"/>` +
-    `<rect x="60" y="${y}" width="8" height="${h - 6}" rx="4" fill="${r.colour}"/>` +
-    txt(110, y + h * 0.66, r.pos, size, { fill: posFill, anchor: "middle" }) +
-    txt(160, y + h * 0.66, r.code, size) +
-    txt(160 + size * 2.4, y + h * 0.66, r.name, size * 0.78, { w: 600, fill: C.muted }) +
-    (r.note ? txt(160 + size * 2.4 + r.name.length * size * 0.36 + 18, y + h * 0.66, r.note, size * 0.7, { w: 600, fill: r.mark === "out" ? C.out : C.gold }) : "") +
-    txt(60 + width - 24, y + h * 0.66, r.time, size, { w: 700, fill: r.mark === "pole" ? C.gold : C.ink, anchor: "end" });
+function callouts(t: number, notes: string[] | undefined, y0: number): string {
+  let s = "";
+  (notes ?? []).forEach((nt, i) => {
+    const y = y0 + i * 92;
+    s += slide(t, 1.4 + i * 0.45, `<rect x="60" y="${y}" width="960" height="76" rx="12" fill="${C.panel}"/><rect x="60" y="${y}" width="8" height="76" rx="4" fill="${C.cool}"/>` +
+      txt(92, y + 50, nt, 38, { w: 700, fill: C.ink2 }));
+  });
+  return s;
 }
 
 // ---------- scenes ----------
 function scene(sc: Scene, t: number): string {
   switch (sc.kind) {
     case "title": {
-      const top = 960 - (sc.lines.length * 175) / 2; // the block sits around the middle
-      let s = sc.kicker ? rise(t, 0.05, txt(60, top - 30, sc.kicker, 40, { w: 700, fill: C.accent, ls: 2 })) : "";
+      const top = 560;
+      let s = sc.kicker ? slide(t, 0.05, txt(60, top - 30, sc.kicker, 40, { w: 700, fill: C.cool, ls: 2 })) : "";
       sc.lines.forEach((l, i) => {
         const hi = i === sc.accent;
-        const size = l.length > 14 ? 120 : 150;
-        s += rise(t, 0.15 + i * 0.22,
-          (hi ? `<rect x="54" y="${top + 120 + i * 175 - size * 0.86}" width="${Math.min(990, l.length * size * 0.62 + 50)}" height="${size * 1.02}" fill="${C.accent}" transform="skewX(-8)"/>` : "") +
-          txt(70, top + 120 + i * 175, l, size));
+        s += slide(t, 0.15 + i * 0.2, txt(60, top + 130 + i * 170, l, l.length > 12 ? 128 : 150, { fill: hi ? C.cool : C.ink }));
       });
-      if (sc.sub) s += rise(t, 0.3 + sc.lines.length * 0.22, txt(60, top + 140 + sc.lines.length * 175, sc.sub, 46, { w: 600, fill: C.muted }));
+      if (sc.sub) s += slide(t, 0.25 + sc.lines.length * 0.2, txt(60, top + 150 + sc.lines.length * 170, sc.sub, 46, { w: 600, fill: C.muted }));
       return s;
     }
     case "clock": {
       const p = easeOut(clamp((t - 0.6) / (sc.dur - 2.2)));
       const v = sc.from + (sc.to - sc.from) * p;
       const hh = Math.floor(v / 3600), mm = Math.floor((v % 3600) / 60), ss = Math.floor(v % 60);
-      const clockStr = `${hh}:${String(mm).padStart(2, "0")}:${String(ss).padStart(2, "0")}`;
-      return rise(t, 0.05, `<rect x="60" y="560" width="70" height="16" fill="${C.accent}"/>` + txt(60, 520, sc.label, 50, { w: 700, fill: C.accent })) +
-        rise(t, 0.2, txt(540, 860, clockStr, 260, { anchor: "middle" })) +
-        rise(t, 0.5, txt(540, 960, sc.caption, 54, { w: 700, fill: C.muted, anchor: "middle" })) +
-        (sc.note ? rise(t, 1.2, wrap(sc.note, 540, 1120, 46, 32, "middle", C.ink)) : "");
+      const str = `${hh}:${String(mm).padStart(2, "0")}:${String(ss).padStart(2, "0")}`;
+      return heading(t, sc.title ?? "", undefined) +
+        slide(t, 0.15, `<rect x="60" y="540" width="${sc.label.length * 24 + 48}" height="64" rx="12" fill="#3a1416"/>` + txt(84, 584, sc.label, 38, { w: 800, fill: C.out, ls: 1 })) +
+        slide(t, 0.3, txt(60, 900, str, 240, { font: NUM, w: 800 })) +
+        slide(t, 0.5, txt(60, 990, sc.caption, 50, { w: 700, fill: C.muted })) +
+        (sc.note ? slide(t, 1.1, wrap(sc.note, 60, 1180, 46, 36, "start", C.ink2)) : "");
     }
     case "table": {
       const n = sc.rows.length;
-      const h = Math.min(86, Math.floor(1240 / n));
-      const size = Math.min(44, h * 0.56);
-      let s = rise(t, 0.05, `<rect x="60" y="330" width="10" height="64" fill="${C.accent}" transform="skewX(-14)"/>` + txt(88, 384, sc.title, 64) + txt(1020, 384, sc.sub, 38, { w: 700, fill: C.muted, anchor: "end" }));
-      sc.rows.forEach((r, i) => {
-        s += rise(t, 0.25 + i * Math.min(0.06, 1.2 / n), rowSvg(r, 430 + i * h, h, size), 0.35);
-      });
-      const ny = 430 + n * h + 70; // notes right under the table
-      (sc.notes ?? []).forEach((nt, i) => {
-        s += rise(t, 1.6 + i * 0.5, `<rect x="60" y="${ny + i * 64 - 40}" width="8" height="48" fill="${C.accent}"/>` + txt(86, ny + i * 64, nt, 40, { w: 700 }));
-      });
-      return s;
+      const h = Math.min(92, Math.floor(1180 / n));
+      const size = Math.min(46, h * 0.56);
+      let s = heading(t, sc.title ?? "", sc.sub);
+      sc.rows.forEach((r, i) => (s += slide(t, 0.2 + i * Math.min(0.06, 1.1 / n), towerRow(r, 410 + i * h, h, size), 0.3)));
+      return s + callouts(t, sc.notes, 410 + n * h + 30);
     }
     case "big": {
-      let s = rise(t, 0.1, txt(540, 900, sc.value, 300, { anchor: "middle", fill: C.ink }));
-      s += rise(t, 0.35, txt(540, 1000, sc.caption, 56, { w: 700, fill: C.gold, anchor: "middle" }));
-      if (sc.left && sc.right) {
-        s += rise(t, 0.6, rowSvg(sc.left, 1110, 100, 50) + rowSvg(sc.right, 1210, 100, 50));
-      }
-      if (sc.note) s += rise(t, 1.1, wrap(sc.note, 540, 1450, 46, 34, "middle", C.ink));
+      let s = "";
+      if (sc.number) s += slide(t, 0, txt(1040, 1060, sc.number, 900, { anchor: "end", fill: "none", font: NUM, extra: `stroke="${sc.colour ?? C.accent}" stroke-width="10" stroke-opacity="0.55"` }), 0.6);
+      s += heading(t, sc.title ?? "");
+      s += slide(t, 0.15, txt(60, 820, sc.value, 300, { font: NUM, fill: C.cool }));
+      s += slide(t, 0.35, txt(60, 910, sc.caption, 50, { w: 700, fill: C.ink2 }));
+      if (sc.left && sc.right) s += slide(t, 0.6, towerRow(sc.left, 1000, 104, 50) + towerRow(sc.right, 1104, 104, 50));
+      if (sc.note) s += slide(t, 1.1, wrap(sc.note, 60, 1340, 44, 38, "start", C.ink2));
       return s;
     }
     case "list": {
-      let s = rise(t, 0.05, `<rect x="60" y="330" width="10" height="64" fill="${C.accent}" transform="skewX(-14)"/>` + txt(88, 384, sc.title, 64));
+      let s = heading(t, sc.title ?? "");
       sc.items.forEach((it, i) => {
-        const y = 480 + i * 190;
-        s += rise(t, 0.3 + i * 0.35, `<rect x="60" y="${y}" width="960" height="170" rx="12" fill="${C.panel}"/><rect x="60" y="${y}" width="10" height="170" rx="5" fill="${it.colour}"/>` +
-          txt(100, y + 70, it.head, 56) + txt(100, y + 132, it.text, 40, { w: 600, fill: C.muted }));
+        const y = 430 + i * 200;
+        s += slide(t, 0.3 + i * 0.3, `<rect x="60" y="${y}" width="960" height="176" rx="14" fill="${C.panel}"/><rect x="60" y="${y}" width="12" height="176" rx="6" fill="${it.colour}"/>` +
+          txt(100, y + 76, it.head, 58) + txt(100, y + 138, it.text, 40, { w: 600, fill: C.muted }));
       });
       return s;
     }
     case "outro": {
       let s = "";
-      sc.lines.forEach((l, i) => (s += rise(t, 0.1 + i * 0.25, txt(540, 760 + i * 140, l, i === 0 ? 120 : 90, { anchor: "middle", fill: i === 0 ? C.ink : C.accent }))));
-      s += rise(t, 0.8, txt(540, 760 + sc.lines.length * 140 + 40, sc.sub, 48, { w: 700, fill: C.muted, anchor: "middle" }));
-      s += rise(t, 1.0, `<rect x="450" y="1300" width="180" height="180" rx="30" fill="${C.accent}"/>` + txt(540, 1425, "PT", 110, { anchor: "middle", fill: "#fff" }));
-      if (sc.credit) s += rise(t, 1.2, txt(540, 1620, sc.credit, 30, { w: 600, fill: C.muted, anchor: "middle" }));
+      sc.lines.forEach((l, i) => (s += slide(t, 0.1 + i * 0.25, txt(60, 700 + i * 150, l, i === 0 ? 110 : 96, { fill: i === 0 ? C.ink : C.cool }))));
+      s += slide(t, 0.7, txt(60, 700 + sc.lines.length * 150 + 20, sc.sub, 48, { w: 700, fill: C.muted }));
+      if (sc.credit) s += slide(t, 1.0, wrap(sc.credit, 60, 1640, 28, 70, "start", C.muted));
       return s;
     }
   }
 }
 
-// Greedy word wrap for a block of text.
 function wrap(s: string, x: number, y: number, size: number, max: number, anchor: string, fill: string): string {
-  const words = s.split(" ");
   const lines: string[] = [];
   let cur = "";
-  for (const w of words) {
+  for (const w of s.split(" ")) {
     if ((cur + " " + w).trim().length > max) {
       lines.push(cur.trim());
       cur = w;
     } else cur += " " + w;
   }
   if (cur.trim()) lines.push(cur.trim());
-  return lines.map((l, i) => txt(x, y + i * size * 1.25, l, size, { w: 600, fill, anchor })).join("");
+  return lines.map((l, i) => txt(x, y + i * size * 1.3, l, size, { w: 600, fill, anchor })).join("");
 }
 
 // ---------- timeline ----------
-const XF = 0.35; // cross-fade between scenes, s
+const WIPE = 0.5; // the team-colour wipe into each scene, s
 const starts: number[] = [];
 let acc = 0;
 for (const sc of spec.scenes) {
@@ -186,10 +225,15 @@ function frame(T: number): string {
   if (i < 0) i = spec.scenes.length - 1;
   const sc = spec.scenes[i];
   const t = T - starts[i];
-  let body = scene(sc, t);
-  // fade out at the end of the scene (not the last one)
-  if (i < spec.scenes.length - 1 && t > sc.dur - XF) body = `<g opacity="${clamp((sc.dur - t) / XF).toFixed(3)}">${body}</g>`;
-  return `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}">${background(T)}${chrome(T, TOTAL, sc.chapter)}${body}</svg>`;
+  let s = `<rect width="${W}" height="${H}" fill="${C.bg}"/>` + circuit(T) + chrome(T, TOTAL) + scene(sc, t);
+  // a band of the scene's colour sweeps across as it opens
+  if (i > 0 && t < WIPE) {
+    const p = easeInOut(t / WIPE);
+    const x = -W * 0.6 + p * W * 2.2;
+    s += `<g transform="skewX(-12)"><rect x="${x.toFixed(1)}" y="0" width="${(W * 0.5).toFixed(0)}" height="${H}" fill="${sc.wipe ?? C.accent}"/>` +
+      `<rect x="${(x - 50).toFixed(1)}" y="0" width="30" height="${H}" fill="${C.ink}" opacity="0.9"/></g>`;
+  }
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}">${s}</svg>`;
 }
 
 const render = (T: number) => new Resvg(frame(T), { font: { fontFiles, loadSystemFonts: false, defaultFontFamily: FONT } }).render().asPng();
