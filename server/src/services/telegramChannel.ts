@@ -165,7 +165,9 @@ async function candidates(now: number): Promise<ChannelPost[]> {
 
   const fresh = new Date(now - ARTICLE_FRESH_DAYS * 24 * 3600_000).toISOString().slice(0, 10);
   const teasers = await channelTeasers().catch(() => new Map<string, string>());
-  for (const a of await listArticles("uk").catch(() => [])) if (a.date >= fresh) out.push(articlePost(a, teasers.get(a.slug)));
+  // oldest first, so two new articles go out in the order they were written
+  const articles = (await listArticles("uk").catch(() => [])).filter((a) => a.date >= fresh).reverse();
+  for (const a of articles) out.push(articlePost(a, teasers.get(a.slug)));
 
   const review = await getSeasonReview(season).catch(() => null);
   if (review?.final) out.push(seasonPost(review));
