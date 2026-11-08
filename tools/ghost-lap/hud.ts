@@ -66,7 +66,7 @@ function timeAt(L: Lap, f: number): number {
 const A = load("lap_a.json"), B = load("lap_b.json");
 const meta = JSON.parse(fs.readFileSync(path.join(FRAMES, "frames.json"), "utf8"));
 const fps: number = meta.fps, leadIn: number = meta.lead_in;
-const total = meta.frames + Math.round(Number(HOLD) * fps);
+const total = process.env.UPTO ? Number(process.env.UPTO) : meta.frames + Math.round(Number(HOLD) * fps); // UPTO: only the first frames, for a preview
 fs.mkdirSync(OUT, { recursive: true });
 
 const carAt = (L: Lap, t: number) => {
