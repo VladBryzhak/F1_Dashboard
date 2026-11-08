@@ -1,4 +1,4 @@
-import { listArticles } from "./articles";
+import { channelTeasers, listArticles } from "./articles";
 import { getCalendar, getCurrentSeason, getSeasonReview } from "./f1db";
 import { gpTitle } from "./gpNames";
 import { SITE_URL } from "./pageHtml";
@@ -18,11 +18,12 @@ import type { ArticleSummary, RacePreview, SeasonReview, SessionHero } from "../
 // who may post. Without both nothing is posted. TELEGRAM_DRY_RUN=1 logs the
 // posts instead of sending them.
 //
-// Render's free plan keeps no files across restarts, so what was posted is
-// remembered in memory only: the first check after a start marks everything
-// already there as posted, and a session or article is only posted while it
-// is fresh. A post can be missed when a deploy lands at that moment, but none
-// is posted twice.
+// Render's free plan keeps no files across restarts, so the channel itself
+// remembers what was posted: before posting, the server reads the channel's
+// public page (t.me/s/<name>) and skips a post whose opening lines are
+// already there. That way an article that arrives with a deploy (which
+// restarts the server) is still posted, and nothing is posted twice. If the
+// page can't be read, nothing is posted that round.
 
 const TOKEN = process.env.TELEGRAM_BOT_TOKEN;
 const CHANNEL = process.env.TELEGRAM_CHANNEL;
@@ -37,7 +38,6 @@ const SESSION_FRESH_MS = 3 * 3600_000; // post a session's result within 3 hours
 const PREVIEW_FROM_MS = 10 * 3600_000; // race-day preview: 10 hours before the start…
 const PREVIEW_UNTIL_MS = 1 * 3600_000; // …until an hour before it
 const ARTICLE_FRESH_DAYS = 2;
-const bootAt = Date.now();
 
 export interface ChannelPost {
   key: string; // what it is about, so it is posted once
@@ -123,11 +123,13 @@ export function previewPost(p: RacePreview, raceStart: number): ChannelPost {
   };
 }
 
-export function articlePost(a: ArticleSummary): ChannelPost {
+// A new article: its headline and a teaser of a few sentences (uk.md's
+// `telegram`, else its description) to bring readers to the site.
+export function articlePost(a: ArticleSummary, teaser = a.description): ChannelPost {
   const url = ukUrl(`/articles/${a.slug}`);
   return {
     key: `article:${a.slug}`,
-    text: [`📝 <b>${esc(a.title)}</b>`, "", esc(a.description), "", url].join("\n"),
+    text: [`📝 <b>${esc(a.title)}</b>`, "", esc(teaser), "", `Читати: ${url}`].join("\n"),
     url,
   };
 }
@@ -146,11 +148,8 @@ export function seasonPost(r: SeasonReview): ChannelPost {
 async function candidates(now: number): Promise<ChannelPost[]> {
   const out: ChannelPost[] = [];
 
-  // A session that ended before this start may have been posted already (its
-  // result can arrive after the first check).
   const hero = latestSessionHero();
-  const ended = hero ? Date.parse(hero.endedAt) : 0;
-  if (hero && now - ended < SESSION_FRESH_MS && ended > bootAt) out.push(sessionPost(hero));
+  if (hero && now - Date.parse(hero.endedAt) < SESSION_FRESH_MS) out.push(sessionPost(hero));
 
   const season = await getCurrentSeason();
   const cal = await getCalendar(String(season)).catch(() => null);
@@ -165,7 +164,8 @@ async function candidates(now: number): Promise<ChannelPost[]> {
   }
 
   const fresh = new Date(now - ARTICLE_FRESH_DAYS * 24 * 3600_000).toISOString().slice(0, 10);
-  for (const a of await listArticles("uk").catch(() => [])) if (a.date >= fresh) out.push(articlePost(a));
+  const teasers = await channelTeasers().catch(() => new Map<string, string>());
+  for (const a of await listArticles("uk").catch(() => [])) if (a.date >= fresh) out.push(articlePost(a, teasers.get(a.slug)));
 
   const review = await getSeasonReview(season).catch(() => null);
   if (review?.final) out.push(seasonPost(review));
@@ -193,9 +193,32 @@ async function send(post: ChannelPost): Promise<void> {
   if (!res.ok) throw new Error(`Telegram ${res.status}: ${(await res.text().catch(() => "")).slice(0, 200)}`);
 }
 
-const posted = new Set<string>();
-let seeded = false;
+const posted = new Set<string>(); // this run's own posts, so the page isn't read for them again
 let testDone = false;
+
+// Letters and digits only, lower case: compares a post with the channel page
+// whatever the markup, spacing or emoji around the words.
+export const signature = (text: string) =>
+  text
+    .replace(/<[^>]+>/g, " ")
+    .replace(/&(amp|lt|gt|quot|#39|nbsp);/g, " ")
+    .toLowerCase()
+    .replace(/[^\p{L}\p{N}]+/gu, "");
+
+// The opening of a post that identifies it: its first two lines with text.
+export const postId = (post: ChannelPost) =>
+  signature(post.text.split("\n").filter((l) => l.trim()).slice(0, 2).join(" "));
+
+async function channelPage(): Promise<string | null> {
+  const name = CHANNEL?.replace(/^@/, "");
+  if (!name || /^-?\d+$/.test(name)) return null; // a numeric id has no public page
+  try {
+    const res = await fetch(`https://t.me/s/${name}`, { signal: AbortSignal.timeout(10_000) });
+    return res.ok ? signature(await res.text()) : null;
+  } catch {
+    return null;
+  }
+}
 
 async function testPost(): Promise<void> {
   const hero = latestSessionHero();
@@ -217,16 +240,16 @@ async function testPost(): Promise<void> {
 
 async function check(): Promise<void> {
   if (TEST_POST && !testDone) await testPost();
-  const posts = await candidates(Date.now());
-  if (!seeded) {
-    // Everything there at start was there before: don't post it again.
-    posts.forEach((p) => posted.add(p.key));
-    seeded = true;
+  const posts = (await candidates(Date.now())).filter((p) => !posted.has(p.key));
+  if (!posts.length) return;
+  const page = await channelPage();
+  if (page == null) {
+    console.warn("[telegram] channel page unreadable, nothing posted this round");
     return;
   }
   for (const p of posts) {
-    if (posted.has(p.key)) continue;
     posted.add(p.key);
+    if (page.includes(postId(p))) continue; // already in the channel
     try {
       await send(p);
       console.log(`[telegram] posted ${p.key}`);

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { articlePost, previewPost, seasonPost, sessionPost } from "./telegramChannel";
+import { articlePost, postId, previewPost, seasonPost, sessionPost, signature } from "./telegramChannel";
 import type { ArticleSummary, RacePreview, SeasonReview, SessionHero } from "../types/f1";
 
 const row = (position: number, driverName: string, constructorName: string, time: string | null) => ({
@@ -72,5 +72,18 @@ describe("channel posts", () => {
     } as unknown as SeasonReview;
     expect(seasonPost(r).text).toContain("Чемпіон світу: Kimi Antonelli (Mercedes)");
     expect(seasonPost(r).url).toBe("https://paddocktimes.com/uk/seasons/2026");
+  });
+
+  it("posts an article's teaser and a link to read it", () => {
+    const a = { slug: "x", title: "T", description: "D", date: "2026-11-08" } as ArticleSummary;
+    expect(articlePost(a, "Three short lines.").text).toBe("📝 <b>T</b>\n\nThree short lines.\n\nЧитати: https://paddocktimes.com/uk/articles/x");
+    expect(articlePost(a).text).toContain("\n\nD\n\n");
+  });
+
+  it("recognises a post on the channel page whatever the markup", () => {
+    const post = sessionPost(hero("race", "Race"));
+    const page = `<div class="tgme_widget_message_text"><i class="emoji">🏁</i> <b>Гран-прі Сан-Паулу · Гонка</b><br/><br/>🥇 Max Verstappen (Red Bull)<br/></div>`;
+    expect(signature(page).includes(postId(post))).toBe(true);
+    expect(signature(page).includes(postId(sessionPost(hero("qualifying", "Qualifying"))))).toBe(false);
   });
 });

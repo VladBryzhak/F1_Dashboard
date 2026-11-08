@@ -246,6 +246,7 @@ interface Text {
   title: string;
   description: string;
   readingLabel: string | null;
+  telegram: string | null; // the channel post's teaser (uk.md), else the description
   body: string;
 }
 
@@ -286,7 +287,7 @@ function readText(file: string): Text | string {
   }
   const { fields, body } = splitFrontMatter(src);
   if (!fields.title || !fields.description) return `${path.basename(file)}: title and description are required`;
-  return { title: fields.title, description: fields.description, readingLabel: fields.readingLabel || null, body };
+  return { title: fields.title, description: fields.description, readingLabel: fields.readingLabel || null, telegram: fields.telegram || null, body };
 }
 
 // Every article on disk that is complete in both languages. A broken one is
@@ -360,6 +361,11 @@ async function summary(a: Loaded, lang: Lang): Promise<ArticleSummary> {
     minutes: readingMinutes(t.body),
     cover: cover(a, lang),
   };
+}
+
+/** The Telegram teaser of each article (uk.md's `telegram`, else its description), by slug. */
+export async function channelTeasers(): Promise<Map<string, string>> {
+  return new Map((await all()).map((a) => [a.slug, a.text.uk.telegram ?? a.text.uk.description]));
 }
 
 export async function listArticles(lang: Lang): Promise<ArticleSummary[]> {

@@ -73,7 +73,7 @@ Our own articles, kept in the repo as files and published with a deploy. Each ar
   - `day`: `fri` | `sat` | `sun` | `midweek`;
   - `tag`: `analysis` | `race` | `sprint` | `qualifying` | `practice` | `drivers` | `teams` | `preview`;
   - `cover`: `driverId` + `constructorId` + `number` for a driver over their number, `reading` for the key number, and an optional `credit`.
-- `en.md` and `uk.md` hold front matter (`title`, `description`, `readingLabel`: the label of the cover's reading) and the body in Markdown.
+- `en.md` and `uk.md` hold front matter (`title`, `description`, `readingLabel`: the label of the cover's reading; `uk.md` may add `telegram`: a 3-4 sentence teaser for the channel post, else the description is used) and the body in Markdown.
 - Rules for the body:
   - links to our pages are written without the language (`/drivers/…`); the Ukrainian text gets `/uk/…` by itself;
   - raw HTML shows as text.
@@ -121,7 +121,7 @@ The race replay shows the team radio the broadcast aired, with captions in both 
 
 - The server posts to the public channel in Ukrainian with /uk links: a session's top three (from the home hero, within 3 hours of its end), the race-day preview (10 to 1 hours before the start), a new article, and the season review once final. Pictures are only Telegram's link preview of our own pages (og:image): never post others' photos.
 - Env on Render: `TELEGRAM_CHANNEL` (@username or id) beside the existing `TELEGRAM_BOT_TOKEN`; the bot must be a channel admin allowed to post. `TELEGRAM_DRY_RUN=1` logs posts instead; `TELEGRAM_TEST_POST=1` (one deploy only) posts the latest session's result a minute after start. Without the channel nothing runs.
-- No disk on Render's free plan: the first check after a start marks all current posts as done, and a session that ended before the start is skipped, so nothing is posted twice (one can be missed during a deploy).
+- No disk on Render's free plan, so the channel is the memory: before posting, the server reads `t.me/s/<channel>` and skips a post whose first two lines (letters and digits only) are already there. An article that arrives with a deploy is still posted; if the page can't be read, nothing is posted that round.
 - The site links the channel (footer, race pages, articles) through `client/src/lib/telegram.ts` `TELEGRAM_URL`; empty hides the links.
 
 ## Generated data (server/src/data)
