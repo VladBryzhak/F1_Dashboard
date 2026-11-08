@@ -305,8 +305,10 @@ def noisy(name, c1, c2, scale, rough=0.8, detail=6.0, bump=0.0):
     return m
 
 
+WET = os.environ.get("GHOST_WET") == "1"  # a wet track under cloud, cars on intermediates
 M = {
-    "asphalt": noisy("asphalt", (0.018, 0.018, 0.021), (0.04, 0.04, 0.045), 9.0, 0.82, bump=0.08),
+    "asphalt": (noisy("asphalt", (0.006, 0.006, 0.008), (0.016, 0.016, 0.019), 9.0, 0.28, bump=0.03) if WET
+                else noisy("asphalt", (0.018, 0.018, 0.021), (0.04, 0.04, 0.045), 9.0, 0.82, bump=0.08)),
     "rubber": material("rubber", (0.008, 0.008, 0.01), 0.7, alpha=0.4),
     "runoff": noisy("runoff", (0.07, 0.07, 0.075), (0.11, 0.11, 0.115), 5.0, 0.9),
     "gravel": noisy("gravel", (0.33, 0.27, 0.19), (0.5, 0.43, 0.32), 40.0, 0.95, bump=0.25),
@@ -760,28 +762,320 @@ def build_car(tag, lap, ghost):
     return root, wheels
 
 
-CAR_A, WHEELS_A = build_car("carA", A, False)
-CAR_B, WHEELS_B = build_car("carB", B, True)
+# ---------------------------------------------------------------- a real 2026 car model
+# GHOST_MODEL: a .glb of a livery-free 2026-regulation car (e.g. "F1 2026
+# concept" by Qvist_designs, CC BY 4.0: credit it). It comes as one grey CAD
+# mesh in millimetres, nose to -X; here it is scaled, turned nose-forward,
+# lightened, its four wheels cut out to spin (the fronts also steer), and
+# painted by zones in the team's colours. Colours and layout only: no team or
+# sponsor logos, which are trademarks.
+LIVERY = {
+    # primary (upper body), secondary (lower body, sidepods), wing, accent (stripe), [wing flaps and endplates]
+    "McLaren": ("#ff7a00", "#1c1d21", "#1c1d21", "#ff7a00"),
+    "Mercedes": ("#c6cbd1", "#0c0d0f", "#0c0d0f", "#27f4d2", "#0c0d0f"),
+    "Ferrari": ("#d40010", "#d40010", "#111111", "#f4f4f4"),
+    "Red Bull Racing": ("#1b2a5b", "#1b2a5b", "#121a33", "#e10600"),
+    "Racing Bulls": ("#f2f2f5", "#1d4ed8", "#111111", "#e10600"),
+    "Aston Martin": ("#006f62", "#006f62", "#111111", "#cedc00"),
+    "Williams": ("#1868db", "#0b1b3f", "#0b1b3f", "#00a3e0"),
+    "Alpine": ("#ff87bc", "#0a54c1", "#111111", "#ffffff"),
+    "Haas F1 Team": ("#f0f0f0", "#111111", "#111111", "#e10600"),
+    "Audi": ("#a0a5ab", "#111111", "#111111", "#f50537"),
+    "Cadillac": ("#111111", "#c9a227", "#111111", "#f4f4f4"),
+}
+
+
+def livery_of(lap):
+    """(primary, secondary, wing, accent, endplates) of the lap's team."""
+    for k, v in LIVERY.items():
+        if k.lower() in lap["team"].lower() or lap["team"].lower() in k.lower():
+            return v if len(v) == 5 else (*v, v[3])
+    c = lap["colour"]
+    return (c, "#1a1a1a", "#111111", "#f4f4f4", "#f4f4f4")
+
+
+MODEL_MESH = None
+
+
+def model_mesh():
+    """The model, imported once: joined, in metres, nose to +X, lightened."""
+    global MODEL_MESH
+    if MODEL_MESH:
+        return MODEL_MESH
+    before = set(bpy.data.objects)
+    bpy.ops.import_scene.gltf(filepath=os.environ["GHOST_MODEL"])
+    obs = [o for o in bpy.data.objects if o not in before and o.type == "MESH"]
+    for o in obs:  # keep the importer's parent rotation (glTF is Y-up) before dropping the parents
+        mw = o.matrix_world.copy()
+        o.parent = None
+        o.matrix_world = mw
+    for o in bpy.data.objects:
+        if o not in before and o.type != "MESH":
+            bpy.data.objects.remove(o)
+    bpy.ops.object.select_all(action="DESELECT")
+    for o in obs:
+        o.select_set(True)
+    bpy.context.view_layer.objects.active = obs[0]
+    bpy.ops.object.join()
+    ob = bpy.context.object
+    bpy.ops.object.transform_apply(location=True, rotation=True, scale=True)
+    me = ob.data
+    mat = Matrix.Rotation(math.pi, 4, "Z") @ Matrix.Scale(0.001, 4)
+    me.transform(mat)
+    zs_ = [v.co.z for v in me.vertices]
+    xs_ = [v.co.x for v in me.vertices]
+    me.transform(Matrix.Translation((-(max(xs_) + min(xs_)) / 2 + 0.25, 0, -min(zs_))))
+    dec = ob.modifiers.new("lighter", "DECIMATE")
+    dec.ratio = float(os.environ.get("GHOST_DECIMATE", "0.4"))
+    bpy.ops.object.modifier_apply(modifier=dec.name)
+    col.objects.unlink(ob) if ob.name in col.objects else None
+    MODEL_MESH = ob.data
+    return MODEL_MESH
+
+
+def livery_paint(name, primary, secondary, accent, front_x):
+    """Body paint split by height in the car's own space, so the line between
+    the colours runs straight and clean whatever the mesh's triangles: the
+    secondary colour below, a thin accent stripe, the primary above. The line
+    sits low on the nose and steps up to the sidepods' shoulder behind it."""
+    m = material(name, primary, 0.3, metal=0.2, coat=0.35)  # today's cars are satin, not gloss
+    nt = m.node_tree
+    bs = nt.nodes["Principled BSDF"]
+    tc = nt.nodes.new("ShaderNodeTexCoord")
+    sep = nt.nodes.new("ShaderNodeSeparateXYZ")
+    nt.links.new(tc.outputs["Object"], sep.inputs["Vector"])
+    split = nt.nodes.new("ShaderNodeMapRange")  # x -> height of the line
+    split.inputs["From Min"].default_value = front_x - 1.0
+    split.inputs["From Max"].default_value = front_x - 0.5
+    split.inputs["To Min"].default_value = 0.5
+    split.inputs["To Max"].default_value = 0.32
+    nt.links.new(sep.outputs["X"], split.inputs["Value"])
+    d = nt.nodes.new("ShaderNodeMath")
+    d.operation = "SUBTRACT"
+    nt.links.new(sep.outputs["Z"], d.inputs[0])
+    nt.links.new(split.outputs["Result"], d.inputs[1])
+    off = nt.nodes.new("ShaderNodeMath")
+    off.operation = "ADD"
+    off.inputs[1].default_value = 0.5
+    nt.links.new(d.outputs["Value"], off.inputs[0])
+    ramp = nt.nodes.new("ShaderNodeValToRGB")
+    ramp.color_ramp.interpolation = "CONSTANT"
+    els = ramp.color_ramp.elements
+    els[0].position, els[0].color = 0.0, (*secondary, 1)
+    els[1].position, els[1].color = 0.5, (*primary, 1)
+    nt.links.new(off.outputs["Value"], ramp.inputs["Fac"])
+    # the stripe: within 22 mm of the line, on the car's sides only
+    near = nt.nodes.new("ShaderNodeMath")
+    near.operation = "COMPARE"
+    near.inputs[1].default_value = 0.0
+    near.inputs[2].default_value = 0.022
+    nt.links.new(d.outputs["Value"], near.inputs[0])
+    geo = nt.nodes.new("ShaderNodeNewGeometry")
+    to_obj = nt.nodes.new("ShaderNodeVectorTransform")
+    to_obj.vector_type = "NORMAL"
+    to_obj.convert_from, to_obj.convert_to = "WORLD", "OBJECT"
+    nt.links.new(geo.outputs["Normal"], to_obj.inputs["Vector"])
+    nsep = nt.nodes.new("ShaderNodeSeparateXYZ")
+    nt.links.new(to_obj.outputs["Vector"], nsep.inputs["Vector"])
+    nz = nt.nodes.new("ShaderNodeMath")
+    nz.operation = "ABSOLUTE"
+    nt.links.new(nsep.outputs["Z"], nz.inputs[0])
+    side = nt.nodes.new("ShaderNodeMath")
+    side.operation = "LESS_THAN"
+    side.inputs[1].default_value = 0.6
+    nt.links.new(nz.outputs["Value"], side.inputs[0])
+    both = nt.nodes.new("ShaderNodeMath")
+    both.operation = "MULTIPLY"
+    nt.links.new(near.outputs["Value"], both.inputs[0])
+    nt.links.new(side.outputs["Value"], both.inputs[1])
+    mix = nt.nodes.new("ShaderNodeMix")
+    mix.data_type = "RGBA"
+    mix.inputs["B"].default_value = (*accent, 1)
+    nt.links.new(ramp.outputs["Color"], mix.inputs["A"])
+    nt.links.new(both.outputs["Value"], mix.inputs["Factor"])
+    nt.links.new(mix.outputs["Result"], bs.inputs["Base Color"])
+    return m
+
+
+def wing_paint(name, base, flaps):
+    """Front wing: dark planes, the upper flaps and the endplates in the
+    accent colour, split in the shader for clean edges."""
+    m = material(name, base, 0.35, metal=0.2)
+    nt = m.node_tree
+    bs = nt.nodes["Principled BSDF"]
+    tc = nt.nodes.new("ShaderNodeTexCoord")
+    sep = nt.nodes.new("ShaderNodeSeparateXYZ")
+    nt.links.new(tc.outputs["Object"], sep.inputs["Vector"])
+    hi = nt.nodes.new("ShaderNodeMath")
+    hi.operation = "GREATER_THAN"
+    hi.inputs[1].default_value = 0.24
+    nt.links.new(sep.outputs["Z"], hi.inputs[0])
+    ay = nt.nodes.new("ShaderNodeMath")
+    ay.operation = "ABSOLUTE"
+    nt.links.new(sep.outputs["Y"], ay.inputs[0])
+    out = nt.nodes.new("ShaderNodeMath")
+    out.operation = "GREATER_THAN"
+    out.inputs[1].default_value = 0.82
+    nt.links.new(ay.outputs["Value"], out.inputs[0])
+    either = nt.nodes.new("ShaderNodeMath")
+    either.operation = "MAXIMUM"
+    nt.links.new(hi.outputs["Value"], either.inputs[0])
+    nt.links.new(out.outputs["Value"], either.inputs[1])
+    mix = nt.nodes.new("ShaderNodeMix")
+    mix.data_type = "RGBA"
+    mix.inputs["A"].default_value = (*base, 1)
+    mix.inputs["B"].default_value = (*flaps, 1)
+    nt.links.new(either.outputs["Value"], mix.inputs["Factor"])
+    nt.links.new(mix.outputs["Result"], bs.inputs["Base Color"])
+    return m
+
+
+def model_car(tag, lap):
+    primary, secondary, wing, accent, ends = (srgb(c) for c in livery_of(lap))
+    paint = lambda nm, c, coat=0.9: material(f"{tag}_{nm}", c, 0.22, metal=0.25, coat=coat)
+    mats = [paint("primary", primary), paint("secondary", secondary), material(tag + "_wing", wing, 0.35, metal=0.2),
+            paint("accent", ends), noisy(tag + "_carbon", (0.008, 0.008, 0.009), (0.02, 0.02, 0.023), 60.0, 0.55),
+            material(tag + "_tyre", (0.015, 0.015, 0.016), 0.85), material(tag + "_rim", (0.06, 0.06, 0.07), 0.3, metal=0.9),
+            material(tag + "_band", srgb("#43b02a" if WET else "#e0141e"), 0.5)]  # intermediate green, soft red
+    P, S, WG, AC, CB, TY, RM, BD, FW = range(9)
+    me = model_mesh().copy()
+    me.materials.clear()
+    for m in mats:
+        me.materials.append(m)
+    bm = bmesh.new()
+    bm.from_mesh(me)
+    bm.faces.ensure_lookup_table()
+    # the wheels: only the tyres reach this far out this high up (the wings'
+    # endplates sit lower, the sidepods further in); the caps above half
+    # height are symmetric about the axle, which gives each wheel's x; its
+    # own top and bottom edge straight through that axle give z and the radius
+    tyre_v = [v.co.copy() for v in bm.verts if abs(v.co.y) > 0.88 and v.co.z > 0.5]
+    xs_t = sorted(v.x for v in tyre_v)
+    gap = max(range(1, len(xs_t)), key=lambda i: xs_t[i] - xs_t[i - 1])
+    mid = (xs_t[gap - 1] + xs_t[gap]) / 2
+    centres, radii = {}, {}
+    for nm, front, sy in (("fl", True, 1), ("fr", True, -1), ("rl", False, 1), ("rr", False, -1)):
+        pts = [v for v in tyre_v if (v.x > mid) == front and (v.y > 0) == (sy > 0)]
+        cx = (max(p.x for p in pts) + min(p.x for p in pts)) / 2
+        col_z = [v.co.z for v in bm.verts if abs(v.co.x - cx) < 0.04 and abs(v.co.y) > 0.6 and (v.co.y > 0) == (sy > 0)
+                 and (v.co.z > 0.5 or v.co.z < 0.05)]
+        cz, r = (max(col_z) + min(col_z)) / 2, (max(col_z) - min(col_z)) / 2
+        inner = [abs(v.co.y) for v in bm.verts if (v.co.y > 0) == (sy > 0) and v.co.z > cz + r * 0.6 and abs(v.co.x - cx) < r * 0.5]
+        cy = sy * (min(y for y in inner if y > 0.5) + max(inner)) / 2
+        centres[nm] = Vector((cx, cy, cz))
+        radii[nm] = r
+    if os.environ.get("GHOST_DEBUG"):
+        print("WHEELS", {k: tuple(round(c, 3) for c in v) for k, v in centres.items()}, {k: round(v, 3) for k, v in radii.items()})
+    front_x = (centres["fl"].x + centres["fr"].x) / 2
+    rear_x = (centres["rl"].x + centres["rr"].x) / 2
+    wheel_faces = {k: [] for k in centres}
+    for f in bm.faces:
+        c = f.calc_center_median()
+        for nm, wc in centres.items():
+            if abs(c.y - wc.y) < 0.26 and math.hypot(c.x - wc.x, c.z - wc.z) < radii[nm] * 1.05:
+                r = math.hypot(c.x - wc.x, c.z - wc.z) / radii[nm]
+                f.material_index = TY if r > 0.68 else (BD if r > 0.6 and abs(c.y) > abs(wc.y) + 0.12 else RM)
+                wheel_faces[nm].append(f)
+                break
+        else:
+            x, y, z = c.x, abs(c.y), c.z
+            if z < 0.07:
+                f.material_index = CB  # floor
+            elif x > front_x + 0.35 and z < 0.42:  # front wing: black planes, coloured flaps and endplates
+                f.material_index = FW
+            elif x < rear_x - 0.25 and z > 0.5:  # rear wing
+                f.material_index = AC if y > 0.43 else WG
+            elif z > 0.82 and front_x - 1.9 < x < front_x - 0.9:
+                f.material_index = CB  # halo
+            else:
+                f.material_index = P  # the body: colours split in the shader
+    mats[P] = livery_paint(tag + "_livery", primary, secondary, accent, front_x)
+    mats.append(wing_paint(tag + "_frontwing", wing, ends))
+    root = link(bpy.data.objects.new(tag, None))
+    # body = everything but the wheels; each wheel its own object around its axle
+    wheel_set = {f for fs in wheel_faces.values() for f in fs}
+    body_bm = bm.copy()
+    body_bm.faces.ensure_lookup_table()
+    bmesh.ops.delete(body_bm, geom=[body_bm.faces[f.index] for f in wheel_set], context="FACES")
+    body_me = bpy.data.meshes.new(tag + "_body")
+    body_bm.to_mesh(body_me)
+    for m in mats:
+        body_me.materials.append(m)
+    body = link(bpy.data.objects.new(tag + "_body", body_me))
+    body.parent = root
+    for poly in body_me.polygons:
+        poly.use_smooth = True
+    wheels = {}
+    for nm, fs in wheel_faces.items():
+        wb = bm.copy()
+        wb.faces.ensure_lookup_table()
+        keep = {f.index for f in fs}
+        bmesh.ops.delete(wb, geom=[f for f in wb.faces if f.index not in keep], context="FACES")
+        wc = centres[nm]
+        bmesh.ops.translate(wb, verts=wb.verts, vec=-wc)
+        wme = bpy.data.meshes.new(f"{tag}_{nm}")
+        wb.to_mesh(wme)
+        for m in mats:
+            wme.materials.append(m)
+        for poly in wme.polygons:
+            poly.use_smooth = True
+        steer = link(bpy.data.objects.new(f"{tag}_{nm}_steer", None))
+        steer.parent = root
+        steer.location = wc
+        hub = link(bpy.data.objects.new(f"{tag}_{nm}", wme))
+        hub.parent = steer
+        wheels[nm] = (steer, hub)
+    # the car number, white on the nose
+    cu = bpy.data.curves.new(tag + "_num", "FONT")
+    cu.body = str(lap["number"])
+    cu.size = 0.2
+    cu.align_x = "CENTER"
+    for sgn in (-1, 1):
+        tx = link(bpy.data.objects.new(tag + "_num", cu))
+        tx.data.materials.append(material(tag + "_white", (0.95, 0.95, 0.95), 0.4))
+        tx.parent = root
+        tx.location = (front_x + 0.15, sgn * 0.13, 0.36)
+        tx.rotation_euler = (math.pi / 2, 0, 0 if sgn > 0 else math.pi)
+    return root, wheels
+
+
+if os.environ.get("GHOST_MODEL"):
+    CAR_A, WHEELS_A = model_car("carA", A)
+    CAR_B, WHEELS_B = model_car("carB", B)
+else:
+    CAR_A, WHEELS_A = build_car("carA", A, False)
+    CAR_B, WHEELS_B = build_car("carB", B, True)
 
 
 # ---------------------------------------------------------------- light and sky
 sun = link(bpy.data.objects.new("sun", bpy.data.lights.new("sun", "SUN")))
-sun.data.energy = 3.6
-sun.data.angle = math.radians(1.5)
+sun.data.energy = 0.9 if WET else 3.6
+sun.data.angle = math.radians(25 if WET else 1.5)  # cloud: soft, faint shadows
 sun.rotation_euler = (math.radians(42), math.radians(8), math.radians(140))
 world = bpy.data.worlds.new("world")
 sc.world = world
 world.use_nodes = True
 nt = world.node_tree
 bg = nt.nodes["Background"]
-try:
-    sky = nt.nodes.new("ShaderNodeTexSky")
-    sky.sun_elevation = math.radians(48)
-    sky.sun_rotation = math.radians(140)
-    nt.links.new(sky.outputs["Color"], bg.inputs["Color"])
-    bg.inputs["Strength"].default_value = 0.22
-except Exception:
-    bg.inputs["Color"].default_value = (0.35, 0.5, 0.7, 1)
+if WET:  # low grey cloud, lighter towards the horizon
+    tc = nt.nodes.new("ShaderNodeTexCoord")
+    sep = nt.nodes.new("ShaderNodeSeparateXYZ")
+    ramp = nt.nodes.new("ShaderNodeValToRGB")
+    ramp.color_ramp.elements[0].color = (0.30, 0.32, 0.35, 1)
+    ramp.color_ramp.elements[1].color = (0.12, 0.13, 0.15, 1)
+    nt.links.new(tc.outputs["Generated"], sep.inputs["Vector"])
+    nt.links.new(sep.outputs["Z"], ramp.inputs["Fac"])
+    nt.links.new(ramp.outputs["Color"], bg.inputs["Color"])
+    bg.inputs["Strength"].default_value = 1.6
+else:
+    try:
+        sky = nt.nodes.new("ShaderNodeTexSky")
+        sky.sun_elevation = math.radians(48)
+        sky.sun_rotation = math.radians(140)
+        nt.links.new(sky.outputs["Color"], bg.inputs["Color"])
+        bg.inputs["Strength"].default_value = 0.22
+    except Exception:
+        bg.inputs["Color"].default_value = (0.35, 0.5, 0.7, 1)
 
 
 # ---------------------------------------------------------------- animation
@@ -884,6 +1178,15 @@ if STILL is None:
         json.dump({"fps": FPS, "lead_in": LEAD_IN, "frames": len(times)}, fh)
     bpy.ops.render.render(animation=True)
 else:
+    if os.environ.get("GHOST_CLOSE"):  # a close look for checking the livery: GHOST_CLOSE=[b:]<degrees around car A or B>
+        which, _, deg = os.environ["GHOST_CLOSE"].rpartition(":")
+        pc = PB if which == "b" else PA
+        ap = pc.at(STILL)
+        ayaw, _ = heading(pc, STILL)
+        ang = ayaw + math.radians(float(deg))
+        cam_data.shift_y = 0
+        cam.location = ap + Vector((math.cos(ang) * 6.5, math.sin(ang) * 6.5, 1.8))
+        cam.rotation_euler = (ap + Vector((0, 0, 0.45)) - cam.location).to_track_quat("-Z", "Y").to_euler()
     sc.render.use_motion_blur = False
     sc.render.filepath = OUT
     bpy.ops.render.render(write_still=True)

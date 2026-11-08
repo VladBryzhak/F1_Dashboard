@@ -38,7 +38,15 @@ requests from 30 minutes before a session to 30 minutes after it.
   boards, fences, pit building, grandstands, trees, the city on the horizon.
   The chase camera sits behind whichever car is behind. `--still T` renders
   one frame at T seconds; `GHOST_SAMPLES` (default 8) and `GHOST_BLUR=1`
-  (motion blur, 3-4x slower) set the quality.
+  (motion blur, 3-4x slower) set the quality. `GHOST_WET=1`: a wet track
+  under low cloud, cars on intermediates.
+- Cars: our own simple ones by default. `GHOST_MODEL=<file.glb>` uses a real
+  2026 car model instead, e.g. "F1 2026 concept" by Qvist_designs on
+  Sketchfab (CC BY 4.0: credit "3D model: Qvist_designs" in the video or its
+  caption). Its wheels are cut out to spin and steer, and it is painted in the
+  team's colours by zones (`LIVERY` in `scene.py`): colours and layout only,
+  never team or sponsor logos. `GHOST_CLOSE=[b:]<degrees>` with `--still`
+  looks at car A (or B) close up, to check a livery.
 - `hud.ts`: one transparent PNG per frame with the data; `banner.ts`: the
   boards' texture.
 - `make.sh`: runs the steps and puts the frames together with ffmpeg.
