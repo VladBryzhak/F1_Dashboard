@@ -29,3 +29,4 @@ jolpica_test.json
 
 # Team radio drafts (tools/team-radio): local review files
 tools/team-radio/drafts/
+tools/recap/node_modules
