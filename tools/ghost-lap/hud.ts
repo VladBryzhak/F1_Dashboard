@@ -9,6 +9,9 @@ import fs from "fs";
 import path from "path";
 
 const [DATA, FRAMES, OUT, TITLE, HOLD = "3"] = process.argv.slice(2);
+// SUBTITLE replaces the "NOR 2025 проти VER 2023" line; CREDIT adds a small
+// line at the bottom (e.g. a CC BY model's author).
+const SUBTITLE = process.env.SUBTITLE, CREDIT = process.env.CREDIT;
 const FONT_DIR = path.resolve(__dirname, "../../server/assets/fonts");
 const fontFiles = fs.readdirSync(FONT_DIR).filter((f) => f.endsWith(".ttf")).map((f) => path.join(FONT_DIR, f));
 const W = 1080, H = 1920;
@@ -160,7 +163,7 @@ function frame(t: number): string {
     `<rect width="${W}" height="460" fill="url(#top)"/><rect y="1180" width="${W}" height="740" fill="url(#bot)"/>` +
     `<rect x="50" y="60" width="64" height="64" rx="12" fill="${C.accent}"/>${txt(82, 106, "PT", 36, 800, "#fff", "middle")}${txt(130, 106, "PADDOCK TIMES", 36, 800)}` +
     txt(50, 215, TITLE, 84, 800, C.ink, "start", HALO) +
-    txt(50, 285, `${A.raw.code} ${A.raw.year} проти ${B.raw.code} ${B.raw.year}`, 50, 700, C.ink, "start", HALO) +
+    txt(50, 285, SUBTITLE ?? `${A.raw.code} ${A.raw.year} проти ${B.raw.code} ${B.raw.year}`, 50, 700, C.ink, "start", HALO) +
     txt(50, 360, clock(lapClock), 52, 700, C.cool, "start", HALO) +
     `<path d="${mapPath}" fill="none" stroke="#000" stroke-opacity="0.5" stroke-width="16" stroke-linejoin="round"/>` +
     `<path d="${mapPath}" fill="none" stroke="#e8e8ee" stroke-width="7" stroke-linejoin="round"/>` +
@@ -182,6 +185,7 @@ function frame(t: number): string {
       txt(990, 1372, `${lead.raw.code} попереду на ${Math.abs(gap).toFixed(3)}`, 60, 800, lead.raw.colour, "end") +
       sectors(t, 1425) + telemetry(A, t, 1525) + telemetry(B, t, 1680);
   }
+  if (CREDIT) s += txt(W / 2, 1852, CREDIT, 24, 600, C.muted, "middle");
   s += txt(W / 2, 1890, "paddocktimes.com", 32, 600, C.muted, "middle");
   return `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}">${s}</svg>`;
 }

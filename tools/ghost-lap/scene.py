@@ -1144,7 +1144,7 @@ for f, t in enumerate(times):
     bdir = Vector((math.cos(byaw), math.sin(byaw), 0))
     want_pos = bp - bdir * 11.5 + Vector((0, 0, 4.0))
     want_look = (bp + front.at(t)) / 2 + bdir * 9 + Vector((0, 0, 0.6))
-    k = 1.0 if cam_pos is None else 0.22  # smooth the camera between frames
+    k = 1.0 if cam_pos is None else 1 - 0.78 ** (30 / FPS)  # smooth the camera, the same at any frame rate
     cam_pos = want_pos if cam_pos is None else cam_pos.lerp(want_pos, k)
     cam_look = want_look if cam_look is None else cam_look.lerp(want_look, k)
     cam.location = cam_pos
