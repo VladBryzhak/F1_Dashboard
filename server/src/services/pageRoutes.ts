@@ -1,5 +1,5 @@
 import { hasArticle } from "./articles";
-import { getCurrentSeason, hasPageSubject, hasRace, hasSeasonReview, isDatasetReady } from "./f1db";
+import { getCurrentSeason, hasPageSubject, hasRace, hasSeasonReview, isDatasetReady, legacySubjectId } from "./f1db";
 
 // What a page address leads to, for the SPA fallback in index.ts: a page the
 // app has (200), an address the app itself sends elsewhere (301, as with a
@@ -84,7 +84,14 @@ export async function pageStatus(pagePath: string, checkData: boolean): Promise<
       // /drivers/<season> is that season's grid; anything else is a profile
       // (ids are never bare years).
       if (isYear(a) && (await seasonOk(a))) return (await isCurrent(a)) ? moved(`/${where}`) : OK;
-      return exists(() => hasPageSubject(where === "drivers" ? "driver" : "team", a));
+      if (!data) return OK;
+      {
+        const kind = where === "drivers" ? "driver" : "team";
+        if (await hasPageSubject(kind, a)) return OK;
+        // an id from before f1db (/drivers/piastri) moves to today's page
+        const now = await legacySubjectId(kind, a);
+        return now ? moved(`/${where}/${now}`) : NOT_FOUND;
+      }
 
     default:
       return NOT_FOUND;

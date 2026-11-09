@@ -9,6 +9,8 @@ const f1db = vi.hoisted(() => ({
   hasPageSubject: async (kind: string, id: string) =>
     ({ driver: ["max-verstappen"], team: ["mclaren"], circuit: ["monza"] } as Record<string, string[]>)[kind].includes(id),
   hasRace: async (season: string, round: string) => season === "2026" && Number(round) >= 1 && Number(round) <= 24,
+  legacySubjectId: async (kind: string, id: string) =>
+    ({ "driver:piastri": "oscar-piastri", "driver:max_verstappen": "max-verstappen", "team:red_bull": "red-bull" } as Record<string, string>)[`${kind}:${id}`] ?? null,
 }));
 vi.mock("./f1db", () => f1db);
 vi.mock("./articles", () => ({ hasArticle: async (slug: string) => slug === "antonelli-champion" }));
@@ -35,6 +37,14 @@ describe("pageStatus", () => {
       "/drivers/not-a-driver", "/drivers/1949", "/articles/nope", "/articles/antonelli-champion/x", "/teams/nope", "/circuits/nope", "/circuits/monza/x", "/%E0%A4%A"]) {
       expect(await status(p), p).toEqual({ code: 404 });
     }
+  });
+
+  it("moves the ids of before f1db to today's profile", async () => {
+    expect(await status("/drivers/piastri")).toEqual({ code: 301, location: "/drivers/oscar-piastri" });
+    expect(await status("/drivers/max_verstappen")).toEqual({ code: 301, location: "/drivers/max-verstappen" });
+    expect(await status("/teams/red_bull")).toEqual({ code: 301, location: "/teams/red-bull" });
+    f1db.ready = false; // cold start: the app decides
+    expect(await status("/drivers/piastri", false)).toEqual({ code: 200 });
   });
 
   it("moves the current season and seasons the app doesn't have to the bare section", async () => {

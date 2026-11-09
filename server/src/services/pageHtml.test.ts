@@ -9,6 +9,7 @@ vi.mock("./f1db", () => ({
   getCurrentSeason: async () => 2026,
   hasPageSubject: async () => false,
   hasRace: async () => false,
+  legacySubjectId: async () => null,
   getDriverProfile: async (id: string) =>
     id === "max-verstappen"
       ? { driverId: "max-verstappen", lastSeason: 2026, seasons: [{ constructorId: "red-bull" }] }

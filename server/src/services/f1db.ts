@@ -140,6 +140,7 @@ interface RawCountry {
 }
 interface RawEntrantDriver {
   year: number;
+  entrantId: string;
   constructorId: string;
   driverId: string;
   rounds: number[];
@@ -363,6 +364,7 @@ interface Dataset {
   // career totals for profile pages, keyed by driverId / constructorId
   driverCareer: Map<string, CareerAgg>;
   constructorCareer: Map<string, CareerAgg>;
+  yearsByDriver: Map<string, Set<number>>;
   // per-round cumulative driver standings (for the title-race chart)
   racesDriverStandings: RawRaceDriverStanding[];
   // race-weekend detail, keyed by `${year}:${round}` (compact)
@@ -379,6 +381,10 @@ interface Dataset {
   enginesByYearTeam: Map<string, string[]>;
   engineNames: Map<string, string>; // engineManufacturerId -> name
   driversByYearTeam: Map<string, string[]>;
+  // year:entrant:constructor → drivers, and year:driver → that key: teammates
+  // are one entrant's drivers (a privateer's Lotus is not Team Lotus).
+  driversByYearEntry: Map<string, string[]>;
+  entryByYearDriver: Map<string, string>;
 }
 
 let datasetPromise: Promise<Dataset> | null = null;
@@ -439,6 +445,8 @@ async function loadDataset(): Promise<Dataset> {
   const teamByYearDriver = new Map<string, string>();
   const roundsSeen = new Map<string, number>();
   const driversByYearTeam = new Map<string, string[]>();
+  const driversByYearEntry = new Map<string, string[]>();
+  const entryByYearDriver = new Map<string, string>();
   for (const e of read<RawEntrantDriver>(
     "f1db-seasons-entrants-drivers.json"
   )) {
@@ -448,10 +456,15 @@ async function loadDataset(): Promise<Dataset> {
     if (!list.includes(e.driverId)) list.push(e.driverId);
     driversByYearTeam.set(teamKey, list);
     const key = `${e.year}:${e.driverId}`;
+    const entryKey = `${e.year}:${e.entrantId}:${e.constructorId}`;
+    const mates = driversByYearEntry.get(entryKey) ?? [];
+    if (!mates.includes(e.driverId)) mates.push(e.driverId);
+    driversByYearEntry.set(entryKey, mates);
     const rounds = e.rounds?.length ?? 0;
     if (rounds >= (roundsSeen.get(key) ?? -1)) {
       roundsSeen.set(key, rounds);
       teamByYearDriver.set(key, e.constructorId);
+      entryByYearDriver.set(key, entryKey);
     }
   }
 
@@ -485,8 +498,23 @@ async function loadDataset(): Promise<Dataset> {
     return agg;
   };
 
+  // A driver f1db lists for a season only as a test driver (Colapinto came
+  // into the Williams race seat mid-2024) gets the team he raced for most.
+  const racedFor = new Map<string, Map<string, number>>();
+  // The seasons a driver raced in: in early years the standings list only
+  // the drivers who scored, so a profile's seasons come from here too.
+  const yearsByDriver = new Map<string, Set<number>>();
   for (const r of read<RawRaceResult>("f1db-races-race-results.json")) {
     const raceKey = `${r.year}:${r.round}`;
+    const seasonKey = `${r.year}:${r.driverId}`;
+    const years = yearsByDriver.get(r.driverId) ?? new Set<number>();
+    years.add(r.year);
+    yearsByDriver.set(r.driverId, years);
+    if (!teamByYearDriver.has(seasonKey)) {
+      const starts = racedFor.get(seasonKey) ?? new Map<string, number>();
+      starts.set(r.constructorId, (starts.get(r.constructorId) ?? 0) + 1);
+      racedFor.set(seasonKey, starts);
+    }
     let arr = resultsByRace.get(raceKey);
     if (!arr) {
       arr = [];
@@ -522,6 +550,9 @@ async function loadDataset(): Promise<Dataset> {
       driverId: r.driverId,
       constructorId: r.constructorId,
     });
+  }
+  for (const [key, starts] of racedFor) {
+    teamByYearDriver.set(key, [...starts].sort((x, y) => y[1] - x[1])[0][0]);
   }
 
   // Fix up constructor "races" to distinct-race counts (see note above).
@@ -661,11 +692,14 @@ async function loadDataset(): Promise<Dataset> {
     circuits,
     circuitLayouts,
     teamByYearDriver,
+    driversByYearEntry,
+    entryByYearDriver,
     winsByYear,
     winnerByRace,
     resultsByRace,
     sprintResultsByRace,
     driverCareer,
+    yearsByDriver,
     constructorCareer,
     racesDriverStandings,
     qualifyingByRace,
@@ -978,21 +1012,24 @@ export async function getDriverProfile(
   if (!career) return null;
 
   const d = ds.drivers.get(driverId);
-  const rawSeasons = ds.driverStandings
-    .filter((s) => s.driverId === driverId)
-    .sort((a, b) => a.year - b.year);
+  const standingByYear = new Map(
+    ds.driverStandings.filter((s) => s.driverId === driverId).map((s) => [s.year, s])
+  );
+  // A season raced without scoring may have no standings row (position 0).
+  const years = [...new Set([...standingByYear.keys(), ...(ds.yearsByDriver.get(driverId) ?? [])])].sort((a, b) => a - b);
 
-  const seasons: DriverSeasonEntry[] = rawSeasons.map((s) => {
+  const seasons: DriverSeasonEntry[] = years.map((year) => {
+    const s = standingByYear.get(year);
     const constructorId =
-      ds.teamByYearDriver.get(`${s.year}:${driverId}`) ?? "";
+      ds.teamByYearDriver.get(`${year}:${driverId}`) ?? "";
     const c = ds.constructors.get(constructorId);
     return {
-      season: s.year,
+      season: year,
       constructorId,
       constructorName: c?.name ?? "",
-      position: s.positionNumber ?? s.positionDisplayOrder,
-      points: s.points,
-      wins: ds.winsByYear.get(s.year)?.drivers.get(driverId) ?? 0,
+      position: s ? s.positionNumber ?? s.positionDisplayOrder : 0,
+      points: s?.points ?? 0,
+      wins: ds.winsByYear.get(year)?.drivers.get(driverId) ?? 0,
     };
   });
 
@@ -1007,10 +1044,10 @@ export async function getDriverProfile(
     code: d?.abbreviation ?? null,
     firstSeason: career.firstSeason,
     lastSeason: career.lastSeason,
-    championships: rawSeasons.filter((s) => s.positionNumber === 1 && seasonComplete(ds, s.year)).length,
+    championships: [...standingByYear.values()].filter((s) => s.positionNumber === 1 && seasonComplete(ds, s.year)).length,
     wins: seasons.reduce((sum, s) => sum + s.wins, 0),
     podiums: career.podiums,
-    points: rawSeasons.reduce((sum, s) => sum + s.points, 0),
+    points: [...standingByYear.values()].reduce((sum, s) => sum + s.points, 0),
     races: career.races,
     seasons,
     fullName: d?.fullName ?? null,
@@ -2185,6 +2222,47 @@ export async function hasPageSubject(
   if (kind === "driver") return ds.driverCareer.has(id);
   if (kind === "team") return ds.constructorCareer.has(id);
   return ds.circuits.has(id);
+}
+
+// A driver's teammates season by season (the other race drivers of his
+// entrant and car that year), for the profile's snapshot.
+export async function getTeammates(driverId: string): Promise<Map<number, { id: string; name: string }[]>> {
+  const ds = await dataset();
+  const out = new Map<number, { id: string; name: string }[]>();
+  for (const year of ds.yearsByDriver.get(driverId) ?? []) {
+    const entry = ds.entryByYearDriver.get(`${year}:${driverId}`);
+    const team = ds.teamByYearDriver.get(`${year}:${driverId}`);
+    // without an entry of his own (a test driver's season), his team's drivers
+    const all = entry ? ds.driversByYearEntry.get(entry) : team ? ds.driversByYearTeam.get(`${year}:${team}`) : undefined;
+    const mates = (all ?? []).filter((id) => id !== driverId);
+    out.set(year, mates.map((id) => {
+      const d = ds.drivers.get(id);
+      return { id, name: d ? `${d.firstName} ${d.lastName}` : id };
+    }));
+  }
+  return out;
+}
+
+// The ids addresses had before f1db (Jolpica's, until June 2026): a driver's
+// surname, or first_last where surnames repeat (piastri, max_verstappen), and
+// snake_case teams (red_bull). Search engines still ask for some, so
+// pageRoutes sends them to today's page. A bare surname goes to the driver of
+// that name who raced last: the old site linked the grids of its seasons.
+const LEGACY_IDS: Record<string, string> = { "driver:sainz": "carlos-sainz-jr", "team:alfa": "alfa-romeo" };
+
+export async function legacySubjectId(kind: "driver" | "team", id: string): Promise<string | null> {
+  const ds = await dataset();
+  const career = kind === "driver" ? ds.driverCareer : ds.constructorCareer;
+  const norm = id.toLowerCase().replace(/_/g, "-");
+  const alias = LEGACY_IDS[`${kind}:${norm}`];
+  if (alias && career.has(alias)) return alias;
+  if (career.has(norm)) return norm === id ? null : norm;
+  if (kind !== "driver") return null;
+  let best: string | null = null;
+  for (const [driverId, c] of career) {
+    if (driverId.endsWith(`-${norm}`) && (!best || c.lastSeason > career.get(best)!.lastSeason)) best = driverId;
+  }
+  return best;
 }
 
 export async function hasRace(season: string, round: string): Promise<boolean> {

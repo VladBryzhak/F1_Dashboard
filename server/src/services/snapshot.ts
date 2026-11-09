@@ -10,6 +10,7 @@ import {
   getHomeHighlights,
   getRaceWeekend,
   getSeasonReview,
+  getTeammates,
   hasSeasonReview,
 } from "./f1db";
 import { getArticle, listArticles, TAG_LABEL } from "./articles";
@@ -447,7 +448,7 @@ async function driver(c: Ctx, id: string, current: number): Promise<string | nul
   const p = await getDriverProfile(id).catch(() => null);
   if (!p) return null;
   const name = `${p.givenName} ${p.familyName}`;
-  const teams = [...new Map(p.seasons.map((s) => [s.constructorId, s.constructorName])).entries()].map(([tid, tn]) =>
+  const teams = [...new Map(p.seasons.filter((s) => s.constructorId).map((s) => [s.constructorId, s.constructorName])).entries()].map(([tid, tn]) =>
     c.a(`/teams/${tid}`, tn),
   );
   const active = p.lastSeason >= current;
@@ -467,14 +468,36 @@ async function driver(c: Ctx, id: string, current: number): Promise<string | nul
       (teams.length ? `, driving for ${joinAnd(teams, "and")}` : "") +
       `. ${enPlural(p.championships, "world title")}, ${enPlural(p.wins, "win")}, ${enPlural(p.podiums, "podium")}, ${enPlural(p.poles, "pole position")} and ${p.points} points from ${enPlural(p.races, "race start")}.</p>`;
   }
+  // What sets one profile apart from the next (so search engines don't take
+  // two drivers' pages for copies of one): birth, best results, teammates.
+  const born = p.dateOfBirth
+    ? c.uk
+      ? `Народження: ${esc(ukDate(p.dateOfBirth))}${p.placeOfBirth ? `, ${esc(p.placeOfBirth)}` : ""}${p.birthCountryCode && ukCountry(p.birthCountryCode) ? ` (${esc(ukCountry(p.birthCountryCode))})` : ""}.`
+      : `Born ${esc(enDate(p.dateOfBirth))}${p.placeOfBirth ? ` in ${esc(p.placeOfBirth)}` : ""}.`
+    : "";
+  const best = c.uk
+    ? [p.bestResult && `найкращий фініш P${p.bestResult}`, p.bestGrid && `найкраща стартова позиція P${p.bestGrid}`, p.bestChampionship && `найкраще місце в чемпіонаті P${p.bestChampionship}`]
+    : [p.bestResult && `best finish P${p.bestResult}`, p.bestGrid && `best grid position P${p.bestGrid}`, p.bestChampionship && `best championship finish P${p.bestChampionship}`];
+  const bests = best.filter(Boolean) as string[];
+  if (born || bests.length) {
+    body += `<p>${born}${bests.length ? `${born ? " " : ""}${c.uk ? "Рекорди" : "Records"}: ${bests.join(", ")}.` : ""}</p>`;
+  }
+  const mates = await getTeammates(id).catch(() => new Map<number, { id: string; name: string }[]>());
   body +=
     `<h2>${c.uk ? "По сезонах" : "Season by season"}</h2>` +
     table(
-      c.uk ? ["Сезон", "Команда", "Місце", "Перемоги", "Очки"] : ["Season", "Team", "Position", "Wins", "Points"],
+      c.uk ? ["Сезон", "Команда", "Напарники", "Місце", "Перемоги", "Очки"] : ["Season", "Team", "Teammates", "Position", "Wins", "Points"],
       p.seasons
         .slice()
         .reverse()
-        .map((s) => [c.a(`/standings/${s.season}`, String(s.season)), c.a(`/teams/${s.constructorId}`, s.constructorName), s.position > 0 ? `P${s.position}` : "", String(s.wins), String(s.points)]),
+        .map((s) => [
+          c.a(`/standings/${s.season}`, String(s.season)),
+          s.constructorId ? c.a(`/teams/${s.constructorId}`, s.constructorName) : "",
+          (mates.get(s.season) ?? []).map((m) => c.a(`/drivers/${m.id}`, m.name)).join(", "),
+          s.position > 0 ? `P${s.position}` : "",
+          String(s.wins),
+          String(s.points),
+        ]),
     );
   return (
     body +
@@ -603,10 +626,6 @@ const STATIC: Record<string, { en: [string, string]; uk: [string, string] }> = {
     en: ["Formula 1 telemetry", "Speed, throttle, brake, gear and DRS traces lap by lap, from 2023 onward."],
     uk: ["Телеметрія Формули-1", "Швидкість, газ, гальма, передача та DRS по колах, з 2023 року."],
   },
-  about: {
-    en: ["About Paddock Times", "An independent, fan-made Formula 1 statistics site. Data from f1db (CC BY 4.0), OpenF1 and Wikimedia Commons."],
-    uk: ["Про Paddock Times", "Незалежний фанатський сайт зі статистикою Формули-1. Дані з f1db (CC BY 4.0), OpenF1 і Wikimedia Commons."],
-  },
   privacy: {
     en: ["Privacy policy", "How Paddock Times handles data: analytics with consent, what is stored in your browser, the feedback form and hosting."],
     uk: ["Політика конфіденційності", "Як Paddock Times працює з даними: аналітика за згодою, що зберігається у браузері, форма відгуку та хостинг."],
@@ -620,6 +639,44 @@ const STATIC: Record<string, { en: [string, string]; uk: [string, string] }> = {
     uk: ["Відгук", "Повідомте про помилку чи запропонуйте функцію для Paddock Times."],
   },
 };
+
+// The About page's own text (pages/About.tsx), so it isn't a one-liner.
+function aboutPage(c: Ctx): string {
+  const t = c.uk
+    ? {
+        h: "Про Paddock Times",
+        lead: "Paddock Times: незалежний фанатський сайт зі статистикою Формули-1. Тут зібрано турнірні таблиці, календар із розкладом вікендів, повні вікенди (гонка, спринт, кваліфікація й практики), путівники трасами, історію пілотів і команд з 1950 року, порівняння пілотів, телеметрію, live-таймінг і повтори гонок.",
+        src: "Звідки дані",
+        items: [
+          "f1db (CC BY 4.0): результати, заліки, розклади, траси, пілоти й команди з 1950 року до сьогодні. Оновлюється після гоночних вікендів.",
+          "OpenF1: live-таймінг, телеметрія, кола, шини й погода, починаючи з 2023 року.",
+          "Wikimedia Commons: фото пілотів і логотипи/фото команд за вільними ліцензіями (CC BY-SA або суспільне надбання) із зазначенням авторів.",
+          "f1-circuits (MIT, © Tomislav Bacinger): геодані трас, за якими намальовано схеми трас.",
+        ],
+        acc: ["Точність", "Дані надходять із джерел, які підтримує спільнота. Інколи в них трапляються помилки або затримки після останньої сесії, і це не офіційний таймінг чи класифікація."],
+        ind: ["Незалежність", "Проєкт не пов'язаний із Formula 1, Formula One Management чи FIA і не схвалений ними. F1, FORMULA 1 та пов'язані знаки є торговельними марками Formula One Licensing B.V."],
+        lang: ["Мови", "Сайт доступний англійською та українською."],
+      }
+    : {
+        h: "About Paddock Times",
+        lead: "Paddock Times is an independent, fan-made Formula 1 statistics site. It brings championship standings, the race calendar with weekend schedules, full race weekends (race, sprint, qualifying and practice), circuit guides, driver and team histories since 1950, head-to-head comparisons, telemetry, live timing and race replays together in one place.",
+        src: "Where the data comes from",
+        items: [
+          "f1db (CC BY 4.0): results, standings, schedules, circuits, drivers and teams from 1950 to today. It is refreshed after race weekends.",
+          "OpenF1: live timing, telemetry, laps, tyres and weather, from 2023 onwards.",
+          "Wikimedia Commons: driver photos and team logos/photos under free licences (CC BY-SA or public domain), credited to their authors.",
+          "f1-circuits (MIT, © Tomislav Bacinger): circuit geodata; the track outlines are drawn from it.",
+        ],
+        acc: ["Accuracy", "The data comes from community-maintained sources. It can occasionally contain mistakes or lag behind the latest session, and it is not official timing or classification."],
+        ind: ["Independence", "This project is not affiliated with, endorsed by, or associated with Formula 1, Formula One Management or the FIA. F1, FORMULA 1 and related marks are trademarks of Formula One Licensing B.V."],
+        lang: ["Languages", "The site is available in English and Ukrainian."],
+      };
+  return (
+    `<h1>${esc(t.h)}</h1><p>${esc(t.lead)}</p>` +
+    `<h2>${esc(t.src)}</h2>${list(t.items.map(esc))}` +
+    [t.acc, t.ind, t.lang].map(([h, p]) => `<h2>${esc(h)}</h2><p>${esc(p)}</p>`).join("")
+  );
+}
 
 async function articleList(c: Ctx): Promise<string> {
   const lang: Lang = c.uk ? "uk" : "en";
@@ -698,6 +755,9 @@ export async function pageSnapshot(rawPath: string, lang: Lang = "en"): Promise<
       break;
     case "articles":
       body = x ? await article(c, x) : await articleList(c);
+      break;
+    case "about":
+      body = x ? "" : aboutPage(c);
       break;
     default:
       if (section && STATIC[section] && !x) {
