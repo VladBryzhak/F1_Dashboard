@@ -3,6 +3,7 @@ import { getCalendar, getCurrentSeason, getSeasonReview } from "./f1db";
 import { gpTitle } from "./gpNames";
 import { SITE_URL } from "./pageHtml";
 import { getRacePreview } from "./racePreview";
+import { sessionCard } from "./sessionCard";
 import { latestSessionHero } from "./sessionHero";
 import { ukPlural } from "./ukText";
 import type { ArticleSummary, RacePreview, SeasonReview, SessionHero } from "../types/f1";
@@ -43,7 +44,13 @@ export interface ChannelPost {
   key: string; // what it is about, so it is posted once
   text: string; // Telegram HTML
   url: string; // the page the link preview shows
+  // A picture to post the text under instead of the link preview (a session's
+  // result card), and until when to wait for it before posting the text alone.
+  photo?: () => Promise<Buffer | null>;
+  photoWaitUntil?: number;
 }
+
+const CARD_WAIT_MS = 60 * 60_000; // a session's card can come a little after its result
 
 const esc = (s: string | number) => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 const ukUrl = (path: string) => `${SITE_URL}/uk${path}`;
@@ -79,6 +86,8 @@ export function sessionPost(h: SessionHero): ChannelPost {
     key: `session:${h.season}:${h.round}:${h.sessionName}`,
     text: [head, "", ...rows, "", `${more}: ${url}`].join("\n"),
     url,
+    photo: () => sessionCard(String(h.season), String(h.round), h.sessionName).catch(() => null),
+    photoWaitUntil: Date.parse(h.endedAt) + CARD_WAIT_MS,
   };
 }
 
@@ -176,9 +185,19 @@ async function candidates(now: number): Promise<ChannelPost[]> {
 
 // ---------- Sending ----------
 
-async function send(post: ChannelPost): Promise<void> {
+async function send(post: ChannelPost, photo: Buffer | null = null): Promise<void> {
   if (DRY_RUN) {
-    console.log(`[telegram] would post ${post.key}:\n${post.text}`);
+    console.log(`[telegram] would post ${post.key}${photo ? ` with a ${Math.round(photo.length / 1024)} KB card` : ""}:\n${post.text}`);
+    return;
+  }
+  if (photo) {
+    const form = new FormData();
+    form.append("chat_id", CHANNEL!);
+    form.append("caption", post.text);
+    form.append("parse_mode", "HTML");
+    form.append("photo", new Blob([new Uint8Array(photo)], { type: "image/png" }), "card.png");
+    const res = await fetch(`https://api.telegram.org/bot${TOKEN}/sendPhoto`, { method: "POST", body: form, signal: AbortSignal.timeout(30_000) });
+    if (!res.ok) throw new Error(`Telegram ${res.status}: ${(await res.text().catch(() => "")).slice(0, 200)}`);
     return;
   }
   const res = await fetch(`https://api.telegram.org/bot${TOKEN}/sendMessage`, {
@@ -230,7 +249,7 @@ async function testPost(): Promise<void> {
   }
   const p = sessionPost(hero);
   try {
-    await send(p);
+    await send(p, (await p.photo?.()) ?? null);
     testDone = true;
     posted.add(p.key);
     console.log(`[telegram] test post sent: ${p.key}`);
@@ -250,10 +269,16 @@ async function check(): Promise<void> {
     return;
   }
   for (const p of posts) {
+    if (page.includes(postId(p))) {
+      posted.add(p.key); // already in the channel
+      continue;
+    }
+    // a post with a card waits for it (a few checks), then goes out as text
+    const photo = p.photo ? await p.photo() : null;
+    if (p.photo && !photo && Date.now() < (p.photoWaitUntil ?? 0)) continue;
     posted.add(p.key);
-    if (page.includes(postId(p))) continue; // already in the channel
     try {
-      await send(p);
+      await send(p, photo);
       console.log(`[telegram] posted ${p.key}`);
     } catch (err) {
       console.warn(`[telegram] ${p.key} not posted:`, err instanceof Error ? err.message : err);

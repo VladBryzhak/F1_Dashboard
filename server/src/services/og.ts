@@ -46,7 +46,7 @@ const TEAM_COLOR: Record<string, string> = {
   haas: "#B6BABD",
   cadillac: "#C9B037",
 };
-const teamColor = (id: string) => TEAM_COLOR[id] ?? "#9a9aa8";
+export const teamColor = (id: string) => TEAM_COLOR[id] ?? "#9a9aa8";
 
 type Card =
   | { kind: "default"; title: string; subtitle: string; kicker?: string }
