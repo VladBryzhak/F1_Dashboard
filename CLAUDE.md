@@ -127,7 +127,12 @@ The race replay shows the team radio the broadcast aired, with captions in both 
 ## Ghost-lap videos (tools/ghost-lap)
 
 - Vertical 3D videos of two real laps (OpenF1, 2023+) for TikTok, Reels and the channel: `./make.sh WORK_DIR "<year>:<location>:<session>:<car>[:pole]" "<B>" "TITLE"`. Blender builds the track from where the session's cars ran (real width, elevation and each car's own line), ffmpeg lays the data layer (`hud.ts`) over the frames. Details in `tools/ghost-lap/README.md`.
-- Our own cars and scenery only (no game models, liveries or photos); no sound in the file. About 1.5 s a frame to render.
+- Cars: our own, or a CC BY 2026 model (`GHOST_MODEL`, e.g. Qvist_designs' "F1 2026 concept", credited in the video through `CREDIT`) painted in team colours by zones: colours and layout only, never team or sponsor logos, game models or photos. `GHOST_WET=1` for a wet session, `GHOST_FPS` for the frame rate. No sound in the file. About 1.5 s a frame to render (60 fps: a lap is about 2 h 15 min).
+
+## Recap videos (tools/recap)
+
+- 2D animated recaps of a session (1080x1920, 60 fps, a few minutes to render): `tsx recap.ts SPEC.json OUT.mp4 --fps 60`. A spec is a list of scenes (`title`, `clock`, `table`, `big`, `list`, `outro`); each session gets a small builder script (`quali_sao_paulo_2026.py`). Facts are checked as for articles. Details in `tools/recap/README.md`.
+- A voiceover is recorded by the owner and laid over afterwards; scene lengths are stretched to the voice.
 
 ## Generated data (server/src/data)
 
