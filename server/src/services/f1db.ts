@@ -2515,6 +2515,21 @@ export async function getRecords(): Promise<RecordsResponse> {
   return cached(`records:${ds.version}`, 6 * 3600, async () => {
     const dName = (id: string) => driverName(ds, id);
     const cName = (id: string) => ds.constructors.get(id)?.name ?? id;
+    // a driver's team for the swatch: the one of most seasons (the later on a tie)
+    const seasonsWith = new Map<string, Map<string, number>>();
+    for (const [key, team] of ds.teamByYearDriver) {
+      const id = key.slice(key.indexOf(":") + 1);
+      const m = seasonsWith.get(id) ?? new Map<string, number>();
+      m.set(team, (m.get(team) ?? 0) + 1);
+      seasonsWith.set(id, m);
+    }
+    const mainTeam = (id: string) => {
+      let best: string | undefined;
+      let n = 0;
+      for (const [team, k] of seasonsWith.get(id) ?? []) if (k >= n) [best, n] = [team, k];
+      return best;
+    };
+    const withTeam = (id: string) => ({ constructorId: mainTeam(id) });
     const count = (pairs: Iterable<[string, number]>) => {
       const m = new Map<string, number>();
       for (const [id, n] of pairs) m.set(id, (m.get(id) ?? 0) + n);
@@ -2535,11 +2550,11 @@ export async function getRecords(): Promise<RecordsResponse> {
     const bySeason = topOf(seasonWins).map((e) => {
       const [id, year] = e.id.split(":");
       const row = seasonWins.find((x) => x.id === e.id)!;
-      return { ...e, id, season: Number(year), races: row.races };
+      return { ...e, id, season: Number(year), races: row.races, constructorId: ds.teamByYearDriver.get(`${year}:${id}`) };
     });
 
     // youngest winners: age on race day
-    const young: { id: string; name: string; value: number; ageDays: number; season: number; grandPrixName: string; born: string; date: string }[] = [];
+    const young: { id: string; name: string; value: number; ageDays: number; season: number; grandPrixName: string; born: string; date: string; constructorId: string }[] = [];
     const firstWin = new Set<string>();
     for (const r of [...ds.races].sort((a, b) => a.date.localeCompare(b.date))) {
       const w = ds.winnerByRace.get(`${r.year}:${r.round}`);
@@ -2548,27 +2563,27 @@ export async function getRecords(): Promise<RecordsResponse> {
       const dob = ds.drivers.get(w.driverId)?.dateOfBirth;
       if (!dob) continue;
       const days = Math.round((Date.parse(r.date) - Date.parse(dob)) / 86_400_000);
-      young.push({ id: w.driverId, name: dName(w.driverId), value: -days, ageDays: days, season: r.year, grandPrixName: ds.grandsPrix.get(r.grandPrixId)?.name ?? r.grandPrixId, born: dob, date: r.date });
+      young.push({ id: w.driverId, name: dName(w.driverId), value: -days, ageDays: days, season: r.year, grandPrixName: ds.grandsPrix.get(r.grandPrixId)?.name ?? r.grandPrixId, born: dob, date: r.date, constructorId: w.constructorId });
     }
-    const youngest = young.sort((a, b) => a.ageDays - b.ageDays).slice(0, TOP).map((y, i) => ({ rank: i + 1, id: y.id, name: y.name, value: y.ageDays, ageDays: y.ageDays, season: y.season, grandPrixName: y.grandPrixName, born: y.born, date: y.date }));
+    const youngest = young.sort((a, b) => a.ageDays - b.ageDays).slice(0, TOP).map((y, i) => ({ rank: i + 1, id: y.id, name: y.name, value: y.ageDays, ageDays: y.ageDays, season: y.season, grandPrixName: y.grandPrixName, born: y.born, date: y.date, constructorId: y.constructorId }));
 
     const career = (key: "podiums" | "races") => [...ds.driverCareer].map(([id, c]) => ({ id, name: dName(id), value: c[key] }));
     const total = (key: "totalPolePositions" | "totalFastestLaps") => [...ds.drivers.values()].map((d) => ({ id: d.id, name: dName(d.id), value: d[key] ?? 0 }));
     return {
       drivers: {
-        titles: topOf(asList(driverTitles, dName)),
-        wins: topOf(asList(driverWins, dName)),
-        poles: topOf(total("totalPolePositions")),
-        podiums: topOf(career("podiums")),
-        starts: topOf(career("races")),
-        fastestLaps: topOf(total("totalFastestLaps")),
+        titles: topOf(asList(driverTitles, dName), withTeam),
+        wins: topOf(asList(driverWins, dName), withTeam),
+        poles: topOf(total("totalPolePositions"), withTeam),
+        podiums: topOf(career("podiums"), withTeam),
+        starts: topOf(career("races"), withTeam),
+        fastestLaps: topOf(total("totalFastestLaps"), withTeam),
         seasonWins: bySeason,
         youngestWinners: youngest,
       },
       teams: {
-        titles: topOf(asList(teamTitles, cName)),
-        wins: topOf(asList(teamWins, cName)),
-        poles: topOf([...ds.constructors.values()].map((c) => ({ id: c.id, name: c.name, value: c.totalPolePositions ?? 0 }))),
+        titles: topOf(asList(teamTitles, cName), (id) => ({ constructorId: id })),
+        wins: topOf(asList(teamWins, cName), (id) => ({ constructorId: id })),
+        poles: topOf([...ds.constructors.values()].map((c) => ({ id: c.id, name: c.name, value: c.totalPolePositions ?? 0 })), (id) => ({ constructorId: id })),
       },
     };
   });

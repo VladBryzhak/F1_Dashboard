@@ -1068,6 +1068,7 @@ export interface RecordEntry {
   id: string // f1db driverId or constructorId
   name: string
   value: number
+  constructorId?: string // a driver's team: the one of most seasons, or of that season or race
   // per list: the span of years, or the season (wins in a season), or the
   // race (youngest winners)
   season?: number

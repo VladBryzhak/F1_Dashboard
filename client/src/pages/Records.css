@@ -1,81 +1,258 @@
-/* All-time records: the top ten of each, in cards of ranked rows. */
+/* Hallmark · shape: data screen · genre: modern-minimal · theme: Console (graphite), brand kept
+ * signature: the record holder up front in each list, the headline records large
+ * states: loading, error, full · motion: still */
 
+/* All-time records: headline tiles, a drivers/teams switch, the lists. */
+
+.rec-intro {
+  max-width: 62ch;
+}
+
+/* ---- The four headline records ---- */
+.rec-hero {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  border: var(--rule-hair) solid var(--color-rule);
+  border-radius: var(--radius-card);
+  background: var(--color-paper-2);
+  margin: var(--space-lg) 0;
+  overflow: hidden;
+}
+
+.rec-tile {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2xs);
+  padding: var(--space-lg);
+  min-width: 0;
+}
+
+/* seams between the tiles instead of separate cards */
+.rec-tile + .rec-tile {
+  border-left: var(--rule-hair) solid var(--color-rule);
+}
+
+.rec-tile-label {
+  font-size: var(--text-sm);
+  color: var(--color-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.rec-tile-val {
+  font-family: var(--font-outlier);
+  font-size: var(--text-display);
+  font-weight: 700;
+  line-height: 1.05;
+  color: var(--color-ink);
+}
+
+/* an age is a reading: instrument blue, and smaller so it fits a tile; the
+   same line box as the numbers beside it, so the names line up */
+.rec-tile-val--reading {
+  font-size: var(--text-lead);
+  white-space: nowrap;
+  color: var(--color-cool);
+  line-height: calc(var(--text-display) * 1.05);
+}
+
+.rec-tile-who {
+  font-family: var(--font-display);
+  font-weight: 800;
+  text-transform: uppercase;
+  font-size: var(--text-lead);
+  line-height: 1.1;
+}
+
+.rec-tile-who a,
+.rec-lead-name,
+.rec-who a {
+  color: var(--color-ink);
+  text-decoration: none;
+  transition: color 160ms ease;
+}
+
+.rec-tile-who a:hover,
+.rec-lead-name:hover,
+.rec-who a:hover {
+  color: var(--color-cool);
+}
+
+.rec-tile-who a:focus-visible,
+.rec-lead-name:focus-visible,
+.rec-who a:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+@media (max-width: 860px) {
+  .rec-hero {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .rec-tile + .rec-tile {
+    border-left: 0;
+  }
+  .rec-tile:nth-child(2n) {
+    border-left: var(--rule-hair) solid var(--color-rule);
+  }
+  .rec-tile:nth-child(n + 3) {
+    border-top: var(--rule-hair) solid var(--color-rule);
+  }
+  .rec-tile {
+    padding: var(--space-md);
+  }
+  /* narrow tiles: labels may wrap, the age and the names step down a size */
+  .rec-tile-label {
+    white-space: normal;
+  }
+  .rec-tile-val--reading {
+    font-size: var(--text-md);
+  }
+  .rec-tile-who {
+    font-size: var(--text-md);
+  }
+}
+
+/* ---- The lists ---- */
 .rec-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(320px, 100%), 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(340px, 100%), 1fr));
   gap: var(--space-md);
-  margin-bottom: var(--space-lg);
+  margin: var(--space-md) 0 var(--space-lg);
+  align-items: start; /* a short list doesn't stretch to its neighbour */
 }
 
 .rec-card {
-  margin: 0;
+  border: var(--rule-hair) solid var(--color-rule);
+  border-radius: var(--radius-card);
+  background: var(--color-paper-2);
+  overflow: hidden;
 }
 
-.rec-list {
+.rec-card-title {
+  margin: 0;
+  padding: var(--space-md) var(--space-lg) var(--space-sm);
+  font-size: var(--text-md);
+}
+
+/* the holder: team swatch, the name large, the value large */
+.rec-lead {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: end;
+  gap: var(--space-md);
+  padding: var(--space-sm) var(--space-lg) var(--space-md);
+  border-left: 4px solid var(--team, var(--color-rule-2));
+  margin-left: var(--space-lg);
+  padding-left: var(--space-md);
+}
+
+.rec-lead-who {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2xs);
+  min-width: 0;
+}
+
+.rec-lead-name {
+  font-family: var(--font-display);
+  font-weight: 800;
+  text-transform: uppercase;
+  font-size: var(--text-title);
+  line-height: 1.05;
+}
+
+.rec-lead-val {
+  font-family: var(--font-outlier);
+  font-size: var(--text-title);
+  font-weight: 700;
+  color: var(--color-ink);
+  white-space: nowrap;
+}
+
+/* ranks 2 to 10 on the deepest step, seams between them */
+.rec-rest {
   list-style: none;
   margin: 0;
   padding: 0;
-  display: grid;
-  gap: var(--space-xs);
+  background: var(--color-paper-3);
+  border-top: var(--rule-hair) solid var(--color-rule);
 }
 
-.rec-list li {
-  position: relative;
+.rec-rest li {
   display: grid;
-  grid-template-columns: 2rem 1fr auto;
-  align-items: baseline;
-  gap: var(--space-xs);
-  padding-bottom: var(--space-2xs);
+  grid-template-columns: 1.75rem 4px 1fr auto;
+  grid-template-areas:
+    'rank swatch who val'
+    'rank swatch bar bar';
+  align-items: center;
+  column-gap: var(--space-sm);
+  row-gap: 6px;
+  padding: var(--space-xs) var(--space-lg);
+}
+
+.rec-rest li + li {
+  border-top: var(--rule-hair) solid var(--color-rule);
+}
+
+.rec-rest li::before {
+  content: '';
+  grid-area: swatch;
+  align-self: stretch;
+  border-radius: 2px;
+  background: var(--team, var(--color-rule-2));
 }
 
 .rec-rank {
+  grid-area: rank;
   font-family: var(--font-outlier);
-  color: var(--muted);
+  color: var(--color-muted);
 }
 
 .rec-who {
+  grid-area: who;
   display: flex;
-  flex-direction: column;
+  flex-wrap: wrap;
+  align-items: baseline;
+  column-gap: var(--space-xs);
   min-width: 0;
 }
 
 .rec-who a {
-  color: var(--text);
-  font-weight: 700;
-  text-decoration: none;
-}
-
-.rec-who a:hover {
-  text-decoration: underline;
+  font-weight: 600;
 }
 
 .rec-detail {
-  color: var(--muted);
-  font-size: 0.85rem;
+  color: var(--color-muted);
+  font-size: var(--text-sm);
 }
 
 .rec-val {
+  grid-area: val;
   font-family: var(--font-outlier);
   font-weight: 700;
-  color: var(--text);
+  color: var(--color-ink);
   white-space: nowrap;
 }
 
-/* the bar under each row: how close to the leader */
+/* how close to the holder: a hairline track, filled in instrument blue */
 .rec-bar {
-  position: absolute;
-  left: 2.5rem;
-  bottom: 0;
+  grid-area: bar;
   height: 2px;
-  background: var(--color-cool);
-  opacity: 0.55;
+  background: var(--color-rule);
   border-radius: 1px;
+  overflow: hidden;
 }
 
-.rec-group {
-  margin: var(--space-lg) 0 var(--space-md);
+.rec-bar > span {
+  display: block;
+  height: 100%;
+  background: var(--color-cool);
+  opacity: 0.7;
 }
 
 .rec-note {
-  font-size: 0.85rem;
+  font-size: var(--text-sm);
+  max-width: 70ch;
 }
