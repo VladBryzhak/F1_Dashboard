@@ -124,6 +124,11 @@ The race replay shows the team radio the broadcast aired, with captions in both 
 - No disk on Render's free plan, so the channel is the memory: before posting, the server reads `t.me/s/<channel>` and skips a post whose first two lines (letters and digits only) are already there. An article that arrives with a deploy is still posted; if the page can't be read, nothing is posted that round.
 - The site links the channel (footer, race pages, articles) through `client/src/lib/telegram.ts` `TELEGRAM_URL`; empty hides the links.
 
+## Ghost-lap videos (tools/ghost-lap)
+
+- Vertical 3D videos of two real laps (OpenF1, 2023+) for TikTok, Reels and the channel: `./make.sh WORK_DIR "<year>:<location>:<session>:<car>[:pole]" "<B>" "TITLE"`. Blender builds the track from where the session's cars ran (real width, elevation and each car's own line), ffmpeg lays the data layer (`hud.ts`) over the frames. Details in `tools/ghost-lap/README.md`.
+- Our own cars and scenery only (no game models, liveries or photos); no sound in the file. About 1.5 s a frame to render.
+
 ## Generated data (server/src/data)
 
 Committed JSON built by one-off scripts, so the site makes no extra upstream calls at runtime. Re-run when a new circuit joins the calendar:

@@ -29,4 +29,7 @@ jolpica_test.json
 
 # Team radio drafts (tools/team-radio): local review files
 tools/team-radio/drafts/
+
+# recap and ghost-lap: links to the server's node modules (tsx, resvg)
 tools/recap/node_modules
+tools/ghost-lap/node_modules
