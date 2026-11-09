@@ -35,6 +35,12 @@ describe("channel posts", () => {
     expect(p.text).toContain("https://paddocktimes.com/uk/calendar/2026/20");
   });
 
+  it("writes a driver f1db knows in Ukrainian", () => {
+    const h = hero("race", "Race");
+    h.top[0] = { ...h.top[0], driverId: "max-verstappen" };
+    expect(sessionPost(h).text).toContain("🥇 Макс Ферстаппен (Red Bull)");
+  });
+
   it("names the pole in qualifying and lists times in practice", () => {
     expect(sessionPost(hero("qualifying", "Qualifying")).text).toContain("Поул: Max Verstappen (Red Bull), 1:10.123");
     expect(sessionPost(hero("practice", "Practice 2")).text).toContain("2. Lewis Hamilton (Ferrari), +0.117");

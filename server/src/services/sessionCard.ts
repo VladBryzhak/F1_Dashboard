@@ -1,7 +1,7 @@
 import { Resvg } from "@resvg/resvg-js";
 import path from "path";
 import { cached } from "../cache/cache";
-import type { RaceWeekend } from "../types/f1";
+import type { RaceWeekend, SessionHero } from "../types/f1";
 import { gpTitle } from "./gpNames";
 import { teamColor } from "./og";
 import { driverPortraitUrl } from "./portraits";
@@ -170,6 +170,36 @@ export async function renderSessionCard(d: CardData): Promise<Buffer> {
   const photos: Record<string, string | null> = {};
   await Promise.all(d.rows.slice(0, 3).map(async (r) => (photos[r.driverId] = r.driverId ? await portrait(r.driverId, r.constructorId, d.season) : null)));
   return Buffer.from(new Resvg(cardSvg(d, photos), { font: { fontFiles: FONTS, loadSystemFonts: false, defaultFontFamily: UKF } }).render().asPng());
+}
+
+// A past session's top three in the shape of the home hero, for posting a
+// card of a session the channel has already passed.
+export async function sessionHeroOf(season: string, round: string, sessionName: string): Promise<SessionHero | null> {
+  const wk = await getRaceWeekendNow(season, round);
+  if (!wk) return null;
+  const race = sessionName === "Race" || sessionName === "Sprint";
+  const quali = sessionName === "Qualifying" || sessionName.startsWith("Sprint ");
+  const sec = (t: string) => t.split(":").reduce((a, v) => a * 60 + Number(v), 0);
+  let top: SessionHero["top"];
+  if (race) {
+    top = (sessionName === "Race" ? wk.results : wk.sprintResults).slice(0, 3).map((r, i) => ({
+      position: i + 1, driverId: r.driverId, driverName: r.driverName, driverCode: r.driverCode, number: null,
+      constructorId: r.constructorId, constructorName: r.constructorName, time: r.timeDisplay, laps: r.laps, headshot: null,
+    }));
+  } else if (quali) {
+    const q = (sessionName === "Qualifying" ? wk.qualifying : wk.sprintQualifying).slice(0, 3);
+    const best = (x: (typeof q)[number]) => x.q3 ?? x.q2 ?? x.q1 ?? "";
+    top = q.map((r, i) => ({
+      position: i + 1, driverId: r.driverId, driverName: r.driverName, driverCode: r.driverCode, number: null,
+      constructorId: r.constructorId, constructorName: r.constructorName,
+      time: i === 0 ? best(r) : best(r) && best(q[0]) ? `+${(sec(best(r)) - sec(best(q[0]))).toFixed(3)}` : null, laps: null, headshot: null,
+    }));
+  } else return null;
+  if (top.length < 3) return null;
+  return {
+    kind: race ? "race" : "qualifying", sessionName, sprint: sessionName.startsWith("Sprint"), segment: null,
+    season: Number(season), round: Number(round), grandPrixName: wk.grandPrixName, top, endedAt: new Date().toISOString(),
+  };
 }
 
 // The card of a weekend's session, or null while it has no result. Kept ten

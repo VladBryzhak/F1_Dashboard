@@ -3,9 +3,10 @@ import { getCalendar, getCurrentSeason, getSeasonReview } from "./f1db";
 import { gpTitle } from "./gpNames";
 import { SITE_URL } from "./pageHtml";
 import { getRacePreview } from "./racePreview";
-import { sessionCard } from "./sessionCard";
+import { sessionCard, sessionHeroOf } from "./sessionCard";
 import { latestSessionHero } from "./sessionHero";
 import { ukPlural } from "./ukText";
+import { UK_DRIVER_NAMES } from "./ukNames";
 import type { ArticleSummary, RacePreview, SeasonReview, SessionHero } from "../types/f1";
 
 // Posts to the site's public Telegram channel, in Ukrainian with links to the
@@ -33,6 +34,15 @@ const DRY_RUN = process.env.TELEGRAM_DRY_RUN === "1";
 // posted at once (retried each check until it goes out). Remove it after, or
 // every restart posts it again.
 const TEST_POST = process.env.TELEGRAM_TEST_POST === "1";
+// Set for one deploy to post past sessions' cards now, e.g.
+// "2026:20:Qualifying,2026:20:Race". Each goes out once: an opening line of
+// their own tells them from the text posts of the same sessions, and the
+// channel page is checked for it, so a restart doesn't post them again.
+const CARDS_NOW = (process.env.TELEGRAM_CARDS_NOW ?? "")
+  .split(",")
+  .map((s) => s.trim().split(":"))
+  .filter((p) => p.length === 3);
+const CARDS_INTRO = "🆕 Результати сесій тепер виходять і картками";
 
 const CHECK_MS = 5 * 60_000;
 const SESSION_FRESH_MS = 3 * 3600_000; // post a session's result within 3 hours of its end
@@ -74,12 +84,17 @@ export function sessionPost(h: SessionHero): ChannelPost {
   const name = SESSION_UK[h.sessionName] ?? h.sessionName;
   const head = `${h.kind === "race" ? "🏁" : "⏱"} <b>${esc(gp(h.grandPrixName))} · ${esc(name)}</b>`;
   const team = (r: SessionHero["top"][number]) => (r.constructorName ? ` (${esc(r.constructorName)})` : "");
+  // the channel is Ukrainian: names as our Ukrainian pages write them
+  const who = (r: SessionHero["top"][number]) => {
+    const n = r.driverId ? UK_DRIVER_NAMES[r.driverId] : undefined;
+    return esc(n ? `${n[0]} ${n[1]}` : r.driverName);
+  };
   const medal = ["🥇", "🥈", "🥉"];
   const rows = h.top.map((r, i) => {
     const time = r.time ? `, ${esc(r.time)}` : "";
-    if (h.kind === "race") return `${medal[i] ?? `${r.position}.`} ${esc(r.driverName)}${team(r)}`;
-    if (h.kind === "qualifying" && i === 0) return `Поул: ${esc(r.driverName)}${team(r)}${time}`;
-    return `${r.position}. ${esc(r.driverName)}${team(r)}${time}`;
+    if (h.kind === "race") return `${medal[i] ?? `${r.position}.`} ${who(r)}${team(r)}`;
+    if (h.kind === "qualifying" && i === 0) return `Поул: ${who(r)}${team(r)}${time}`;
+    return `${r.position}. ${who(r)}${team(r)}${time}`;
   });
   const more = h.kind === "race" ? "Повні результати" : "Результати й анонс гонки";
   return {
@@ -259,7 +274,35 @@ async function testPost(): Promise<void> {
   }
 }
 
+// The cards asked for in TELEGRAM_CARDS_NOW, in that order.
+async function cardsNow(): Promise<void> {
+  const page = await channelPage();
+  if (page == null) return console.warn("[telegram] cards now: channel page unreadable, trying again at the next check");
+  cardsDone = true;
+  for (const [season, round, session] of CARDS_NOW) {
+    const hero = await sessionHeroOf(season, round, session).catch(() => null);
+    if (!hero) {
+      console.warn(`[telegram] cards now: no result for ${season}:${round}:${session}`);
+      continue;
+    }
+    const base = sessionPost(hero);
+    // the race is run: its qualifying leads to the results, not the preview
+    const text = base.text.replace("Результати й анонс гонки:", "Повні результати:");
+    const post = { ...base, key: `${base.key}:card`, text: `${CARDS_INTRO}\n\n${text}` };
+    if (page.includes(postId(post))) continue; // posted before this restart
+    try {
+      await send(post, (await post.photo?.()) ?? null);
+      posted.add(post.key);
+      console.log(`[telegram] card posted: ${post.key}`);
+    } catch (err) {
+      console.warn(`[telegram] card ${post.key} not posted:`, err instanceof Error ? err.message : err);
+    }
+  }
+}
+let cardsDone = false;
+
 async function check(): Promise<void> {
+  if (CARDS_NOW.length && !cardsDone) await cardsNow();
   if (TEST_POST && !testDone) await testPost();
   const posts = (await candidates(Date.now())).filter((p) => !posted.has(p.key));
   if (!posts.length) return;
