@@ -8,7 +8,6 @@ import {
   getDriverProfile,
   getDriverStandings,
   getHomeHighlights,
-  getRaceWeekend,
   getSeasonReview,
   getTeammates,
   hasSeasonReview,
@@ -18,6 +17,7 @@ import { getRacePreview } from "./racePreview";
 import { gpTitle, type Lang } from "./gpNames";
 import { UK, ukCountry, ukDate, ukPlural } from "./ukText";
 import { driverName, UK_DRIVER_NAMES } from "./ukNames";
+import { getRaceWeekendNow } from "./provisional";
 
 // Plain-HTML snapshot of a page for search-engine crawlers. The app renders
 // in the browser, so the raw HTML a crawler fetches first was an empty
@@ -282,7 +282,7 @@ async function racePreviewHtml(c: Ctx, season: string, round: string): Promise<s
 }
 
 async function race(c: Ctx, season: string, round: string): Promise<string | null> {
-  const w = await getRaceWeekend(season, round).catch(() => null);
+  const w = await getRaceWeekendNow(season, round).catch(() => null);
   if (!w) return null;
   const ahead = !w.results.length;
   const winner = w.results.find((r) => r.positionText === "1");

@@ -356,6 +356,8 @@ export default function RaceWeekend() {
 
           <p className="profile-summary">{raceSummary(data, lang)}</p>
 
+          {data.provisional && <p className="wknd-provisional">{t('wk.provisional')}</p>}
+
           {upcoming && preview.data && <RacePreview preview={preview.data} />}
 
           <div className="wknd-highlights">

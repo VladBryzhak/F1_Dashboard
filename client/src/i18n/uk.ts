@@ -183,6 +183,7 @@ const uk: Dict & Record<string, string> = {
 
   // Race weekend page
   'wk.loadError': 'Не вдалося завантажити вікенд: {error}',
+  'wk.provisional': 'Попередні результати з live-таймінгу. Офіційна класифікація, з можливими штрафами після гонки, з’явиться протягом доби.',
   'wk.ofVote': 'голосів',
   'wk.pole': 'Поул-позиція',
   'wk.fastestLap': 'Найшвидше коло',

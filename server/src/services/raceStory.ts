@@ -1,9 +1,10 @@
 import { cached } from "../cache/cache";
 import type { RaceStory, StoryDriver, StoryEvent } from "../types/f1";
-import { getChampionshipAround, getRaceWeekend } from "./f1db";
+import { getChampionshipAround } from "./f1db";
 import { getRaceControl, getReplay } from "./live";
 import { isOpenF1Unavailable, optional } from "./openf1Client";
 import { getRaceStrategy } from "./strategy";
+import { getRaceWeekendNow } from "./provisional";
 
 // The facts of how a race unfolded, for the race page's story text and key-
 // moments timeline. Everything comes from data we already serve: results,
@@ -17,13 +18,13 @@ const NUMERIC = /^\d+$/;
 const cleanReason = (s: string) => s.replace(/\s*\(\d{1,2}:\d{2}(:\d{2})?\)\s*$/, "").trim();
 
 export async function getRaceStory(season: string, round: string): Promise<RaceStory | null> {
-  const wk = await getRaceWeekend(season, round);
+  const wk = await getRaceWeekendNow(season, round);
   if (!wk || !wk.results.length) return null;
 
   // A story built while OpenF1 was busy lacks its lap-by-lap part: keep it
   // a minute, so the next visitor gets the full one.
   let partial = false;
-  return cached(`story:${season}:${round}`, () => (partial ? 60 : 6 * 3600), async () => {
+  return cached(`story:${season}:${round}`, () => (partial ? 60 : wk.provisional ? 600 : 6 * 3600), async () => {
     const results = wk.results;
     const byCode = new Map(results.filter((r) => r.driverCode).map((r) => [r.driverCode!, r]));
     const who = (r: { driverName: string; driverCode: string | null; constructorId: string }): StoryDriver => ({
@@ -81,7 +82,8 @@ export async function getRaceStory(season: string, round: string): Promise<RaceS
       };
     }
 
-    const champ = await getChampionshipAround(Number(season), Number(round));
+    // f1db's standings after this race come with its results: none for a provisional one
+    const champ = wk.provisional ? null : await getChampionshipAround(Number(season), Number(round));
     if (champ) {
       const [lead, second] = champ.after;
       const leaderBefore = [...champ.before.entries()].find(([, p]) => p === 1)?.[0] ?? null;

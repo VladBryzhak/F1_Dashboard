@@ -134,6 +134,12 @@ The race replay shows the team radio the broadcast aired, with captions in both 
 - 2D animated recaps of a session (1080x1920, 60 fps, a few minutes to render): `tsx recap.ts SPEC.json OUT.mp4 --fps 60`. A spec is a list of scenes (`title`, `clock`, `table`, `big`, `list`, `outro`); each session gets a small builder script (`quali_sao_paulo_2026.py`). Facts are checked as for articles. Details in `tools/recap/README.md`.
 - A voiceover is recorded by the owner and laid over afterwards; scene lengths are stretched to the voice.
 
+## Provisional race weekends (server/src/services/provisional.ts)
+
+- f1db usually has a race only the morning after. Until then (from the weekend's Friday to a week after the race, 2023 on) a race page, its story, title and crawler snapshot take the weekend from OpenF1 (`getRaceWeekendNow`, used instead of f1db's `getRaceWeekend` everywhere a weekend's results show; JSON-LD stays on f1db): each session's classification from `session_result`, the race's grid from the replay's first positions, the fastest lap from its lap times. f1db's own sessions stay where it has them, and once it has the race its results take over by themselves.
+- The weekend carries `provisional: true`: the page says the results are provisional (`wk.provisional`), the story leaves out the championship swing (f1db's standings come with its results), a retirement's cause is unknown ("Retired", left out of the text). Kept 10 minutes; `warmProvisional` (started in `index.ts`) refreshes the current weekend every 10 minutes in the queue's background lane.
+- Checked against f1db on São Paulo 2026: race, grid, points, qualifying and practice match; FP1 stand-ins f1db lists only as test drivers keep OpenF1's name without a link. `PROVISIONAL_ROUND=2026:20` (the `server-provisional` preview config) shows a round as if f1db hadn't got it, for local checks.
+
 ## Generated data (server/src/data)
 
 Committed JSON built by one-off scripts, so the site makes no extra upstream calls at runtime. Re-run when a new circuit joins the calendar:

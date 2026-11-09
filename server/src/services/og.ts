@@ -9,13 +9,13 @@ import {
   getCurrentSeason,
   getDriverProfile,
   getDriverStandings,
-  getRaceWeekend,
   getSeasonReview,
 } from "./f1db";
 import type { CircuitOutline, DriverProfile } from "../types/f1";
 import { gpTitle, type Lang } from "./gpNames";
 import { UK, ukCountry, ukDate, ukPlural } from "./ukText";
 import { driverName, UK_DRIVER_NAMES } from "./ukNames";
+import { getRaceWeekendNow } from "./provisional";
 
 // Link previews (Open Graph / Twitter cards). Social crawlers don't run our
 // JavaScript, so the server works out each page's title, description and a
@@ -170,7 +170,7 @@ export async function describePage(rawPath: string, lang: Lang = "en"): Promise<
 
     case "calendar": {
       if (isSeason(a) && b && /^\d+$/.test(b)) {
-        const w = await getRaceWeekend(a!, b).catch(() => null);
+        const w = await getRaceWeekendNow(a!, b).catch(() => null);
         if (w) {
           const outline = circuitOutline(w.circuitId);
           const podium = w.results

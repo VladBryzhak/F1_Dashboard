@@ -11,6 +11,8 @@ import homeRouter from "./routes/home";
 import liveRouter from "./routes/live";
 import { warmReplays } from "./services/live";
 import { warmSessionHero } from "./services/sessionHero";
+import { warmProvisional } from "./services/provisional";
+import { getRaceNear } from "./services/f1db";
 import { startChannel } from "./services/telegramChannel";
 import profilesRouter from "./routes/profiles";
 import seasonsRouter from "./routes/seasons";
@@ -185,6 +187,15 @@ app.listen(PORT, () => {
   warmReplays();
   // And the home hero's latest session result.
   warmSessionHero();
+  // a race weekend's results before f1db has them: the race of this weekend
+  // (from its Friday) until the morning after
+  warmProvisional(async () => {
+    for (const days of [0, 1, 2, -1]) {
+      const r = await getRaceNear(new Date(Date.now() + days * 86_400_000).toISOString());
+      if (r) return { season: String(r.season), round: String(r.round) };
+    }
+    return null;
+  });
   // And post to the Telegram channel, when one is set up.
   startChannel();
 });

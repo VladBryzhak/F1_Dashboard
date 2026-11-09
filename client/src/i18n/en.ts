@@ -178,6 +178,7 @@ const en = {
 
   // Race weekend page
   'wk.loadError': 'Could not load the race weekend: {error}',
+  'wk.provisional': 'Provisional results from live timing. The official classification, with any penalties after the race, follows within a day.',
   'wk.ofVote': 'of the vote',
   'wk.pole': 'Pole position',
   'wk.fastestLap': 'Fastest lap',
