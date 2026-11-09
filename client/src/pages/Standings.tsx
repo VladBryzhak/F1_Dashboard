@@ -29,12 +29,12 @@ export default function Standings() {
   const [tab, setTab] = useState<Tab>('drivers')
   const { t, lang } = useI18n()
 
+  const drivers = useAsync(() => api.driverStandings(season), [season])
+
   useSeo({
-    ...seoText.standings(season, lang),
+    ...seoText.standings(season, lang, drivers.data?.standings[0]),
     canonicalPath,
   })
-
-  const drivers = useAsync(() => api.driverStandings(season), [season])
   const constructors = useAsync(
     () => api.constructorStandings(season),
     [season],

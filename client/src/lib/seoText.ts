@@ -2,9 +2,10 @@
 // The server builds the same text for the first HTML a visitor or crawler
 // gets (server/src/services/og.ts, describePage) — keep the two in step.
 import { plural, type Lang } from '../i18n/core'
-import type { Article, CircuitProfile, ConstructorProfile, DriverProfile, RaceWeekend, SeasonReview } from '../types/f1'
+import type { Article, CircuitProfile, ConstructorProfile, DriverProfile, DriverStanding, RaceWeekend, SeasonReview } from '../types/f1'
 import { countryName } from './countries'
 import { gpTitle } from './gpNames'
+import { CURRENT_SEASON } from './seasons'
 import { driverName } from './ukNames'
 
 export type NotFoundKind = 'page' | 'driver' | 'team' | 'circuit' | 'race' | 'article'
@@ -30,23 +31,39 @@ export const DEFAULT_SEO: Record<Lang, { title: string; description: string }> =
 
 const uk = (lang: Lang) => lang === 'uk'
 const n = (key: string, count: number) => plural(key, count, undefined, 'uk')
+const en = (count: number, one: string, many = `${one}s`) => `${count} ${count === 1 ? one : many}`
+// "a, b and c" / "a, b і c"
+const joinAnd = (items: string[], and: string) =>
+  items.length < 2 ? items.join('') : `${items.slice(0, -1).join(', ')} ${and} ${items[items.length - 1]}`
+// A driver's teams in the order raced for (searches ask "ayrton senna teams").
+const teamsOf = (p: DriverProfile) => [...new Set(p.seasons.map((s) => s.constructorName).filter(Boolean))]
 
 export const seoText = {
-  standings: (season: string, lang: Lang): SeoText =>
-    uk(lang)
-      ? {
-          title: `Залік Ф1 ${season}: пілоти й конструктори Формули-1`,
-          description: `Залік пілотів і Кубок конструкторів Формули-1 сезону ${season}: очки, перемоги та відставання від лідера.`,
-        }
-      : {
-          title: `${season} F1 Championship Standings`,
-          description: `Formula 1 drivers' and constructors' championship standings for the ${season} season: points, wins and gaps to the leader.`,
-        },
+  // With the leader once the standings are in: the champion of a past season,
+  // the leader of this one.
+  standings: (season: string, lang: Lang, leader?: DriverStanding): SeoText => {
+    const past = Number(season) < CURRENT_SEASON
+    const who = leader && driverName(leader.driverId, leader.givenName, leader.familyName, uk(lang))
+    if (uk(lang)) {
+      return {
+        title: `Турнірна таблиця Ф1 ${season}: залік пілотів і конструкторів`,
+        description:
+          (who ? `${past ? 'Чемпіон' : 'Лідер'} ${season} року: ${who}, ${n('plural.points', leader!.points)}. ` : '') +
+          `Залік пілотів і Кубок конструкторів Формули-1 сезону ${season}: очки, перемоги та відставання від лідера.`,
+      }
+    }
+    return {
+      title: `${season} F1 Championship Standings`,
+      description:
+        (who ? `${who} ${past ? `won the ${season} title` : 'leads'} with ${leader!.points} points. ` : '') +
+        `Formula 1 drivers' and constructors' championship standings for the ${season} season: points, wins and gaps to the leader.`,
+    }
+  },
 
   calendar: (season: string, lang: Lang): SeoText =>
     uk(lang)
       ? {
-          title: `Календар Ф1 ${season}: гонки й результати Формули-1`,
+          title: `Календар Ф1 ${season}: розклад гонок і результати Формули-1`,
           description: `Календар гонок Формули-1 ${season} року з переможцями, командами та повними результатами кожного Гран-прі.`,
         }
       : {
@@ -115,15 +132,19 @@ export const seoText = {
 
   driver: (p: DriverProfile, lang: Lang): SeoText => {
     const name = driverName(p.driverId, p.givenName, p.familyName, uk(lang))
+    const active = p.lastSeason >= CURRENT_SEASON
+    const teams = teamsOf(p)
     if (uk(lang)) {
+      const span = active ? `з ${p.firstSeason} року` : `у ${p.firstSeason}-${p.lastSeason} роках`
       return {
-        title: `${name}: статистика кар'єри у Ф1`,
-        description: `${name} у Формулі-1: ${n('plural.titles', p.championships)}, ${n('plural.wins', p.wins)}, ${n('plural.podiums', p.podiums)} і ${n('plural.races', p.races)} у ${p.firstSeason}-${p.lastSeason} роках.`,
+        title: `${name}: статистика, перемоги й команди у Ф1`,
+        description: `${name} у Формулі-1 ${span}${teams.length ? `, ${teams.length === 1 ? 'команда' : 'команди'} ${joinAnd(teams, 'і')}` : ''}: ${n('plural.titles', p.championships)}, ${n('plural.wins', p.wins)}, ${n('plural.podiums', p.podiums)} і ${n('plural.races', p.races)}.`,
       }
     }
+    const span = active ? `has raced in Formula 1 since ${p.firstSeason}` : `raced in Formula 1 from ${p.firstSeason} to ${p.lastSeason}`
     return {
-      title: `${name}: F1 Career Stats`,
-      description: `${name}'s Formula 1 career: ${p.championships} title${p.championships === 1 ? '' : 's'}, ${p.wins} wins, ${p.podiums} podiums and ${p.races} races from ${p.firstSeason} to ${p.lastSeason}.`,
+      title: `${name}: F1 Career Stats, Wins & Teams`,
+      description: `${name} ${span}${teams.length ? `, for ${joinAnd(teams, 'and')}` : ''}: ${en(p.championships, 'world title')}, ${en(p.wins, 'win')}, ${en(p.podiums, 'podium')} and ${en(p.races, 'race start')}.`,
     }
   },
 
@@ -146,7 +167,7 @@ export const seoText = {
         }
       : {
           title: `${p.name}: F1 History, Titles & Wins`,
-          description: `${p.name} in Formula 1: ${p.championships} constructors' title${p.championships === 1 ? '' : 's'}, ${p.wins} wins, ${p.podiums} podiums and ${p.races} races since ${p.firstSeason}.`,
+          description: `${p.name} in Formula 1: ${en(p.championships, "constructors' title")}, ${en(p.wins, 'win')}, ${en(p.podiums, 'podium')} and ${en(p.races, 'race')} since ${p.firstSeason}.`,
         },
 
   circuits: (lang: Lang): SeoText =>
