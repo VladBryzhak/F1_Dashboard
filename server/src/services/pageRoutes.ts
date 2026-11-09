@@ -15,7 +15,7 @@ const NOT_FOUND: PageStatus = { code: 404 };
 const moved = (location: string): PageStatus => ({ code: 301, location });
 
 // Pages without parameters (besides the home page and the sections below).
-const PLAIN = new Set(["compare", "telemetry", "live", "feedback", "about", "privacy", "support"]);
+const PLAIN = new Set(["compare", "telemetry", "live", "feedback", "about", "privacy", "support", "records"]);
 
 const isYear = (s: string) => /^\d{4}$/.test(s);
 

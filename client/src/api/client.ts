@@ -75,6 +75,7 @@ async function postJson<T>(path: string, body: unknown): Promise<T> {
 }
 
 import type {
+  RecordsResponse,
   Article,
   TeamRadio,
   ArticleSummary,
@@ -137,6 +138,7 @@ export const api = {
   raceStory: (season: string, round: number) =>
     getJson<RaceStory>(`/calendar/${season}/${round}/story`),
   seasonReview: (season: string) => getJson<SeasonReview>(`/seasons/${season}/review`),
+  records: () => getJson<RecordsResponse>('/records'),
   racePreview: (season: string, round: number) =>
     getJson<RacePreview>(`/calendar/${season}/${round}/preview`),
   driverHeadshots: (season: string) =>

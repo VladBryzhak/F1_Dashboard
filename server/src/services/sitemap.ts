@@ -32,7 +32,7 @@ interface Entry {
   lastmod?: string; // yyyy-mm-dd
 }
 
-const STATIC_PAGES = ["/", "/articles", "/standings", "/calendar", "/drivers", "/teams", "/circuits", "/compare", "/live", "/telemetry", "/about", "/privacy"];
+const STATIC_PAGES = ["/", "/articles", "/standings", "/calendar", "/drivers", "/teams", "/circuits", "/records", "/compare", "/live", "/telemetry", "/about", "/privacy"];
 
 async function entries(): Promise<Entry[]> {
   const current = await getCurrentSeason();

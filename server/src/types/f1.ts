@@ -1067,3 +1067,38 @@ export interface SeasonReview {
   firstWins: ReviewFirstWin[]; // first career wins this season
   duels: ReviewDuel[];
 }
+
+// ----- All-time records (/records) -----
+
+export interface RecordEntry {
+  rank: number; // equal values share a rank
+  id: string; // f1db driverId or constructorId
+  name: string;
+  value: number;
+  // per list: the span of years, or the season (wins in a season), or the
+  // race (youngest winners)
+  season?: number;
+  races?: number; // the season's races, for wins in a season
+  grandPrixName?: string;
+  ageDays?: number; // youngest winners: age on the day
+  born?: string; // and the dates it runs between (yyyy-mm-dd)
+  date?: string;
+}
+
+export interface RecordsResponse {
+  drivers: {
+    titles: RecordEntry[];
+    wins: RecordEntry[];
+    poles: RecordEntry[];
+    podiums: RecordEntry[];
+    starts: RecordEntry[];
+    fastestLaps: RecordEntry[];
+    seasonWins: RecordEntry[];
+    youngestWinners: RecordEntry[];
+  };
+  teams: {
+    titles: RecordEntry[];
+    wins: RecordEntry[];
+    poles: RecordEntry[];
+  };
+}

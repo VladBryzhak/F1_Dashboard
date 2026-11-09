@@ -5,7 +5,8 @@ vi.mock("./articles", () => ({ TAG_LABEL: {} }));
 vi.mock("./racePreview", () => ({}));
 vi.mock("./provisional", () => ({}));
 
-import { driverFacts as serverFacts } from "./snapshot";
+import { ageText as serverAge, driverFacts as serverFacts } from "./snapshot";
+import { ageText as clientAge } from "../../../client/src/lib/age";
 import { driverFacts as clientFacts } from "../../../client/src/lib/summaries";
 import { CURRENT_SEASON } from "../../../client/src/lib/seasons";
 import type { DriverProfile } from "../types/f1";
@@ -41,5 +42,13 @@ describe("driver quick facts", () => {
         expect(clientFacts(p, "Name", uk ? "uk" : "en")).toEqual(serverFacts(p, "Name", uk, CURRENT_SEASON));
       }
     }
+  });
+});
+
+describe("record ages", () => {
+  it("counts whole years from the birthday, then the days", () => {
+    expect(serverAge("1997-09-30", "2016-05-15", false)).toBe("18 years 228 days"); // Verstappen, Spain 2016
+    expect(serverAge("1987-07-03", "2008-09-14", true)).toBe("21 р. 73 дн."); // Vettel, Italy 2008
+    expect(clientAge("1997-09-30", "2016-05-15", false)).toBe(serverAge("1997-09-30", "2016-05-15", false));
   });
 });

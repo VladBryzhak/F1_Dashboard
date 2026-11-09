@@ -19,6 +19,7 @@ const quickLinks: { to: string; label: TKey }[] = [
   { to: '/circuits', label: 'nav.circuits' },
   { to: '/drivers', label: 'nav.drivers' },
   { to: '/teams', label: 'nav.teams' },
+  { to: '/records', label: 'nav.records' },
   { to: '/compare', label: 'nav.compare' },
   { to: '/telemetry', label: 'nav.telemetry' },
   { to: '/feedback', label: 'nav.feedback' },

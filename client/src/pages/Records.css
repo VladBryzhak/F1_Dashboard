@@ -1,0 +1,81 @@
+/* All-time records: the top ten of each, in cards of ranked rows. */
+
+.rec-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(320px, 100%), 1fr));
+  gap: var(--space-md);
+  margin-bottom: var(--space-lg);
+}
+
+.rec-card {
+  margin: 0;
+}
+
+.rec-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: var(--space-xs);
+}
+
+.rec-list li {
+  position: relative;
+  display: grid;
+  grid-template-columns: 2rem 1fr auto;
+  align-items: baseline;
+  gap: var(--space-xs);
+  padding-bottom: var(--space-2xs);
+}
+
+.rec-rank {
+  font-family: var(--font-outlier);
+  color: var(--muted);
+}
+
+.rec-who {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.rec-who a {
+  color: var(--text);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.rec-who a:hover {
+  text-decoration: underline;
+}
+
+.rec-detail {
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+.rec-val {
+  font-family: var(--font-outlier);
+  font-weight: 700;
+  color: var(--text);
+  white-space: nowrap;
+}
+
+/* the bar under each row: how close to the leader */
+.rec-bar {
+  position: absolute;
+  left: 2.5rem;
+  bottom: 0;
+  height: 2px;
+  background: var(--color-cool);
+  opacity: 0.55;
+  border-radius: 1px;
+}
+
+.rec-group {
+  margin: var(--space-lg) 0 var(--space-md);
+}
+
+.rec-note {
+  font-size: 0.85rem;
+}
