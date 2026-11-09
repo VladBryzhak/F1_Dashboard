@@ -42,6 +42,13 @@ He started on the podium: third on his debut in Australia in 2007. One win in ev
 
 São Paulo has been part of Hamilton's story from the start. In 2008 he finished fifth there and took his first title by a single point. He has won at Interlagos three times: in 2016, in 2018 and in 2021, when he won from tenth on the grid. Including those wins, he has seven podiums at the circuit from 19 starts.
 
+For the 400th he wore Brazil's colours: a yellow helmet with green stripes. Ferrari posted the weekend with a short line, "Milestone race 400 checked off in São Paulo". The photos show the helmet up close and his car in the garage under the number 44 board, surrounded by mechanics.
+
+```instagram
+url: https://www.instagram.com/p/Dffx6lpEYJt/
+handle: scuderiaferrari
+```
+
 ## What comes next
 
 Hamilton is fourth in the championship with 261 points, 18 behind Verstappen in second, with three races left. He has said he is "still all in" at Ferrari for the foreseeable future, and he will race for the team in 2027 ([Crash.net](https://www.crash.net/f1/news/1109337/1/fernando-alonso-reacts-lewis-hamilton-joins-his-exclusive-f1-club)). Alonso, who is signed with Aston Martin for 2027, stays 45 starts ahead. Hamilton can only close that gap if Alonso stops first.
