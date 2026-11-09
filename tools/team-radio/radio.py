@@ -19,6 +19,7 @@ import subprocess
 import sys
 import tempfile
 import time
+import urllib.parse
 import urllib.request
 
 import numpy as np
@@ -76,7 +77,8 @@ def download(session_key, clips):
         name = os.path.basename(c["recording_url"])[:-4]
         mp3, raw, clean = (os.path.join(base, f"{name}{ext}") for ext in (".mp3", ".raw.wav", ".clean.wav"))
         if not os.path.exists(mp3):
-            urllib.request.urlretrieve(c["recording_url"], mp3)
+            # the meeting's name is in the path, e.g. São Paulo: send it percent-encoded
+            urllib.request.urlretrieve(urllib.parse.quote(c["recording_url"], safe=":/%"), mp3)
         if not os.path.exists(clean):
             ffmpeg(mp3, raw)
             ffmpeg(raw, clean, CLEAN)
