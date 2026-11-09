@@ -7,9 +7,9 @@ Max Verstappen started the São Paulo Grand Prix 21st and finished it second, 14
 
 ```stats
 title: Verstappen at Interlagos
-- 2024: 17th to 1st
-- 2025: pit lane to 3rd
-- 2026: 21st to 2nd
+- 2024, from 17th: P1
+- 2025, from pit lane: P3
+- 2026, from 21st: P2
 source: f1db results; grid slots from Wikipedia and ESPN
 ```
 
@@ -23,6 +23,13 @@ The weather helped him again. Everyone started on intermediates, the track dried
 
 Ahead of him the race kept changing. Antonelli and Liam Lawson both got past Norris off the line, then Antonelli spun at Turn 1 and later went straight on at the same corner, and Norris took control. Verstappen was voted driver of the day.
 
+F1 summed up his afternoon in two short lines: started P21, finished P2. The photo shows him on the podium, the trophy raised in one hand and the other hand up to the crowd.
+
+```instagram
+url: https://www.instagram.com/p/DffpVmvkwJQ/
+handle: f1
+```
+
 ## "What a disaster to drive"
 
 He was not celebrating. On slicks he had heavy oversteer in the fast corners, and after the flag he said: "I'm sorry, but what a disaster to drive." He believes he spent most of the race with a damaged car, and that there was more to come if it had been in good shape. Back on intermediates in the final laps, he said, the car felt night and day different. Red Bull now want to find out whether something broke ([ESPN](https://www.espn.com/f1/story/_/id/50389072/max-verstappen-sao-paulo-grand-prix-brazil-formula-1)).
@@ -33,7 +40,7 @@ The bigger picture is his form. Second in Brazil was Verstappen's eighth podium 
 
 ```stats
 title: Rounds 13 to 20
-- Podiums: 8 of 8
+- Podiums: 8
 - Wins: 3
 - Points: 159
 source: f1db

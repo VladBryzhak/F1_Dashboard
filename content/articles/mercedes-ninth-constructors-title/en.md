@@ -8,8 +8,8 @@ Mercedes are constructors' champions again. In a wet São Paulo Grand Prix, Geor
 ```stats
 title: Mercedes after round 20
 - Points: 652
-- Lead over Ferrari: 142
-- Wins: 12 of 20
+- Lead over Ferrari: +142
+- Wins: 12
 - Podiums: 24
 source: f1db, after the São Paulo Grand Prix
 ```
@@ -31,18 +31,25 @@ The last time F1 brought in a new generation of power units was 2014, with the f
 The 2026 rules brought new power units, with a much larger share of electric power, and smaller, lighter cars. Mercedes got it right from the first race, as they did twelve years ago. Antonelli's season is covered in [The Champion's season in numbers](/articles/antonelli-champion-season-in-numbers); this title belongs to the whole team, with Russell's three wins and 262 points in it.
 
 ```stats
-title: Mercedes, 2022 to 2026
-- 2022: 3rd, 1 win
-- 2023: 2nd, 0 wins
-- 2024: 4th, 4 wins
-- 2025: 2nd, 2 wins
-- 2026: 1st, 12 wins
-source: f1db
+title: Mercedes in the constructors' table
+- 2022: P3
+- 2023: P2
+- 2024: P4
+- 2025: P2
+- 2026: P1
+source: f1db; wins by year: 1, 0, 4, 2, 12
 ```
 
 ## Level with Williams
 
 With nine titles, Mercedes draw level with Williams. Only two teams have more: McLaren with 10 and Ferrari with 16. Every one of the nine has come since 2014, in the team's current form. Mercedes the works team returned to F1 in 2010, after Brawn's title season of 2009.
+
+There is a second record in this title, and it belongs to Toto Wolff. He has run the team since 2013, so all nine titles came under him. F1 marked it on Instagram: a ninth constructors' title for a team boss equals the record of Sir Frank Williams, who led Williams to its nine. The graphic shows Wolff with his arms crossed beside the words "Toto's done it" and every title year after it, from 2014 on.
+
+```instagram
+url: https://www.instagram.com/p/DffeUYZGK6A/
+handle: f1
+```
 
 ## What is left
 
