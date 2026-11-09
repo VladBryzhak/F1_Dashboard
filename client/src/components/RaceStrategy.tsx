@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useMemo, useState, type PointerEvent } from 'react'
 import { api } from '../api/client'
 import { useAsync } from '../hooks/useAsync'
 import { useI18n, type TKey } from '../i18n/core'
@@ -10,16 +10,18 @@ const COMPOUNDS = ['SOFT', 'MEDIUM', 'HARD', 'INTERMEDIATE', 'WET'] as const
 
 // Position-by-lap chart. Each car is a line in its team colour (the second
 // car of a team dashed); tapping a code focuses that car and dims the rest.
+// With cars focused, the lap under the pointer shows their positions then.
 function LapChart({ data }: { data: Strategy }) {
   const { t } = useI18n()
   const [focus, setFocus] = useState<Set<number>>(new Set())
   const [hover, setHover] = useState<number | null>(null)
+  const [atLap, setAtLap] = useState<number | null>(null)
 
   const rows = data.drivers.length
   const laps = data.totalLaps
   const W = 1000
   const ROW = 26
-  const PAD_L = 52
+  const PAD_L = 84 // positions, then the grid codes
   const PAD_R = 52
   const PAD_T = 14
   const PAD_B = 30
@@ -73,6 +75,16 @@ function LapChart({ data }: { data: Strategy }) {
 
   const byGrid = [...data.drivers].filter((d) => d.grid != null)
 
+  // The lap under the pointer, from its x in the chart's own units.
+  function track(e: PointerEvent<SVGSVGElement>) {
+    if (!focus.size) return
+    const box = e.currentTarget.getBoundingClientRect()
+    const vx = ((e.clientX - box.left) / box.width) * W
+    const lap = Math.round(((vx - PAD_L) / (W - PAD_L - PAD_R)) * laps)
+    setAtLap(lap < 0 || lap > laps ? null : lap)
+  }
+  const shown = atLap != null && focus.size ? data.drivers.filter((d) => focus.has(d.num) && d.positions[atLap] != null) : []
+
   return (
     <div className="strat-chart-wrap">
       <svg
@@ -81,9 +93,17 @@ function LapChart({ data }: { data: Strategy }) {
         role="img"
         aria-label={t('strat.lapChart')}
         onMouseLeave={() => setHover(null)}
+        onPointerMove={track}
+        onPointerDown={track} // a tap on a phone
+        onPointerLeave={() => setAtLap(null)}
       >
         {Array.from({ length: rows }, (_, i) => (
-          <line key={i} x1={PAD_L} x2={W - PAD_R} y1={y(i + 1)} y2={y(i + 1)} className="strat-grid" />
+          <g key={i}>
+            <line x1={PAD_L} x2={W - PAD_R} y1={y(i + 1)} y2={y(i + 1)} className="strat-grid" />
+            <text x={14} y={y(i + 1) + 4} className="strat-pos">
+              {i + 1}
+            </text>
+          </g>
         ))}
         {ticks.map((l) => (
           <g key={l}>
@@ -118,6 +138,37 @@ function LapChart({ data }: { data: Strategy }) {
               </g>
             )
           })}
+
+        {/* The focused cars at the lap under the pointer. */}
+        {atLap != null && shown.length > 0 && (
+          <g className="strat-at" pointerEvents="none">
+            <line x1={x(atLap)} x2={x(atLap)} y1={PAD_T - 6} y2={H - PAD_B + 6} />
+            <text x={x(atLap)} y={PAD_T - 1} textAnchor="middle" className="strat-at-lap">
+              {atLap === 0 ? t('strat.atGrid') : t('strat.atLap', { n: atLap })}
+            </text>
+            {shown.map((d) => {
+              const p = d.positions[atLap]!
+              const left = x(atLap) > W - PAD_R - 70
+              const label = `P${p}`
+              return (
+                <g key={d.num}>
+                  <circle cx={x(atLap)} cy={y(p)} r={5.5} fill={teamColor(d.colour)} />
+                  <rect
+                    x={left ? x(atLap) - 12 - 52 : x(atLap) + 12}
+                    y={y(p) - 10}
+                    width={52}
+                    height={20}
+                    rx={4}
+                    fill={teamColor(d.colour)}
+                  />
+                  <text x={left ? x(atLap) - 12 - 26 : x(atLap) + 12 + 26} y={y(p) + 4} textAnchor="middle" className="strat-at-pos">
+                    {d.code} {label}
+                  </text>
+                </g>
+              )
+            })}
+          </g>
+        )}
 
         {/* Grid order on the left, finishing order on the right. */}
         {byGrid.map((d) => (

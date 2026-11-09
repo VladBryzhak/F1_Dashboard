@@ -62,6 +62,33 @@
   fill: var(--text);
 }
 
+.strat-pos {
+  fill: var(--muted-2);
+  font: 600 12px var(--font-outlier);
+}
+
+.strat-at line {
+  stroke: var(--text);
+  stroke-width: 1;
+  stroke-dasharray: 3 3;
+  opacity: 0.6;
+}
+
+.strat-at circle {
+  stroke: var(--color-paper);
+  stroke-width: 2;
+}
+
+.strat-at-lap {
+  fill: var(--text);
+  font: 700 11px var(--font-body);
+}
+
+.strat-at-pos {
+  fill: var(--color-ink-dark);
+  font: 800 11px var(--font-outlier);
+}
+
 .strat-chart-foot {
   display: flex;
   flex-wrap: wrap;
