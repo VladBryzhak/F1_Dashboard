@@ -249,3 +249,71 @@ export function seasonSummary(
   }
   return text
 }
+
+// ---- Quick facts: the questions people search, answered from the data ----
+// ("how many wins does Hamilton have"). Mirrored in the crawler snapshot
+// (server/src/services/snapshot.ts, driverFacts): keep the two in step.
+// Ukrainian questions keep the name in the nominative ("Скільки перемог має
+// Льюїс Хемілтон?") and the answers avoid case endings, so any name reads right.
+export interface Fact {
+  q: string
+  a: string
+}
+
+export function driverFacts(p: DriverProfile, name: string, lang: Lang = getLang()): Fact[] {
+  const uk = lang === 'uk'
+  const n = (key: string, v: number) => plural(key, v, undefined, 'uk')
+  const active = p.lastSeason >= CURRENT_SEASON
+  const seasons = new Set(p.seasons.map((s) => s.season)).size
+  const teams = [...new Set(p.seasons.map((s) => s.constructorName).filter(Boolean))]
+  const and = (items: string[]) =>
+    items.length < 2 ? items.join('') : `${items.slice(0, -1).join(', ')} ${uk ? 'і' : 'and'} ${items[items.length - 1]}`
+  // title years: the seasons won, past ones (this season's leader isn't champion yet)
+  const titleYears = p.seasons.filter((s) => s.position === 1 && s.season < CURRENT_SEASON).map((s) => s.season)
+  if (titleYears.length < p.championships) {
+    const now = p.seasons.find((s) => s.season === CURRENT_SEASON && s.position === 1)
+    if (now) titleYears.push(now.season)
+  }
+  const bestYear = p.bestChampionship != null ? p.seasons.find((s) => s.position === p.bestChampionship)?.season : undefined
+  const best = p.bestChampionship != null ? `P${p.bestChampionship}${bestYear ? ` (${bestYear})` : ''}` : null
+  const facts: Fact[] = []
+  if (uk) {
+    facts.push({
+      q: `Скільки перемог має ${name}?`,
+      a: p.wins > 0
+        ? `${n('plural.wins', p.wins)}; стартів у кар'єрі: ${p.races}.`
+        : `${active ? 'Поки жодної' : 'Жодної'} перемоги в Гран-прі; стартів у кар'єрі: ${p.races}${p.bestResult ? `, найкращий фініш: P${p.bestResult}` : ''}.`,
+    })
+    facts.push({
+      q: `Скільки титулів чемпіона світу має ${name}?`,
+      a: p.championships > 0
+        ? `${p.championships}: ${titleYears.join(', ')}.`
+        : `${active ? 'Поки жодного' : 'Жодного'}${best ? `; найкраще місце в чемпіонаті: ${best}` : ''}.`,
+    })
+    facts.push({
+      q: `Скільки сезонів у Формулі-1 має ${name}?`,
+      a: `${seasons}, ${active ? `з ${p.firstSeason} року` : p.firstSeason === p.lastSeason ? `у ${p.firstSeason} році` : `у ${p.firstSeason}-${p.lastSeason} роках`}${teams.length ? `. ${teams.length === 1 ? 'Команда' : 'Команди'}: ${and(teams)}` : ''}.`,
+    })
+    if (p.poles || p.podiums) facts.push({ q: `Скільки поулів і подіумів має ${name}?`, a: `Поул-позицій: ${p.poles}, подіумів: ${p.podiums}.` })
+    return facts
+  }
+  const c = (v: number, one: string) => count(v, one)
+  facts.push({
+    q: `How many races has ${name} won?`,
+    a: p.wins > 0
+      ? `${c(p.wins, 'Grand Prix win')} from ${c(p.races, 'race start')}.`
+      : `No Grand Prix wins${active ? ' yet' : ''} from ${c(p.races, 'race start')}${p.bestResult ? `; best finish P${p.bestResult}` : ''}.`,
+  })
+  facts.push({
+    q: `How many world titles has ${name} won?`,
+    a: p.championships > 0
+      ? `${p.championships}: ${titleYears.join(', ')}.`
+      : `None${active ? ' yet' : ''}${best ? `; best championship finish ${best}` : ''}.`,
+  })
+  facts.push({
+    q: `How long has ${name} been in Formula 1?`,
+    a: `${c(seasons, 'season')}, ${active ? `since ${p.firstSeason}` : p.firstSeason === p.lastSeason ? `in ${p.firstSeason}` : `from ${p.firstSeason} to ${p.lastSeason}`}${teams.length ? `, with ${and(teams)}` : ''}.`,
+  })
+  if (p.poles || p.podiums) facts.push({ q: `How many pole positions and podiums does ${name} have?`, a: `${c(p.poles, 'pole position')} and ${c(p.podiums, 'podium')}.` })
+  return facts
+}

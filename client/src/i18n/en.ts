@@ -343,6 +343,7 @@ const en = {
   'drv.formHint': 'Last {n} Grands Prix',
   'drv.family': 'Family in Formula 1',
   'drv.career': 'Season by season',
+  'drv.facts': 'Quick facts',
   'drv.colYear': 'Year',
   'drv.colTeam': 'Team',
   'drv.colPos': 'Pos',

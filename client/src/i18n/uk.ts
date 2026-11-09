@@ -346,6 +346,7 @@ const uk: Dict & Record<string, string> = {
   'drv.formHint': 'Останні {n} Гран-прі',
   'drv.family': 'Родина у Формулі-1',
   'drv.career': 'По сезонах',
+  'drv.facts': 'Коротко',
   'drv.colYear': 'Рік',
   'drv.colTeam': 'Команда',
   'drv.colPos': 'Місце',

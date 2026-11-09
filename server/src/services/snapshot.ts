@@ -18,6 +18,7 @@ import { gpTitle, type Lang } from "./gpNames";
 import { UK, ukCountry, ukDate, ukPlural } from "./ukText";
 import { driverName, UK_DRIVER_NAMES } from "./ukNames";
 import { getRaceWeekendNow } from "./provisional";
+import type { DriverProfile } from "../types/f1";
 
 // Plain-HTML snapshot of a page for search-engine crawlers. The app renders
 // in the browser, so the raw HTML a crawler fetches first was an empty
@@ -450,6 +451,57 @@ async function teamList(c: Ctx, season: number, current: number): Promise<string
   );
 }
 
+// The questions people search, answered: a mirror of driverFacts in
+// client/src/lib/summaries.ts (keep the two in step).
+export function driverFacts(p: DriverProfile, name: string, uk: boolean, current: number): { q: string; a: string }[] {
+  const active = p.lastSeason >= current;
+  const seasons = new Set(p.seasons.map((s) => s.season)).size;
+  const teams = [...new Set(p.seasons.map((s) => s.constructorName).filter(Boolean))];
+  const and = (items: string[]) => joinAnd(items, uk ? "і" : "and");
+  const titleYears = p.seasons.filter((s) => s.position === 1 && s.season < current).map((s) => s.season);
+  if (titleYears.length < p.championships) {
+    const now = p.seasons.find((s) => s.season === current && s.position === 1);
+    if (now) titleYears.push(now.season);
+  }
+  const bestYear = p.bestChampionship != null ? p.seasons.find((s) => s.position === p.bestChampionship)?.season : undefined;
+  const best = p.bestChampionship != null ? `P${p.bestChampionship}${bestYear ? ` (${bestYear})` : ""}` : null;
+  const facts: { q: string; a: string }[] = [];
+  if (uk) {
+    facts.push({
+      q: `Скільки перемог має ${name}?`,
+      a: p.wins > 0
+        ? `${ukPlural(p.wins, UK.wins)}; стартів у кар'єрі: ${p.races}.`
+        : `${active ? "Поки жодної" : "Жодної"} перемоги в Гран-прі; стартів у кар'єрі: ${p.races}${p.bestResult ? `, найкращий фініш: P${p.bestResult}` : ""}.`,
+    });
+    facts.push({
+      q: `Скільки титулів чемпіона світу має ${name}?`,
+      a: p.championships > 0 ? `${p.championships}: ${titleYears.join(", ")}.` : `${active ? "Поки жодного" : "Жодного"}${best ? `; найкраще місце в чемпіонаті: ${best}` : ""}.`,
+    });
+    facts.push({
+      q: `Скільки сезонів у Формулі-1 має ${name}?`,
+      a: `${seasons}, ${active ? `з ${p.firstSeason} року` : p.firstSeason === p.lastSeason ? `у ${p.firstSeason} році` : `у ${p.firstSeason}-${p.lastSeason} роках`}${teams.length ? `. ${teams.length === 1 ? "Команда" : "Команди"}: ${and(teams)}` : ""}.`,
+    });
+    if (p.poles || p.podiums) facts.push({ q: `Скільки поулів і подіумів має ${name}?`, a: `Поул-позицій: ${p.poles}, подіумів: ${p.podiums}.` });
+    return facts;
+  }
+  facts.push({
+    q: `How many races has ${name} won?`,
+    a: p.wins > 0
+      ? `${enPlural(p.wins, "Grand Prix win")} from ${enPlural(p.races, "race start")}.`
+      : `No Grand Prix wins${active ? " yet" : ""} from ${enPlural(p.races, "race start")}${p.bestResult ? `; best finish P${p.bestResult}` : ""}.`,
+  });
+  facts.push({
+    q: `How many world titles has ${name} won?`,
+    a: p.championships > 0 ? `${p.championships}: ${titleYears.join(", ")}.` : `None${active ? " yet" : ""}${best ? `; best championship finish ${best}` : ""}.`,
+  });
+  facts.push({
+    q: `How long has ${name} been in Formula 1?`,
+    a: `${enPlural(seasons, "season")}, ${active ? `since ${p.firstSeason}` : p.firstSeason === p.lastSeason ? `in ${p.firstSeason}` : `from ${p.firstSeason} to ${p.lastSeason}`}${teams.length ? `, with ${and(teams)}` : ""}.`,
+  });
+  if (p.poles || p.podiums) facts.push({ q: `How many pole positions and podiums does ${name} have?`, a: `${enPlural(p.poles, "pole position")} and ${enPlural(p.podiums, "podium")}.` });
+  return facts;
+}
+
 async function driver(c: Ctx, id: string, current: number): Promise<string | null> {
   const p = await getDriverProfile(id).catch(() => null);
   if (!p) return null;
@@ -488,6 +540,7 @@ async function driver(c: Ctx, id: string, current: number): Promise<string | nul
   if (born || bests.length) {
     body += `<p>${born}${bests.length ? `${born ? " " : ""}${c.uk ? "Рекорди" : "Records"}: ${bests.join(", ")}.` : ""}</p>`;
   }
+  body += `<h2>${c.uk ? "Коротко" : "Quick facts"}</h2><dl>${driverFacts(p, name, c.uk, current).map((f) => `<dt>${esc(f.q)}</dt><dd>${esc(f.a)}</dd>`).join("")}</dl>`;
   const mates = await getTeammates(id).catch(() => new Map<number, { id: string; name: string }[]>());
   body +=
     `<h2>${c.uk ? "По сезонах" : "Season by season"}</h2>` +
