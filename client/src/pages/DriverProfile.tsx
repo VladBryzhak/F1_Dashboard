@@ -304,7 +304,7 @@ export default function DriverProfile() {
                           <span className="team">{s.constructorName || ''}</span>
                         )}
                       </td>
-                      <td className="num">{s.position}</td>
+                      <td className="num">{s.position || ''}</td>
                       <td className="num points">{s.points}</td>
                       <td className="num">{s.wins}</td>
                     </tr>

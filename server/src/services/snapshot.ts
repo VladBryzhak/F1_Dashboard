@@ -10,6 +10,7 @@ import {
   getHomeHighlights,
   getRaceWeekend,
   getSeasonReview,
+  getTeammates,
   hasSeasonReview,
 } from "./f1db";
 import { getArticle, listArticles, TAG_LABEL } from "./articles";
@@ -447,7 +448,7 @@ async function driver(c: Ctx, id: string, current: number): Promise<string | nul
   const p = await getDriverProfile(id).catch(() => null);
   if (!p) return null;
   const name = `${p.givenName} ${p.familyName}`;
-  const teams = [...new Map(p.seasons.map((s) => [s.constructorId, s.constructorName])).entries()].map(([tid, tn]) =>
+  const teams = [...new Map(p.seasons.filter((s) => s.constructorId).map((s) => [s.constructorId, s.constructorName])).entries()].map(([tid, tn]) =>
     c.a(`/teams/${tid}`, tn),
   );
   const active = p.lastSeason >= current;
@@ -467,14 +468,36 @@ async function driver(c: Ctx, id: string, current: number): Promise<string | nul
       (teams.length ? `, driving for ${joinAnd(teams, "and")}` : "") +
       `. ${enPlural(p.championships, "world title")}, ${enPlural(p.wins, "win")}, ${enPlural(p.podiums, "podium")}, ${enPlural(p.poles, "pole position")} and ${p.points} points from ${enPlural(p.races, "race start")}.</p>`;
   }
+  // What sets one profile apart from the next (so search engines don't take
+  // two drivers' pages for copies of one): birth, best results, teammates.
+  const born = p.dateOfBirth
+    ? c.uk
+      ? `Народження: ${esc(ukDate(p.dateOfBirth))}${p.placeOfBirth ? `, ${esc(p.placeOfBirth)}` : ""}${p.birthCountryCode && ukCountry(p.birthCountryCode) ? ` (${esc(ukCountry(p.birthCountryCode))})` : ""}.`
+      : `Born ${esc(enDate(p.dateOfBirth))}${p.placeOfBirth ? ` in ${esc(p.placeOfBirth)}` : ""}.`
+    : "";
+  const best = c.uk
+    ? [p.bestResult && `найкращий фініш P${p.bestResult}`, p.bestGrid && `найкраща стартова позиція P${p.bestGrid}`, p.bestChampionship && `найкраще місце в чемпіонаті P${p.bestChampionship}`]
+    : [p.bestResult && `best finish P${p.bestResult}`, p.bestGrid && `best grid position P${p.bestGrid}`, p.bestChampionship && `best championship finish P${p.bestChampionship}`];
+  const bests = best.filter(Boolean) as string[];
+  if (born || bests.length) {
+    body += `<p>${born}${bests.length ? `${born ? " " : ""}${c.uk ? "Рекорди" : "Records"}: ${bests.join(", ")}.` : ""}</p>`;
+  }
+  const mates = await getTeammates(id).catch(() => new Map<number, { id: string; name: string }[]>());
   body +=
     `<h2>${c.uk ? "По сезонах" : "Season by season"}</h2>` +
     table(
-      c.uk ? ["Сезон", "Команда", "Місце", "Перемоги", "Очки"] : ["Season", "Team", "Position", "Wins", "Points"],
+      c.uk ? ["Сезон", "Команда", "Напарники", "Місце", "Перемоги", "Очки"] : ["Season", "Team", "Teammates", "Position", "Wins", "Points"],
       p.seasons
         .slice()
         .reverse()
-        .map((s) => [c.a(`/standings/${s.season}`, String(s.season)), c.a(`/teams/${s.constructorId}`, s.constructorName), s.position > 0 ? `P${s.position}` : "", String(s.wins), String(s.points)]),
+        .map((s) => [
+          c.a(`/standings/${s.season}`, String(s.season)),
+          s.constructorId ? c.a(`/teams/${s.constructorId}`, s.constructorName) : "",
+          (mates.get(s.season) ?? []).map((m) => c.a(`/drivers/${m.id}`, m.name)).join(", "),
+          s.position > 0 ? `P${s.position}` : "",
+          String(s.wins),
+          String(s.points),
+        ]),
     );
   return (
     body +
