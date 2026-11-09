@@ -1,0 +1,13 @@
+{
+  "date": "2026-11-09",
+  "season": 2026,
+  "round": 20,
+  "day": "midweek",
+  "tag": "drivers",
+  "cover": {
+    "driverId": "lewis-hamilton",
+    "constructorId": "ferrari",
+    "number": "44",
+    "reading": "400"
+  }
+}
