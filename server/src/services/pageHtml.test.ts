@@ -62,6 +62,7 @@ describe("pageHtml", () => {
     const html = await pageHtml(file, "/standings", "Mozilla/5.0", "n");
     expect(html).toContain('<meta property="og:type" content="website" />');
     expect(html).not.toContain("article:published_time");
+    expect(html).toContain('<meta name="robots" content="max-image-preview:large" />');
   });
 
   it("serves a 'not found' shell: noindex, no canonical or language twins, nonce kept", async () => {
@@ -69,6 +70,7 @@ describe("pageHtml", () => {
     expect(html).toContain('<html lang="uk">');
     expect(html).toContain("<title>Сторінку не знайдено · Paddock Times</title>");
     expect(html).toContain('<meta name="robots" content="noindex" />');
+    expect(html).not.toContain("max-image-preview");
     expect(html).not.toContain('rel="canonical"');
     expect(html).not.toContain("hreflang");
     expect(html).not.toContain("og:url");

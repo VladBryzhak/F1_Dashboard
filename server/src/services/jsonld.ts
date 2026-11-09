@@ -2,6 +2,7 @@ import { getArticle } from "./articles";
 import { getCircuitProfile, getConstructorProfile, getDriverProfile, getRaceWeekend } from "./f1db";
 import { gpTitle, type Lang } from "./gpNames";
 import type { Article, CircuitProfile, ConstructorProfile, DriverProfile, RaceWeekend } from "../types/f1";
+import { driverName } from "./ukNames";
 
 // schema.org JSON-LD for a page, written into the HTML by pageHtml, so search
 // engines (and the ones that don't run JavaScript at all) see the page as an
@@ -43,8 +44,8 @@ export async function pageJsonLd(siteUrl: string, pagePath: string, lang: Lang):
       if (!p) return null;
       const path = `/drivers/${p.driverId}`;
       return [
-        driverLd(p, url(path)),
-        crumbs([home, { name: uk ? "Пілоти" : "Drivers", path: "/drivers" }, { name: `${p.givenName} ${p.familyName}`, path }]),
+        driverLd(p, url(path), uk),
+        crumbs([home, { name: uk ? "Пілоти" : "Drivers", path: "/drivers" }, { name: driverName(p.driverId, p.givenName, p.familyName, uk), path }]),
       ];
     }
 
@@ -128,11 +129,15 @@ function siteLd(siteUrl: string): object[] {
   ];
 }
 
-function driverLd(p: DriverProfile, pageUrl: string): object {
+// On a Ukrainian page the name is the Ukrainian spelling, the Latin one its alternateName.
+function driverLd(p: DriverProfile, pageUrl: string, uk = false): object {
+  const latin = `${p.givenName} ${p.familyName}`;
+  const name = driverName(p.driverId, p.givenName, p.familyName, uk);
   return {
     "@context": CTX,
     "@type": "Person",
-    name: `${p.givenName} ${p.familyName}`,
+    name,
+    ...(name !== latin && { alternateName: latin }),
     givenName: p.givenName,
     familyName: p.familyName,
     jobTitle: "Formula One Driver",

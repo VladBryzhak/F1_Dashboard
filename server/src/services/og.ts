@@ -15,6 +15,7 @@ import {
 import type { CircuitOutline } from "../types/f1";
 import { gpTitle, type Lang } from "./gpNames";
 import { UK, ukCountry, ukDate, ukPlural } from "./ukText";
+import { driverName, UK_DRIVER_NAMES } from "./ukNames";
 
 // Link previews (Open Graph / Twitter cards). Social crawlers don't run our
 // JavaScript, so the server works out each page's title, description and a
@@ -199,7 +200,8 @@ export async function describePage(rawPath: string, lang: Lang = "en"): Promise<
         const p = await getDriverProfile(a).catch(() => null);
         if (p) {
           const lastTeam = p.seasons[p.seasons.length - 1]?.constructorId ?? "";
-          const name = `${p.givenName} ${p.familyName}`;
+          const name = driverName(p.driverId, p.givenName, p.familyName, uk);
+          const ukName = uk ? UK_DRIVER_NAMES[p.driverId] : undefined;
           return pg(
             uk ? `${name}: статистика кар'єри у Ф1` : `${name}: F1 Career Stats`,
             uk
@@ -207,8 +209,8 @@ export async function describePage(rawPath: string, lang: Lang = "en"): Promise<
               : `${name}'s Formula 1 career: ${p.championships} title${p.championships === 1 ? "" : "s"}, ${p.wins} wins, ${p.podiums} podiums and ${p.races} races from ${p.firstSeason} to ${p.lastSeason}.`,
             {
               kind: "driver",
-              first: p.givenName,
-              last: p.familyName,
+              first: ukName?.[0] ?? p.givenName,
+              last: ukName?.[1] ?? p.familyName,
               meta: [uk ? ukCountry(p.countryCode) : p.nationality, `${p.firstSeason}–${p.lastSeason}`].filter(Boolean).join(" · "),
               number: p.permanentNumber,
               color: teamColor(lastTeam),

@@ -5,6 +5,7 @@ import { plural, type Lang } from '../i18n/core'
 import type { Article, CircuitProfile, ConstructorProfile, DriverProfile, RaceWeekend, SeasonReview } from '../types/f1'
 import { countryName } from './countries'
 import { gpTitle } from './gpNames'
+import { driverName } from './ukNames'
 
 export type NotFoundKind = 'page' | 'driver' | 'team' | 'circuit' | 'race' | 'article'
 
@@ -113,7 +114,7 @@ export const seoText = {
         },
 
   driver: (p: DriverProfile, lang: Lang): SeoText => {
-    const name = `${p.givenName} ${p.familyName}`
+    const name = driverName(p.driverId, p.givenName, p.familyName, uk(lang))
     if (uk(lang)) {
       return {
         title: `${name}: статистика кар'єри у Ф1`,

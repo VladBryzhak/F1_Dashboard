@@ -237,6 +237,8 @@ export async function pageHtml(
     html = setTag(html, 'name="twitter:description"', meta.description);
   }
   html = setTag(html, 'rel="canonical"', url, "href");
+  // let search show the page's picture large (Discover, Top stories)
+  html = html.replace("</head>", `<meta name="robots" content="max-image-preview:large" /></head>`);
   html = setTag(html, 'property="og:url"', url);
   html = setTag(html, 'property="og:image"', image);
   html = setTag(html, 'property="og:image:width"', "1200");
