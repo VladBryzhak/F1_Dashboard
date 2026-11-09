@@ -34,14 +34,18 @@ const DRY_RUN = process.env.TELEGRAM_DRY_RUN === "1";
 // posted at once (retried each check until it goes out). Remove it after, or
 // every restart posts it again.
 const TEST_POST = process.env.TELEGRAM_TEST_POST === "1";
-// Set for one deploy to post past sessions' cards now, e.g.
-// "2026:20:Qualifying,2026:20:Race". Each goes out once: an opening line of
-// their own tells them from the text posts of the same sessions, and the
-// channel page is checked for it, so a restart doesn't post them again.
-const CARDS_NOW = (process.env.TELEGRAM_CARDS_NOW ?? "")
-  .split(",")
-  .map((s) => s.trim().split(":"))
-  .filter((p) => p.length === 3);
+// Past sessions' cards to post once, until a date (no setting to add or
+// remove on Render). Each opens with a line of its own that tells it from the
+// text post of the same session, and the channel page is checked for it, so a
+// restart doesn't post it again; the date keeps one from coming back once the
+// post has scrolled off the page.
+const CARDS_NOW: { until: string; sessions: [string, string, string][] } = {
+  until: "2026-11-11",
+  sessions: [
+    ["2026", "20", "Qualifying"],
+    ["2026", "20", "Race"],
+  ],
+};
 const CARDS_INTRO = "🆕 Результати сесій тепер виходять і картками";
 
 const CHECK_MS = 5 * 60_000;
@@ -279,7 +283,7 @@ async function cardsNow(): Promise<void> {
   const page = await channelPage();
   if (page == null) return console.warn("[telegram] cards now: channel page unreadable, trying again at the next check");
   cardsDone = true;
-  for (const [season, round, session] of CARDS_NOW) {
+  for (const [season, round, session] of CARDS_NOW.sessions) {
     const hero = await sessionHeroOf(season, round, session).catch(() => null);
     if (!hero) {
       console.warn(`[telegram] cards now: no result for ${season}:${round}:${session}`);
@@ -302,7 +306,7 @@ async function cardsNow(): Promise<void> {
 let cardsDone = false;
 
 async function check(): Promise<void> {
-  if (CARDS_NOW.length && !cardsDone) await cardsNow();
+  if (!cardsDone && new Date().toISOString().slice(0, 10) <= CARDS_NOW.until) await cardsNow();
   if (TEST_POST && !testDone) await testPost();
   const posts = (await candidates(Date.now())).filter((p) => !posted.has(p.key));
   if (!posts.length) return;
