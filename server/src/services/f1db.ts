@@ -1432,6 +1432,8 @@ export interface SeasonDriver {
   abbreviation: string | null;
   constructorId: string;
   constructorName: string;
+  nationality: string;
+  countryCode: string | null;
 }
 
 // A season's drivers with their team (the one they drove most rounds for),
@@ -1452,6 +1454,8 @@ export async function getSeasonDrivers(season: number): Promise<SeasonDriver[]> 
       abbreviation: d.abbreviation,
       constructorId,
       constructorName: ds.constructors.get(constructorId)?.name ?? constructorId,
+      nationality: demonym(ds, d.nationalityCountryId),
+      countryCode: alpha2(ds, d.nationalityCountryId),
     });
   }
   return out;

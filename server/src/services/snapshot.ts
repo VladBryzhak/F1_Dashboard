@@ -8,7 +8,6 @@ import {
   getDriverProfile,
   getDriverStandings,
   getHomeHighlights,
-  getRaceWeekend,
   getSeasonReview,
   getTeammates,
   hasSeasonReview,
@@ -17,6 +16,8 @@ import { getArticle, listArticles, TAG_LABEL } from "./articles";
 import { getRacePreview } from "./racePreview";
 import { gpTitle, type Lang } from "./gpNames";
 import { UK, ukCountry, ukDate, ukPlural } from "./ukText";
+import { driverName, UK_DRIVER_NAMES } from "./ukNames";
+import { getRaceWeekendNow } from "./provisional";
 
 // Plain-HTML snapshot of a page for search-engine crawlers. The app renders
 // in the browser, so the raw HTML a crawler fetches first was an empty
@@ -71,7 +72,12 @@ function ctx(lang: Lang, current?: number): Ctx {
   };
   return {
     uk,
-    a: (path, text) => `<a href="${esc(href(path))}">${esc(text)}</a>`,
+    // a link to a driver's page names the driver in the page's language
+    a: (path, text) => {
+      const d = uk && /^\/drivers\/([a-z0-9-]+)$/.exec(path);
+      const n = d ? UK_DRIVER_NAMES[d[1]] : undefined;
+      return `<a href="${esc(href(path))}">${esc(n ? `${n[0]} ${n[1]}` : text)}</a>`;
+    },
     date: uk ? ukDate : enDate,
   };
 }
@@ -157,7 +163,7 @@ async function standings(c: Ctx, season: number, current: number): Promise<strin
     getConstructorStandings(String(season)).catch(() => null),
   ]);
   const leader = drv?.standings[0];
-  const leaderName = leader ? `${leader.givenName} ${leader.familyName}` : "";
+  const leaderName = leader ? driverName(leader.driverId, leader.givenName, leader.familyName, c.uk) : "";
   let body = c.uk
     ? `<h1>Залік Формули-1 ${season}</h1>` +
       `<p>Залік пілотів і Кубок конструкторів сезону ${season}: очки, перемоги та відставання від лідера.` +
@@ -276,7 +282,7 @@ async function racePreviewHtml(c: Ctx, season: string, round: string): Promise<s
 }
 
 async function race(c: Ctx, season: string, round: string): Promise<string | null> {
-  const w = await getRaceWeekend(season, round).catch(() => null);
+  const w = await getRaceWeekendNow(season, round).catch(() => null);
   if (!w) return null;
   const ahead = !w.results.length;
   const winner = w.results.find((r) => r.positionText === "1");
@@ -447,7 +453,7 @@ async function teamList(c: Ctx, season: number, current: number): Promise<string
 async function driver(c: Ctx, id: string, current: number): Promise<string | null> {
   const p = await getDriverProfile(id).catch(() => null);
   if (!p) return null;
-  const name = `${p.givenName} ${p.familyName}`;
+  const name = driverName(p.driverId, p.givenName, p.familyName, c.uk);
   const teams = [...new Map(p.seasons.filter((s) => s.constructorId).map((s) => [s.constructorId, s.constructorName])).entries()].map(([tid, tn]) =>
     c.a(`/teams/${tid}`, tn),
   );

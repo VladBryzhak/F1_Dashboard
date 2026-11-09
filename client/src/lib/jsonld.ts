@@ -6,6 +6,7 @@
 // the app (server/src/services/jsonld.ts): keep the two in step.
 import { getLang, localizedPath } from '../i18n/core'
 import type { Article, ConstructorProfile, DriverProfile, RaceWeekend } from '../types/f1'
+import { driverName } from './ukNames'
 
 const BASE = 'https://paddocktimes.com'
 
@@ -37,12 +38,16 @@ export function siteLd(): object[] {
 }
 
 // A driver as a schema.org Person.
-export function driverLd(p: DriverProfile): object {
-  const name = `${p.givenName} ${p.familyName}`
+// On a Ukrainian page the name is the Ukrainian spelling, with the Latin one
+// as alternateName.
+export function driverLd(p: DriverProfile, uk = false): object {
+  const latin = `${p.givenName} ${p.familyName}`
+  const name = driverName(p.driverId, p.givenName, p.familyName, uk)
   const ld: Record<string, unknown> = {
     '@context': 'https://schema.org',
     '@type': 'Person',
     name,
+    ...(name !== latin && { alternateName: latin }),
     givenName: p.givenName,
     familyName: p.familyName,
     jobTitle: 'Formula One Driver',

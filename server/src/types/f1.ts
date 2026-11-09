@@ -541,6 +541,9 @@ export interface RaceWeekend {
   fastestLap: WeekendHighlight | null;
   driverOfTheDay: WeekendHighlight | null;
   atCircuit: CircuitYear[]; // every race at this circuit, oldest first (this one included)
+  // results taken from OpenF1 before f1db has the race (usually until the
+  // morning after): unofficial, penalties may still change them
+  provisional?: boolean;
 }
 
 export interface TelemetrySession {

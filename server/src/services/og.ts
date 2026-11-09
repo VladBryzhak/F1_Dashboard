@@ -9,12 +9,13 @@ import {
   getCurrentSeason,
   getDriverProfile,
   getDriverStandings,
-  getRaceWeekend,
   getSeasonReview,
 } from "./f1db";
-import type { CircuitOutline } from "../types/f1";
+import type { CircuitOutline, DriverProfile } from "../types/f1";
 import { gpTitle, type Lang } from "./gpNames";
 import { UK, ukCountry, ukDate, ukPlural } from "./ukText";
+import { driverName, UK_DRIVER_NAMES } from "./ukNames";
+import { getRaceWeekendNow } from "./provisional";
 
 // Link previews (Open Graph / Twitter cards). Social crawlers don't run our
 // JavaScript, so the server works out each page's title, description and a
@@ -79,6 +80,24 @@ const fmtDate = (iso: string) =>
   new Date(iso).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" });
 
 // Page path → meta + preview card. Unknown paths get the site defaults.
+const enPlural = (n: number, one: string, many = `${one}s`) => `${n} ${n === 1 ? one : many}`;
+const joinAnd = (items: string[], and: string) =>
+  items.length < 2 ? items.join("") : `${items.slice(0, -1).join(", ")} ${and} ${items[items.length - 1]}`;
+
+// A driver's page description: since when (or from-to), the teams in the
+// order raced for (searches ask "ayrton senna teams"), the career numbers.
+// Mirrors seoText.driver in the client.
+function driverDescription(p: DriverProfile, name: string, uk: boolean, current: number): string {
+  const active = p.lastSeason >= current;
+  const teams = [...new Set(p.seasons.map((s) => s.constructorName).filter(Boolean))];
+  if (uk) {
+    const span = active ? `з ${p.firstSeason} року` : `у ${p.firstSeason}-${p.lastSeason} роках`;
+    return `${name} у Формулі-1 ${span}${teams.length ? `, ${teams.length === 1 ? "команда" : "команди"} ${joinAnd(teams, "і")}` : ""}: ${ukPlural(p.championships, UK.titles)}, ${ukPlural(p.wins, UK.wins)}, ${ukPlural(p.podiums, UK.podiums)} і ${ukPlural(p.races, UK.races)}.`;
+  }
+  const span = active ? `has raced in Formula 1 since ${p.firstSeason}` : `raced in Formula 1 from ${p.firstSeason} to ${p.lastSeason}`;
+  return `${name} ${span}${teams.length ? `, for ${joinAnd(teams, "and")}` : ""}: ${enPlural(p.championships, "world title")}, ${enPlural(p.wins, "win")}, ${enPlural(p.podiums, "podium")} and ${enPlural(p.races, "race start")}.`;
+}
+
 export async function describePage(rawPath: string, lang: Lang = "en"): Promise<PageMeta> {
   const uk = lang === "uk";
   const pg = (title: string | null, description: string, card: Card) => page(title, description, card, lang);
@@ -107,10 +126,16 @@ export async function describePage(rawPath: string, lang: Lang = "en"): Promise<
         points: d.points,
         color: teamColor(d.constructorId),
       }));
-      const title = uk ? `Залік Ф1 ${season}: пілоти й конструктори Формули-1` : `${season} F1 Championship Standings`;
+      // the champion of a past season, the leader of this one
+      const leader = st?.standings[0];
+      const past = Number(season) < Number(current);
+      const who = leader && driverName(leader.driverId, leader.givenName, leader.familyName, uk);
+      const title = uk ? `Турнірна таблиця Ф1 ${season}: залік пілотів і конструкторів` : `${season} F1 Championship Standings`;
       const description = uk
-        ? `Залік пілотів і Кубок конструкторів Формули-1 сезону ${season}: очки, перемоги та відставання від лідера.`
-        : `Formula 1 drivers' and constructors' championship standings for the ${season} season: points, wins and gaps to the leader.`;
+        ? (who ? `${past ? "Чемпіон" : "Лідер"} ${season} року: ${who}, ${ukPlural(leader!.points, UK.points)}. ` : "") +
+          `Залік пілотів і Кубок конструкторів Формули-1 сезону ${season}: очки, перемоги та відставання від лідера.`
+        : (who ? `${who} ${past ? `won the ${season} title` : "leads"} with ${leader!.points} points. ` : "") +
+          `Formula 1 drivers' and constructors' championship standings for the ${season} season: points, wins and gaps to the leader.`;
       return rows.length ? pg(title, description, { kind: "standings", heading: uk ? `Чемпіонат ${season}` : `${season} championship`, rows }) : generic(title, description);
     }
 
@@ -145,7 +170,7 @@ export async function describePage(rawPath: string, lang: Lang = "en"): Promise<
 
     case "calendar": {
       if (isSeason(a) && b && /^\d+$/.test(b)) {
-        const w = await getRaceWeekend(a!, b).catch(() => null);
+        const w = await getRaceWeekendNow(a!, b).catch(() => null);
         if (w) {
           const outline = circuitOutline(w.circuitId);
           const podium = w.results
@@ -186,7 +211,7 @@ export async function describePage(rawPath: string, lang: Lang = "en"): Promise<
       const cal = await getCalendar(season).catch(() => null);
       const n = cal?.races.length ?? 0;
       return generic(
-        uk ? `Календар Ф1 ${season}: гонки й результати Формули-1` : `${season} F1 Race Calendar & Results`,
+        uk ? `Календар Ф1 ${season}: розклад гонок і результати Формули-1` : `${season} F1 Race Calendar & Results`,
         uk
           ? `Календар гонок Формули-1 ${season} року з переможцями, командами та повними результатами кожного Гран-прі.`
           : `The ${season} Formula 1 race calendar with winners, teams and full results for every Grand Prix.`,
@@ -199,16 +224,15 @@ export async function describePage(rawPath: string, lang: Lang = "en"): Promise<
         const p = await getDriverProfile(a).catch(() => null);
         if (p) {
           const lastTeam = p.seasons[p.seasons.length - 1]?.constructorId ?? "";
-          const name = `${p.givenName} ${p.familyName}`;
+          const name = driverName(p.driverId, p.givenName, p.familyName, uk);
+          const ukName = uk ? UK_DRIVER_NAMES[p.driverId] : undefined;
           return pg(
-            uk ? `${name}: статистика кар'єри у Ф1` : `${name}: F1 Career Stats`,
-            uk
-              ? `${name} у Формулі-1: ${ukPlural(p.championships, UK.titles)}, ${ukPlural(p.wins, UK.wins)}, ${ukPlural(p.podiums, UK.podiums)} і ${ukPlural(p.races, UK.races)} у ${p.firstSeason}-${p.lastSeason} роках.`
-              : `${name}'s Formula 1 career: ${p.championships} title${p.championships === 1 ? "" : "s"}, ${p.wins} wins, ${p.podiums} podiums and ${p.races} races from ${p.firstSeason} to ${p.lastSeason}.`,
+            uk ? `${name}: статистика, перемоги й команди у Ф1` : `${name}: F1 Career Stats, Wins & Teams`,
+            driverDescription(p, name, uk, Number(current)),
             {
               kind: "driver",
-              first: p.givenName,
-              last: p.familyName,
+              first: ukName?.[0] ?? p.givenName,
+              last: ukName?.[1] ?? p.familyName,
               meta: [uk ? ukCountry(p.countryCode) : p.nationality, `${p.firstSeason}–${p.lastSeason}`].filter(Boolean).join(" · "),
               number: p.permanentNumber,
               color: teamColor(lastTeam),
@@ -239,7 +263,7 @@ export async function describePage(rawPath: string, lang: Lang = "en"): Promise<
             uk ? `${p.name}: історія, титули й перемоги у Ф1` : `${p.name}: F1 History, Titles & Wins`,
             uk
               ? `${p.name} у Формулі-1: ${ukPlural(p.championships, UK.ctitles)}, ${ukPlural(p.wins, UK.wins)}, ${ukPlural(p.podiums, UK.podiums)} і ${ukPlural(p.races, UK.races)} з ${p.firstSeason} року.`
-              : `${p.name} in Formula 1: ${p.championships} constructors' title${p.championships === 1 ? "" : "s"}, ${p.wins} wins, ${p.podiums} podiums and ${p.races} races since ${p.firstSeason}.`,
+              : `${p.name} in Formula 1: ${enPlural(p.championships, "constructors' title")}, ${enPlural(p.wins, "win")}, ${enPlural(p.podiums, "podium")} and ${enPlural(p.races, "race")} since ${p.firstSeason}.`,
             {
               kind: "team",
               name: p.name,

@@ -43,6 +43,13 @@ function ukPlural(n: number, one: string, few: string, many: string): string {
 
 const times = (n: number) => (n === 1 ? 'once' : n === 2 ? 'twice' : `${n} times`)
 
+// A retirement's cause, or nothing when it isn't known (live timing only
+// says "Retired" until the official classification).
+function knownReason(reason: string | undefined, lang: Lang): string {
+  if (!reason || /^retired$/i.test(reason.trim())) return ''
+  return retirementReason(reason, lang)
+}
+
 function penaltyReason(reason: string | undefined, lang: Lang): string {
   if (!reason) return ''
   for (const [re, en, uk] of PENALTY_REASON) if (re.test(reason)) return lang === 'uk' ? uk : en
@@ -255,8 +262,10 @@ export function storyParagraphs(s: RaceStory, lang: Lang): string[] {
       const items = [...s.retirements]
         .sort((a, b) => (a.lap ?? 999) - (b.lap ?? 999))
         .map(
-          (r) =>
-            `${r.name} (${retirementReason(r.reason, lang)}${r.lap ? `, ${uk ? 'коло' : 'lap'} ${r.lap}` : ''})`,
+          (r) => {
+            const why = [knownReason(r.reason, lang), r.lap ? `${uk ? 'коло' : 'lap'} ${r.lap}` : ''].filter(Boolean)
+            return why.length ? `${r.name} (${why.join(', ')})` : r.name
+          },
         )
       parts.push(
         uk
@@ -340,10 +349,10 @@ export function eventText(e: StoryEvent, lang: Lang, withLaps = true): string {
       const why = penaltyReason(e.reason, lang)
       return `${n}: ${what}${why ? `, ${why}` : ''}`
     }
-    case 'dnf':
-      return uk
-        ? `${n}: сход, ${retirementReason(e.reason ?? '', lang)}`
-        : `${n} retires: ${retirementReason(e.reason ?? '', lang)}`
+    case 'dnf': {
+      const why = knownReason(e.reason, lang)
+      return uk ? `${n}: сход${why ? `, ${why}` : ''}` : `${n} retires${why ? `: ${why}` : ''}`
+    }
     case 'fastest':
       return uk ? `${n}: найшвидше коло` : `${n}: fastest lap`
   }

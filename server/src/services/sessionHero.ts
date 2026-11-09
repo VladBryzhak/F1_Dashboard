@@ -21,10 +21,14 @@ const KINDS: Record<string, SessionHero["kind"]> = {
   Race: "race",
 };
 
-interface RawResult {
+export interface RawResult {
   position: number | null;
   driver_number: number;
   number_of_laps: number | null;
+  points?: number | null;
+  dnf?: boolean;
+  dns?: boolean;
+  dsq?: boolean;
   // One value, or one per qualifying part (Q1, Q2, Q3).
   duration: number | (number | null)[] | null;
   gap_to_leader: number | string | (number | string | null)[] | null;
@@ -51,23 +55,24 @@ export function formatDuration(sec: number): string {
   return h ? `${h}:${String(m).padStart(2, "0")}:${s}` : `${m}:${s}`;
 }
 
-// 0.117 -> "+0.117"; OpenF1's "+1 LAP" -> "+1 lap" (as f1db writes it).
+// 0.117 -> "+0.117", 75.402 -> "+1:15.402"; OpenF1's "+1 LAP" -> "+1 lap"
+// (as f1db writes them).
 export function formatGap(gap: number | string): string {
-  if (typeof gap === "number") return `+${gap.toFixed(3)}`;
+  if (typeof gap === "number") return gap >= 60 ? `+${formatDuration(gap)}` : `+${gap.toFixed(3)}`;
   const laps = /^\+?\s*(\d+)\s*LAPS?$/i.exec(gap.trim());
   if (laps) return `+${laps[1]} lap${laps[1] === "1" ? "" : "s"}`;
   return gap;
 }
 
 // The last value set: a qualifying result carries one per part.
-function lastSet<T>(v: T | (T | null)[] | null): T | null {
+export function lastSet<T>(v: T | (T | null)[] | null): T | null {
   if (!Array.isArray(v)) return v;
   for (let i = v.length - 1; i >= 0; i--) if (v[i] != null) return v[i];
   return null;
 }
 
 // "Lando NORRIS" -> "Lando Norris".
-function titleCase(name: string): string {
+export function titleCase(name: string): string {
   return name.toLowerCase().replace(/(^|[\s-])(\p{L})/gu, (_, a: string, b: string) => a + b.toUpperCase());
 }
 
@@ -122,7 +127,7 @@ export function topThree(results: RawResult[], drivers: RawDriver[], season: Sea
 
 // A session's classification. Kept a few hours (a race's for one, in case of
 // penalties); an empty answer, while OpenF1 is still filling it in, a minute.
-function sessionResult(sessionKey: number, race: boolean): Promise<RawResult[]> {
+export function sessionResult(sessionKey: number, race: boolean): Promise<RawResult[]> {
   return cached(
     `of1:result:${sessionKey}`,
     (rows) => (rows.length ? (race ? 3600 : 6 * 3600) : 60),

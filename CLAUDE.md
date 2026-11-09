@@ -18,7 +18,7 @@ The **client only talks to our backend** (`/api/*`). The **server** talks to the
 - English pages live at `/…`, their Ukrainian twins at `/uk/…`. The language comes from the address (`langFromPath`/`localizedPath` in `client/src/i18n/core.ts`); Ukrainian pages run the router under the `/uk` basename (`i18n/LangRouter.tsx`), so in-app links stay plain (`<Link to="/standings">`) and keep the current language. The EN/UA switch moves to the same page in the other language and remembers the choice; an unprefixed address opens in Ukrainian for a visitor who chose it or whose browser asks for it (rewritten in place in `main.tsx`, never for crawlers).
 - Paths built for outside the router (canonical, JSON-LD, analytics) must carry the prefix: use `localizedPath(path, lang)` or `window.location.pathname`.
 - The server reads the language from the path (`isUkPath` in `server/src/services/pageHtml.ts`): `<html lang>`, `og:locale`, `hreflang` links (en, uk, x-default → English) and the page's title, description and crawler snapshot in that language (`describePage(path, lang)` in `og.ts`, `pageSnapshot(path, lang)` in `snapshot.ts`, Ukrainian wording helpers in `ukText.ts`, GP names mirrored from the client in `gpNames.ts`).
-- Page titles and descriptions live in `client/src/lib/seoText.ts` (both languages, one function per page) and in `describePage` on the server: keep the two in step. The sitemap lists Ukrainian twins for the current season's pages only.
+- Page titles and descriptions live in `client/src/lib/seoText.ts` (both languages, one function per page) and in `describePage` on the server: keep the two in step. Ukrainian pages name drivers in Ukrainian (`UK_DRIVER_NAMES` in `client/src/lib/ukNames.ts`, mirrored in `server/src/services/ukNames.ts`, a test compares them): titles, descriptions, the profile heading, the preview card, JSON-LD (Latin as `alternateName`) and every driver link in the crawler snapshot. A driver not in the map keeps the Latin name; add new drivers there with the spelling our articles use. The sitemap lists Ukrainian twins for the current season's pages only.
 
 ## Styles (client)
 
@@ -133,6 +133,12 @@ The race replay shows the team radio the broadcast aired, with captions in both 
 
 - 2D animated recaps of a session (1080x1920, 60 fps, a few minutes to render): `tsx recap.ts SPEC.json OUT.mp4 --fps 60`. A spec is a list of scenes (`title`, `clock`, `table`, `big`, `list`, `outro`); each session gets a small builder script (`quali_sao_paulo_2026.py`). Facts are checked as for articles. Details in `tools/recap/README.md`.
 - A voiceover is recorded by the owner and laid over afterwards; scene lengths are stretched to the voice.
+
+## Provisional race weekends (server/src/services/provisional.ts)
+
+- f1db usually has a race only the morning after. Until then (from the weekend's Friday to a week after the race, 2023 on) a race page, its story, title and crawler snapshot take the weekend from OpenF1 (`getRaceWeekendNow`, used instead of f1db's `getRaceWeekend` everywhere a weekend's results show; JSON-LD stays on f1db): each session's classification from `session_result`, the race's grid from the replay's first positions, the fastest lap from its lap times. f1db's own sessions stay where it has them, and once it has the race its results take over by themselves.
+- The weekend carries `provisional: true`: the page says the results are provisional (`wk.provisional`), the story leaves out the championship swing (f1db's standings come with its results), a retirement's cause is unknown ("Retired", left out of the text). Kept 10 minutes; `warmProvisional` (started in `index.ts`) refreshes the current weekend every 10 minutes in the queue's background lane.
+- Checked against f1db on São Paulo 2026: race, grid, points, qualifying and practice match; FP1 stand-ins f1db lists only as test drivers keep OpenF1's name without a link. `PROVISIONAL_ROUND=2026:20` (the `server-provisional` preview config) shows a round as if f1db hadn't got it, for local checks.
 
 ## Generated data (server/src/data)
 

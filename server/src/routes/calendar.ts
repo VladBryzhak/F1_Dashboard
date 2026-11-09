@@ -2,12 +2,12 @@ import { Router } from "express";
 import {
   getCalendar,
   getRaceResults,
-  getRaceWeekend,
-} from "../services/f1db";
+  } from "../services/f1db";
 import { calendarFeed } from "../services/calendarFeed";
 import { getRacePreview } from "../services/racePreview";
 import { getRaceStory } from "../services/raceStory";
 import { getRaceStrategy } from "../services/strategy";
+import { getRaceWeekendNow } from "../services/provisional";
 
 const router = Router();
 
@@ -49,7 +49,7 @@ router.get("/:season/:round", async (req, res, next) => {
 // fastest lap and driver of the day
 router.get("/:season/:round/weekend", async (req, res, next) => {
   try {
-    const weekend = await getRaceWeekend(req.params.season, req.params.round);
+    const weekend = await getRaceWeekendNow(req.params.season, req.params.round);
     if (!weekend) {
       return res.status(404).json({ error: "Race not found" });
     }

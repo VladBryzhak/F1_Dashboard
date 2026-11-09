@@ -15,6 +15,7 @@ import { driverSummary } from '../lib/summaries'
 import type { DriverProfile as Profile } from '../types/f1'
 import '../styles/profile.css'
 import { seoText } from '../lib/seoText'
+import { driverName } from '../lib/ukNames'
 import NotFound from './NotFound'
 
 // Whole years between two yyyy-mm-dd dates (to today when `to` is null).
@@ -86,18 +87,21 @@ export default function DriverProfile() {
   const seasons = profile?.seasons ?? []
   const lastTeamId = seasons[seasons.length - 1]?.constructorId ?? ''
   const color = teamColor(lastTeamId)
+  const displayName = profile
+    ? driverName(profile.driverId, profile.givenName, profile.familyName, lang === 'uk')
+    : ''
 
   useSeo({
     skip: notFound,
     ...(profile ? seoText.driver(profile, lang) : {}),
     jsonLd: profile
       ? [
-          driverLd(profile),
+          driverLd(profile, lang === 'uk'),
           breadcrumbLd([
             { name: t('nav.home'), path: '/' },
             { name: t('nav.drivers'), path: '/drivers' },
             {
-              name: `${profile.givenName} ${profile.familyName}`,
+              name: displayName,
               path: `/drivers/${profile.driverId}`,
             },
           ]),
@@ -136,7 +140,7 @@ export default function DriverProfile() {
               { name: t('nav.home'), path: '/' },
               { name: t('nav.drivers'), path: '/drivers' },
               {
-                name: `${profile.givenName} ${profile.familyName}`,
+                name: displayName,
                 path: `/drivers/${profile.driverId}`,
               },
             ]}
@@ -162,12 +166,12 @@ export default function DriverProfile() {
               // in server/src/services/pageHtml.ts).
               sizes="(max-width: 860px) 250px, 170px"
               color={color}
-              alt={`${profile.givenName} ${profile.familyName}`}
+              alt={displayName}
               eager
             />
             <div className="profile-heading">
               <h1 className="profile-name">
-                {profile.givenName} {profile.familyName}
+                {displayName}
               </h1>
               <div className="profile-meta">
                 <Flag code={profile.countryCode} nationality={profile.nationality} />
