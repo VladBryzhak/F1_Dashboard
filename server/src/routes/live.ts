@@ -46,11 +46,13 @@ router.get("/:sessionKey/replay", async (req, res, next) => {
 });
 
 // GET /api/live/:sessionKey/radio — the session's team radio with captions
-// (an empty list when it has none).
+// (an empty list when it has none). The captions arrive with a deploy, often
+// after people have opened the replay, so the browser asks again every time
+// (no-cache): the ETag makes that a 304 while nothing has changed.
 router.get("/:sessionKey/radio", (req, res) => {
   const key = intParam(req.params.sessionKey, 1, SESSION_KEY_MAX);
   if (key == null) return res.status(400).json({ error: "Invalid session key." });
-  res.set("Cache-Control", "public, max-age=3600").json(sessionRadio(key));
+  res.set("Cache-Control", "no-cache").json(sessionRadio(key));
 });
 
 // GET /api/live/session — the latest completed session (kept for compatibility).
