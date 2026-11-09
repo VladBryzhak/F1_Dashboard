@@ -1,0 +1,599 @@
+{
+  "sessionKey": 11412,
+  "clips": [
+    {
+      "id": "NOR_1_20261108_132915",
+      "driverNumber": 1,
+      "code": "NOR",
+      "date": "2026-11-08T16:55:22.430000+00:00",
+      "url": "https://livetiming.formula1.com/static/2026/2026-11-08_S%C3%A3o_Paulo_Grand_Prix/2026-11-08_Race/TeamRadio/NOR_1_20261108_132915.mp3",
+      "lines": [
+        {
+          "who": "driver",
+          "unclear": true
+        },
+        {
+          "who": "driver",
+          "en": "This feels a lot sketchier than yesterday, a lot less grip than yesterday.",
+          "uk": "Відчуття значно хиткіші, ніж учора, зчеплення набагато менше, ніж учора.",
+          "from": 7.1,
+          "to": 10.1
+        }
+      ]
+    },
+    {
+      "id": "NOR_1_20261108_150603",
+      "driverNumber": 1,
+      "code": "NOR",
+      "date": "2026-11-08T18:06:29.761000+00:00",
+      "url": "https://livetiming.formula1.com/static/2026/2026-11-08_S%C3%A3o_Paulo_Grand_Prix/2026-11-08_Race/TeamRadio/NOR_1_20261108_150603.mp3",
+      "lines": [
+        {
+          "who": "engineer",
+          "en": "So, Lando, … we'll try and go to the end, so we would have to pass them. Are you happy?",
+          "uk": "Отже, Ландо, … спробуємо доїхати до кінця, тож доведеться їх обійти. Тебе влаштовує?"
+        },
+        {
+          "who": "driver",
+          "en": "Yeah, that's fine.",
+          "uk": "Так, нормально."
+        },
+        {
+          "who": "engineer",
+          "en": "Okay.",
+          "uk": "Добре."
+        }
+      ]
+    },
+    {
+      "id": "NOR_1_20261108_151625",
+      "driverNumber": 1,
+      "code": "NOR",
+      "date": "2026-11-08T18:16:37.050000+00:00",
+      "url": "https://livetiming.formula1.com/static/2026/2026-11-08_S%C3%A3o_Paulo_Grand_Prix/2026-11-08_Race/TeamRadio/NOR_1_20261108_151625.mp3",
+      "lines": [
+        {
+          "who": "engineer",
+          "en": "This rain should last ten minutes, possible heavier rain lap 65.",
+          "uk": "Цей дощ має триматися хвилин десять, можливий сильніший дощ на 65-му колі.",
+          "from": 2.8,
+          "to": 7.3
+        }
+      ]
+    },
+    {
+      "id": "NOR_1_20261108_153944",
+      "driverNumber": 1,
+      "code": "NOR",
+      "date": "2026-11-08T18:40:30.689000+00:00",
+      "url": "https://livetiming.formula1.com/static/2026/2026-11-08_S%C3%A3o_Paulo_Grand_Prix/2026-11-08_Race/TeamRadio/NOR_1_20261108_153944.mp3",
+      "lines": [
+        {
+          "who": "engineer",
+          "en": "Well done, mate. Well done. Nicely done.",
+          "uk": "Молодець, друже. Молодець. Чудова робота."
+        },
+        {
+          "who": "driver",
+          "en": "Well done, guys. You all deserve it. You keep working hard, I try and deliver. Today we did. Thank you very much.",
+          "uk": "Молодці, хлопці. Ви всі на це заслуговуєте. Ви наполегливо працюєте, я намагаюся віддячити. Сьогодні вийшло. Дуже дякую."
+        },
+        {
+          "who": "driver",
+          "en": "Let's keep it going, please. Let's keep the work up.",
+          "uk": "Давайте так і далі. Працюємо далі.",
+          "from": 20.3,
+          "to": 22.9
+        },
+        {
+          "who": null,
+          "en": "Zak must have done the right rain dance for his birthday last night. Oh, yes. Happy birthday, Zak.",
+          "uk": "Мабуть, Зак станцював правильний танець дощу на свій день народження вчора. О, так. З днем народження, Заку.",
+          "from": 23.1,
+          "to": 28.2
+        }
+      ]
+    },
+    {
+      "id": "NOR_1_20261108_154500",
+      "driverNumber": 1,
+      "code": "NOR",
+      "date": "2026-11-08T18:45:36.594000+00:00",
+      "url": "https://livetiming.formula1.com/static/2026/2026-11-08_S%C3%A3o_Paulo_Grand_Prix/2026-11-08_Race/TeamRadio/NOR_1_20261108_154500.mp3",
+      "lines": [
+        {
+          "who": null,
+          "unclear": true
+        },
+        {
+          "who": "driver",
+          "en": "Good job. I think everyone did a fantastic job today supporting me.",
+          "uk": "Гарна робота. Думаю, сьогодні всі чудово мене підтримали.",
+          "from": 7.5,
+          "to": 10.5
+        },
+        {
+          "who": "driver",
+          "en": "Yeah, no, good strategy, everything.",
+          "uk": "Так, хороша стратегія, усе.",
+          "from": 11.6,
+          "to": 13.7
+        },
+        {
+          "who": "driver",
+          "unclear": true
+        }
+      ]
+    },
+    {
+      "id": "VER_3_20261108_143545",
+      "driverNumber": 3,
+      "code": "VER",
+      "date": "2026-11-08T17:36:29.557000+00:00",
+      "url": "https://livetiming.formula1.com/static/2026/2026-11-08_S%C3%A3o_Paulo_Grand_Prix/2026-11-08_Race/TeamRadio/VER_3_20261108_143545.mp3",
+      "unclear": true
+    },
+    {
+      "id": "VER_3_20261108_150116",
+      "driverNumber": 3,
+      "code": "VER",
+      "date": "2026-11-08T18:01:53.956000+00:00",
+      "url": "https://livetiming.formula1.com/static/2026/2026-11-08_S%C3%A3o_Paulo_Grand_Prix/2026-11-08_Race/TeamRadio/VER_3_20261108_150116.mp3",
+      "lines": [
+        {
+          "who": "engineer",
+          "en": "Norris is talking about going to the end. What are your thoughts?",
+          "uk": "Норріс говорить, що поїде до кінця. Які твої думки?"
+        },
+        {
+          "who": "driver",
+          "en": "No, no…",
+          "uk": "Ні, ні…"
+        }
+      ]
+    },
+    {
+      "id": "VER_3_20261108_150245",
+      "driverNumber": 3,
+      "code": "VER",
+      "date": "2026-11-08T18:03:24.476000+00:00",
+      "url": "https://livetiming.formula1.com/static/2026/2026-11-08_S%C3%A3o_Paulo_Grand_Prix/2026-11-08_Race/TeamRadio/VER_3_20261108_150245.mp3",
+      "unclear": true
+    },
+    {
+      "id": "VER_3_20261108_154416",
+      "driverNumber": 3,
+      "code": "VER",
+      "date": "2026-11-08T18:45:06.477000+00:00",
+      "url": "https://livetiming.formula1.com/static/2026/2026-11-08_S%C3%A3o_Paulo_Grand_Prix/2026-11-08_Race/TeamRadio/VER_3_20261108_154416.mp3",
+      "lines": [
+        {
+          "who": "driver",
+          "en": "Of course P2 is nice, but not in this way. I'm sorry, but what a disaster to drive. Unbelievable. I've never experienced something like this, in the wet or in the dry.",
+          "uk": "Звісно, друге місце приємне, але не так. Вибачте, але це катастрофа, а не машина. Неймовірно. Я ніколи такого не відчував, ні на мокрій трасі, ні на сухій."
+        },
+        {
+          "who": "engineer",
+          "en": "Understood, Max. We saw you fighting with the car all the way through. Well done to get a P2 in these conditions, and I'm sure we'll get to the bottom of it.",
+          "uk": "Зрозуміло, Максе. Ми бачили, як ти боровся з машиною всю гонку. Молодець, що взяв друге місце в таких умовах, і ми точно розберемося, в чому справа."
+        },
+        {
+          "who": "engineer",
+          "en": "A tricky car in all possible conditions, but you got the points, which are important. Thank you.",
+          "uk": "Складна машина в усіх можливих умовах, але ти взяв очки, а вони важливі. Дякую."
+        },
+        {
+          "who": "driver",
+          "en": "Double podium, right?",
+          "uk": "Подвійний подіум, так?",
+          "from": 36.3,
+          "to": 37.5
+        },
+        {
+          "who": "engineer",
+          "en": "Yes, Isack finished P3.",
+          "uk": "Так, Ісак фінішував третім."
+        },
+        {
+          "who": "driver",
+          "en": "Well, that's a good effort.",
+          "uk": "Ну, це гарний результат.",
+          "from": 40.4,
+          "to": 41.6
+        }
+      ]
+    },
+    {
+      "id": "HAD_6_20261108_143729",
+      "driverNumber": 6,
+      "code": "HAD",
+      "date": "2026-11-08T17:38:00.351000+00:00",
+      "url": "https://livetiming.formula1.com/static/2026/2026-11-08_S%C3%A3o_Paulo_Grand_Prix/2026-11-08_Race/TeamRadio/HAD_6_20261108_143729.mp3",
+      "lines": [
+        {
+          "who": "engineer",
+          "en": "There's a growing risk of rain in 15 …",
+          "uk": "Зростає ризик дощу через 15 …",
+          "from": 4.2,
+          "to": 7.4
+        }
+      ]
+    },
+    {
+      "id": "HAD_6_20261108_150000",
+      "driverNumber": 6,
+      "code": "HAD",
+      "date": "2026-11-08T18:00:21.391000+00:00",
+      "url": "https://livetiming.formula1.com/static/2026/2026-11-08_S%C3%A3o_Paulo_Grand_Prix/2026-11-08_Race/TeamRadio/HAD_6_20261108_150000.mp3",
+      "lines": [
+        {
+          "who": "engineer",
+          "en": "And if he can't get by Lando, he'll stay like that.",
+          "uk": "І якщо він не пройде Ландо, так і залишиться."
+        },
+        {
+          "who": "driver",
+          "en": "Hey, don't forget to come back to me, huh?",
+          "uk": "Гей, не забудь повернутися до мене, га?",
+          "from": 8.0,
+          "to": 10.0
+        },
+        {
+          "who": "engineer",
+          "en": "Yes, mate, I'm working on it. I'm still working on it.",
+          "uk": "Так, друже, працюю над цим. Досі працюю.",
+          "from": 10.7,
+          "to": 12.3
+        }
+      ]
+    },
+    {
+      "id": "HAD_6_20261108_150453",
+      "driverNumber": 6,
+      "code": "HAD",
+      "date": "2026-11-08T18:05:26.607000+00:00",
+      "url": "https://livetiming.formula1.com/static/2026/2026-11-08_S%C3%A3o_Paulo_Grand_Prix/2026-11-08_Race/TeamRadio/HAD_6_20261108_150453.mp3",
+      "lines": [
+        {
+          "who": "engineer",
+          "en": "And I think some cars are talking about going to the end on the current tyre.",
+          "uk": "І, здається, деякі машини збираються доїхати до кінця на цих шинах.",
+          "from": 4.5,
+          "to": 7.6
+        },
+        {
+          "who": "driver",
+          "unclear": true
+        }
+      ]
+    },
+    {
+      "id": "GAS_10_20261108_145220",
+      "driverNumber": 10,
+      "code": "GAS",
+      "date": "2026-11-08T17:52:44.265000+00:00",
+      "url": "https://livetiming.formula1.com/static/2026/2026-11-08_S%C3%A3o_Paulo_Grand_Prix/2026-11-08_Race/TeamRadio/GAS_10_20261108_145220.mp3",
+      "unclear": true
+    },
+    {
+      "id": "ANT_12_20261108_132331",
+      "driverNumber": 12,
+      "code": "ANT",
+      "date": "2026-11-08T16:55:22.430000+00:00",
+      "url": "https://livetiming.formula1.com/static/2026/2026-11-08_S%C3%A3o_Paulo_Grand_Prix/2026-11-08_Race/TeamRadio/ANT_12_20261108_132331.mp3",
+      "unclear": true
+    },
+    {
+      "id": "ANT_12_20261108_141229",
+      "driverNumber": 12,
+      "code": "ANT",
+      "date": "2026-11-08T17:13:06.215000+00:00",
+      "url": "https://livetiming.formula1.com/static/2026/2026-11-08_S%C3%A3o_Paulo_Grand_Prix/2026-11-08_Race/TeamRadio/ANT_12_20261108_141229.mp3",
+      "lines": [
+        {
+          "who": "engineer",
+          "en": "So just keep looking for water, keep these rears cool.",
+          "uk": "Тож шукай воду, тримай задні шини холодними.",
+          "from": 4.3,
+          "to": 6.8
+        }
+      ]
+    },
+    {
+      "id": "ANT_12_20261108_143013",
+      "driverNumber": 12,
+      "code": "ANT",
+      "date": "2026-11-08T17:30:23.527000+00:00",
+      "url": "https://livetiming.formula1.com/static/2026/2026-11-08_S%C3%A3o_Paulo_Grand_Prix/2026-11-08_Race/TeamRadio/ANT_12_20261108_143013.mp3",
+      "lines": [
+        {
+          "who": "driver",
+          "en": "Something's weird with the car.",
+          "uk": "З машиною щось дивне.",
+          "from": 1.5,
+          "to": 2.9
+        }
+      ]
+    },
+    {
+      "id": "ANT_12_20261108_143043",
+      "driverNumber": 12,
+      "code": "ANT",
+      "date": "2026-11-08T17:31:23.712000+00:00",
+      "url": "https://livetiming.formula1.com/static/2026/2026-11-08_S%C3%A3o_Paulo_Grand_Prix/2026-11-08_Race/TeamRadio/ANT_12_20261108_143043.mp3",
+      "lines": [
+        {
+          "who": "engineer",
+          "en": "We are just lacking surface temp…",
+          "uk": "Нам просто бракує температури поверхні шин…",
+          "from": 1.9,
+          "to": 4.9
+        },
+        {
+          "who": "driver",
+          "en": "No, mate, it's the suspension.",
+          "uk": "Ні, друже, це підвіска.",
+          "from": 5.5,
+          "to": 8.1
+        },
+        {
+          "who": "engineer",
+          "en": "Okay, stand by.",
+          "uk": "Зрозумів, чекай.",
+          "from": 8.5,
+          "to": 9.5
+        }
+      ]
+    },
+    {
+      "id": "ANT_12_20261108_143348",
+      "driverNumber": 12,
+      "code": "ANT",
+      "date": "2026-11-08T17:34:26.469000+00:00",
+      "url": "https://livetiming.formula1.com/static/2026/2026-11-08_S%C3%A3o_Paulo_Grand_Prix/2026-11-08_Race/TeamRadio/ANT_12_20261108_143348.mp3",
+      "lines": [
+        {
+          "who": "driver",
+          "en": "Bono, the car is pulling to one side when accelerating. It's so weird.",
+          "uk": "Боно, машину тягне вбік, коли розганяюся. Дуже дивно.",
+          "from": 3.8,
+          "to": 8.9
+        },
+        {
+          "who": "engineer",
+          "en": "Okay, copy, we'll look at it.",
+          "uk": "Зрозумів, подивимося.",
+          "from": 9.1,
+          "to": 10.2
+        }
+      ]
+    },
+    {
+      "id": "ANT_12_20261108_143839",
+      "driverNumber": 12,
+      "code": "ANT",
+      "date": "2026-11-08T17:39:01.523000+00:00",
+      "url": "https://livetiming.formula1.com/static/2026/2026-11-08_S%C3%A3o_Paulo_Grand_Prix/2026-11-08_Race/TeamRadio/ANT_12_20261108_143839.mp3",
+      "lines": [
+        {
+          "who": "engineer",
+          "en": "Okay, Kimi, let's go head down, refocus.",
+          "uk": "Добре, Кімі, голову вниз, зосередься.",
+          "from": 2.0,
+          "to": 4.2
+        },
+        {
+          "who": "driver",
+          "en": "Yeah, but there's a problem. Like, I can't turn in the left corners, the car is … by itself.",
+          "uk": "Так, але є проблема. Я не можу повернути в лівих поворотах, машина … сама.",
+          "from": 4.6,
+          "to": 10.4
+        }
+      ]
+    },
+    {
+      "id": "ANT_12_20261108_151239",
+      "driverNumber": 12,
+      "code": "ANT",
+      "date": "2026-11-08T18:13:03.706000+00:00",
+      "url": "https://livetiming.formula1.com/static/2026/2026-11-08_S%C3%A3o_Paulo_Grand_Prix/2026-11-08_Race/TeamRadio/ANT_12_20261108_151239.mp3",
+      "lines": [
+        {
+          "who": "driver",
+          "en": "What do you want me to do?",
+          "uk": "Що мені робити?",
+          "from": 2.7,
+          "to": 4.0
+        },
+        {
+          "who": "engineer",
+          "en": "We're just going to hang it out, Kimi, just see what comes our way.",
+          "uk": "Просто протримаємося, Кімі, і подивимося, що нам випаде.",
+          "from": 4.3,
+          "to": 7.4
+        }
+      ]
+    },
+    {
+      "id": "ANT_12_20261108_151958",
+      "driverNumber": 12,
+      "code": "ANT",
+      "date": "2026-11-08T18:20:12.132000+00:00",
+      "url": "https://livetiming.formula1.com/static/2026/2026-11-08_S%C3%A3o_Paulo_Grand_Prix/2026-11-08_Race/TeamRadio/ANT_12_20261108_151958.mp3",
+      "lines": [
+        {
+          "who": "engineer",
+          "en": "I think when the heavier rain arrives, it will be inter conditions.",
+          "uk": "Думаю, коли прийде сильніший дощ, будуть умови для проміжних шин.",
+          "from": 4.3,
+          "to": 7.3
+        }
+      ]
+    },
+    {
+      "id": "LEC_16_20261108_135537",
+      "driverNumber": 16,
+      "code": "LEC",
+      "date": "2026-11-08T16:55:52.508000+00:00",
+      "url": "https://livetiming.formula1.com/static/2026/2026-11-08_S%C3%A3o_Paulo_Grand_Prix/2026-11-08_Race/TeamRadio/LEC_16_20261108_135537.mp3",
+      "unclear": true
+    },
+    {
+      "id": "HAM_44_20261108_141621",
+      "driverNumber": 44,
+      "code": "HAM",
+      "date": "2026-11-08T17:16:41.094000+00:00",
+      "url": "https://livetiming.formula1.com/static/2026/2026-11-08_S%C3%A3o_Paulo_Grand_Prix/2026-11-08_Race/TeamRadio/HAM_44_20261108_141621.mp3",
+      "unclear": true
+    },
+    {
+      "id": "HAM_44_20261108_141832",
+      "driverNumber": 44,
+      "code": "HAM",
+      "date": "2026-11-08T17:19:12.023000+00:00",
+      "url": "https://livetiming.formula1.com/static/2026/2026-11-08_S%C3%A3o_Paulo_Grand_Prix/2026-11-08_Race/TeamRadio/HAM_44_20261108_141832.mp3",
+      "lines": [
+        {
+          "who": "driver",
+          "unclear": true
+        },
+        {
+          "who": "driver",
+          "en": "Can I come in now or not?",
+          "uk": "Можна заїхати зараз чи ні?",
+          "from": 6.4,
+          "to": 7.7
+        },
+        {
+          "who": "engineer",
+          "en": "Negative, negative, we are not in the crossover yet.",
+          "uk": "Ні, ні, ми ще не в точці переходу.",
+          "from": 8.0,
+          "to": 11.2
+        }
+      ]
+    },
+    {
+      "id": "HAM_44_20261108_142204",
+      "driverNumber": 44,
+      "code": "HAM",
+      "date": "2026-11-08T17:22:47.246000+00:00",
+      "url": "https://livetiming.formula1.com/static/2026/2026-11-08_S%C3%A3o_Paulo_Grand_Prix/2026-11-08_Race/TeamRadio/HAM_44_20261108_142204.mp3",
+      "lines": [
+        {
+          "who": "driver",
+          "unclear": true
+        },
+        {
+          "who": "driver",
+          "en": "It's on the edge, for sure…",
+          "uk": "Це на межі, точно…",
+          "from": 5.2,
+          "to": 10.4
+        },
+        {
+          "who": "driver",
+          "en": "The only place that's slippery is …",
+          "uk": "Слизько тільки в одному місці: …",
+          "from": 11.3,
+          "to": 13.9
+        },
+        {
+          "who": "engineer",
+          "en": "Exactly. … We agree, we need to wait a bit.",
+          "uk": "Саме так. … Згодні, треба трохи почекати.",
+          "from": 14.4,
+          "to": 18.4
+        }
+      ]
+    },
+    {
+      "id": "RUS_63_20261108_151725",
+      "driverNumber": 63,
+      "code": "RUS",
+      "date": "2026-11-08T18:17:38.269000+00:00",
+      "url": "https://livetiming.formula1.com/static/2026/2026-11-08_S%C3%A3o_Paulo_Grand_Prix/2026-11-08_Race/TeamRadio/RUS_63_20261108_151725.mp3",
+      "lines": [
+        {
+          "who": null,
+          "unclear": true
+        },
+        {
+          "who": "engineer",
+          "en": "Just don't hold him up.",
+          "uk": "Просто не затримуй його."
+        }
+      ]
+    },
+    {
+      "id": "RUS_63_20261108_152938",
+      "driverNumber": 63,
+      "code": "RUS",
+      "date": "2026-11-08T18:29:49.037000+00:00",
+      "url": "https://livetiming.formula1.com/static/2026/2026-11-08_S%C3%A3o_Paulo_Grand_Prix/2026-11-08_Race/TeamRadio/RUS_63_20261108_152938.mp3",
+      "unclear": true
+    },
+    {
+      "id": "RUS_63_20261108_152941",
+      "driverNumber": 63,
+      "code": "RUS",
+      "date": "2026-11-08T18:30:20.271000+00:00",
+      "url": "https://livetiming.formula1.com/static/2026/2026-11-08_S%C3%A3o_Paulo_Grand_Prix/2026-11-08_Race/TeamRadio/RUS_63_20261108_152941.mp3",
+      "lines": [
+        {
+          "who": "driver",
+          "en": "Is everyone struggling or is it just me?",
+          "uk": "Усім важко чи тільки мені?"
+        },
+        {
+          "who": "engineer",
+          "en": "No, everybody's struggling, so we just need to build the temperature again.",
+          "uk": "Ні, важко всім, тож нам просто треба знову набрати температуру."
+        },
+        {
+          "who": "driver",
+          "en": "I've got temperature, but something is weird.",
+          "uk": "Температура в мене є, але щось дивне."
+        }
+      ]
+    },
+    {
+      "id": "RUS_63_20261108_153421",
+      "driverNumber": 63,
+      "code": "RUS",
+      "date": "2026-11-08T18:34:54.670000+00:00",
+      "url": "https://livetiming.formula1.com/static/2026/2026-11-08_S%C3%A3o_Paulo_Grand_Prix/2026-11-08_Race/TeamRadio/RUS_63_20261108_153421.mp3",
+      "lines": [
+        {
+          "who": "driver",
+          "en": "… This is crazy.",
+          "uk": "… Це божевілля."
+        },
+        {
+          "who": "engineer",
+          "en": "Yeah, similar balance comments, both cars.",
+          "uk": "Так, схожі скарги на баланс в обох машинах."
+        }
+      ]
+    },
+    {
+      "id": "RUS_63_20261108_154101",
+      "driverNumber": 63,
+      "code": "RUS",
+      "date": "2026-11-08T18:41:31.224000+00:00",
+      "url": "https://livetiming.formula1.com/static/2026/2026-11-08_S%C3%A3o_Paulo_Grand_Prix/2026-11-08_Race/TeamRadio/RUS_63_20261108_154101.mp3",
+      "lines": [
+        {
+          "who": null,
+          "en": "Quite an afternoon, quite an adventure. We secured the championship, I think that's the most important.",
+          "uk": "Ото був день, ото пригода. Ми забезпечили собі чемпіонство, думаю, це найголовніше."
+        },
+        {
+          "who": "driver",
+          "en": "Well done, everybody. Great to see what we've achieved this year.",
+          "uk": "Молодці всі. Чудово бачити, чого ми досягли цього року."
+        }
+      ]
+    }
+  ]
+}
