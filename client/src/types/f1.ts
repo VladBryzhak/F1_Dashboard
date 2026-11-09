@@ -1069,6 +1069,11 @@ export interface RecordEntry {
   name: string
   value: number
   constructorId?: string // a driver's team: the one of most seasons, or of that season or race
+  // a list's holder: the photo (the official portrait of the last season's
+  // team, else Wikimedia Commons, added by the route)
+  lastTeam?: string
+  lastSeason?: number
+  photoUrl?: string | null
   // per list: the span of years, or the season (wins in a season), or the
   // race (youngest winners)
   season?: number

@@ -2529,7 +2529,11 @@ export async function getRecords(): Promise<RecordsResponse> {
       for (const [team, k] of seasonsWith.get(id) ?? []) if (k >= n) [best, n] = [team, k];
       return best;
     };
-    const withTeam = (id: string) => ({ constructorId: mainTeam(id) });
+    const lastOf = (id: string) => {
+      const last = ds.driverCareer.get(id)?.lastSeason;
+      return last ? { lastSeason: last, lastTeam: ds.teamByYearDriver.get(`${last}:${id}`) } : {};
+    };
+    const withTeam = (id: string) => ({ constructorId: mainTeam(id), ...lastOf(id) });
     const count = (pairs: Iterable<[string, number]>) => {
       const m = new Map<string, number>();
       for (const [id, n] of pairs) m.set(id, (m.get(id) ?? 0) + n);
@@ -2550,7 +2554,7 @@ export async function getRecords(): Promise<RecordsResponse> {
     const bySeason = topOf(seasonWins).map((e) => {
       const [id, year] = e.id.split(":");
       const row = seasonWins.find((x) => x.id === e.id)!;
-      return { ...e, id, season: Number(year), races: row.races, constructorId: ds.teamByYearDriver.get(`${year}:${id}`) };
+      return { ...e, id, season: Number(year), races: row.races, constructorId: ds.teamByYearDriver.get(`${year}:${id}`), ...lastOf(id) };
     });
 
     // youngest winners: age on race day
@@ -2565,7 +2569,7 @@ export async function getRecords(): Promise<RecordsResponse> {
       const days = Math.round((Date.parse(r.date) - Date.parse(dob)) / 86_400_000);
       young.push({ id: w.driverId, name: dName(w.driverId), value: -days, ageDays: days, season: r.year, grandPrixName: ds.grandsPrix.get(r.grandPrixId)?.name ?? r.grandPrixId, born: dob, date: r.date, constructorId: w.constructorId });
     }
-    const youngest = young.sort((a, b) => a.ageDays - b.ageDays).slice(0, TOP).map((y, i) => ({ rank: i + 1, id: y.id, name: y.name, value: y.ageDays, ageDays: y.ageDays, season: y.season, grandPrixName: y.grandPrixName, born: y.born, date: y.date, constructorId: y.constructorId }));
+    const youngest = young.sort((a, b) => a.ageDays - b.ageDays).slice(0, TOP).map((y, i) => ({ rank: i + 1, id: y.id, name: y.name, value: y.ageDays, ageDays: y.ageDays, season: y.season, grandPrixName: y.grandPrixName, born: y.born, date: y.date, constructorId: y.constructorId, ...lastOf(y.id) }));
 
     const career = (key: "podiums" | "races") => [...ds.driverCareer].map(([id, c]) => ({ id, name: dName(id), value: c[key] }));
     const total = (key: "totalPolePositions" | "totalFastestLaps") => [...ds.drivers.values()].map((d) => ({ id: d.id, name: dName(d.id), value: d[key] ?? 0 }));

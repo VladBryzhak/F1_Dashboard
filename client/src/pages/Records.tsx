@@ -2,12 +2,13 @@ import type { CSSProperties } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
 import { api } from '../api/client'
 import Breadcrumbs from '../components/Breadcrumbs'
+import { Headshot } from '../components/EntityCards'
 import { useAsync } from '../hooks/useAsync'
 import { useSeo } from '../hooks/useSeo'
 import { useI18n, type TKey } from '../i18n/core'
 import { ageText } from '../lib/age'
 import { breadcrumbLd } from '../lib/jsonld'
-import { teamColor } from '../lib/f1meta'
+import { driverPortraitUrl, teamColor } from '../lib/f1meta'
 import { gpTitle } from '../lib/gpNames'
 import { seoText } from '../lib/seoText'
 import { UK_DRIVER_NAMES } from '../lib/ukNames'
@@ -50,7 +51,20 @@ function RecordList({ spec }: { spec: ListSpec }) {
   return (
     <article className="rec-card">
       <h2 className="rec-card-title">{t(`rec.${spec.key}` as TKey)}</h2>
-      <div className="rec-lead" style={{ '--team': teamColor(lead.constructorId ?? '') } as CSSProperties}>
+      <div
+        className={kind === 'driver' ? 'rec-lead rec-lead--photo' : 'rec-lead'}
+        style={{ '--team': teamColor(lead.constructorId ?? '') } as CSSProperties}
+      >
+        {kind === 'driver' && (
+          // the official portrait of the last season's team, else the
+          // Wikimedia photo; nothing when neither loads
+          <Headshot
+            portraitUrl={lead.lastTeam && lead.lastSeason ? driverPortraitUrl(lead.id, lead.lastTeam, String(lead.lastSeason)) : null}
+            thirdUrl={lead.photoUrl}
+            alt={name(kind, lead)}
+            sizes="96px"
+          />
+        )}
         <div className="rec-lead-who">
           <Link to={hrefOf(kind, lead)} className="rec-lead-name">
             {name(kind, lead)}
