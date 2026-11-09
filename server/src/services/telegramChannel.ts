@@ -3,8 +3,10 @@ import { getCalendar, getCurrentSeason, getSeasonReview } from "./f1db";
 import { gpTitle } from "./gpNames";
 import { SITE_URL } from "./pageHtml";
 import { getRacePreview } from "./racePreview";
+import { sessionCard, sessionHeroOf } from "./sessionCard";
 import { latestSessionHero } from "./sessionHero";
 import { ukPlural } from "./ukText";
+import { UK_DRIVER_NAMES } from "./ukNames";
 import type { ArticleSummary, RacePreview, SeasonReview, SessionHero } from "../types/f1";
 
 // Posts to the site's public Telegram channel, in Ukrainian with links to the
@@ -32,6 +34,15 @@ const DRY_RUN = process.env.TELEGRAM_DRY_RUN === "1";
 // posted at once (retried each check until it goes out). Remove it after, or
 // every restart posts it again.
 const TEST_POST = process.env.TELEGRAM_TEST_POST === "1";
+// Set for one deploy to post past sessions' cards now, e.g.
+// "2026:20:Qualifying,2026:20:Race". Each goes out once: an opening line of
+// their own tells them from the text posts of the same sessions, and the
+// channel page is checked for it, so a restart doesn't post them again.
+const CARDS_NOW = (process.env.TELEGRAM_CARDS_NOW ?? "")
+  .split(",")
+  .map((s) => s.trim().split(":"))
+  .filter((p) => p.length === 3);
+const CARDS_INTRO = "🆕 Результати сесій тепер виходять і картками";
 
 const CHECK_MS = 5 * 60_000;
 const SESSION_FRESH_MS = 3 * 3600_000; // post a session's result within 3 hours of its end
@@ -43,7 +54,13 @@ export interface ChannelPost {
   key: string; // what it is about, so it is posted once
   text: string; // Telegram HTML
   url: string; // the page the link preview shows
+  // A picture to post the text under instead of the link preview (a session's
+  // result card), and until when to wait for it before posting the text alone.
+  photo?: () => Promise<Buffer | null>;
+  photoWaitUntil?: number;
 }
+
+const CARD_WAIT_MS = 60 * 60_000; // a session's card can come a little after its result
 
 const esc = (s: string | number) => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 const ukUrl = (path: string) => `${SITE_URL}/uk${path}`;
@@ -67,18 +84,25 @@ export function sessionPost(h: SessionHero): ChannelPost {
   const name = SESSION_UK[h.sessionName] ?? h.sessionName;
   const head = `${h.kind === "race" ? "🏁" : "⏱"} <b>${esc(gp(h.grandPrixName))} · ${esc(name)}</b>`;
   const team = (r: SessionHero["top"][number]) => (r.constructorName ? ` (${esc(r.constructorName)})` : "");
+  // the channel is Ukrainian: names as our Ukrainian pages write them
+  const who = (r: SessionHero["top"][number]) => {
+    const n = r.driverId ? UK_DRIVER_NAMES[r.driverId] : undefined;
+    return esc(n ? `${n[0]} ${n[1]}` : r.driverName);
+  };
   const medal = ["🥇", "🥈", "🥉"];
   const rows = h.top.map((r, i) => {
     const time = r.time ? `, ${esc(r.time)}` : "";
-    if (h.kind === "race") return `${medal[i] ?? `${r.position}.`} ${esc(r.driverName)}${team(r)}`;
-    if (h.kind === "qualifying" && i === 0) return `Поул: ${esc(r.driverName)}${team(r)}${time}`;
-    return `${r.position}. ${esc(r.driverName)}${team(r)}${time}`;
+    if (h.kind === "race") return `${medal[i] ?? `${r.position}.`} ${who(r)}${team(r)}`;
+    if (h.kind === "qualifying" && i === 0) return `Поул: ${who(r)}${team(r)}${time}`;
+    return `${r.position}. ${who(r)}${team(r)}${time}`;
   });
   const more = h.kind === "race" ? "Повні результати" : "Результати й анонс гонки";
   return {
     key: `session:${h.season}:${h.round}:${h.sessionName}`,
     text: [head, "", ...rows, "", `${more}: ${url}`].join("\n"),
     url,
+    photo: () => sessionCard(String(h.season), String(h.round), h.sessionName).catch(() => null),
+    photoWaitUntil: Date.parse(h.endedAt) + CARD_WAIT_MS,
   };
 }
 
@@ -176,9 +200,19 @@ async function candidates(now: number): Promise<ChannelPost[]> {
 
 // ---------- Sending ----------
 
-async function send(post: ChannelPost): Promise<void> {
+async function send(post: ChannelPost, photo: Buffer | null = null): Promise<void> {
   if (DRY_RUN) {
-    console.log(`[telegram] would post ${post.key}:\n${post.text}`);
+    console.log(`[telegram] would post ${post.key}${photo ? ` with a ${Math.round(photo.length / 1024)} KB card` : ""}:\n${post.text}`);
+    return;
+  }
+  if (photo) {
+    const form = new FormData();
+    form.append("chat_id", CHANNEL!);
+    form.append("caption", post.text);
+    form.append("parse_mode", "HTML");
+    form.append("photo", new Blob([new Uint8Array(photo)], { type: "image/png" }), "card.png");
+    const res = await fetch(`https://api.telegram.org/bot${TOKEN}/sendPhoto`, { method: "POST", body: form, signal: AbortSignal.timeout(30_000) });
+    if (!res.ok) throw new Error(`Telegram ${res.status}: ${(await res.text().catch(() => "")).slice(0, 200)}`);
     return;
   }
   const res = await fetch(`https://api.telegram.org/bot${TOKEN}/sendMessage`, {
@@ -230,7 +264,7 @@ async function testPost(): Promise<void> {
   }
   const p = sessionPost(hero);
   try {
-    await send(p);
+    await send(p, (await p.photo?.()) ?? null);
     testDone = true;
     posted.add(p.key);
     console.log(`[telegram] test post sent: ${p.key}`);
@@ -240,7 +274,35 @@ async function testPost(): Promise<void> {
   }
 }
 
+// The cards asked for in TELEGRAM_CARDS_NOW, in that order.
+async function cardsNow(): Promise<void> {
+  const page = await channelPage();
+  if (page == null) return console.warn("[telegram] cards now: channel page unreadable, trying again at the next check");
+  cardsDone = true;
+  for (const [season, round, session] of CARDS_NOW) {
+    const hero = await sessionHeroOf(season, round, session).catch(() => null);
+    if (!hero) {
+      console.warn(`[telegram] cards now: no result for ${season}:${round}:${session}`);
+      continue;
+    }
+    const base = sessionPost(hero);
+    // the race is run: its qualifying leads to the results, not the preview
+    const text = base.text.replace("Результати й анонс гонки:", "Повні результати:");
+    const post = { ...base, key: `${base.key}:card`, text: `${CARDS_INTRO}\n\n${text}` };
+    if (page.includes(postId(post))) continue; // posted before this restart
+    try {
+      await send(post, (await post.photo?.()) ?? null);
+      posted.add(post.key);
+      console.log(`[telegram] card posted: ${post.key}`);
+    } catch (err) {
+      console.warn(`[telegram] card ${post.key} not posted:`, err instanceof Error ? err.message : err);
+    }
+  }
+}
+let cardsDone = false;
+
 async function check(): Promise<void> {
+  if (CARDS_NOW.length && !cardsDone) await cardsNow();
   if (TEST_POST && !testDone) await testPost();
   const posts = (await candidates(Date.now())).filter((p) => !posted.has(p.key));
   if (!posts.length) return;
@@ -250,10 +312,16 @@ async function check(): Promise<void> {
     return;
   }
   for (const p of posts) {
+    if (page.includes(postId(p))) {
+      posted.add(p.key); // already in the channel
+      continue;
+    }
+    // a post with a card waits for it (a few checks), then goes out as text
+    const photo = p.photo ? await p.photo() : null;
+    if (p.photo && !photo && Date.now() < (p.photoWaitUntil ?? 0)) continue;
     posted.add(p.key);
-    if (page.includes(postId(p))) continue; // already in the channel
     try {
-      await send(p);
+      await send(p, photo);
       console.log(`[telegram] posted ${p.key}`);
     } catch (err) {
       console.warn(`[telegram] ${p.key} not posted:`, err instanceof Error ? err.message : err);
