@@ -457,3 +457,20 @@
     transition: none;
   }
 }
+
+/* Quick facts: the questions people search, answered */
+.drv-facts {
+  margin: 0;
+  display: grid;
+  gap: var(--space-sm);
+}
+
+.drv-facts dt {
+  font-weight: 700;
+  color: var(--text);
+}
+
+.drv-facts dd {
+  margin: 0.15rem 0 0;
+  color: var(--muted);
+}

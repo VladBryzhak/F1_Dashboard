@@ -8,6 +8,7 @@ import {
   getDriverProfile,
   getDriverStandings,
   getHomeHighlights,
+  getRecords,
   getSeasonReview,
   getTeammates,
   hasSeasonReview,
@@ -18,6 +19,7 @@ import { gpTitle, type Lang } from "./gpNames";
 import { UK, ukCountry, ukDate, ukPlural } from "./ukText";
 import { driverName, UK_DRIVER_NAMES } from "./ukNames";
 import { getRaceWeekendNow } from "./provisional";
+import type { DriverProfile, RecordEntry } from "../types/f1";
 
 // Plain-HTML snapshot of a page for search-engine crawlers. The app renders
 // in the browser, so the raw HTML a crawler fetches first was an empty
@@ -450,6 +452,57 @@ async function teamList(c: Ctx, season: number, current: number): Promise<string
   );
 }
 
+// The questions people search, answered: a mirror of driverFacts in
+// client/src/lib/summaries.ts (keep the two in step).
+export function driverFacts(p: DriverProfile, name: string, uk: boolean, current: number): { q: string; a: string }[] {
+  const active = p.lastSeason >= current;
+  const seasons = new Set(p.seasons.map((s) => s.season)).size;
+  const teams = [...new Set(p.seasons.map((s) => s.constructorName).filter(Boolean))];
+  const and = (items: string[]) => joinAnd(items, uk ? "і" : "and");
+  const titleYears = p.seasons.filter((s) => s.position === 1 && s.season < current).map((s) => s.season);
+  if (titleYears.length < p.championships) {
+    const now = p.seasons.find((s) => s.season === current && s.position === 1);
+    if (now) titleYears.push(now.season);
+  }
+  const bestYear = p.bestChampionship != null ? p.seasons.find((s) => s.position === p.bestChampionship)?.season : undefined;
+  const best = p.bestChampionship != null ? `P${p.bestChampionship}${bestYear ? ` (${bestYear})` : ""}` : null;
+  const facts: { q: string; a: string }[] = [];
+  if (uk) {
+    facts.push({
+      q: `Скільки перемог має ${name}?`,
+      a: p.wins > 0
+        ? `${ukPlural(p.wins, UK.wins)}; стартів у кар'єрі: ${p.races}.`
+        : `${active ? "Поки жодної" : "Жодної"} перемоги в Гран-прі; стартів у кар'єрі: ${p.races}${p.bestResult ? `, найкращий фініш: P${p.bestResult}` : ""}.`,
+    });
+    facts.push({
+      q: `Скільки титулів чемпіона світу має ${name}?`,
+      a: p.championships > 0 ? `${p.championships}: ${titleYears.join(", ")}.` : `${active ? "Поки жодного" : "Жодного"}${best ? `; найкраще місце в чемпіонаті: ${best}` : ""}.`,
+    });
+    facts.push({
+      q: `Скільки сезонів у Формулі-1 має ${name}?`,
+      a: `${seasons}, ${active ? `з ${p.firstSeason} року` : p.firstSeason === p.lastSeason ? `у ${p.firstSeason} році` : `у ${p.firstSeason}-${p.lastSeason} роках`}${teams.length ? `. ${teams.length === 1 ? "Команда" : "Команди"}: ${and(teams)}` : ""}.`,
+    });
+    if (p.poles || p.podiums) facts.push({ q: `Скільки поулів і подіумів має ${name}?`, a: `Поул-позицій: ${p.poles}, подіумів: ${p.podiums}.` });
+    return facts;
+  }
+  facts.push({
+    q: `How many races has ${name} won?`,
+    a: p.wins > 0
+      ? `${enPlural(p.wins, "Grand Prix win")} from ${enPlural(p.races, "race start")}.`
+      : `No Grand Prix wins${active ? " yet" : ""} from ${enPlural(p.races, "race start")}${p.bestResult ? `; best finish P${p.bestResult}` : ""}.`,
+  });
+  facts.push({
+    q: `How many world titles has ${name} won?`,
+    a: p.championships > 0 ? `${p.championships}: ${titleYears.join(", ")}.` : `None${active ? " yet" : ""}${best ? `; best championship finish ${best}` : ""}.`,
+  });
+  facts.push({
+    q: `How long has ${name} been in Formula 1?`,
+    a: `${enPlural(seasons, "season")}, ${active ? `since ${p.firstSeason}` : p.firstSeason === p.lastSeason ? `in ${p.firstSeason}` : `from ${p.firstSeason} to ${p.lastSeason}`}${teams.length ? `, with ${and(teams)}` : ""}.`,
+  });
+  if (p.poles || p.podiums) facts.push({ q: `How many pole positions and podiums does ${name} have?`, a: `${enPlural(p.poles, "pole position")} and ${enPlural(p.podiums, "podium")}.` });
+  return facts;
+}
+
 async function driver(c: Ctx, id: string, current: number): Promise<string | null> {
   const p = await getDriverProfile(id).catch(() => null);
   if (!p) return null;
@@ -488,6 +541,7 @@ async function driver(c: Ctx, id: string, current: number): Promise<string | nul
   if (born || bests.length) {
     body += `<p>${born}${bests.length ? `${born ? " " : ""}${c.uk ? "Рекорди" : "Records"}: ${bests.join(", ")}.` : ""}</p>`;
   }
+  body += `<h2>${c.uk ? "Коротко" : "Quick facts"}</h2><dl>${driverFacts(p, name, c.uk, current).map((f) => `<dt>${esc(f.q)}</dt><dd>${esc(f.a)}</dd>`).join("")}</dl>`;
   const mates = await getTeammates(id).catch(() => new Map<number, { id: string; name: string }[]>());
   body +=
     `<h2>${c.uk ? "По сезонах" : "Season by season"}</h2>` +
@@ -646,6 +700,43 @@ const STATIC: Record<string, { en: [string, string]; uk: [string, string] }> = {
   },
 };
 
+// "18 years 228 days" / "18 р. 228 дн.": whole years from the birthday, then
+// the days since the last one (mirrors client/src/lib/age.ts).
+export function ageText(born: string, on: string, uk: boolean): string {
+  const [by, bm, bd] = born.split("-").map(Number);
+  const [y, m, d] = on.split("-").map(Number);
+  const years = y - by - (m < bm || (m === bm && d < bd) ? 1 : 0);
+  const days = Math.round((Date.UTC(y, m - 1, d) - Date.UTC(by + years, bm - 1, bd)) / 86_400_000);
+  return uk ? `${years} р. ${days} дн.` : `${years} years ${days} days`;
+}
+
+// All-time records: a mirror of pages/Records.tsx.
+async function recordsPage(c: Ctx): Promise<string> {
+  const r = await getRecords();
+  const table = (title: string, rows: RecordEntry[], href: (e: RecordEntry) => string, val: (e: RecordEntry) => string, detail?: (e: RecordEntry) => string) =>
+    `<h2>${esc(title)}</h2><ol>${rows.map((e) => `<li>${c.a(href(e), e.name)}: ${esc(val(e))}${detail ? ` (${esc(detail(e))})` : ""}</li>`).join("")}</ol>`;
+  const drv = (e: RecordEntry) => `/drivers/${e.id}`;
+  const team = (e: RecordEntry) => `/teams/${e.id}`;
+  const num = (e: RecordEntry) => String(e.value);
+  const L = c.uk
+    ? { h: "Рекорди Формули-1", p: "Рекорди Формули-1 за всю історію з 1950 року: пілоти й команди, з посиланнями на їхні сторінки.", titles: "Найбільше титулів чемпіона світу", wins: "Найбільше перемог", poles: "Найбільше поул-позицій", podiums: "Найбільше подіумів", starts: "Найбільше стартів", fl: "Найбільше найшвидших кіл", season: "Найбільше перемог за сезон", young: "Наймолодші переможці гонок", tTitles: "Команди: найбільше Кубків конструкторів", tWins: "Команди: найбільше перемог", tPoles: "Команди: найбільше поул-позицій", of: "з" }
+    : { h: "Formula 1 records", p: "All-time Formula 1 records since 1950, drivers and teams, with links to their pages.", titles: "Most world titles", wins: "Most wins", poles: "Most pole positions", podiums: "Most podiums", starts: "Most race starts", fl: "Most fastest laps", season: "Most wins in a season", young: "Youngest race winners", tTitles: "Teams: most constructors' titles", tWins: "Teams: most wins", tPoles: "Teams: most pole positions", of: "of" };
+  return (
+    `<h1>${esc(L.h)}</h1><p>${esc(L.p)}</p>` +
+    table(L.titles, r.drivers.titles, drv, num) +
+    table(L.wins, r.drivers.wins, drv, num) +
+    table(L.poles, r.drivers.poles, drv, num) +
+    table(L.podiums, r.drivers.podiums, drv, num) +
+    table(L.starts, r.drivers.starts, drv, num) +
+    table(L.fl, r.drivers.fastestLaps, drv, num) +
+    table(L.season, r.drivers.seasonWins, drv, (e) => `${e.value} ${L.of} ${e.races}`, (e) => String(e.season)) +
+    table(L.young, r.drivers.youngestWinners, drv, (e) => (e.born && e.date ? ageText(e.born, e.date, c.uk) : ""), (e) => `${gpTitle(e.grandPrixName ?? "", c.uk ? "uk" : "en")} ${e.season}`) +
+    table(L.tTitles, r.teams.titles, team, num) +
+    table(L.tWins, r.teams.wins, team, num) +
+    table(L.tPoles, r.teams.poles, team, num)
+  );
+}
+
 // The About page's own text (pages/About.tsx), so it isn't a one-liner.
 function aboutPage(c: Ctx): string {
   const t = c.uk
@@ -764,6 +855,9 @@ export async function pageSnapshot(rawPath: string, lang: Lang = "en"): Promise<
       break;
     case "about":
       body = x ? "" : aboutPage(c);
+      break;
+    case "records":
+      body = x ? "" : await recordsPage(c);
       break;
     default:
       if (section && STATIC[section] && !x) {

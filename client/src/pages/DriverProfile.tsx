@@ -11,7 +11,7 @@ import { countryName } from '../lib/countries'
 import { breadcrumbLd, driverLd } from '../lib/jsonld'
 import { driverPortraitUrl, teamColor } from '../lib/f1meta'
 import { gpShort } from '../lib/gpNames'
-import { driverSummary } from '../lib/summaries'
+import { driverFacts, driverSummary } from '../lib/summaries'
 import type { DriverProfile as Profile } from '../types/f1'
 import '../styles/profile.css'
 import { seoText } from '../lib/seoText'
@@ -272,6 +272,18 @@ export default function DriverProfile() {
               )}
             </div>
           )}
+
+          <div className="card">
+            <h2 className="wknd-section">{t('drv.facts')}</h2>
+            <dl className="drv-facts">
+              {driverFacts(profile, displayName, lang).map((f) => (
+                <div key={f.q}>
+                  <dt>{f.q}</dt>
+                  <dd>{f.a}</dd>
+                </div>
+              ))}
+            </dl>
+          </div>
 
           <div className="card">
             <h2 className="wknd-section">{t('drv.career')}</h2>

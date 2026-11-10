@@ -170,6 +170,19 @@ export const seoText = {
           description: `${p.name} in Formula 1: ${en(p.championships, "constructors' title")}, ${en(p.wins, 'win')}, ${en(p.podiums, 'podium')} and ${en(p.races, 'race')} since ${p.firstSeason}.`,
         },
 
+  records: (lang: Lang): SeoText =>
+    uk(lang)
+      ? {
+          title: 'Рекорди Ф1: найбільше перемог, титулів і поулів',
+          description:
+            'Рекорди Формули-1 за всю історію: найбільше титулів, перемог, поулів, подіумів і стартів, найбільше перемог за сезон, наймолодші переможці, рекорди команд.',
+        }
+      : {
+          title: 'F1 Records: Most Wins, Titles & Poles',
+          description:
+            'All-time Formula 1 records: most world titles, wins, pole positions, podiums and race starts, most wins in a season, youngest race winners and team records.',
+        },
+
   circuits: (lang: Lang): SeoText =>
     uk(lang)
       ? {

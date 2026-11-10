@@ -55,6 +55,7 @@ const DriverProfile = lazyPage(() => import('./pages/DriverProfile'))
 const Teams = lazyPage(() => import('./pages/Teams'))
 const TeamProfile = lazyPage(() => import('./pages/TeamProfile'))
 const Compare = lazyPage(() => import('./pages/Compare'))
+const Records = lazyPage(() => import('./pages/Records'))
 const Telemetry = lazyPage(() => import('./pages/Telemetry'))
 const Live = lazyPage(() => import('./pages/Live'))
 const Feedback = lazyPage(() => import('./pages/Feedback'))
@@ -122,6 +123,7 @@ export default function App() {
           <Route path="teams" element={<Teams />} />
           <Route path="teams/:slug" element={<TeamsOrProfile />} />
           <Route path="compare" element={<Compare />} />
+          <Route path="records" element={<Records />} />
           <Route path="telemetry" element={<Telemetry />} />
           <Route path="live" element={<Live />} />
           <Route path="feedback" element={<Feedback />} />

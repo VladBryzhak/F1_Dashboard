@@ -27,7 +27,7 @@ describe("pageStatus", () => {
   it("answers 200 for the pages the app has", async () => {
     for (const p of ["/", "/standings", "/standings/1998", "/calendar/2025", "/drivers", "/drivers/2025",
       "/drivers/max-verstappen", "/teams/mclaren", "/circuits", "/circuits/monza", "/calendar/2026/18",
-      "/calendar/2026/018", "/articles", "/articles/antonelli-champion", "/compare", "/telemetry", "/live", "/about", "/privacy", "/support", "/feedback"]) {
+      "/calendar/2026/018", "/articles", "/articles/antonelli-champion", "/compare", "/telemetry", "/live", "/about", "/privacy", "/support", "/feedback", "/records"]) {
       expect(await status(p), p).toEqual({ code: 200 });
     }
   });
