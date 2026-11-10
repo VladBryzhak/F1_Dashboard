@@ -37,6 +37,13 @@ Verstappen has 279 of Red Bull's 415 points, about two thirds. He has been on th
 
 Hadjar's points matter because McLaren's second car has not kept up. He has 122 points in 17 races for Red Bull. He missed the Dutch, Italian and Spanish rounds with a wrist injury he picked up in training over the summer break, and Liam Lawson scored 14 points in his place ([Formula 1](https://www.formula1.com/en/latest/article/red-bull-confirm-hadjar-to-miss-dutch-grand-prix-as-lawson-steps-up-and-tsunoda-returns.3D3k7oc9dUwwEBZC7upjR1.3D3k7oc9dUwwEBZC7upjR1)). In São Paulo Hadjar started fifth and finished third, the fourth podium of his career and his third for Red Bull, after Monaco and Baku.
 
+Red Bull marked it with two podium photos: Hadjar grinning with both thumbs up and a trophy in front of him, then Verstappen holding up his trophy and raising his other hand, both in Pirelli podium caps.
+
+```instagram
+url: https://www.instagram.com/p/DfffLgpm7rO/
+handle: redbullracing
+```
+
 ## McLaren's split
 
 At McLaren the points are shared very differently. Norris has 246 and three wins: Hungary, the Netherlands and now São Paulo, from pole. Piastri has 152 and no wins this year. In the last six races he finished 13th, 6th, 5th, 7th, 13th and 6th. When Norris wins, McLaren can match Red Bull. When he does not, the team falls behind, because Red Bull now usually have both cars in the points.

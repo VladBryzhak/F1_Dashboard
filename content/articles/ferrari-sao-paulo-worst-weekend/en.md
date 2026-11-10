@@ -33,6 +33,13 @@ title: Ferrari's tyres in São Paulo
 source: OpenF1 stints
 ```
 
+Ferrari's own post after the flag has two pictures. The first shows a Ferrari on track with the result graphic over it: Leclerc P7, Hamilton P9. It went up before the stewards' penalty moved Leclerc to eighth. The second is Hamilton's car up close, his yellow and green helmet in Brazil's colours.
+
+```instagram
+url: https://www.instagram.com/p/DffbJNdj4m-/
+handle: scuderiaferrari
+```
+
 The weekend came straight after Mexico, where a first-lap fight between the two drivers cost Ferrari the win ([our analysis](/articles/ferrari-hamilton-leclerc-mexico)). Fred Vasseur met both of them before Brazil, and Leclerc said afterwards that "everything is settled" ([ESPN](https://www.espn.com/f1/story/_/id/50407666/charles-leclerc-ferrari-lewis-hamilton-fred-vasseur)). In São Paulo there was no fight between them. They were both too far back.
 
 ## What it cost
