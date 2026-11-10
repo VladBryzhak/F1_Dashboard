@@ -62,7 +62,8 @@ function RecordList({ spec }: { spec: ListSpec }) {
             portraitUrl={lead.lastTeam && lead.lastSeason ? driverPortraitUrl(lead.id, lead.lastTeam, String(lead.lastSeason)) : null}
             thirdUrl={lead.photoUrl}
             alt={name(kind, lead)}
-            sizes="96px"
+            // the frame's width: the browser picks 240 or 360 px on 2x and 3x screens
+            sizes="88px"
           />
         )}
         <div className="rec-lead-who">
