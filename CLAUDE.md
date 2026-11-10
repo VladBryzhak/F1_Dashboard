@@ -137,7 +137,7 @@ The race replay shows the team radio the broadcast aired, with captions in both 
 
 ## Records and quick facts
 
-- `/records` (`pages/Records.tsx`, `GET /api/records`, `getRecords` in `f1db.ts`, cached per dataset version): the top ten of drivers' titles, wins, poles, podiums, starts, fastest laps, wins in a season and youngest winners (age on race day, `lib/age.ts`), and teams' titles, wins and poles. The same numbers as the profiles: titles from final standings of completed seasons only, so this season's champion joins after the final round. Linked from the footer; the crawler text mirrors the page (`recordsPage` in `snapshot.ts`).
+- `/records` (`pages/Records.tsx`, `GET /api/records`, `getRecords` in `f1db.ts`, cached per dataset version): the top ten of drivers' titles, wins, poles, podiums, starts, fastest laps, wins in a season and youngest winners (age on race day, `lib/age.ts`), and teams' titles, wins and poles. The same numbers as the profiles: titles from final standings of completed seasons only, so this season's champion joins after the final round. In the header menu (and the crawler snapshot's nav); the crawler text mirrors the page (`recordsPage` in `snapshot.ts`).
 - A driver's page answers the questions people search ("How many races has Lewis Hamilton won?", titles with their years, seasons and teams, poles and podiums): `driverFacts` in `client/src/lib/summaries.ts`, mirrored in `snapshot.ts` (a test keeps them the same). Ukrainian questions keep the name in the nominative ("Скільки перемог має …?") so no name needs a case ending.
 
 ## Provisional race weekends (server/src/services/provisional.ts)
