@@ -1,5 +1,6 @@
 import { plural, translate, type Lang, type TKey } from '../i18n/core'
 import type { PreviewWeatherDay, PreviewWins, RacePreview } from '../types/f1'
+import { localName } from './ukNames'
 
 // The three short facts at the top of an upcoming race's preview
 // (components/RacePreview.tsx): the race-day forecast (or, without one, the
@@ -34,7 +35,7 @@ export function weekday(date: string, lang: Lang, style: 'long' | 'short' = 'lon
 
 // "A", "A and B", "A, B and C".
 function names(list: PreviewWins[], lang: Lang): string {
-  const n = list.map((w) => w.name)
+  const n = list.map((w) => localName(w.id, w.name, lang))
   if (n.length < 2) return n.join('')
   return `${n.slice(0, -1).join(', ')} ${translate('pv.and', undefined, lang)} ${n[n.length - 1]}`
 }
@@ -64,7 +65,7 @@ function lastTimeFact(p: RacePreview, lang: Lang): PreviewFact | null {
     tag: 'pv.tag.last',
     text: translate(
       'pv.fact.last',
-      { year: last.year, name: last.winnerName, team: last.winnerConstructorName },
+      { year: last.year, name: localName(last.winnerId, last.winnerName, lang), team: last.winnerConstructorName },
       lang,
     ),
   }
@@ -88,7 +89,7 @@ function recordFact(p: RacePreview, lang: Lang): PreviewFact | null {
   if (r) {
     return {
       tag: 'pv.tag.record',
-      text: translate('pv.fact.record', { time: r.time, name: r.driverName, year: r.year }, lang),
+      text: translate('pv.fact.record', { time: r.time, name: localName(r.driverId, r.driverName, lang), year: r.year }, lang),
     }
   }
   if (!p.circuit.racesHeld) return null

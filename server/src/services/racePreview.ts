@@ -117,6 +117,7 @@ export async function getRacePreview(
       winnerName: r.winnerName!,
       winnerConstructorId: r.winnerConstructorId!,
       winnerConstructorName: r.winnerConstructorName!,
+      poleId: r.poleDriverId,
       poleName: r.poleDriverName,
     }));
 

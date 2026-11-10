@@ -1,7 +1,7 @@
-import type { CSSProperties } from 'react'
+import { useMemo, type CSSProperties } from 'react'
 import { useI18n, type TKey } from '../i18n/core'
 import { teamColor } from '../lib/f1meta'
-import { eventText, storyParagraphs } from '../lib/raceStory'
+import { eventText, localStory, storyParagraphs } from '../lib/raceStory'
 import type { RaceStory as Story, StoryEvent, StoryEventKind } from '../types/f1'
 import './RaceStory.css'
 
@@ -81,8 +81,9 @@ function Timeline({ story }: { story: Story }) {
   )
 }
 
-export default function RaceStory({ story }: { story: Story }) {
+export default function RaceStory({ story: raw }: { story: Story }) {
   const { t, lang } = useI18n()
+  const story = useMemo(() => localStory(raw, lang), [raw, lang])
   const paragraphs = storyParagraphs(story, lang)
   if (!paragraphs.length) return null
   const kinds = [...new Set(story.events.map((e) => e.kind))]

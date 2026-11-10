@@ -14,6 +14,7 @@ import { useI18n } from '../i18n/core'
 import { breadcrumbLd, raceLd } from '../lib/jsonld'
 import { teamColor } from '../lib/f1meta'
 import { raceSummary } from '../lib/summaries'
+import { localName } from '../lib/ukNames'
 import type {
   CalendarSession,
   PracticeSession,
@@ -76,20 +77,23 @@ function TeamCell({ id, name }: { id: string; name: string }) {
 }
 
 function DriverCell({
+  id,
   name,
   code,
   countryCode,
   nationality,
 }: {
+  id: string | null
   name: string
   code: string | null
   countryCode?: string | null
   nationality?: string
 }) {
+  const { lang } = useI18n()
   return (
     <span className="country">
       {countryCode !== undefined && <Flag code={countryCode} nationality={nationality ?? ''} />}
-      <span className="name">{name}</span>
+      <span className="name">{localName(id, name, lang)}</span>
       {code && <span className="code">{code}</span>}
     </span>
   )
@@ -117,6 +121,7 @@ function ResultTable({ rows }: { rows: WeekendResult[] }) {
               <td className="pos">{r.positionText}</td>
               <td>
                 <DriverCell
+                  id={r.driverId}
                   name={r.driverName}
                   code={r.driverCode}
                   countryCode={r.countryCode}
@@ -160,7 +165,7 @@ function QualiTable({ rows, prefix }: { rows: QualifyingEntry[]; prefix: string 
             <tr key={q.driverId}>
               <td className="pos">{q.position ?? ''}</td>
               <td>
-                <DriverCell name={q.driverName} code={q.driverCode} />
+                <DriverCell id={q.driverId} name={q.driverName} code={q.driverCode} />
               </td>
               <td>
                 <TeamCell id={q.constructorId} name={q.constructorName} />
@@ -196,7 +201,7 @@ function PracticeTable({ session }: { session: PracticeSession }) {
             <tr key={p.driverId}>
               <td className="pos">{p.positionText}</td>
               <td>
-                <DriverCell name={p.driverName} code={p.driverCode} />
+                <DriverCell id={p.driverId} name={p.driverName} code={p.driverCode} />
               </td>
               <td>
                 <TeamCell id={p.constructorId} name={p.constructorName} />
@@ -367,7 +372,7 @@ export default function RaceWeekend() {
                   <Highlight
                     key={label}
                     label={label}
-                    name={h.driverName}
+                    name={localName(h.driverId, h.driverName, lang)}
                     constructorId={h.constructorId}
                     detail={lapWord(h.detail)}
                   />

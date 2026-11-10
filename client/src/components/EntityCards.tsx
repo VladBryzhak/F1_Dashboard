@@ -4,6 +4,7 @@ import { driverPortraitUrl, f1SrcSet, teamCarUrl, teamColor } from '../lib/f1met
 import type { ConstructorStanding, DriverStanding } from '../types/f1'
 import Flag from './Flag'
 import { useI18n } from '../i18n/core'
+import { localParts } from '../lib/ukNames'
 import { countryName } from '../lib/countries'
 import './EntityCards.css'
 
@@ -120,7 +121,8 @@ export function DriverCard({
   headshot?: string
 }) {
   const color = teamColor(d.constructorId)
-  const { t, tn } = useI18n()
+  const { t, tn, lang } = useI18n()
+  const [given, family] = localParts(d.driverId, d.givenName, d.familyName, lang)
   return (
     <Link to={`/drivers/${d.driverId}`} className="ecard">
       <Headshot
@@ -128,12 +130,12 @@ export function DriverCard({
         fallbackUrl={headshot}
         sizes="60px"
         color={color}
-        alt={`${d.givenName} ${d.familyName}`}
+        alt={`${given} ${family}`}
       />
       {d.permanentNumber ? <span className="big-num">{d.permanentNumber}</span> : null}
       <div className="rank">P{d.position}</div>
       <h2 className="ename">
-        {d.givenName} {d.familyName}
+        {given} {family}
       </h2>
       <div className="esub">
         <Flag code={d.countryCode} nationality={d.nationality} />

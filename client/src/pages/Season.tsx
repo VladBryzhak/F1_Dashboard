@@ -12,6 +12,7 @@ import { teamColor } from '../lib/f1meta'
 import { gpTitle } from '../lib/gpNames'
 import { CURRENT_SEASON } from '../lib/seasons'
 import { seoText } from '../lib/seoText'
+import { localName } from '../lib/ukNames'
 import type { ReviewEntrant, SeasonReview } from '../types/f1'
 import NotFound from './NotFound'
 import './Season.css'
@@ -31,11 +32,12 @@ function ordinal(n: number, lang: string): string {
 }
 
 function Champion({ e, label, sub, href }: { e: ReviewEntrant; label: string; sub: string; href: string }) {
+  const { lang } = useI18n()
   return (
     <div className="ssn-champ" style={{ '--team': teamColor(e.constructorId) } as CSSProperties}>
       <span className="ssn-champ-label">{label}</span>
       <Link to={href} className="ssn-champ-name">
-        {e.name}
+        {href.startsWith('/drivers/') ? localName(e.id, e.name, lang) : e.name}
       </Link>
       <span className="ssn-champ-sub">{sub}</span>
     </div>
@@ -116,7 +118,7 @@ function Body({ r }: { r: SeasonReview }) {
       <ol className="ssn-rounds">
         {r.winners.map((w) => {
           const label = `${t('common.round')} ${w.round}. ${gp(w.grandPrixName)}. ${
-            w.winnerName ? t('cy.won', { name: w.winnerName }) : t('cy.toCome')
+            w.winnerName ? t('cy.won', { name: localName(w.winnerId, w.winnerName, lang) }) : t('cy.toCome')
           }`
           return (
             <li key={w.round}>
@@ -140,7 +142,7 @@ function Body({ r }: { r: SeasonReview }) {
           {r.wins.map((w) => (
             <li key={w.id} style={{ '--team': teamColor(w.constructorId) } as CSSProperties}>
               <Link to={`/drivers/${w.id}`} className="ssn-wins-name">
-                {w.name}
+                {localName(w.id, w.name, lang)}
               </Link>
               <span className="ssn-wins-bar" style={{ width: `${(w.count / maxWins) * 100}%` }} aria-hidden="true" />
               <span className="ssn-wins-n mono">{w.count}</span>
@@ -163,7 +165,7 @@ function Body({ r }: { r: SeasonReview }) {
             {r.firstWins.map((f) => (
               <li key={f.id}>
                 <span className="ssn-swatch" style={{ background: teamColor(f.constructorId) }} aria-hidden="true" />
-                <Link to={`/drivers/${f.id}`}>{f.name}</Link>
+                <Link to={`/drivers/${f.id}`}>{localName(f.id, f.name, lang)}</Link>
                 <span className="muted">
                   {' '}
                   · <Link to={`/calendar/${r.season}/${f.round}`}>{gp(f.grandPrixName)}</Link>
@@ -187,7 +189,7 @@ function Body({ r }: { r: SeasonReview }) {
               >
                 <span className="ssn-duel-team">{x.constructorName}</span>
                 <span className="ssn-duel-row">
-                  <span>{x.a.code ?? x.a.name}</span>
+                  <span>{x.a.code ?? localName(x.a.id, x.a.name, lang)}</span>
                   <span className="ssn-duel-kind">{t('ssn.quali')}</span>
                   <span className="mono">
                     {x.quali.a}:{x.quali.b}
@@ -196,7 +198,7 @@ function Body({ r }: { r: SeasonReview }) {
                   <span className="mono">
                     {x.race.a}:{x.race.b}
                   </span>
-                  <span>{x.b.code ?? x.b.name}</span>
+                  <span>{x.b.code ?? localName(x.b.id, x.b.name, lang)}</span>
                 </span>
               </Link>
             ))}

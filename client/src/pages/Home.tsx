@@ -9,7 +9,7 @@ import { siteLd } from '../lib/jsonld'
 import { api } from '../api/client'
 import { driverPortraitUrl, f1SrcSet, teamColor } from '../lib/f1meta'
 import { sessionLabel } from '../lib/live'
-import { useI18n, type TKey } from '../i18n/core'
+import { useI18n, type Lang, type TKey } from '../i18n/core'
 import type {
   ChampionHighlight,
   DriverStanding,
@@ -24,9 +24,13 @@ import type {
 } from '../types/f1'
 import { gpTitle } from '../lib/gpNames'
 import { retirementReason } from '../lib/retirementReasons'
+import { localName, localParts } from '../lib/ukNames'
 import './Home.css'
 
-function lastName(full: string): string {
+// The surname, in Ukrainian on Ukrainian pages when the driver is in the map.
+function lastName(full: string, id: string | null, lang: Lang): string {
+  const uk = lang === 'uk' && id ? localParts(id, '', full, lang) : null
+  if (uk && uk[0]) return uk[1]
   const parts = full.trim().split(' ')
   return parts.length > 1 ? parts.slice(1).join(' ') : full
 }
@@ -125,13 +129,13 @@ interface BoardRow {
 // A top three as a small timing board: position, team swatch, name and team,
 // then P1's time or the gap to P1.
 function PodiumBoard({ rows, label, laps = false }: { rows: BoardRow[]; label: string; laps?: boolean }) {
-  const { tn } = useI18n()
+  const { tn, lang } = useI18n()
   return (
     <ol className="podium-board" aria-label={label}>
       {rows.map((p) => {
         const name = (
           <>
-            <b>{lastName(p.driverName)}</b>
+            <b>{lastName(p.driverName, p.driverId, lang)}</b>
             <span className="pb-team">
               {p.constructorName}
               {laps && p.laps ? ` · ${tn('plural.lapsN', p.laps)}` : ''}
@@ -264,14 +268,14 @@ function WinnerHero({
         session={sprint ? t('session.sprint') : undefined}
       />
       <h1 className="hero-title">
-        {lastName(winner.driverName)} <span>{t(sprint ? 'home.winsSprint' : 'home.wins')}</span>
+        {lastName(winner.driverName, winner.driverId, lang)} <span>{t(sprint ? 'home.winsSprint' : 'home.wins')}</span>
       </h1>
       <PodiumBoard rows={race.podium} label={t('home.podium')} />
       {retirement && (
         <p className="hero-note">
           <span className="hero-note-tag">{t('home.incident')}</span>
           <span>
-            {retirement.driverName}: {retirementReason(retirement.reason, lang)}
+            {localName(retirement.driverId, retirement.driverName, lang)}: {retirementReason(retirement.reason, lang)}
           </span>
         </p>
       )}
@@ -282,7 +286,7 @@ function WinnerHero({
 
 // After qualifying: the pole-sitter, the pole lap and the top three.
 function PoleHero({ session, image }: { session: SessionHero; image: HeroImage }) {
-  const { t } = useI18n()
+  const { t, lang } = useI18n()
   const pole = session.top[0]
   const label = sessionLabel(session.sessionName, t)
   return (
@@ -302,7 +306,7 @@ function PoleHero({ session, image }: { session: SessionHero; image: HeroImage }
         session={label}
       />
       <h1 className="hero-title">
-        {lastName(pole.driverName)} <span>{t('home.onPole')}</span>
+        {lastName(pole.driverName, pole.driverId, lang)} <span>{t('home.onPole')}</span>
       </h1>
       {pole.time && (
         <p className="hero-poletime">
@@ -325,7 +329,7 @@ const TRIO_SIZES = '(max-width: 768px) 160px, 240px'
 // After a practice: the top three, the fastest in front with the other two
 // behind on either side, and the times as a timing board.
 function PracticeHero({ session, image }: { session: SessionHero; image: HeroImage }) {
-  const { t } = useI18n()
+  const { t, lang } = useI18n()
   const [p1, p2, p3] = session.top
   const label = sessionLabel(session.sessionName, t)
   const photo = (r: SessionRow) => {
@@ -368,7 +372,7 @@ function PracticeHero({ session, image }: { session: SessionHero; image: HeroIma
           session={label}
         />
         <h1 className="hero-title">
-          {lastName(p1.driverName)} <span>{t('home.fastest')}</span>
+          {lastName(p1.driverName, p1.driverId, lang)} <span>{t('home.fastest')}</span>
         </h1>
         <PodiumBoard rows={session.top} label={t('home.top3', { session: label })} laps />
         <WeekendLink season={session.season} round={session.round} schedule />
@@ -404,7 +408,7 @@ function ChampionHero({ champion, heroSizes }: { champion: ChampionHighlight; he
       </p>
       {/* The page's h1 is the first slide's headline. */}
       <h2 className="hero-title">
-        {lastName(champion.driverName)} <span>{t('home.champion')}</span>
+        {lastName(champion.driverName, champion.driverId, lang)} <span>{t('home.champion')}</span>
       </h2>
       <dl className="champ-stats">
         {stats.map(([label, value]) => (
@@ -523,7 +527,7 @@ function ChampionshipCard({
   // Every round of the season run: the standings are final.
   final?: boolean
 }) {
-  const { t } = useI18n()
+  const { t, lang } = useI18n()
   if (!rows.length) return null
   // Bars are scaled to the leader's points.
   const top = Math.max(rows[0].points, 1)
@@ -544,7 +548,7 @@ function ChampionshipCard({
                 <div className="champ-line">
                   <span className="champ-dot" style={{ background: color }} />
                   <Link to={`/drivers/${d.driverId}`} className="champ-name">
-                    {initialName(d.givenName, d.familyName)}
+                    {initialName(...localParts(d.driverId, d.givenName, d.familyName, lang))}
                   </Link>
                 </div>
                 <span className="champ-bar" aria-hidden="true">

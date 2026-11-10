@@ -157,3 +157,16 @@ export function driverName(id: string, given: string, family: string, uk: boolea
   const n = uk ? UK_DRIVER_NAMES[id] : undefined
   return n ? `${n[0]} ${n[1]}` : `${given} ${family}`
 }
+
+// A name the API gives in Latin, for a page in this language: Ukrainian
+// where the driver is known (by f1db id), else as given.
+export function localName(id: string | null | undefined, latin: string, lang: 'en' | 'uk'): string {
+  const n = lang === 'uk' && id ? UK_DRIVER_NAMES[id] : undefined
+  return n ? `${n[0]} ${n[1]}` : latin
+}
+
+// The same as [given, family], for layouts that set the two apart.
+export function localParts(id: string | null | undefined, given: string, family: string, lang: 'en' | 'uk'): [string, string] {
+  const n = lang === 'uk' && id ? UK_DRIVER_NAMES[id] : undefined
+  return n ? [n[0], n[1]] : [given, family]
+}

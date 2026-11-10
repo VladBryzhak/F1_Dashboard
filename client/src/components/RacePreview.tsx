@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom'
 import { useAsync } from '../hooks/useAsync'
 import { useI18n } from '../i18n/core'
+import { localName } from '../lib/ukNames'
 import { teamColor } from '../lib/f1meta'
 import { fetchForecast, previewFacts, skyKey, weekday } from '../lib/racePreview'
 import type { RacePreview as Preview } from '../types/f1'
@@ -86,10 +87,10 @@ export default function RacePreview({ preview }: { preview: Preview }) {
                         style={{ background: teamColor(r.winnerConstructorId) }}
                         aria-hidden="true"
                       />
-                      <Link to={`/drivers/${r.winnerId}`}>{r.winnerName}</Link>
+                      <Link to={`/drivers/${r.winnerId}`}>{localName(r.winnerId, r.winnerName, lang)}</Link>
                       <span className="pv-team">{r.winnerConstructorName}</span>
                     </span>
-                    {r.poleName && <span className="pv-pole">{t('pv.pole', { name: r.poleName })}</span>}
+                    {r.poleName && <span className="pv-pole">{t('pv.pole', { name: localName(r.poleId, r.poleName, lang) })}</span>}
                   </li>
                 ))}
               </ol>
@@ -102,7 +103,7 @@ export default function RacePreview({ preview }: { preview: Preview }) {
               {p.topWinners.map((w, i) => (
                 <span key={w.id}>
                   {i > 0 && ' · '}
-                  <Link to={`/drivers/${w.id}`}>{w.name}</Link> <span className="mono">{w.count}</span>
+                  <Link to={`/drivers/${w.id}`}>{localName(w.id, w.name, lang)}</Link> <span className="mono">{w.count}</span>
                 </span>
               ))}
             </p>

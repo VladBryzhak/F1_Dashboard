@@ -8,6 +8,7 @@ import {
   YAxis,
 } from 'recharts'
 import { useI18n } from '../i18n/core'
+import { localName } from '../lib/ukNames'
 import { teamColor } from '../lib/f1meta'
 import { gpShort } from '../lib/gpNames'
 import type { SeasonProgression } from '../types/f1'
@@ -67,7 +68,7 @@ function ChartTooltip({
 }
 
 export default function TitleRaceChart({ data }: { data: SeasonProgression }) {
-  const { t } = useI18n()
+  const { t, lang } = useI18n()
   if (!data.series.length) {
     return <p className="muted">{t('st.noData')}</p>
   }
@@ -82,7 +83,7 @@ export default function TitleRaceChart({ data }: { data: SeasonProgression }) {
     const m: SeriesMeta = {
       driverId: s.driverId,
       label: s.driverCode ?? s.driverName,
-      name: s.driverName,
+      name: localName(s.driverId, s.driverName, lang),
       color,
       dashed,
     }
