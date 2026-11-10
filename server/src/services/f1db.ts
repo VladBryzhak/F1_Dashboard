@@ -2056,6 +2056,7 @@ export async function getRaceWeekend(
           round: r.round,
           grandPrixName: ds.grandsPrix.get(r.grandPrixId)?.name ?? r.grandPrixId,
           winnerName: w ? nameOf(w.driverId) : null,
+          winnerDriverId: w?.driverId ?? null,
         };
       }),
   };
@@ -2182,6 +2183,7 @@ export async function getCircuitProfile(circuitId: string): Promise<CircuitProfi
       winnerName: w ? driverName(w.driverId) : null,
       winnerConstructorId: w?.constructorId ?? null,
       winnerConstructorName: w ? teamName(w.constructorId) : null,
+      poleDriverId: pole?.driverId ?? null,
       poleDriverName: pole ? driverName(pole.driverId) : null,
     });
   }

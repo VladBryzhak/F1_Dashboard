@@ -9,6 +9,7 @@ import { useAsync } from '../hooks/useAsync'
 import { useSeasonRoute } from '../hooks/useSeasonRoute'
 import { useSeo } from '../hooks/useSeo'
 import { useI18n } from '../i18n/core'
+import { localName } from '../lib/ukNames'
 import { teamColor } from '../lib/f1meta'
 import { gpShort, gpTitle } from '../lib/gpNames'
 import './Calendar.css'
@@ -152,7 +153,7 @@ export default function Calendar() {
                       </td>
                       <td>
                         {r.winnerName ? (
-                          <span className="name">{r.winnerName}</span>
+                          <span className="name">{localName(r.winnerDriverId, r.winnerName, lang)}</span>
                         ) : isNext ? (
                           <span className="next-tag">{t('common.next')}</span>
                         ) : (

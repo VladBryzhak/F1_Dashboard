@@ -9,6 +9,7 @@ import { useI18n, type TKey } from '../i18n/core'
 import { countryName } from '../lib/countries'
 import { teamColor } from '../lib/f1meta'
 import { breadcrumbLd } from '../lib/jsonld'
+import { localName } from '../lib/ukNames'
 import type { CircuitTally } from '../types/f1'
 import { gpShort, gpTitle } from '../lib/gpNames'
 import './CircuitProfile.css'
@@ -26,6 +27,7 @@ function Tally({
   linkBase: string
   colorOf?: (id: string) => string
 }) {
+  const { lang } = useI18n()
   if (rows.length === 0) return null
   return (
     <div className="card circ-tally">
@@ -36,7 +38,7 @@ function Tally({
             <span className="circ-tally-pos">{i + 1}</span>
             {colorOf && <span className="dot" style={{ background: colorOf(r.id) }} />}
             <Link to={`${linkBase}/${r.id}`} className="circ-tally-name">
-              {r.name}
+              {linkBase === '/drivers' ? localName(r.id, r.name, lang) : r.name}
             </Link>
             <span className="circ-tally-num">{r.count}</span>
           </li>
@@ -188,7 +190,7 @@ export default function CircuitProfile() {
           <div className="circ-record-body">
             <span className="circ-record-time mono">{c.lapRecord.time}</span>
             <span className="circ-record-who">
-              <Link to={`/drivers/${c.lapRecord.driverId}`}>{c.lapRecord.driverName}</Link>
+              <Link to={`/drivers/${c.lapRecord.driverId}`}>{localName(c.lapRecord.driverId, c.lapRecord.driverName, lang)}</Link>
               <span className="circ-record-team">
                 <span
                   className="wknd-hl-swatch"
@@ -283,7 +285,7 @@ export default function CircuitProfile() {
                     </td>
                     {c.grandsPrix.length > 1 && <td className="muted">{gpShort(r.grandPrixName, lang)}</td>}
                     <td>
-                      <span className="name">{r.winnerName ?? ''}</span>
+                      <span className="name">{r.winnerName ? localName(r.winnerDriverId, r.winnerName, lang) : ''}</span>
                     </td>
                     <td>
                       {r.winnerConstructorName ? (
@@ -296,7 +298,7 @@ export default function CircuitProfile() {
                         </span>
                       ) : null}
                     </td>
-                    <td className="muted">{r.poleDriverName ?? ''}</td>
+                    <td className="muted">{r.poleDriverName ? localName(r.poleDriverId, r.poleDriverName, lang) : ''}</td>
                     <td className="muted chevron" aria-hidden="true">
                       ›
                     </td>

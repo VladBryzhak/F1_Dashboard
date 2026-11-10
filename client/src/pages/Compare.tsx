@@ -9,6 +9,7 @@ import type { DriverProfile, SeasonComparison as SeasonCmp } from '../types/f1'
 import { useI18n } from '../i18n/core'
 import './Compare.css'
 import { seoText } from '../lib/seoText'
+import { localName, localParts } from '../lib/ukNames'
 
 type View = 'career' | 'season'
 
@@ -30,8 +31,9 @@ function bestFinish(p: DriverProfile): number {
 // context (career span or that season's team). Side b mirrors side a.
 function Head({
   side,
-  givenName,
-  familyName,
+  id,
+  givenName: given,
+  familyName: family,
   countryCode,
   nationality,
   color,
@@ -39,6 +41,7 @@ function Head({
   sub,
 }: {
   side: 'a' | 'b'
+  id: string
   givenName: string
   familyName: string
   countryCode: string | null
@@ -47,6 +50,8 @@ function Head({
   urls: (string | null | undefined)[]
   sub: string
 }) {
+  const { lang } = useI18n()
+  const [givenName, familyName] = localParts(id, given, family, lang)
   return (
     <div className={`cmp-head cmp-head--${side}`}>
       <DriverThumb urls={urls} code={familyName.slice(0, 3).toUpperCase()} />
@@ -105,6 +110,7 @@ function Comparison({ a, b, h2h, photoA, photoB }: { a: DriverProfile; b: Driver
       <div className="cmp-heads">
         <Head
           side="a"
+          id={a.driverId}
           givenName={a.givenName}
           familyName={a.familyName}
           countryCode={a.countryCode}
@@ -118,6 +124,7 @@ function Comparison({ a, b, h2h, photoA, photoB }: { a: DriverProfile; b: Driver
         </div>
         <Head
           side="b"
+          id={b.driverId}
           givenName={b.givenName}
           familyName={b.familyName}
           countryCode={b.countryCode}
@@ -191,6 +198,7 @@ function SeasonComparison({ data, photoA, photoB }: { data: SeasonCmp; photoA?: 
       <div className="cmp-heads">
         <Head
           side="a"
+          id={a.driverId}
           givenName={a.givenName}
           familyName={a.familyName}
           countryCode={a.countryCode}
@@ -202,6 +210,7 @@ function SeasonComparison({ data, photoA, photoB }: { data: SeasonCmp; photoA?: 
         <div className="cmp-vs mono">{data.season}</div>
         <Head
           side="b"
+          id={b.driverId}
           givenName={b.givenName}
           familyName={b.familyName}
           countryCode={b.countryCode}
@@ -297,12 +306,18 @@ export default function Compare() {
   // name → id for the datalist inputs
   const byName = useMemo(() => {
     const m = new Map<string, string>()
-    for (const d of drivers.data ?? []) m.set(d.name.toLowerCase(), d.driverId)
+    // the name in the page's language, and the Latin one people may type
+    for (const d of drivers.data ?? []) {
+      m.set(d.name.toLowerCase(), d.driverId)
+      m.set(localName(d.driverId, d.name, lang).toLowerCase(), d.driverId)
+    }
     return m
-  }, [drivers.data])
+  }, [drivers.data, lang])
 
-  const nameOf = (id: string) =>
-    drivers.data?.find((d) => d.driverId === id)?.name ?? id
+  const nameOf = (id: string) => {
+    const d = drivers.data?.find((x) => x.driverId === id)
+    return d ? localName(d.driverId, d.name, lang) : id
+  }
 
   const pick = (setId: (id: string) => void) => (value: string) => {
     const id = byName.get(value.toLowerCase())
@@ -334,7 +349,7 @@ export default function Compare() {
         />
         <datalist id="driver-list">
           {(drivers.data ?? []).map((d) => (
-            <option key={d.driverId} value={d.name} />
+            <option key={d.driverId} value={localName(d.driverId, d.name, lang)} />
           ))}
         </datalist>
       </div>

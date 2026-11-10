@@ -3,6 +3,7 @@ import { driverPortraitUrl, f1SrcSet, teamColor } from '../lib/f1meta'
 import type { ConstructorStanding, DriverStanding } from '../types/f1'
 import Flag from './Flag'
 import { useI18n } from '../i18n/core'
+import { localParts } from '../lib/ukNames'
 import { countryName } from '../lib/countries'
 
 // Circular driver photo for a standings row. Tries the season/team-accurate
@@ -85,7 +86,7 @@ export function DriverStandingsTable({
                       color={teamColor(r.constructorId)}
                     />
                     <span className="name">
-                      {r.givenName} {r.familyName}
+                      {localParts(r.driverId, r.givenName, r.familyName, lang).join(' ')}
                     </span>
                     {r.code ? <span className="code">{r.code}</span> : null}
                   </span>

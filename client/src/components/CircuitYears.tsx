@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom'
 import { useI18n } from '../i18n/core'
+import { localName } from '../lib/ukNames'
 import { gpTitle } from '../lib/gpNames'
 import type { RaceWeekend } from '../types/f1'
 import './CircuitYears.css'
@@ -22,7 +23,7 @@ export default function CircuitYears({ weekend: w }: { weekend: RaceWeekend }) {
         {w.atCircuit.map((r) => {
           const here = r.year === Number(w.season) && r.round === w.round
           const label = `${gpTitle(r.grandPrixName, lang)} ${r.year}. ${
-            r.winnerName ? t('cy.won', { name: r.winnerName }) : t('cy.toCome')
+            r.winnerName ? t('cy.won', { name: localName(r.winnerDriverId, r.winnerName, lang) }) : t('cy.toCome')
           }`
           const cls = `cy-year mono${r.grandPrixName !== w.grandPrixName ? ' is-other' : ''}`
           return (

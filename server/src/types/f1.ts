@@ -443,6 +443,7 @@ export interface TeammateDuels {
 // ----- Race story (how a race unfolded) -----
 
 export interface StoryDriver {
+  id?: string; // f1db driverId, to name the driver in the page's language
   name: string;
   code: string | null;
   constructorId?: string;
@@ -521,6 +522,7 @@ export interface CircuitYear {
   round: number;
   grandPrixName: string;
   winnerName: string | null; // null until it has run
+  winnerDriverId?: string | null;
 }
 
 export interface RaceWeekend {
@@ -756,6 +758,7 @@ export interface CircuitRace {
   winnerName: string | null;
   winnerConstructorId: string | null;
   winnerConstructorName: string | null;
+  poleDriverId: string | null;
   poleDriverName: string | null;
 }
 
@@ -974,6 +977,7 @@ export interface PreviewPastRace {
   winnerName: string;
   winnerConstructorId: string;
   winnerConstructorName: string;
+  poleId: string | null;
   poleName: string | null;
 }
 

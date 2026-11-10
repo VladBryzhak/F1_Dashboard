@@ -27,7 +27,8 @@ export async function getRaceStory(season: string, round: string): Promise<RaceS
   return cached(`story:${season}:${round}`, () => (partial ? 60 : wk.provisional ? 600 : 6 * 3600), async () => {
     const results = wk.results;
     const byCode = new Map(results.filter((r) => r.driverCode).map((r) => [r.driverCode!, r]));
-    const who = (r: { driverName: string; driverCode: string | null; constructorId: string }): StoryDriver => ({
+    const who = (r: { driverId: string; driverName: string; driverCode: string | null; constructorId: string }): StoryDriver => ({
+      id: r.driverId,
       name: r.driverName,
       code: r.driverCode,
       constructorId: r.constructorId,
@@ -74,6 +75,7 @@ export async function getRaceStory(season: string, round: string): Promise<RaceS
       const m = /^([\d:.]+)(?:\s*\(lap (\d+)\))?/.exec(wk.fastestLap.detail);
       const row = results.find((r) => r.driverId === wk.fastestLap!.driverId);
       story.fastest = {
+        id: wk.fastestLap.driverId,
         name: wk.fastestLap.driverName,
         code: row?.driverCode ?? null,
         constructorId: wk.fastestLap.constructorId,
@@ -89,8 +91,8 @@ export async function getRaceStory(season: string, round: string): Promise<RaceS
       const leaderBefore = [...champ.before.entries()].find(([, p]) => p === 1)?.[0] ?? null;
       const winnerAfter = winnerRow ? champ.after.find((s) => s.driverId === winnerRow.driverId) : undefined;
       story.championship = {
-        leader: { name: lead.name, code: lead.code, points: lead.points },
-        second: second ? { name: second.name, code: second.code, points: second.points } : null,
+        leader: { id: lead.driverId, name: lead.name, code: lead.code, points: lead.points },
+        second: second ? { id: second.driverId, name: second.name, code: second.code, points: second.points } : null,
         winnerPos: winnerAfter?.position ?? null,
         winnerPosBefore: winnerRow ? champ.before.get(winnerRow.driverId) ?? null : null,
         leaderChanged: leaderBefore != null && leaderBefore !== lead.driverId,

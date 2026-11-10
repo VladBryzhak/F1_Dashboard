@@ -14,6 +14,7 @@ import { getLang, plural, type Lang } from '../i18n/core'
 import { countryName } from './countries'
 import { gpTitle } from './gpNames'
 import { CURRENT_SEASON } from './seasons'
+import { localName } from './ukNames'
 
 // "a, b and c" from a de-duplicated, non-empty list.
 function naturalList(items: string[]): string {
@@ -62,7 +63,7 @@ function driverSummaryUk(p: DriverProfile): string {
       : `у ${p.firstSeason}-${p.lastSeason} роках`
   const teams = [...new Set(p.seasons.map((s) => s.constructorName))].filter(Boolean)
 
-  let text = `${p.givenName} ${p.familyName}${country ? ` (${country})` : ''}: виступи в чемпіонаті світу FIA Формули-1 ${span}.`
+  let text = `${localName(p.driverId, `${p.givenName} ${p.familyName}`, 'uk')}${country ? ` (${country})` : ''}: виступи в чемпіонаті світу FIA Формули-1 ${span}.`
   if (teams.length) text += ` ${teams.length === 1 ? 'Команда' : 'Команди'}: ${teams.join(', ')}.`
 
   const feats: string[] = []
@@ -179,15 +180,15 @@ export function raceSummary(w: RaceWeekend, lang: Lang = getLang()): string {
     })
     let text = `${gpTitle(w.grandPrixName, 'uk')} ${w.season} року ${ahead ? 'відбудеться' : 'відбулося'} ${date}.`
     if (winner) {
-      text += ` Перемога: ${winner.driverName} (${winner.constructorName})`
+      text += ` Перемога: ${localName(winner.driverId, winner.driverName, 'uk')} (${winner.constructorName})`
       if (grid === 1) text += ', старт із поул-позиції'
       else if (grid) text += `, старт із P${grid}`
       text += '.'
     }
     if (pole && (!winner || pole.driverId !== winner.driverId)) {
-      text += ` Поул-позиція: ${pole.driverName}.`
+      text += ` Поул-позиція: ${localName(pole.driverId, pole.driverName, 'uk')}.`
     }
-    if (w.fastestLap) text += ` Найшвидше коло гонки: ${w.fastestLap.driverName}.`
+    if (w.fastestLap) text += ` Найшвидше коло гонки: ${localName(w.fastestLap.driverId, w.fastestLap.driverName, 'uk')}.`
     return text
   }
 
@@ -218,7 +219,7 @@ export function seasonSummary(
 ): string {
   if (!driver) return ''
   const complete = Number(season) < CURRENT_SEASON
-  const driverName = `${driver.givenName} ${driver.familyName}`
+  const driverName = localName(driver.driverId, `${driver.givenName} ${driver.familyName}`, lang)
 
   if (lang === 'uk') {
     const pts = plural('plural.points', driver.points, undefined, 'uk')

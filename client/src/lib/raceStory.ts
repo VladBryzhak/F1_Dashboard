@@ -1,5 +1,6 @@
 import type { Lang } from '../i18n/core'
 import { retirementReason } from './retirementReasons'
+import { localName } from './ukNames'
 import type { RaceStory, StoryDriver, StoryEvent } from '../types/f1'
 
 // Turns the race-story facts from /api/calendar/:season/:round/story into a
@@ -27,8 +28,23 @@ const PENALTY_REASON: [RegExp, string, string][] = [
   ],
   [/FORCING ANOTHER DRIVER/, 'forcing a driver off track', 'виштовхування суперника з траси'],
   [/IMPEDING/, 'impeding', 'блокування суперника'],
+  [/REJOINING/, 'rejoining unsafely', 'небезпечне повернення на трасу'],
   [/SAFETY CAR|VSC/, 'safety car rules', 'порушення режиму Safety Car'],
 ]
+
+// The story with every driver named in the page's language: each driver
+// object carries its f1db id beside the Latin name.
+export function localStory(s: RaceStory, lang: Lang): RaceStory {
+  if (lang !== 'uk') return s
+  const walk = (v: unknown): unknown => {
+    if (Array.isArray(v)) return v.map(walk)
+    if (!v || typeof v !== 'object') return v
+    const o = Object.fromEntries(Object.entries(v).map(([k, x]) => [k, walk(x)])) as Record<string, unknown>
+    if (typeof o.name === 'string' && typeof o.id === 'string') o.name = localName(o.id, o.name, lang)
+    return o
+  }
+  return walk(s) as RaceStory
+}
 
 const sentence = (s: string) => (s ? s[0].toUpperCase() + s.slice(1) : s)
 

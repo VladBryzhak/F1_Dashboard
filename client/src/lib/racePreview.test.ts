@@ -62,8 +62,8 @@ describe('previewFacts', () => {
   it('states the race-day forecast, the grid winners here and the lap record', () => {
     expect(previewFacts(base, 'uk').map((f) => f.text)).toEqual([
       'Неділя: мряка, 19°, ймовірність дощу 94%',
-      'Lewis Hamilton і Max Verstappen: по 3 перемоги тут',
-      '1:10.540, Valtteri Bottas, 2018',
+      'Льюїс Хемілтон і Макс Ферстаппен: по 3 перемоги тут',
+      '1:10.540, Валттері Боттас, 2018',
     ])
     expect(previewFacts(base, 'en')[1].text).toBe('Lewis Hamilton and Max Verstappen: 3 wins each here')
   })
