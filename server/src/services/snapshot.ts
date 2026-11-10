@@ -91,6 +91,7 @@ const NAV: [string, string, string][] = [
   ["/calendar", "Calendar", "Календар"],
   ["/drivers", "Drivers", "Пілоти"],
   ["/teams", "Teams", "Команди"],
+  ["/records", "Records", "Рекорди"],
   ["/circuits", "Circuits", "Траси"],
   ["/compare", "Compare drivers", "Порівняння пілотів"],
   ["/live", "Live timing", "Live-таймінг"],

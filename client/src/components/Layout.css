@@ -238,12 +238,12 @@ main:focus {
 /* ---------- Responsive header ---------- */
 /* Mid-width desktops: tighten the header so all links fit on one line (the
    Ukrainian labels are the longer ones). */
-@media (max-width: 1280px) {
+@media (max-width: 1360px) {
   .topbar {
-    gap: 1.75rem;
+    gap: 1.5rem;
   }
   .nav {
-    gap: 1.15rem;
+    gap: 1rem;
   }
 }
 
@@ -257,6 +257,20 @@ main:focus {
   /* The shortcut stays in the button's tooltip. */
   .search-kbd {
     display: none;
+  }
+}
+
+/* Narrow laptops, just above the burger: ten links still fit on one line
+   (the Ukrainian labels are the longer ones). */
+@media (min-width: 1025px) and (max-width: 1120px) {
+  .topbar {
+    gap: 0.5rem;
+  }
+  .nav {
+    gap: 0.6rem;
+  }
+  .nav-link {
+    font-size: 0.9rem;
   }
 }
 
