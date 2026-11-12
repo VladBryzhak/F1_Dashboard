@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { articlePost, postId, previewPost, seasonPost, sessionPost, signature } from "./telegramChannel";
+import { articlePost, postId, previewPost, seasonFresh, seasonPost, sessionPost, signature } from "./telegramChannel";
 import type { ArticleSummary, RacePreview, SeasonReview, SessionHero } from "../types/f1";
 
 const row = (position: number, driverName: string, constructorName: string, time: string | null) => ({
@@ -72,12 +72,21 @@ describe("channel posts", () => {
     const r = {
       season: 2026,
       held: 21,
-      driver: { name: "Kimi Antonelli", constructorName: "Mercedes" },
+      driver: { id: "kimi-antonelli", name: "Kimi Antonelli", constructorName: "Mercedes" },
       team: { name: "Mercedes" },
       wins: [{}, {}],
     } as unknown as SeasonReview;
-    expect(seasonPost(r).text).toContain("Чемпіон світу: Kimi Antonelli (Mercedes)");
+    expect(seasonPost(r).text).toContain("Чемпіон світу: Кімі Антонеллі (Mercedes)");
     expect(seasonPost(r).url).toBe("https://paddocktimes.com/uk/seasons/2026");
+  });
+
+  it("posts the season review only once it is final, for ten days after the last race", () => {
+    const r = (final: boolean) => ({ final, winners: [{ date: "2026-11-29" }, { date: "2026-12-06" }] }) as unknown as SeasonReview;
+    const at = (d: string) => Date.parse(`${d}T12:00:00Z`);
+    expect(seasonFresh(r(false), at("2026-12-07"))).toBe(false);
+    expect(seasonFresh(r(true), at("2026-12-07"))).toBe(true);
+    expect(seasonFresh(r(true), at("2026-12-15"))).toBe(true);
+    expect(seasonFresh(r(true), at("2026-12-20"))).toBe(false);
   });
 
   it("posts an article's teaser and a link to read it", () => {

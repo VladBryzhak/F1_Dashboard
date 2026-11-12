@@ -53,6 +53,7 @@ const SESSION_FRESH_MS = 3 * 3600_000; // post a session's result within 3 hours
 const PREVIEW_FROM_MS = 10 * 3600_000; // race-day preview: 10 hours before the start…
 const PREVIEW_UNTIL_MS = 1 * 3600_000; // …until an hour before it
 const ARTICLE_FRESH_DAYS = 2;
+const SEASON_FRESH_DAYS = 10; // the season review: within 10 days of the last race
 
 export interface ChannelPost {
   key: string; // what it is about, so it is posted once
@@ -165,10 +166,17 @@ export function articlePost(a: ArticleSummary, teaser = a.description): ChannelP
 export function seasonPost(r: SeasonReview): ChannelPost {
   const url = ukUrl(`/seasons/${r.season}`);
   const lines = [`🏆 <b>Сезон Ф1 ${r.season}: підсумки</b>`, ""];
-  if (r.driver) lines.push(`Чемпіон світу: ${esc(r.driver.name)} (${esc(r.driver.constructorName)})`);
+  const uk = r.driver ? UK_DRIVER_NAMES[r.driver.id] : undefined;
+  if (r.driver) lines.push(`Чемпіон світу: ${esc(uk ? uk.join(" ") : r.driver.name)} (${esc(r.driver.constructorName)})`);
   if (r.team) lines.push(`Кубок конструкторів: ${esc(r.team.name)}`);
   lines.push(`Гонок: ${r.held}, різних переможців: ${r.wins.length}.`, "", url);
   return { key: `season:${r.season}`, text: lines.join("\n"), url };
+}
+
+export function seasonFresh(r: SeasonReview, now: number): boolean {
+  if (!r.final) return false;
+  const last = r.winners.reduce((m, w) => (w.date > m ? w.date : m), "");
+  return !!last && now - Date.parse(`${last}T00:00:00Z`) <= SEASON_FRESH_DAYS * 24 * 3600_000;
 }
 
 // ---------- What there is to post now ----------
@@ -197,8 +205,13 @@ async function candidates(now: number): Promise<ChannelPost[]> {
   const articles = (await listArticles("uk").catch(() => [])).filter((a) => a.date >= fresh).reverse();
   for (const a of articles) out.push(articlePost(a, teasers.get(a.slug)));
 
-  const review = await getSeasonReview(season).catch(() => null);
-  if (review?.final) out.push(seasonPost(review));
+  // The season just ended, also when f1db already lists next year's calendar
+  // (then the current season is the new one); only while the last race is
+  // recent, so a post that has scrolled off the channel page doesn't return.
+  for (const y of [season, season - 1]) {
+    const review = await getSeasonReview(y).catch(() => null);
+    if (review && seasonFresh(review, now)) out.push(seasonPost(review));
+  }
   return out;
 }
 
