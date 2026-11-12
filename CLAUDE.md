@@ -96,7 +96,7 @@ Our own articles, kept in the repo as files and published with a deploy. Each ar
 
 ## Team radio (tools/team-radio)
 
-The race replay shows the team radio the broadcast aired, with captions in both languages. They are made on the owner's Mac and committed as data. Nothing here runs on Render.
+The replay shows the team radio the broadcast aired, with captions in both languages: races, and qualifying and sprints from São Paulo 2026 on (the weekend tasks draft Saturday's sessions too). They are made on the owner's Mac and committed as data. Nothing here runs on Render.
 
 - **Draft.** `tools/team-radio/radio.py draft <session_key>` (see its README) takes the session's clips from OpenF1 and:
   - finds the speech turns (Silero VAD);
@@ -119,7 +119,7 @@ The race replay shows the team radio the broadcast aired, with captions in both 
 
 ## Telegram channel (server/src/services/telegramChannel.ts)
 
-- The server posts to the public channel in Ukrainian with /uk links: a session's top three (from the home hero, within 3 hours of its end), the race-day preview (10 to 1 hours before the start), a new article, and the season review once final. Pictures are Telegram's link preview of our own pages (og:image), except a session's result, which goes out as a card under its text.
+- The server posts to the public channel in Ukrainian with /uk links: a session's top three (from the home hero, within 3 hours of its end), the race-day preview (10 to 1 hours before the start), a new article, and the season review once final (this season or the last, within 10 days of the last race, so a calendar for next year arriving early doesn't skip it). Pictures are Telegram's link preview of our own pages (og:image), except a session's result, which goes out as a card under its text.
 - Session cards (`services/sessionCard.ts`): 1080×1350, the top three on a podium with their formula1.com portraits, then P4 to P10, from the race weekend (OpenF1 before f1db has it). The portraits are Formula 1's: the owner chose them for the channel's cards only (2026-11-09), knowing a complaint could take a post down; the site's pages and other social posts still use no one else's photos. A post waits up to an hour after the session for its card, then goes out as text.
 - Env on Render: `TELEGRAM_CHANNEL` (@username or id) beside the existing `TELEGRAM_BOT_TOKEN`; the bot must be a channel admin allowed to post. `TELEGRAM_DRY_RUN=1` logs posts instead; `TELEGRAM_TEST_POST=1` (one deploy only) posts the latest session's result a minute after start. Past sessions' cards can be posted once through `CARDS_NOW` in `telegramChannel.ts` (sessions and a last date, no Render setting): each opens with a line of its own, so the channel-page check keeps a restart from posting it again. Without the channel nothing runs.
 - No disk on Render's free plan, so the channel is the memory: before posting, the server reads `t.me/s/<channel>` and skips a post whose first two lines (letters and digits only) are already there. An article that arrives with a deploy is still posted; if the page can't be read, nothing is posted that round.
@@ -144,6 +144,7 @@ The race replay shows the team radio the broadcast aired, with captions in both 
 
 - f1db usually has a race only the morning after. Until then (from the weekend's Friday to a week after the race, 2023 on) a race page, its story, title and crawler snapshot take the weekend from OpenF1 (`getRaceWeekendNow`, used instead of f1db's `getRaceWeekend` everywhere a weekend's results show; JSON-LD stays on f1db): each session's classification from `session_result`, the race's grid from the replay's first positions, the fastest lap from its lap times. f1db's own sessions stay where it has them, and once it has the race its results take over by themselves.
 - The weekend carries `provisional: true`: the page says the results are provisional (`wk.provisional`), the story leaves out the championship swing (f1db's standings come with its results), a retirement's cause is unknown ("Retired", left out of the text). Kept 10 minutes; `warmProvisional` (started in `index.ts`) refreshes the current weekend every 10 minutes in the queue's background lane.
+- Drivers come from the whole meeting (`meetingDrivers`), not the race session, whose list OpenF1 fills only once the race runs; a practice stand-in keeps OpenF1's name and gets its team's colour by team name.
 - Checked against f1db on São Paulo 2026: race, grid, points, qualifying and practice match; FP1 stand-ins f1db lists only as test drivers keep OpenF1's name without a link. `PROVISIONAL_ROUND=2026:20` (the `server-provisional` preview config) shows a round as if f1db hadn't got it, for local checks.
 
 ## Generated data (server/src/data)
