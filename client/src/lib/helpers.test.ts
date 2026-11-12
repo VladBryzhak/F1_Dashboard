@@ -60,3 +60,18 @@ describe('formula1.com images', () => {
     expect(f1SrcSet(null)).toBeUndefined()
   })
 })
+
+import { resultTime } from './retirementReasons'
+
+describe('result time column', () => {
+  it('writes laps behind and retirement reasons in Ukrainian', () => {
+    expect(resultTime('+1 lap', 'uk')).toBe('+1 коло')
+    expect(resultTime('+2 laps', 'uk')).toBe('+2 кола')
+    expect(resultTime('+5 laps', 'uk')).toBe('+5 кіл')
+    expect(resultTime('+14.602', 'uk')).toBe('+14.602')
+    expect(resultTime('1:35:23.504', 'uk')).toBe('1:35:23.504')
+    expect(resultTime('Wheel nut', 'uk')).toBe('Гайка колеса')
+    expect(resultTime('Something new', 'uk')).toBe('Something new')
+    expect(resultTime('+1 lap', 'en')).toBe('+1 lap')
+  })
+})
