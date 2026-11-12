@@ -2,7 +2,7 @@ import { describe, expect, it, vi } from "vitest";
 
 vi.mock("./f1db", () => ({ getRaceWeekend: async () => null, getSeasonDrivers: async () => [] }));
 vi.mock("./live", () => ({ LIVE_MARGIN_MS: 0, endOf: () => 0, getReplay: async () => null, getYearSessions: async () => [] }));
-vi.mock("./openf1", () => ({ rawDrivers: async () => [] }));
+vi.mock("./openf1", () => ({ meetingDrivers: async () => [], rawDrivers: async () => [] }));
 
 import { classify } from "./provisional";
 

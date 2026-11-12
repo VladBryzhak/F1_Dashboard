@@ -51,7 +51,7 @@ const SESSION_KICKER: Record<string, string> = {
   Sprint: "СПРИНТ", Race: "ГОНКА",
 };
 
-const surname = (id: string, name: string) => UK_DRIVER_NAMES[id]?.[1] ?? name.split(" ").slice(1).join(" ") ?? name;
+const surname = (id: string, name: string) => UK_DRIVER_NAMES[id]?.[1] ?? (name.includes(" ") ? name.split(" ").slice(1).join(" ") : name);
 const ukLaps = (s: string) => s.replace(/\+(\d+) laps?/, (_, n: string) => `+${n} ${n === "1" ? "коло" : Number(n) < 5 ? "кола" : "кіл"}`);
 const qualiBest = (q: { q1: string | null; q2: string | null; q3: string | null }) => q.q3 ?? q.q2 ?? q.q1 ?? "";
 

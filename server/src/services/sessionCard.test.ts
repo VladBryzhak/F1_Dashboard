@@ -42,6 +42,14 @@ describe("session card", () => {
     expect(d.rows.map((r) => r.right)).toEqual(["1:27.470", "1:27.674", "1:29.302"]);
   });
 
+  it("names a practice stand-in OpenF1 knows only by number", () => {
+    const fp = (pos: string, id: string, name: string, time: string) => ({ positionText: pos, driverId: id, driverName: name, driverCode: null, constructorId: id ? "mclaren" : "", constructorName: "", time, gap: null, laps: 20 });
+    const withFp = { ...wk, practices: [{ number: 1, results: [fp("1", "lando-norris", "Lando Norris", "1:11.717"), fp("2", "", "#62", "1:11.799"), fp("3", "", "Gabriele Mini", "1:12.000")] }] } as unknown as RaceWeekend;
+    const svg = cardSvg(cardData(withFp, "Practice 1")!, {});
+    expect(svg).toContain(">#62<");
+    expect(svg).toContain(">MINI<");
+  });
+
   it("has no card for a session without a result", () => {
     expect(cardData(wk, "Practice 1")).toBeNull();
     expect(cardData(wk, "Sprint")).toBeNull();

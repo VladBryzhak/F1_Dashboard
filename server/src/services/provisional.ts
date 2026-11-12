@@ -2,7 +2,7 @@ import { cached } from "../cache/cache";
 import type { PracticeSession, QualifyingEntry, RaceWeekend, WeekendHighlight, WeekendResult } from "../types/f1";
 import { getRaceWeekend, getSeasonDrivers, type SeasonDriver } from "./f1db";
 import { LIVE_MARGIN_MS, endOf, getReplay, getYearSessions, type RawSession } from "./live";
-import { rawDrivers, type RawDriver } from "./openf1";
+import { meetingDrivers, rawDrivers, type RawDriver } from "./openf1";
 import { inBackground, isOpenF1Unavailable, optional } from "./openf1Client";
 import { formatDuration, formatGap, lastSet, matchDriver, sessionResult, titleCase, type RawResult } from "./sessionHero";
 
@@ -63,7 +63,7 @@ export async function build(wk: RaceWeekend): Promise<RaceWeekend | null> {
   const named = (...names: string[]) => open(meeting.find((s) => names.includes(s.session_name)));
 
   const season = await getSeasonDrivers(Number(wk.season));
-  const drivers = await rawDrivers(race.session_key).catch(optional<RawDriver[]>([]));
+  const drivers = await (race.meeting_key ? meetingDrivers(race.meeting_key) : rawDrivers(race.session_key)).catch(optional<RawDriver[]>([]));
   const who = whoIs(drivers, season);
 
   const raceS = named("Race");
@@ -127,7 +127,8 @@ function whoIs(drivers: RawDriver[], season: SeasonDriver[]): (num: number) => W
       driverCode: d?.name_acronym ?? f?.abbreviation ?? null,
       nationality: f?.nationality ?? "",
       countryCode: f?.countryCode ?? null,
-      constructorId: f?.constructorId ?? "",
+      // a stand-in's team by OpenF1's team name, for its colour
+      constructorId: f?.constructorId ?? season.find((x) => d?.team_name && x.constructorName === d.team_name)?.constructorId ?? "",
       constructorName: f?.constructorName ?? d?.team_name ?? "",
     };
   };

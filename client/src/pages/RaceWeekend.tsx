@@ -13,6 +13,7 @@ import { useSeo } from '../hooks/useSeo'
 import { useI18n } from '../i18n/core'
 import { breadcrumbLd, raceLd } from '../lib/jsonld'
 import { teamColor } from '../lib/f1meta'
+import { resultTime } from '../lib/retirementReasons'
 import { raceSummary } from '../lib/summaries'
 import { localName } from '../lib/ukNames'
 import type {
@@ -100,7 +101,7 @@ function DriverCell({
 }
 
 function ResultTable({ rows }: { rows: WeekendResult[] }) {
-  const { t } = useI18n()
+  const { t, lang } = useI18n()
   return (
     <div className="table-scroll">
       <table className="standings standings--rank">
@@ -135,7 +136,7 @@ function ResultTable({ rows }: { rows: WeekendResult[] }) {
               <td className="num">
                 <Delta n={r.positionsGained} />
               </td>
-              <td className="muted">{r.timeDisplay}</td>
+              <td className="muted">{resultTime(r.timeDisplay, lang)}</td>
               <td className="num points">{r.points || ''}</td>
             </tr>
           ))}
