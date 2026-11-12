@@ -10,6 +10,7 @@ import { useSeo } from '../hooks/useSeo'
 import { SAMPLE_CONSTRUCTOR_STANDINGS } from '../lib/sampleData'
 import { useI18n } from '../i18n/core'
 import { seoText } from '../lib/seoText'
+import { sectionLd } from '../lib/jsonld'
 
 type View = 'grid' | 'search'
 
@@ -25,6 +26,7 @@ export default function Teams() {
   useSeo({
     ...seoText.teams(season, lang),
     canonicalPath,
+    jsonLd: sectionLd(t('nav.home'), t('nav.teams'), '/teams', canonicalPath.split('/')[2]),
   })
   const { data, loading, error } = useAsync(
     () => api.constructorStandings(season),

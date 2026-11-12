@@ -2038,6 +2038,7 @@ export async function getRaceWeekend(
     countryCode: alpha2(ds, gp?.countryId),
     circuitId: race.circuitId,
     circuitName: ds.circuits.get(race.circuitId)?.fullName ?? race.circuitId,
+    placeName: ds.circuits.get(race.circuitId)?.placeName ?? "",
     qualifying,
     results,
     sprintResults,

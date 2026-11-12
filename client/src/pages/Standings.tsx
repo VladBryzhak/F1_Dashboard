@@ -17,6 +17,7 @@ import {
   SAMPLE_DRIVER_STANDINGS,
 } from '../lib/sampleData'
 import { seoText } from '../lib/seoText'
+import { sectionLd } from '../lib/jsonld'
 
 type Tab = 'drivers' | 'constructors' | 'progression'
 
@@ -34,6 +35,7 @@ export default function Standings() {
   useSeo({
     ...seoText.standings(season, lang, drivers.data?.standings[0]),
     canonicalPath,
+    jsonLd: sectionLd(t('nav.home'), t('nav.standings'), '/standings', canonicalPath.split('/')[2]),
   })
   const constructors = useAsync(
     () => api.constructorStandings(season),

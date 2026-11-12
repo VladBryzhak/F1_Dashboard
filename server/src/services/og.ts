@@ -664,9 +664,21 @@ const FONTS = [
   ...WEIGHTS.map((w) => path.join(FONT_DIR, `FiraSansExtraCondensed-${w}.ttf`)),
 ];
 
-export function renderCard(card: Card, lang: Lang = "en"): Buffer {
+// The card in another shape for Google's article images (16:9 is the card
+// itself; 4:3 and 1:1 put it on the same background, centred).
+export type CardRatio = "16x9" | "4x3" | "1x1";
+const RATIO_H: Record<CardRatio, number> = { "16x9": H, "4x3": 900, "1x1": 1200 };
+
+export function renderCard(card: Card, lang: Lang = "en", ratio: CardRatio = "16x9"): Buffer {
   let svg = draw(card, lang);
   if (lang === "uk") svg = svg.split(`font-family="${FONT}"`).join(`font-family="${FONT_UK}"`);
+  const h = RATIO_H[ratio];
+  if (h !== H) {
+    // the red rule moves to the top of the taller image
+    const rule = `<rect x="0" y="0" width="${W}" height="8" fill="${ACCENT}"/>`;
+    const inner = svg.replace(/^<svg xmlns="http:\/\/www.w3.org\/2000\/svg" /, `<svg y="${(h - H) / 2}" `).replace(rule, "");
+    svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${h}" viewBox="0 0 ${W} ${h}"><rect width="${W}" height="${h}" fill="${BG}"/>${rule}${inner}</svg>`;
+  }
   const png = new Resvg(svg, {
     font: { fontFiles: FONTS, loadSystemFonts: false, defaultFontFamily: lang === "uk" ? FONT_UK : FONT },
     fitTo: { mode: "width", value: W },
@@ -682,14 +694,15 @@ const TTL = 6 * 3600 * 1000;
 const MAX = 300;
 
 // pagePath may carry the /uk prefix: the Ukrainian page's card.
-export async function previewPng(pagePath: string): Promise<Buffer> {
-  const hit = cache.get(pagePath);
+export async function previewPng(pagePath: string, ratio: CardRatio = "16x9"): Promise<Buffer> {
+  const key = `${pagePath}|${ratio}`;
+  const hit = cache.get(key);
   if (hit && Date.now() - hit.at < TTL) return hit.png;
   const lang: Lang = /^\/uk(?=\/|$)/.test(pagePath) ? "uk" : "en";
   const bare = pagePath.replace(/^\/uk(?=\/|$)/, "") || "/";
   const meta = await describePage(bare, lang);
-  const png = renderCard(meta.card, lang);
+  const png = renderCard(meta.card, lang, ratio);
   if (cache.size >= MAX) cache.delete(cache.keys().next().value as string);
-  cache.set(pagePath, { at: Date.now(), png });
+  cache.set(key, { at: Date.now(), png });
   return png;
 }
