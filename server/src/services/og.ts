@@ -353,10 +353,10 @@ export async function describePage(rawPath: string, lang: Lang = "en"): Promise<
     }
 
     case "records":
-      if (uk) return generic("Рекорди Ф1: найбільше перемог, титулів і поулів", "Рекорди Формули-1 за всю історію: найбільше титулів, перемог, поулів, подіумів і стартів, найбільше перемог за сезон, наймолодші переможці, рекорди команд.");
+      if (uk) return generic("Рекорди Ф1: найбільше перемог, титулів і поулів", "Рекорди Формули-1 за всю історію: титули, перемоги, поули й подіуми, перемоги поспіль, очки й сходи за сезон, наймолодші пілоти, рекорди команд.");
       return generic(
         "F1 Records: Most Wins, Titles & Poles",
-        "All-time Formula 1 records: most world titles, wins, pole positions, podiums and race starts, most wins in a season, youngest race winners and team records.",
+        "All-time Formula 1 records: most titles, wins, poles and podiums, consecutive wins, points and retirements in a season, youngest drivers and team records.",
       );
     case "compare":
       if (uk) return generic("Порівняння пілотів Ф1", "Порівняйте двох будь-яких пілотів Формули-1: титули, перемоги, подіуми, очки та очні дуелі за кар'єру або окремий сезон.");

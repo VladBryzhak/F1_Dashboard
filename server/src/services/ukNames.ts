@@ -150,6 +150,19 @@ export const UK_DRIVER_NAMES: Record<string, [string, string]> = {
   "nino-farina": ["Ніно", "Фаріна"],
   "juan-manuel-fangio": ["Хуан Мануель", "Фанхіо"],
   "luigi-fagioli": ["Луїджі", "Фаджолі"],
+  // record holders on the records page
+  "troy-ruttman": ["Трой", "Раттмен"],
+  "andrea-de-cesaris": ["Андреа", "де Чезаріс"],
+  "ivan-capelli": ["Іван", "Капеллі"],
+  "piercarlo-ghinzani": ["П'єркарло", "Гінцані"],
+  "adrian-campos": ["Адріан", "Кампос"],
+  "alessandro-nannini": ["Алессандро", "Нанніні"],
+  "alex-caffi": ["Алекс", "Каффі"],
+  "martin-brundle": ["Мартін", "Брандл"],
+  "derek-warwick": ["Дерек", "Ворік"],
+  "eddie-cheever": ["Едді", "Чівер"],
+  "mike-thackwell": ["Майк", "Теквелл"],
+  "ricardo-rodriguez": ["Рікардо", "Родрігес"],
 };
 
 // The driver's name for a page in this language: Ukrainian where known.

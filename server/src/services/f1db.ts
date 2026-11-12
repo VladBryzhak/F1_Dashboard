@@ -2499,6 +2499,28 @@ async function buildReview(
 const TOP = 10;
 
 // The top ten of a list, equal values sharing a rank, ties in name order.
+// Each driver's longest run of consecutive wins over races in order (a
+// shared drive in the 1950s counts for both); runs of one are left out.
+export function longestRuns(races: { year: number; winners: string[] }[]): Map<string, { value: number; from: number; to: number }> {
+  const best = new Map<string, { value: number; from: number; to: number }>();
+  let run = new Map<string, { value: number; from: number; to: number }>();
+  const keepBest = (id: string, s: { value: number; from: number; to: number }) => {
+    if (s.value > 1 && (best.get(id)?.value ?? 0) < s.value) best.set(id, s);
+  };
+  for (const r of races) {
+    const won = new Set(r.winners);
+    const next = new Map<string, { value: number; from: number; to: number }>();
+    for (const id of won) {
+      const s = run.get(id);
+      next.set(id, { value: (s?.value ?? 0) + 1, from: s?.from ?? r.year, to: r.year });
+    }
+    for (const [id, s] of run) if (!won.has(id)) keepBest(id, s);
+    run = next;
+  }
+  for (const [id, s] of run) keepBest(id, s);
+  return best;
+}
+
 function topOf(items: { id: string; name: string; value: number }[], extra?: (id: string) => Partial<RecordEntry>): RecordEntry[] {
   const sorted = items.filter((x) => x.value > 0).sort((a, b) => b.value - a.value || a.name.localeCompare(b.name));
   const out: RecordEntry[] = [];
@@ -2574,6 +2596,79 @@ export async function getRecords(): Promise<RecordsResponse> {
     const youngest = young.sort((a, b) => a.ageDays - b.ageDays).slice(0, TOP).map((y, i) => ({ rank: i + 1, id: y.id, name: y.name, value: y.ageDays, ageDays: y.ageDays, season: y.season, grandPrixName: y.grandPrixName, born: y.born, date: y.date, constructorId: y.constructorId, ...lastOf(y.id) }));
 
     const career = (key: "podiums" | "races") => [...ds.driverCareer].map(([id, c]) => ({ id, name: dName(id), value: c[key] }));
+    const gpOf = (r: RawRace) => ds.grandsPrix.get(r.grandPrixId)?.name ?? r.grandPrixId;
+    const byDate = [...ds.races].sort((a, b) => a.date.localeCompare(b.date) || a.round - b.round);
+    const ran = byDate.filter((r) => ds.resultsByRace.has(`${r.year}:${r.round}`));
+    // Per-season lists keep one row per driver and season, keyed id:year.
+    const perSeason = (rows: { id: string; value: number; season: number; races?: number }[]) =>
+      topOf(rows.map((x) => ({ ...x, id: `${x.id}:${x.season}`, name: dName(x.id) }))).map((e) => {
+        const [id, year] = e.id.split(":");
+        return { ...e, id, constructorId: ds.teamByYearDriver.get(`${year}:${id}`), ...lastOf(id) };
+      });
+
+    // points in a season, from the final (or current) standings
+    const seasonPoints = perSeason(ds.driverStandings.map((s) => ({ id: s.driverId, value: s.points, season: s.year })));
+
+    // retirements in a season (classified DNF), with the season's starts
+    const dnf = new Map<string, { n: number; starts: number }>();
+    for (const r of ran) {
+      for (const x of ds.resultsByRace.get(`${r.year}:${r.round}`) ?? []) {
+        const k = `${x.driverId}:${r.year}`;
+        const v = dnf.get(k) ?? { n: 0, starts: 0 };
+        v.starts += 1;
+        if (x.positionText === "DNF") v.n += 1;
+        dnf.set(k, v);
+      }
+    }
+    const seasonDnfs = perSeason([...dnf].map(([k, v]) => {
+      const [id, year] = k.split(":");
+      return { id, value: v.n, season: Number(year), races: v.starts };
+    }));
+
+    // consecutive wins, across seasons; the Indianapolis 500 (a championship
+    // round in 1950-1960 the regulars skipped) doesn't break a run
+    const bestRun = longestRuns(
+      ran.filter((r) => r.grandPrixId !== "indianapolis").map((r) => ({
+        year: r.year,
+        winners: (ds.resultsByRace.get(`${r.year}:${r.round}`) ?? []).filter((x) => x.positionNumber === 1).map((x) => x.driverId),
+      })),
+    );
+    const winStreak = topOf([...bestRun].map(([id, s]) => ({ id, name: dName(id), value: s.value }))).map((e) => {
+      const s = bestRun.get(e.id)!;
+      return { ...e, span: s.from === s.to ? String(s.from) : `${s.from}-${s.to}`, constructorId: ds.teamByYearDriver.get(`${s.to}:${e.id}`), ...lastOf(e.id) };
+    });
+
+    // wins from furthest back on the grid (a pit-lane start has no number)
+    const fromBack: { id: string; name: string; value: number; season: number; grandPrixName: string; constructorId: string }[] = [];
+    for (const r of ran) {
+      if (r.grandPrixId === "indianapolis") continue;
+      const grid = ds.gridByRace.get(`${r.year}:${r.round}`);
+      for (const x of ds.resultsByRace.get(`${r.year}:${r.round}`) ?? []) {
+        const g = x.positionNumber === 1 ? grid?.get(x.driverId) : undefined;
+        if (g) fromBack.push({ id: `${x.driverId}:${r.year}:${r.round}`, name: dName(x.driverId), value: g, season: r.year, grandPrixName: gpOf(r), constructorId: x.constructorId });
+      }
+    }
+    const winFromBack = topOf(fromBack).map((e) => {
+      const row = fromBack.find((x) => x.id === e.id)!;
+      const id = e.id.split(":")[0];
+      return { ...e, id, season: row.season, grandPrixName: row.grandPrixName, constructorId: row.constructorId, ...lastOf(id) };
+    });
+
+    // most starts without a win
+    const winless = topOf(career("races").filter((x) => !driverWins.has(x.id)), withTeam);
+
+    // youngest starters: age at the first race actually started
+    const NOT_STARTED = new Set(["DNS", "DNQ", "DNPQ", "DNP", "EX"]);
+    const firstStart = new Map<string, RawRace>();
+    for (const r of ran) for (const x of ds.resultsByRace.get(`${r.year}:${r.round}`) ?? []) if (!NOT_STARTED.has(x.positionText) && !firstStart.has(x.driverId)) firstStart.set(x.driverId, r);
+    const starters = [...firstStart].flatMap(([id, r]) => {
+      const dob = ds.drivers.get(id)?.dateOfBirth;
+      if (!dob) return [];
+      const days = Math.round((Date.parse(r.date) - Date.parse(dob)) / 86_400_000);
+      return [{ id, name: dName(id), days, season: r.year, grandPrixName: gpOf(r), born: dob, date: r.date, constructorId: ds.teamByYearDriver.get(`${r.year}:${id}`) }];
+    });
+    const youngestStarters = starters.sort((a, b) => a.days - b.days).slice(0, TOP).map((y, i) => ({ rank: i + 1, id: y.id, name: y.name, value: y.days, ageDays: y.days, season: y.season, grandPrixName: y.grandPrixName, born: y.born, date: y.date, constructorId: y.constructorId, ...lastOf(y.id) }));
+
     const total = (key: "totalPolePositions" | "totalFastestLaps") => [...ds.drivers.values()].map((d) => ({ id: d.id, name: dName(d.id), value: d[key] ?? 0 }));
     return {
       drivers: {
@@ -2585,6 +2680,12 @@ export async function getRecords(): Promise<RecordsResponse> {
         fastestLaps: topOf(total("totalFastestLaps"), withTeam),
         seasonWins: bySeason,
         youngestWinners: youngest,
+        seasonPoints,
+        seasonDnfs,
+        winStreak,
+        winFromBack,
+        winless,
+        youngestStarters,
       },
       teams: {
         titles: topOf(asList(teamTitles, cName), (id) => ({ constructorId: id })),

@@ -22,7 +22,8 @@ import './Records.css'
 // recordsPage).
 
 type Kind = 'driver' | 'team'
-type Tab = 'drivers' | 'teams'
+type Tab = 'career' | 'season' | 'streaks' | 'teams'
+const TABS: Tab[] = ['career', 'season', 'streaks', 'teams']
 
 interface ListSpec {
   key: string
@@ -76,7 +77,7 @@ function RecordList({ spec }: { spec: ListSpec }) {
       </div>
       <ol className="rec-rest">
         {rest.map((e) => (
-          <li key={`${e.id}-${e.season ?? ''}`} style={{ '--team': teamColor(e.constructorId ?? '') } as CSSProperties}>
+          <li key={`${e.id}-${e.season ?? ''}-${e.grandPrixName ?? ''}`} style={{ '--team': teamColor(e.constructorId ?? '') } as CSSProperties}>
             <span className="rec-rank">{e.rank}</span>
             <span className="rec-who">
               <Link to={hrefOf(kind, e)}>{name(kind, e)}</Link>
@@ -131,9 +132,10 @@ function Headline({ data }: { data: RecordsResponse }) {
 }
 
 export default function Records() {
-  const { t, lang } = useI18n()
+  const { t, lang, fmtNum } = useI18n()
   const [params, setParams] = useSearchParams()
-  const tab: Tab = params.get('tab') === 'teams' ? 'teams' : 'drivers'
+  const asked = params.get('tab') as Tab | null
+  const tab: Tab = asked && TABS.includes(asked) ? asked : 'career'
   const { data, loading, error } = useAsync(() => api.records(), [])
   const uk = lang === 'uk'
   useSeo({
@@ -146,37 +148,38 @@ export default function Records() {
     ],
   })
   const num = (e: RecordEntry) => String(e.value)
-  const lists: ListSpec[] = data
-    ? tab === 'drivers'
-      ? [
-          { key: 'titles', rows: data.drivers.titles, kind: 'driver', value: num },
-          { key: 'wins', rows: data.drivers.wins, kind: 'driver', value: num },
-          { key: 'poles', rows: data.drivers.poles, kind: 'driver', value: num },
-          { key: 'podiums', rows: data.drivers.podiums, kind: 'driver', value: num },
-          {
-            key: 'seasonWins',
-            rows: data.drivers.seasonWins,
-            kind: 'driver',
-            value: (e) => t('rec.ofRaces', { n: e.value, of: e.races ?? 0 }),
-            detail: (e) => String(e.season),
-          },
-          {
-            key: 'youngest',
-            rows: data.drivers.youngestWinners,
-            kind: 'driver',
-            value: (e) => (e.born && e.date ? ageText(e.born, e.date, uk) : ''),
-            detail: (e) => `${gpTitle(e.grandPrixName ?? '', lang)} ${e.season}`,
-            bars: false,
-          },
-          { key: 'starts', rows: data.drivers.starts, kind: 'driver', value: num },
-          { key: 'fastestLaps', rows: data.drivers.fastestLaps, kind: 'driver', value: num },
-        ]
-      : [
-          { key: 'teamTitles', rows: data.teams.titles, kind: 'team', value: num },
-          { key: 'teamWins', rows: data.teams.wins, kind: 'team', value: num },
-          { key: 'teamPoles', rows: data.teams.poles, kind: 'team', value: num },
-        ]
-    : []
+  const age = (e: RecordEntry) => (e.born && e.date ? ageText(e.born, e.date, uk) : '')
+  const race = (e: RecordEntry) => `${gpTitle(e.grandPrixName ?? '', lang)} ${e.season}`
+  const ofRaces = (e: RecordEntry) => t('rec.ofRaces', { n: e.value, of: e.races ?? 0 })
+  const season = (e: RecordEntry) => String(e.season)
+  const byTab: Record<Tab, (d: RecordsResponse) => ListSpec[]> = {
+    career: (d) => [
+      { key: 'titles', rows: d.drivers.titles, kind: 'driver', value: num },
+      { key: 'wins', rows: d.drivers.wins, kind: 'driver', value: num },
+      { key: 'poles', rows: d.drivers.poles, kind: 'driver', value: num },
+      { key: 'podiums', rows: d.drivers.podiums, kind: 'driver', value: num },
+      { key: 'starts', rows: d.drivers.starts, kind: 'driver', value: num },
+      { key: 'fastestLaps', rows: d.drivers.fastestLaps, kind: 'driver', value: num },
+      { key: 'winless', rows: d.drivers.winless, kind: 'driver', value: num },
+    ],
+    season: (d) => [
+      { key: 'seasonWins', rows: d.drivers.seasonWins, kind: 'driver', value: ofRaces, detail: season },
+      { key: 'seasonPoints', rows: d.drivers.seasonPoints, kind: 'driver', value: (e) => fmtNum(e.value), detail: season },
+      { key: 'seasonDnfs', rows: d.drivers.seasonDnfs, kind: 'driver', value: ofRaces, detail: season },
+      { key: 'winFromBack', rows: d.drivers.winFromBack, kind: 'driver', value: (e) => `P${e.value}`, detail: race },
+    ],
+    streaks: (d) => [
+      { key: 'winStreak', rows: d.drivers.winStreak, kind: 'driver', value: num, detail: (e) => e.span ?? '' },
+      { key: 'youngest', rows: d.drivers.youngestWinners, kind: 'driver', value: age, detail: race, bars: false },
+      { key: 'youngestStarters', rows: d.drivers.youngestStarters, kind: 'driver', value: age, detail: race, bars: false },
+    ],
+    teams: (d) => [
+      { key: 'teamTitles', rows: d.teams.titles, kind: 'team', value: num },
+      { key: 'teamWins', rows: d.teams.wins, kind: 'team', value: num },
+      { key: 'teamPoles', rows: d.teams.poles, kind: 'team', value: num },
+    ],
+  }
+  const lists: ListSpec[] = data ? byTab[tab](data) : []
 
   return (
     <section className="rec">
@@ -197,15 +200,15 @@ export default function Records() {
         <>
           <Headline data={data} />
           <div className="tabs" role="tablist">
-            {(['drivers', 'teams'] as Tab[]).map((id) => (
+            {TABS.map((id) => (
               <button
                 key={id}
                 role="tab"
                 aria-selected={tab === id}
                 className={tab === id ? 'tab active' : 'tab'}
-                onClick={() => setParams(id === 'teams' ? { tab: 'teams' } : {}, { replace: true })}
+                onClick={() => setParams(id === 'career' ? {} : { tab: id }, { replace: true })}
               >
-                {t(id === 'drivers' ? 'rec.drivers' : 'rec.teams')}
+                {t(id === 'teams' ? 'rec.teams' : (`rec.tab.${id}` as TKey))}
               </button>
             ))}
           </div>

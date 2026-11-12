@@ -175,12 +175,12 @@ export const seoText = {
       ? {
           title: 'Рекорди Ф1: найбільше перемог, титулів і поулів',
           description:
-            'Рекорди Формули-1 за всю історію: найбільше титулів, перемог, поулів, подіумів і стартів, найбільше перемог за сезон, наймолодші переможці, рекорди команд.',
+            'Рекорди Формули-1 за всю історію: титули, перемоги, поули й подіуми, перемоги поспіль, очки й сходи за сезон, наймолодші пілоти, рекорди команд.',
         }
       : {
           title: 'F1 Records: Most Wins, Titles & Poles',
           description:
-            'All-time Formula 1 records: most world titles, wins, pole positions, podiums and race starts, most wins in a season, youngest race winners and team records.',
+            'All-time Formula 1 records: most titles, wins, poles and podiums, consecutive wins, points and retirements in a season, youngest drivers and team records.',
         },
 
   circuits: (lang: Lang): SeoText =>
