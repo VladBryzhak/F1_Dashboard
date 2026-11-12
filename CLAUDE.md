@@ -190,4 +190,4 @@ Social crawlers don't run JS, so the Express SPA fallback (`server/src/services/
 - macOS. Node 20 (20.20.2) through nvm (`~/.nvm`), not system-wide; the repo and Render ask for Node >= 20.
 - git remote over SSH: `git@github.com:VladBryzhak/F1_Dashboard.git`.
 - Claude Code's preview servers come from `Сайти/.claude/launch.json` (the folder above the repo), which calls node and `npm-cli.js` by absolute nvm paths with an explicit `PATH`. After a Node upgrade those paths must be updated, or the servers fail with "No such file or directory". `F1_Dashboard/.claude/launch.json` in the repo is an older, simpler one that the preview tool doesn't use.
-- Deploys: Render builds with `npm run build` at the repo root (installs and builds client and server) and starts `npm start` (`render.yaml`); the owner deploys by hand after a push to `main`.
+- Deploys: Render builds with `npm run build` at the repo root (installs and builds client and server) and starts `npm start` (`render.yaml`); after a push to `main` the CI's `deploy` job calls Render's Deploy Hook once the checks pass (repository secret `RENDER_DEPLOY_HOOK`; without it the owner deploys by hand).
