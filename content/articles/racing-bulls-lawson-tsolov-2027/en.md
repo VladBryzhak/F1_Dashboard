@@ -7,6 +7,13 @@ Before São Paulo, Liam Lawson said there was "definitely no assurance" he would
 
 "I have no doubt that this is the best driver line-up for us," said team boss Alan Permane.
 
+Formula 1 marked the news with a short video on Instagram. It opens on a close-up portrait in blue under the words "2027 line-up" and the Racing Bulls name.
+
+```instagram
+url: https://www.instagram.com/p/DfpoceyD3XZ/
+handle: f1
+```
+
 ## Lawson earned it on track
 
 [Liam Lawson](/drivers/liam-lawson) is ninth in the championship with 89 points, his best season by a distance. His previous best was 38 points and 14th place in 2025. The form has been strongest exactly when the decision was being made.
