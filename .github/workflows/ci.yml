@@ -34,3 +34,23 @@ jobs:
         run: npm --prefix server run build
       - name: Tests
         run: npm test
+
+  # After the checks pass on main, ask Render to deploy (its Deploy Hook,
+  # kept as the repository secret RENDER_DEPLOY_HOOK). Render's own
+  # Auto-Deploy doesn't fire for this service, so this stands in for it;
+  # without the secret the step says so and does nothing.
+  deploy:
+    needs: check
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger the Render deploy
+        env:
+          HOOK: ${{ secrets.RENDER_DEPLOY_HOOK }}
+        run: |
+          if [ -z "$HOOK" ]; then
+            echo "RENDER_DEPLOY_HOOK is not set: deploy on Render by hand."
+            exit 0
+          fi
+          curl -fsS -X POST "$HOOK" > /dev/null
+          echo "Render deploy requested."
