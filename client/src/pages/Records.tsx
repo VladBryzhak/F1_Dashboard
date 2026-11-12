@@ -27,7 +27,7 @@ const TABS: Tab[] = ['career', 'season', 'streaks', 'teams']
 
 interface ListSpec {
   key: string
-  rows: RecordEntry[]
+  rows: RecordEntry[] | undefined
   kind: Kind
   value: (e: RecordEntry) => string
   detail?: (e: RecordEntry) => string
@@ -45,7 +45,8 @@ function useNames() {
 function RecordList({ spec }: { spec: ListSpec }) {
   const { t } = useI18n()
   const name = useNames()
-  const { rows, kind, value, detail, bars = true } = spec
+  const { kind, value, detail, bars = true } = spec
+  const rows = spec.rows ?? [] // a list an older response doesn't have
   if (!rows.length) return null
   const [lead, ...rest] = rows
   const top = lead.value || 1
@@ -100,7 +101,7 @@ function RecordList({ spec }: { spec: ListSpec }) {
 function Headline({ data }: { data: RecordsResponse }) {
   const { t, lang } = useI18n()
   const name = useNames()
-  const holders = (rows: RecordEntry[]) => rows.filter((e) => e.rank === 1)
+  const holders = (rows: RecordEntry[] | undefined) => (rows ?? []).filter((e) => e.rank === 1)
   const young = data.drivers.youngestWinners[0]
   const tiles: { key: string; value: string; who: RecordEntry[]; sub?: string; reading?: boolean }[] = [
     { key: 'titles', value: String(data.drivers.titles[0]?.value ?? ''), who: holders(data.drivers.titles) },

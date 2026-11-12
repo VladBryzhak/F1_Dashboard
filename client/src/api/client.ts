@@ -138,7 +138,9 @@ export const api = {
   raceStory: (season: string, round: number) =>
     getJson<RaceStory>(`/calendar/${season}/${round}/story`),
   seasonReview: (season: string) => getJson<SeasonReview>(`/seasons/${season}/review`),
-  records: () => getJson<RecordsResponse>('/records'),
+  // `v` changes with the response's shape: a browser may keep the last one for
+  // an hour, and an older shape lacks lists the page now reads
+  records: () => getJson<RecordsResponse>('/records?v=2'),
   racePreview: (season: string, round: number) =>
     getJson<RacePreview>(`/calendar/${season}/${round}/preview`),
   driverHeadshots: (season: string) =>
