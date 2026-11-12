@@ -1086,6 +1086,7 @@ export interface RecordEntry {
   ageDays?: number // youngest winners: age on the day
   born?: string // and the dates it runs between (yyyy-mm-dd)
   date?: string
+  span?: string // a run of wins: its season, or seasons (2012-2013)
 }
 
 export interface RecordsResponse {
@@ -1098,6 +1099,12 @@ export interface RecordsResponse {
     fastestLaps: RecordEntry[]
     seasonWins: RecordEntry[]
     youngestWinners: RecordEntry[]
+    seasonPoints: RecordEntry[]
+    seasonDnfs: RecordEntry[]
+    winStreak: RecordEntry[]
+    winFromBack: RecordEntry[]
+    winless: RecordEntry[]
+    youngestStarters: RecordEntry[]
   }
   teams: {
     titles: RecordEntry[]

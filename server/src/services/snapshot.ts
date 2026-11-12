@@ -719,9 +719,11 @@ async function recordsPage(c: Ctx): Promise<string> {
   const drv = (e: RecordEntry) => `/drivers/${e.id}`;
   const team = (e: RecordEntry) => `/teams/${e.id}`;
   const num = (e: RecordEntry) => String(e.value);
+  const age = (e: RecordEntry) => (e.born && e.date ? ageText(e.born, e.date, c.uk) : "");
+  const race = (e: RecordEntry) => `${gpTitle(e.grandPrixName ?? "", c.uk ? "uk" : "en")} ${e.season}`;
   const L = c.uk
-    ? { h: "Рекорди Формули-1", p: "Рекорди Формули-1 за всю історію з 1950 року: пілоти й команди, з посиланнями на їхні сторінки.", titles: "Найбільше титулів чемпіона світу", wins: "Найбільше перемог", poles: "Найбільше поул-позицій", podiums: "Найбільше подіумів", starts: "Найбільше стартів", fl: "Найбільше найшвидших кіл", season: "Найбільше перемог за сезон", young: "Наймолодші переможці гонок", tTitles: "Команди: найбільше Кубків конструкторів", tWins: "Команди: найбільше перемог", tPoles: "Команди: найбільше поул-позицій", of: "з" }
-    : { h: "Formula 1 records", p: "All-time Formula 1 records since 1950, drivers and teams, with links to their pages.", titles: "Most world titles", wins: "Most wins", poles: "Most pole positions", podiums: "Most podiums", starts: "Most race starts", fl: "Most fastest laps", season: "Most wins in a season", young: "Youngest race winners", tTitles: "Teams: most constructors' titles", tWins: "Teams: most wins", tPoles: "Teams: most pole positions", of: "of" };
+    ? { h: "Рекорди Формули-1", p: "Рекорди Формули-1 за всю історію з 1950 року: пілоти й команди, з посиланнями на їхні сторінки.", titles: "Найбільше титулів чемпіона світу", wins: "Найбільше перемог", poles: "Найбільше поул-позицій", podiums: "Найбільше подіумів", starts: "Найбільше стартів", fl: "Найбільше найшвидших кіл", season: "Найбільше перемог за сезон", young: "Наймолодші переможці гонок", points: "Найбільше очок за сезон", dnfs: "Найбільше сходів за сезон", streak: "Найбільше перемог поспіль", back: "Перемоги з найдальшого місця на старті", winless: "Найбільше стартів без перемоги", starters: "Наймолодші пілоти на старті гонки", tTitles: "Команди: найбільше Кубків конструкторів", tWins: "Команди: найбільше перемог", tPoles: "Команди: найбільше поул-позицій", of: "з" }
+    : { h: "Formula 1 records", p: "All-time Formula 1 records since 1950, drivers and teams, with links to their pages.", titles: "Most world titles", wins: "Most wins", poles: "Most pole positions", podiums: "Most podiums", starts: "Most race starts", fl: "Most fastest laps", season: "Most wins in a season", young: "Youngest race winners", points: "Most points in a season", dnfs: "Most retirements in a season", streak: "Most consecutive wins", back: "Wins from furthest back on the grid", winless: "Most starts without a win", starters: "Youngest drivers to start a race", tTitles: "Teams: most constructors' titles", tWins: "Teams: most wins", tPoles: "Teams: most pole positions", of: "of" };
   return (
     `<h1>${esc(L.h)}</h1><p>${esc(L.p)}</p>` +
     table(L.titles, r.drivers.titles, drv, num) +
@@ -731,7 +733,13 @@ async function recordsPage(c: Ctx): Promise<string> {
     table(L.starts, r.drivers.starts, drv, num) +
     table(L.fl, r.drivers.fastestLaps, drv, num) +
     table(L.season, r.drivers.seasonWins, drv, (e) => `${e.value} ${L.of} ${e.races}`, (e) => String(e.season)) +
-    table(L.young, r.drivers.youngestWinners, drv, (e) => (e.born && e.date ? ageText(e.born, e.date, c.uk) : ""), (e) => `${gpTitle(e.grandPrixName ?? "", c.uk ? "uk" : "en")} ${e.season}`) +
+    table(L.young, r.drivers.youngestWinners, drv, age, race) +
+    table(L.points, r.drivers.seasonPoints, drv, num, (e) => String(e.season)) +
+    table(L.dnfs, r.drivers.seasonDnfs, drv, (e) => `${e.value} ${L.of} ${e.races}`, (e) => String(e.season)) +
+    table(L.back, r.drivers.winFromBack, drv, (e) => `P${e.value}`, race) +
+    table(L.streak, r.drivers.winStreak, drv, num, (e) => e.span ?? "") +
+    table(L.winless, r.drivers.winless, drv, num) +
+    table(L.starters, r.drivers.youngestStarters, drv, age, race) +
     table(L.tTitles, r.teams.titles, team, num) +
     table(L.tWins, r.teams.wins, team, num) +
     table(L.tPoles, r.teams.poles, team, num)

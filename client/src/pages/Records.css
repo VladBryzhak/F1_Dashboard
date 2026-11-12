@@ -289,3 +289,17 @@
   font-size: var(--text-sm);
   max-width: 70ch;
 }
+
+/* four tabs on one line: a tab never wraps; on phones the gaps close up,
+   and a very narrow screen scrolls the row instead of breaking it */
+.rec .tab {
+  white-space: nowrap;
+}
+
+@media (max-width: 480px) {
+  .rec .tabs {
+    gap: var(--space-md);
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+}
