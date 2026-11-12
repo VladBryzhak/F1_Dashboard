@@ -141,54 +141,140 @@
   color: var(--color-ink);
 }
 
-/* Key numbers inside the text. */
+/* Key numbers inside the text (server/src/services/articles.ts, statsBlock):
+   tiles for short readings, chips for short sequences, lines for the rest. */
 .art-stats {
   margin: 2rem 0;
-  padding: var(--space-md) var(--space-lg);
   background: var(--color-paper-2);
   border: var(--rule-hair) solid var(--color-rule);
   border-radius: var(--radius-card);
+  overflow: hidden;
 }
 
 .art-prose .art-stats-title {
-  margin: 0 0 var(--space-sm);
-  font: 700 0.95rem var(--font-body);
+  margin: 0;
+  padding: var(--space-sm) var(--space-md);
+  font: 600 var(--text-sm) / 1.3 var(--font-body);
   text-transform: none;
+  color: var(--color-ink-2);
+  border-bottom: var(--rule-hair) solid var(--color-rule);
 }
 
 .art-stats dl {
-  display: grid;
-  grid-auto-flow: column;
-  grid-auto-columns: minmax(0, 1fr);
   margin: 0;
 }
 
-.art-stats dl > div {
-  min-width: 0;
-}
-
-.art-stats dl > div + div {
-  border-left: var(--rule-hair) solid var(--color-rule);
-  padding-left: var(--space-md);
+.art-stats dl + dl {
+  border-top: var(--rule-hair) solid var(--color-rule);
 }
 
 .art-stats dt {
-  font-size: 0.75rem;
+  font-size: 0.78rem;
   line-height: 1.3;
   color: var(--color-muted);
 }
 
 .art-stats dd {
   margin: 0;
-  font-size: 1.9rem;
-  line-height: 1.1;
   color: var(--color-ink);
 }
 
+/* Tiles: seams between them are the panel's rule colour showing through the gap. */
+.art-stat-tiles {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--rule-hair);
+  background: var(--color-rule);
+}
+
+/* Tiles grow to fill their row, so a short last row never leaves a gap. */
+.art-stat-tiles > div {
+  flex: 1 1 9.5rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: var(--space-sm);
+  min-width: 0;
+  padding: var(--space-md);
+  background: var(--color-paper-2);
+}
+
+.art-stat-tiles dd {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 0 0.4rem;
+}
+
+.art-stat-num {
+  font-size: clamp(1.9rem, 1.4rem + 1.6vw, 2.6rem);
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+}
+
+.art-stat-num--long {
+  font-size: clamp(1.35rem, 1.1rem + 0.8vw, 1.7rem);
+  letter-spacing: -0.01em;
+}
+
+.art-stat-unit {
+  font-size: var(--text-sm);
+  color: var(--color-muted);
+}
+
+/* Lines: label left, value right; chips sit in the value's place. */
+.art-stat-lines > div {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(0, 3fr);
+  align-items: center;
+  gap: var(--space-md);
+  padding: 0.7rem var(--space-md);
+}
+
+.art-stat-lines > div + div {
+  border-top: var(--rule-hair) solid var(--color-rule);
+}
+
+.art-stat-lines dt {
+  font-size: var(--text-sm);
+}
+
+.art-stat-lines dd {
+  font-size: 0.95rem;
+  font-weight: 500;
+  line-height: 1.4;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.art-prose .art-stat-chips {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 0.35rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.art-prose .art-stat-chips li {
+  margin: 0;
+  padding: 0.2rem 0.55rem;
+  font-size: 0.9rem;
+  line-height: 1.3;
+  background: var(--color-paper-3);
+  border: var(--rule-hair) solid var(--color-rule-2);
+  border-radius: var(--radius-pill);
+}
+
 .art-prose .art-stats-src {
-  margin: var(--space-sm) 0 0;
+  margin: 0;
+  padding: var(--space-sm) var(--space-md);
   font-size: 0.75rem;
   color: var(--color-muted-2);
+  border-top: var(--rule-hair) solid var(--color-rule);
 }
 
 /* A photo with its credit. */
@@ -332,17 +418,17 @@
   .art-title {
     text-shadow: none;
   }
-  .art-stats dl {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    grid-auto-flow: row;
-    gap: var(--space-sm) 0;
+  .art-stat-tiles > div {
+    flex-basis: 8rem;
   }
-  .art-stats dl > div:nth-child(odd) {
-    border-left: 0;
-    padding-left: 0;
+  .art-stat-lines > div {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0.35rem;
   }
-  .art-stats dl > div:nth-child(even) {
-    border-left: var(--rule-hair) solid var(--color-rule);
-    padding-left: var(--space-md);
+  .art-stat-lines dd {
+    text-align: left;
+  }
+  .art-prose .art-stat-chips {
+    justify-content: flex-start;
   }
 }

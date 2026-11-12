@@ -78,7 +78,7 @@ Our own articles, kept in the repo as files and published with a deploy. Each ar
   - links to our pages are written without the language (`/drivers/…`); the Ukrainian text gets `/uk/…` by itself;
   - raw HTML shows as text.
 - Three blocks of ours, as fenced code blocks of `key: value` lines (`server/src/services/articles.ts`):
-  - `stats`: `- Label: value` rows, `title`, `source`;
+  - `stats`: `- Label: value` rows, `title`, `source`. Each value is drawn by its shape, in order (`statCell`): a short reading (`380`, `+17`, `45 points`, `P1 and P3`, `261 → 279`) as a tile with a big number and a small unit, a short comma sequence (`7th, 7th, 9th`) as chips, anything longer as a label-and-value line. Keep a reading to one number per row so it becomes a tile;
   - `figure`: `src` (`/media/articles/<slug>/…` in `client/public`, or https), `alt`, `caption`, `credit`, `creditUrl`, `width`, `height`;
   - `instagram`: `url`, `handle`. Instagram posts are embedded only through this block: nothing is fetched from Instagram until the reader presses the button. Then the post's own embed frame replaces it; CSP `frame-src` allows www.instagram.com. Never copy an Instagram photo into the repo.
 - An article must exist in both languages, or it is left out with a warning in the server log.

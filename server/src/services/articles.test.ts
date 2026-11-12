@@ -43,8 +43,21 @@ describe("renderBody", () => {
   it("draws the stats block", () => {
     const html = renderBody("```stats\ntitle: In numbers\n- Points: 380\nsource: f1db\n```", "en");
     expect(html).toContain('<aside class="art-stats"><h2 class="art-stats-title">In numbers</h2>');
-    expect(html).toContain('<dt>Points</dt><dd class="mono">380</dd>');
+    expect(html).toContain('<dl class="art-stat-tiles"><div><dt>Points</dt><dd><span class="art-stat-num mono">380</span></dd></div></dl>');
     expect(html).toContain("Data: f1db");
+  });
+
+  it("draws each stat by its shape, keeping the order", () => {
+    const html = renderBody(
+      "```stats\n- Gap: 45 points\n- Run: 7th, 7th, 9th\n- Tyres: soft 1 to 20, hard 21 to 57\n- Gain: +17\n```",
+      "en",
+    );
+    expect(html).toContain('<span class="art-stat-num mono">45</span> <span class="art-stat-unit">points</span>');
+    expect(html).toContain('<ol class="art-stat-chips"><li class="mono">7th</li><li class="mono">7th</li><li class="mono">9th</li></ol>');
+    expect(html).toContain('<dt>Tyres</dt><dd>soft 1 to 20, hard 21 to 57</dd>');
+    expect(html.match(/<dl class="art-stat-/g)).toHaveLength(3);
+    expect(html.indexOf("Gap")).toBeLessThan(html.indexOf("Tyres"));
+    expect(html.indexOf("Tyres")).toBeLessThan(html.indexOf("Gain"));
   });
 
   it("puts an Instagram post behind a button, and only a real Instagram post", () => {

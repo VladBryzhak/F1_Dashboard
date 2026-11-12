@@ -127,13 +127,49 @@ export function splitFrontMatter(src: string): { fields: Record<string, string>;
 const isOurs = (href: string) => href.startsWith("/") && !href.startsWith("//");
 const httpUrl = (s: string | undefined) => (s && /^https:\/\//.test(s) ? s : null);
 
+// A stats value is drawn by its shape, each cell in its order:
+// - "tile": a short reading ("380", "+17", "45 points") as a big number with a small unit;
+// - "chips": a short sequence ("7th, 7th, 9th") as a row of chips;
+// - "line": anything longer, as a label and value across the panel.
+// Consecutive tiles share one grid, so a row never ends in a gap.
+const NUM = String.raw`[+\-−]?P?\d(?:[\d.,:]*\d)?(?:-[\p{L}]+|st|nd|rd|th|%)?`;
+const NUMBER = new RegExp(String.raw`^(${NUM}(?:\s*(?:→|to|до|and|і|of|з)\s*${NUM})?)(?:,?\s+(\p{L}[\p{L}\d'’ ]{0,11}))?$`, "u");
+
+type StatCell = { kind: "tile" | "chips" | "line"; html: string };
+
+function statCell(label: string, value: string): StatCell {
+  const dt = `<dt>${esc(label)}</dt>`;
+  const num = value.length <= 18 ? NUMBER.exec(value) : null;
+  if (num) {
+    const unit = num[2] ? ` <span class="art-stat-unit">${esc(num[2])}</span>` : "";
+    const long = num[1].length > 6 ? " art-stat-num--long" : "";
+    return { kind: "tile", html: `<div>${dt}<dd><span class="art-stat-num${long} mono">${esc(num[1])}</span>${unit}</dd></div>` };
+  }
+  const parts = value.split(/,\s*/);
+  if (parts.length >= 3 && parts.every((x) => x.length > 0 && x.length <= 6)) {
+    const chips = parts.map((x) => `<li class="mono">${esc(x)}</li>`).join("");
+    return { kind: "chips", html: `<div>${dt}<dd><ol class="art-stat-chips">${chips}</ol></dd></div>` };
+  }
+  return { kind: "line", html: `<div>${dt}<dd>${esc(value)}</dd></div>` };
+}
+
 function statsBlock(text: string, lang: Lang): string {
   const { fields, rows } = readBlock(text);
   if (!rows.length) return "";
   const title = fields.title ? `<h2 class="art-stats-title">${esc(fields.title)}</h2>` : "";
-  const cells = rows.map(([k, v]) => `<div><dt>${esc(k)}</dt><dd class="mono">${esc(v)}</dd></div>`).join("");
+  const groups: { tiles: boolean; cells: string[] }[] = [];
+  for (const [k, v] of rows) {
+    const cell = statCell(k, v);
+    const tiles = cell.kind === "tile";
+    const last = groups[groups.length - 1];
+    if (last && last.tiles === tiles) last.cells.push(cell.html);
+    else groups.push({ tiles, cells: [cell.html] });
+  }
+  const body = groups
+    .map((g) => `<dl class="${g.tiles ? "art-stat-tiles" : "art-stat-lines"}">${g.cells.join("")}</dl>`)
+    .join("");
   const source = fields.source ? `<p class="art-stats-src">${LABELS[lang].source}: ${esc(fields.source)}</p>` : "";
-  return `<aside class="art-stats">${title}<dl>${cells}</dl>${source}</aside>`;
+  return `<aside class="art-stats">${title}${body}${source}</aside>`;
 }
 
 function credit(lang: Lang, who: string | undefined, url: string | null): string {

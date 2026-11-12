@@ -23,7 +23,8 @@ title: The last five Grands Prix
 - Lawson: 7th, 7th, 9th, 7th, 7th
 - Lawson's points: 26
 - Lindblad's points: 1
-- Racing Bulls in the constructors' table: 5th, 114 points
+- Racing Bulls in the constructors' table: 5th
+- Racing Bulls' points: 114
 - Gap to Alpine in 6th: 45 points
 source: Paddock Times (f1db), Bahrain to São Paulo
 ```
