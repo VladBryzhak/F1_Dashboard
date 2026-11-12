@@ -73,6 +73,18 @@ export async function getRaceSessions(
 
 // A session's drivers as OpenF1 lists them (shared by the telemetry driver
 // list and the headshots).
+// Every driver of a race weekend, one entry per car number (the latest
+// session's): practice stand-ins included, and there before the race has run.
+// Kept half an hour, so a stand-in named on Friday shows the same evening.
+export function meetingDrivers(meetingKey: number): Promise<RawDriver[]> {
+  return cached(`of1:meetingdrivers:${meetingKey}`, 1800, async () => {
+    const all = await getJson<RawDriver[]>(`/drivers?meeting_key=${meetingKey}`);
+    const byNumber = new Map<number, RawDriver>();
+    for (const d of all) byNumber.set(d.driver_number, d);
+    return [...byNumber.values()];
+  });
+}
+
 export function rawDrivers(sessionKey: number): Promise<RawDriver[]> {
   return cached(`of1:rawdrivers:${sessionKey}`, DAY, () =>
     getJson<RawDriver[]>(`/drivers?session_key=${sessionKey}`)
