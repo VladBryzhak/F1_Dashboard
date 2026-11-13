@@ -1,10 +1,12 @@
 import { channelTeasers, listArticles } from "./articles";
-import { getCalendar, getCurrentSeason, getSeasonReview } from "./f1db";
+import { getCalendar, getCurrentSeason, getDriverStandings, getSeasonReview } from "./f1db";
 import { gpTitle } from "./gpNames";
 import { SITE_URL } from "./pageHtml";
 import { getRacePreview } from "./racePreview";
 import { sessionCard, sessionHeroOf } from "./sessionCard";
 import { latestSessionHero } from "./sessionHero";
+import { getRaceWeekendNow } from "./provisional";
+import { answerText, canPost, findPost, introText, pollOptions, pollSpecs, type PollCount, type PollKind, type PollSpec } from "./telegramPolls";
 import { ukPlural } from "./ukText";
 import { UK_DRIVER_NAMES } from "./ukNames";
 import type { ArticleSummary, RacePreview, SeasonReview, SessionHero } from "../types/f1";
@@ -262,15 +264,20 @@ export const signature = (text: string) =>
 export const postId = (post: ChannelPost) =>
   signature(post.text.split("\n").filter((l) => l.trim()).slice(0, 2).join(" "));
 
-async function channelPage(): Promise<string | null> {
+async function channelHtml(): Promise<string | null> {
   const name = CHANNEL?.replace(/^@/, "");
   if (!name || /^-?\d+$/.test(name)) return null; // a numeric id has no public page
   try {
     const res = await fetch(`https://t.me/s/${name}`, { signal: AbortSignal.timeout(10_000) });
-    return res.ok ? signature(await res.text()) : null;
+    return res.ok ? await res.text() : null;
   } catch {
     return null;
   }
+}
+
+async function channelPage(): Promise<string | null> {
+  const html = await channelHtml();
+  return html == null ? null : signature(html);
 }
 
 async function testPost(): Promise<void> {
@@ -318,7 +325,149 @@ async function cardsNow(): Promise<void> {
 }
 let cardsDone = false;
 
+// ---------- Weekend polls (telegramPolls.ts) ----------
+
+const pollMessage = new Map<string, number>(); // poll key -> its message, as posted this run
+const pollCount = new Map<string, PollCount>(); // poll key -> Telegram's count when closed
+const pollStopped = new Set<string>();
+const STOP_FOR_MS = 6 * 3600_000; // keep trying to close a poll for six hours after its session starts
+
+async function telegram<T>(method: string, body: object): Promise<T> {
+  const res = await fetch(`https://api.telegram.org/bot${TOKEN}/${method}`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+    signal: AbortSignal.timeout(10_000),
+  });
+  const json = (await res.json().catch(() => null)) as { ok: boolean; result: T; description?: string } | null;
+  if (!res.ok || !json?.ok) throw new Error(`Telegram ${method} ${res.status}: ${(json?.description ?? "").slice(0, 200)}`);
+  return json.result;
+}
+
+// The weekends' polls now: the nine highest in the standings who raced last
+// time (a driver who has left the grid doesn't stay an option).
+async function currentPolls(now: number): Promise<PollSpec[]> {
+  const season = await getCurrentSeason();
+  const cal = await getCalendar(String(season)).catch(() => null);
+  if (!cal) return [];
+  const standings = (await getDriverStandings(String(season)).catch(() => null))?.standings ?? [];
+  const last = [...cal.races].reverse().find((r) => r.winnerDriverId);
+  const lastWk = last ? await getRaceWeekendNow(String(season), String(last.round)).catch(() => null) : null;
+  const racing = lastWk?.results.length ? new Set(lastWk.results.map((r) => r.driverId)) : undefined;
+  return pollSpecs(season, cal.races, pollOptions(standings, racing), now);
+}
+
+async function winnerOf(p: PollSpec): Promise<{ driverId: string; name: string } | null> {
+  const wk = await getRaceWeekendNow(String(p.season), String(p.round)).catch(() => null);
+  if (!wk) return null;
+  if (p.kind === "Q") {
+    const q = wk.qualifying.find((x) => x.position === 1);
+    return q?.driverId ? { driverId: q.driverId, name: q.driverName } : null;
+  }
+  const r = wk.results.find((x) => x.positionText === "1");
+  return r?.driverId ? { driverId: r.driverId, name: r.driverName } : null;
+}
+
+// A weekend's polls as posted: the intro's message and the kinds after it.
+// After a restart it is found again on the channel page by the intro's text.
+function postedBundle(html: string, p: PollSpec, url: string): { intro: number; kinds: PollKind[] } | null {
+  for (const kinds of [["Q", "RACE"], ["Q"], ["RACE"]] as PollKind[][]) {
+    const head = introText(p.grandPrixName, p.season, kinds, url).split("\n")[0];
+    const id = findPost(html, head, signature);
+    if (id != null) return { intro: id, kinds };
+  }
+  return null;
+}
+
+export async function polls(now: number): Promise<void> {
+  const specs = await currentPolls(now);
+  if (!specs.length) return;
+  const html = await channelHtml();
+  if (html == null) return; // without the page nothing is posted twice: wait for the next check
+
+  const weekends = new Map<string, PollSpec[]>();
+  for (const p of specs) weekends.set(`${p.season}:${p.round}`, [...(weekends.get(`${p.season}:${p.round}`) ?? []), p]);
+
+  for (const [wkKey, list] of weekends) {
+    const url = ukUrl(`/calendar/${list[0].season}/${list[0].round}`);
+    let bundle = postedBundle(html, list[0], url);
+
+    // 1. Post the intro and the open polls together, once a weekend.
+    const open = list.filter((p) => canPost(p, now));
+    const introKey = `poll:${wkKey}:intro`;
+    if (open.length && !bundle && !posted.has(introKey)) {
+      posted.add(introKey);
+      const kinds = open.map((p) => p.kind);
+      try {
+        if (DRY_RUN) {
+          console.log(`[telegram] would post the polls for ${wkKey}:\n${introText(list[0].grandPrixName, list[0].season, kinds, url)}`);
+          for (const p of open) console.log(`  ${p.question} / ${p.options.map((o) => o.text).join(" | ")}`);
+        } else {
+          const intro = await telegram<{ message_id: number }>("sendMessage", {
+            chat_id: CHANNEL,
+            text: introText(list[0].grandPrixName, list[0].season, kinds, url),
+            parse_mode: "HTML",
+            link_preview_options: { is_disabled: true },
+          });
+          for (const p of open) {
+            const msg = await telegram<{ message_id: number }>("sendPoll", {
+              chat_id: CHANNEL,
+              question: p.question,
+              options: p.options.map((o) => ({ text: o.text })),
+              is_anonymous: true,
+            });
+            pollMessage.set(p.key, msg.message_id);
+          }
+          bundle = { intro: intro.message_id, kinds };
+          console.log(`[telegram] posted the polls for ${wkKey}: ${kinds.join(", ")}`);
+        }
+      } catch (err) {
+        console.warn(`[telegram] polls for ${wkKey} not posted:`, err instanceof Error ? err.message : err);
+      }
+    }
+    if (DRY_RUN || !bundle) continue; // nothing in the channel to close or answer
+
+    for (const p of list) {
+      const at = bundle.kinds.indexOf(p.kind);
+      if (at < 0) continue; // this one wasn't asked
+      const id = pollMessage.get(p.key) ?? bundle.intro + 1 + at;
+
+      // 2. Close it when its session starts, keeping Telegram's count.
+      if (now >= p.closesAt && now < p.closesAt + STOP_FOR_MS && !pollStopped.has(p.key)) {
+        pollStopped.add(p.key);
+        try {
+          const poll = await telegram<{ total_voter_count: number; options: { text: string; voter_count: number }[] }>("stopPoll", {
+            chat_id: CHANNEL,
+            message_id: id,
+          });
+          pollCount.set(p.key, { total: poll.total_voter_count, options: poll.options.map((o) => ({ text: o.text, votes: o.voter_count })) });
+          console.log(`[telegram] closed poll ${p.key}: ${poll.total_voter_count} votes`);
+        } catch (err) {
+          // already closed (by hand, or before a restart): the answer goes out without the count
+          console.warn(`[telegram] poll ${p.key} not closed:`, err instanceof Error ? err.message : err);
+        }
+      }
+
+      // 3. The answer, once the session's result is in.
+      const key = `${p.key}:answer`;
+      if (now < p.closesAt || posted.has(key)) continue;
+      const winner = await winnerOf(p);
+      if (!winner) continue;
+      const post: ChannelPost = { key, text: answerText(p, winner, pollCount.get(p.key) ?? null, url), url };
+      posted.add(key);
+      if (signature(html).includes(postId(post))) continue; // answered before a restart
+      try {
+        await send(post);
+        console.log(`[telegram] posted ${key}`);
+      } catch (err) {
+        console.warn(`[telegram] ${key} not posted:`, err instanceof Error ? err.message : err);
+      }
+    }
+  }
+}
+
 async function check(): Promise<void> {
+  await polls(Date.now()).catch((err) => console.warn("[telegram] polls failed:", err instanceof Error ? err.message : err));
   if (!cardsDone && new Date().toISOString().slice(0, 10) <= CARDS_NOW.until) await cardsNow();
   if (TEST_POST && !testDone) await testPost();
   const posts = (await candidates(Date.now())).filter((p) => !posted.has(p.key));
