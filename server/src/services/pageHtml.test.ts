@@ -18,7 +18,7 @@ vi.mock("./f1db", () => ({
 // The page's own text and preview card don't matter here.
 vi.mock("./og", () => ({ describePage: async () => ({ title: "T", description: "D", card: {} }) }));
 vi.mock("./home", () => ({ homePayload: async () => ({}) }));
-vi.mock("./jsonld", () => ({ pageJsonLd: async () => null }));
+vi.mock("./jsonld", async (orig) => ({ ...(await orig<typeof import("./jsonld")>()), pageJsonLd: async () => null }));
 vi.mock("./articles", () => ({
   getArticle: async (slug: string) =>
     slug === "antonelli-champion"
@@ -53,7 +53,7 @@ describe("pageHtml", () => {
   it("marks an article as one, with its date, and preloads its text and cover", async () => {
     const html = await pageHtml(file, "/uk/articles/antonelli-champion", "Mozilla/5.0", "n");
     expect(html).toContain('<meta property="og:type" content="article" />');
-    expect(html).toContain('<meta property="article:published_time" content="2026-11-02" />');
+    expect(html).toContain('<meta property="article:published_time" content="2026-11-02T00:00:00+02:00" />');
     expect(html).toContain('<link rel="preload" as="fetch" href="/api/articles/antonelli-champion?lang=uk" crossorigin />');
     expect(html).toMatch(/<link rel="preload" as="image" href="https:\/\/media\.formula1\.com\/[^"]+andant01[^"]+"/);
   });

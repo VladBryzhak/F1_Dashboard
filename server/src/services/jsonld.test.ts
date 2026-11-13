@@ -30,7 +30,7 @@ vi.mock("./f1db", () => ({
       : null,
 }));
 
-import { pageJsonLd } from "./jsonld";
+import { articleTime, pageJsonLd } from "./jsonld";
 
 const SITE = "https://example.test";
 
@@ -81,5 +81,10 @@ describe("pageJsonLd", () => {
       ["2025", `${SITE}/uk/standings/2025`],
     ]);
     expect(await pageJsonLd(SITE, "/drivers/nobody", "en")).toBeNull();
+  });
+
+  it("dates an article with a time and Kyiv's offset, summer and winter", () => {
+    expect(articleTime("2026-11-10")).toBe("2026-11-10T00:00:00+02:00");
+    expect(articleTime("2026-07-01")).toBe("2026-07-01T00:00:00+03:00");
   });
 });

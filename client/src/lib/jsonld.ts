@@ -154,6 +154,17 @@ export function raceLd(w: RaceWeekend): object {
   }
 }
 
+// An article's day as a full date-time, which Google's article checks ask for:
+// the start of that day in Kyiv, with its offset (+02:00, or +03:00 in summer).
+export function articleTime(date: string): string {
+  const at = new Date(`${date}T12:00:00Z`)
+  const off = new Intl.DateTimeFormat('en-US', { timeZone: 'Europe/Kyiv', timeZoneName: 'longOffset' })
+    .formatToParts(at)
+    .find((p) => p.type === 'timeZoneName')
+    ?.value.replace('GMT', '')
+  return `${date}T00:00:00${off || '+00:00'}`
+}
+
 // An article of ours as a schema.org NewsArticle; its image is the page's
 // link-preview card (server/src/services/jsonld.ts articleLd builds the same).
 export function articleLd(a: Article): object {
@@ -164,8 +175,8 @@ export function articleLd(a: Article): object {
     '@type': 'NewsArticle',
     headline: a.title,
     description: a.description,
-    datePublished: a.date,
-    dateModified: a.date,
+    datePublished: articleTime(a.date),
+    dateModified: articleTime(a.date),
     image: cards(`/articles/${a.slug}`),
     url: BASE + path,
     mainEntityOfPage: BASE + path,
