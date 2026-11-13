@@ -10,6 +10,7 @@ import { countryName } from '../lib/countries'
 import type { CircuitSummary } from '../types/f1'
 import './Circuits.css'
 import { seoText } from '../lib/seoText'
+import { sectionLd } from '../lib/jsonld'
 
 function CircuitTile({ c }: { c: CircuitSummary }) {
   const { t, tn, locale } = useI18n()
@@ -46,6 +47,7 @@ export default function Circuits() {
   const { t, locale, lang } = useI18n()
   useSeo({
     ...seoText.circuits(lang),
+    jsonLd: sectionLd(t('nav.home'), t('nav.circuits'), '/circuits'),
   })
   const { data, loading, error } = useAsync(() => api.circuits(), [])
   const [q, setQ] = useState('')

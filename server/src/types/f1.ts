@@ -534,6 +534,7 @@ export interface RaceWeekend {
   countryCode: string | null;
   circuitId: string;
   circuitName: string;
+  placeName?: string; // the circuit's town or city
   qualifying: QualifyingEntry[];
   results: WeekendResult[];
   sprintResults: WeekendResult[];

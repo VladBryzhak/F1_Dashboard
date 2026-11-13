@@ -98,7 +98,10 @@ app.get("/sitemap.xml", async (_req, res, next) => {
 app.get(/^\/og\/(.+)\.png$/, async (req, res, next) => {
   try {
     const page = "/" + req.params[0];
-    const png = await previewPng(page === "/index" ? "/" : page);
+    // ?r=4x3 or ?r=1x1: the same card in another shape (article images)
+    const r = req.query.r;
+    const ratio = r === "4x3" || r === "1x1" ? r : "16x9";
+    const png = await previewPng(page === "/index" ? "/" : page, ratio);
     res.set("Cache-Control", "public, max-age=86400");
     res.type("png").send(png);
   } catch (err) {

@@ -25,6 +25,15 @@ export async function pageJsonLd(siteUrl: string, pagePath: string, lang: Lang):
     itemListElement: trail.map((c, i) => ({ "@type": "ListItem", position: i + 1, name: c.name, item: url(c.path) })),
   });
   const home: Crumb = { name: uk ? "Головна" : "Home", path: "/" };
+  // the page's preview card in Google's three article shapes
+  const cards = (path: string) => {
+    const png = siteUrl + (uk ? "/og/uk" : "/og") + `${path}.png`;
+    return [png, `${png}?r=4x3`, `${png}?r=1x1`];
+  };
+  // a section's list page (and its season version): Home › Section [› season]
+  const listPage = (name: Crumb["name"], path: string, season?: string) =>
+    [crumbs([home, { name, path }, ...(season ? [{ name: season, path: `${path}/${season}` }] : [])])];
+  const L = (en: string, ukName: string) => (uk ? ukName : en);
 
   let parts: string[];
   try {
@@ -36,10 +45,22 @@ export async function pageJsonLd(siteUrl: string, pagePath: string, lang: Lang):
 
   switch (section) {
     case undefined:
-      return siteLd(siteUrl);
+      return siteLd(siteUrl, uk);
+
+    case "standings":
+      return listPage(L("Standings", "Залік"), "/standings", isSeason(a) ? a : undefined);
+
+    case "records":
+      return listPage(L("Formula 1 records", "Рекорди Формули-1"), "/records");
+
+    case "compare":
+      return listPage(L("Compare", "Порівняння"), "/compare");
+
+    case "seasons":
+      return isSeason(a) ? [crumbs([home, { name: uk ? `Сезон ${a}` : `${a} season`, path: `/seasons/${a}` }])] : null;
 
     case "drivers": {
-      if (!a || isSeason(a)) return null;
+      if (!a || isSeason(a)) return listPage(L("Drivers", "Пілоти"), "/drivers", a);
       const p = await getDriverProfile(a).catch(() => null);
       if (!p) return null;
       const path = `/drivers/${p.driverId}`;
@@ -50,7 +71,7 @@ export async function pageJsonLd(siteUrl: string, pagePath: string, lang: Lang):
     }
 
     case "teams": {
-      if (!a || isSeason(a)) return null;
+      if (!a || isSeason(a)) return listPage(L("Teams", "Команди"), "/teams", a);
       const p = await getConstructorProfile(a).catch(() => null);
       if (!p) return null;
       const path = `/teams/${p.constructorId}`;
@@ -58,12 +79,13 @@ export async function pageJsonLd(siteUrl: string, pagePath: string, lang: Lang):
     }
 
     case "calendar": {
+      if (!a || (isSeason(a) && !b)) return listPage(L("Calendar", "Календар"), "/calendar", a);
       if (!isSeason(a) || !b || !/^\d+$/.test(b)) return null;
       const w = await getRaceWeekend(a!, b).catch(() => null);
       if (!w) return null;
       const path = `/calendar/${w.season}/${w.round}`;
       return [
-        raceLd(w, url(path)),
+        raceLd(w, url(path), cards(path), lang),
         crumbs([
           home,
           { name: uk ? "Календар" : "Calendar", path: "/calendar" },
@@ -73,7 +95,7 @@ export async function pageJsonLd(siteUrl: string, pagePath: string, lang: Lang):
     }
 
     case "circuits": {
-      if (!a) return null;
+      if (!a) return listPage(L("Circuits", "Траси"), "/circuits");
       const c = await getCircuitProfile(a).catch(() => null);
       if (!c) return null;
       const path = `/circuits/${c.circuitId}`;
@@ -81,12 +103,12 @@ export async function pageJsonLd(siteUrl: string, pagePath: string, lang: Lang):
     }
 
     case "articles": {
-      if (!a) return null;
+      if (!a) return listPage(L("Articles", "Статті"), "/articles");
       const art = await getArticle(a, lang).catch(() => null);
       if (!art) return null;
       const path = `/articles/${art.slug}`;
       return [
-        articleLd(art, url(path), siteUrl + (uk ? "/og/uk" : "/og") + `${path}.png`, siteUrl),
+        articleLd(art, url(path), cards(path), siteUrl, url("/about")),
         crumbs([home, { name: uk ? "Статті" : "Articles", path: "/articles" }, { name: art.title, path }]),
       ];
     }
@@ -98,7 +120,7 @@ export async function pageJsonLd(siteUrl: string, pagePath: string, lang: Lang):
 
 // An article of ours as a schema.org NewsArticle (client/src/lib/jsonld.ts
 // articleLd builds the same).
-function articleLd(a: Article, pageUrl: string, image: string, siteUrl: string): object {
+function articleLd(a: Article, pageUrl: string, images: string[], siteUrl: string, aboutUrl: string): object {
   const org = { "@type": "Organization", name: "Paddock Times", url: siteUrl };
   return {
     "@context": CTX,
@@ -106,25 +128,43 @@ function articleLd(a: Article, pageUrl: string, image: string, siteUrl: string):
     headline: a.title,
     description: a.description,
     datePublished: a.date,
-    image: [image],
+    dateModified: a.date,
+    image: images,
     url: pageUrl,
     mainEntityOfPage: pageUrl,
-    author: org,
+    author: { ...org, url: aboutUrl },
     publisher: { ...org, logo: { "@type": "ImageObject", url: `${siteUrl}/apple-touch-icon.png` } },
   };
 }
 
 // Site-wide identity, on the home page.
-function siteLd(siteUrl: string): object[] {
+export const TELEGRAM_CHANNEL_URL = "https://t.me/paddocktimes";
+const SITE_DESCRIPTION = {
+  en: "Formula 1 standings, race calendar, driver & team career stats, head-to-head comparisons and telemetry.",
+  uk: "Турнірна таблиця, календар і результати Формули-1, статистика пілотів і команд, порівняння й телеметрія.",
+};
+
+function siteLd(siteUrl: string, uk = false): object[] {
+  const description = uk ? SITE_DESCRIPTION.uk : SITE_DESCRIPTION.en;
   return [
-    { "@context": CTX, "@type": "Organization", name: "Paddock Times", url: siteUrl, logo: `${siteUrl}/apple-touch-icon.png` },
+    {
+      "@context": CTX,
+      "@type": "Organization",
+      name: "Paddock Times",
+      alternateName: "Paddock Times F1",
+      url: siteUrl,
+      logo: `${siteUrl}/apple-touch-icon.png`,
+      description,
+      sameAs: [TELEGRAM_CHANNEL_URL],
+    },
     {
       "@context": CTX,
       "@type": "WebSite",
       name: "Paddock Times",
+      alternateName: "Paddock Times F1",
       url: siteUrl,
-      description:
-        "Formula 1 standings, race calendar, driver & team career stats, head-to-head comparisons and telemetry.",
+      inLanguage: ["en", "uk"],
+      description,
     },
   ];
 }
@@ -167,19 +207,52 @@ function teamLd(p: ConstructorProfile, pageUrl: string): object {
   };
 }
 
-function raceLd(w: RaceWeekend, pageUrl: string): object {
+// The weekend from its first session to about two hours after the race start
+// (dates alone when f1db has no times). Google's event guidelines want the
+// address, start and end, a description and an image.
+export function eventSpan(w: Pick<RaceWeekend, "date" | "sessions">): { start: string; end: string } {
+  const iso = (ms: number) => new Date(ms).toISOString().replace(/\.\d{3}Z$/, "Z");
+  const sessions = w.sessions ?? [];
+  const known = sessions.filter((s) => s.timeKnown).map((s) => Date.parse(s.start)).filter((t) => !Number.isNaN(t));
+  const race = sessions.find((s) => s.kind === "RACE" && s.timeKnown);
+  const first = sessions.map((s) => s.start.slice(0, 10)).sort()[0];
+  return {
+    start: known.length ? iso(Math.min(...known)) : first ?? w.date,
+    end: race ? iso(Date.parse(race.start) + 2 * 3600_000) : w.date,
+  };
+}
+
+export function eventDescription(w: Pick<RaceWeekend, "round" | "season" | "sessions">, uk: boolean): string {
+  const sprint = (w.sessions ?? []).some((s) => s.kind === "SPRINT");
+  return uk
+    ? `${w.round}-й етап чемпіонату світу Формули-1 ${w.season} року: практики, ${sprint ? "спринт, " : ""}кваліфікація й гонка.`
+    : `Round ${w.round} of the ${w.season} FIA Formula One World Championship: practice, ${sprint ? "the sprint, " : ""}qualifying and the race.`;
+}
+
+function raceLd(w: RaceWeekend, pageUrl: string, images: string[], lang: Lang): object {
+  const uk = lang === "uk";
+  const { start, end } = eventSpan(w);
   return {
     "@context": CTX,
     "@type": "SportsEvent",
-    name: `${w.grandPrixName} Grand Prix ${w.season}`,
+    name: uk ? `${gpTitle(w.grandPrixName, "uk")} ${w.season}` : `${w.grandPrixName} Grand Prix ${w.season}`,
+    description: eventDescription(w, uk),
     sport: "Formula One",
-    startDate: w.date,
+    startDate: start,
+    endDate: end,
     eventStatus: "https://schema.org/EventScheduled",
+    eventAttendanceMode: "https://schema.org/OfflineEventAttendanceMode",
     location: {
       "@type": "Place",
       name: w.circuitName,
-      ...(w.countryCode && { address: { "@type": "PostalAddress", addressCountry: w.countryCode.toUpperCase() } }),
+      address: {
+        "@type": "PostalAddress",
+        ...(w.placeName && { addressLocality: w.placeName }),
+        ...(w.countryCode && { addressCountry: w.countryCode.toUpperCase() }),
+      },
     },
+    image: images,
+    organizer: { "@type": "Organization", name: "Formula 1", url: "https://www.formula1.com" },
     url: pageUrl,
   };
 }

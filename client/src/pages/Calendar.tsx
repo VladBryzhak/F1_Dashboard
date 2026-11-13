@@ -14,6 +14,7 @@ import { teamColor } from '../lib/f1meta'
 import { gpShort, gpTitle } from '../lib/gpNames'
 import './Calendar.css'
 import { seoText } from '../lib/seoText'
+import { sectionLd } from '../lib/jsonld'
 
 export default function Calendar() {
   const { season: seasonParam } = useParams()
@@ -34,6 +35,7 @@ export default function Calendar() {
   useSeo({
     ...seoText.calendar(season, lang),
     canonicalPath,
+    jsonLd: sectionLd(t('nav.home'), t('nav.calendar'), '/calendar', canonicalPath.split('/')[2]),
   })
   const { data, loading, error } = useAsync(() => api.calendar(season), [season])
 

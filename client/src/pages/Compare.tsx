@@ -10,6 +10,7 @@ import { useI18n } from '../i18n/core'
 import './Compare.css'
 import { seoText } from '../lib/seoText'
 import { localName, localParts } from '../lib/ukNames'
+import { sectionLd } from '../lib/jsonld'
 
 type View = 'career' | 'season'
 
@@ -261,6 +262,7 @@ export default function Compare() {
   const { t, lang } = useI18n()
   useSeo({
     ...seoText.compare(lang),
+    jsonLd: sectionLd(t('nav.home'), t('nav.compare'), '/compare'),
   })
   const drivers = useAsync(() => api.drivers(), [])
   // Wikimedia driver photos (shared map, cached server-side). Optional: a

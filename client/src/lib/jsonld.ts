@@ -6,6 +6,8 @@
 // the app (server/src/services/jsonld.ts): keep the two in step.
 import { getLang, localizedPath } from '../i18n/core'
 import type { Article, ConstructorProfile, DriverProfile, RaceWeekend } from '../types/f1'
+import { gpTitle } from './gpNames'
+import { TELEGRAM_URL } from './telegram'
 import { driverName } from './ukNames'
 
 const BASE = 'https://paddocktimes.com'
@@ -16,23 +18,39 @@ function pageUrl(): string {
   return window.location.origin + window.location.pathname
 }
 
+// The page's preview card in Google's three article shapes (16:9, 4:3, 1:1).
+function cards(path: string): string[] {
+  const png = `${BASE}/og${localizedPath(path, getLang())}.png`
+  return [png, `${png}?r=4x3`, `${png}?r=1x1`]
+}
+
+const SITE_DESCRIPTION = {
+  en: 'Formula 1 standings, race calendar, driver & team career stats, head-to-head comparisons and telemetry.',
+  uk: 'Турнірна таблиця, календар і результати Формули-1, статистика пілотів і команд, порівняння й телеметрія.',
+}
+
 // Site-wide identity — emitted on the home page.
 export function siteLd(): object[] {
+  const description = SITE_DESCRIPTION[getLang()]
   return [
     {
       '@context': 'https://schema.org',
       '@type': 'Organization',
       name: 'Paddock Times',
+      alternateName: 'Paddock Times F1',
       url: BASE,
       logo: `${BASE}/apple-touch-icon.png`,
+      description,
+      ...(TELEGRAM_URL && { sameAs: [TELEGRAM_URL] }),
     },
     {
       '@context': 'https://schema.org',
       '@type': 'WebSite',
       name: 'Paddock Times',
+      alternateName: 'Paddock Times F1',
       url: BASE,
-      description:
-        'Formula 1 standings, race calendar, driver & team career stats, head-to-head comparisons and telemetry.',
+      inLanguage: ['en', 'uk'],
+      description,
     },
   ]
 }
@@ -86,22 +104,52 @@ export function teamLd(p: ConstructorProfile): object {
   return ld
 }
 
-// A race weekend as a schema.org SportsEvent.
+// The weekend from its first session to about two hours after the race
+// start (dates alone without times): server/src/services/jsonld.ts eventSpan.
+function eventSpan(w: RaceWeekend): { start: string; end: string } {
+  const iso = (ms: number) => new Date(ms).toISOString().replace(/\.\d{3}Z$/, 'Z')
+  const sessions = w.sessions ?? []
+  const known = sessions
+    .filter((s) => s.timeKnown)
+    .map((s) => Date.parse(s.start))
+    .filter((t) => !Number.isNaN(t))
+  const race = sessions.find((s) => s.kind === 'RACE' && s.timeKnown)
+  const first = sessions.map((s) => s.start.slice(0, 10)).sort()[0]
+  return {
+    start: known.length ? iso(Math.min(...known)) : (first ?? w.date),
+    end: race ? iso(Date.parse(race.start) + 2 * 3600_000) : w.date,
+  }
+}
+
+// A race weekend as a schema.org SportsEvent, with what Google's event
+// guidelines ask for (address, start and end, description, images).
 export function raceLd(w: RaceWeekend): object {
+  const uk = getLang() === 'uk'
+  const { start, end } = eventSpan(w)
+  const sprint = (w.sessions ?? []).some((s) => s.kind === 'SPRINT')
   return {
     '@context': 'https://schema.org',
     '@type': 'SportsEvent',
-    name: `${w.grandPrixName} Grand Prix ${w.season}`,
+    name: uk ? `${gpTitle(w.grandPrixName, 'uk')} ${w.season}` : `${w.grandPrixName} Grand Prix ${w.season}`,
+    description: uk
+      ? `${w.round}-й етап чемпіонату світу Формули-1 ${w.season} року: практики, ${sprint ? 'спринт, ' : ''}кваліфікація й гонка.`
+      : `Round ${w.round} of the ${w.season} FIA Formula One World Championship: practice, ${sprint ? 'the sprint, ' : ''}qualifying and the race.`,
     sport: 'Formula One',
-    startDate: w.date,
+    startDate: start,
+    endDate: end,
     eventStatus: 'https://schema.org/EventScheduled',
+    eventAttendanceMode: 'https://schema.org/OfflineEventAttendanceMode',
     location: {
       '@type': 'Place',
       name: w.circuitName,
-      ...(w.countryCode && {
-        address: { '@type': 'PostalAddress', addressCountry: w.countryCode.toUpperCase() },
-      }),
+      address: {
+        '@type': 'PostalAddress',
+        ...(w.placeName && { addressLocality: w.placeName }),
+        ...(w.countryCode && { addressCountry: w.countryCode.toUpperCase() }),
+      },
     },
+    image: cards(`/calendar/${w.season}/${w.round}`),
+    organizer: { '@type': 'Organization', name: 'Formula 1', url: 'https://www.formula1.com' },
     url: pageUrl(),
   }
 }
@@ -117,10 +165,11 @@ export function articleLd(a: Article): object {
     headline: a.title,
     description: a.description,
     datePublished: a.date,
-    image: [`${BASE}/og${path}.png`],
+    dateModified: a.date,
+    image: cards(`/articles/${a.slug}`),
     url: BASE + path,
     mainEntityOfPage: BASE + path,
-    author: org,
+    author: { ...org, url: BASE + localizedPath('/about', getLang()) },
     publisher: { ...org, logo: { '@type': 'ImageObject', url: `${BASE}/apple-touch-icon.png` } },
   }
 }
@@ -139,4 +188,14 @@ export function breadcrumbLd(
       item: BASE + localizedPath(t.path, getLang()),
     })),
   }
+}
+
+// A section's list page (and its season version): Home › Section [› season],
+// as the server writes it (server/src/services/jsonld.ts listPage).
+export function sectionLd(home: string, name: string, path: string, season?: string): object {
+  return breadcrumbLd([
+    { name: home, path: '/' },
+    { name, path },
+    ...(season ? [{ name: season, path: `${path}/${season}` }] : []),
+  ])
 }
