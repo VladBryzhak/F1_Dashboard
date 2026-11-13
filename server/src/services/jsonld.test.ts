@@ -21,6 +21,7 @@ vi.mock("./f1db", () => ({
     season === "2026" && round === "18"
       ? {
           season: "2026", round: 18, grandPrixName: "United States", date: "2026-10-25", circuitName: "Circuit of the Americas", placeName: "Austin", countryCode: "us",
+          teams: [{ id: "mclaren", name: "McLaren" }],
           sessions: [
             { kind: "FP1", start: "2026-10-23T17:30:00Z", timeKnown: true },
             { kind: "SPRINT", start: "2026-10-24T17:00:00Z", timeKnown: true },
@@ -30,7 +31,7 @@ vi.mock("./f1db", () => ({
       : null,
 }));
 
-import { pageJsonLd } from "./jsonld";
+import { articleTime, pageJsonLd } from "./jsonld";
 
 const SITE = "https://example.test";
 
@@ -58,6 +59,7 @@ describe("pageJsonLd", () => {
     const ld = (await pageJsonLd(SITE, "/calendar/2026/18", "uk")) as Record<string, any>[];
     expect(ld[0]).toMatchObject({ "@type": "SportsEvent", url: `${SITE}/uk/calendar/2026/18` });
     expect(ld[0].location).toMatchObject({ name: "Circuit of the Americas", address: { addressLocality: "Austin", addressCountry: "US" } });
+    expect(ld[0].performer).toEqual([{ "@type": "SportsTeam", name: "McLaren", url: `${SITE}/uk/teams/mclaren` }]);
     // what Google's event guidelines ask for: start and end with times, a description, images
     expect(ld[0]).toMatchObject({
       name: "Гран-прі США 2026",
@@ -81,5 +83,10 @@ describe("pageJsonLd", () => {
       ["2025", `${SITE}/uk/standings/2025`],
     ]);
     expect(await pageJsonLd(SITE, "/drivers/nobody", "en")).toBeNull();
+  });
+
+  it("dates an article with a time and Kyiv's offset, summer and winter", () => {
+    expect(articleTime("2026-11-10")).toBe("2026-11-10T00:00:00+02:00");
+    expect(articleTime("2026-07-01")).toBe("2026-07-01T00:00:00+03:00");
   });
 });

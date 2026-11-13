@@ -3,7 +3,7 @@ import path from "path";
 import { getCurrentSeason, getDriverProfile, isDatasetReady, warmDataset } from "./f1db";
 import { getArticle } from "./articles";
 import { homePayload } from "./home";
-import { pageJsonLd } from "./jsonld";
+import { articleTime, pageJsonLd } from "./jsonld";
 import { describePage, type PageMeta } from "./og";
 import { pageStatus, type PageStatus } from "./pageRoutes";
 import { driverPortraitUrl } from "./portraits";
@@ -100,7 +100,7 @@ async function articleHead(slug: string, lang: "en" | "uk"): Promise<string> {
   const c = a.cover;
   const portrait = c.driverId && c.constructorId ? driverPortraitUrl(c.driverId, c.constructorId, a.season, 600) : null;
   return (
-    `<meta property="article:published_time" content="${attr(a.date)}" />` +
+    `<meta property="article:published_time" content="${attr(articleTime(a.date))}" />` +
     `<link rel="preload" as="fetch" href="/api/articles/${encodeURIComponent(a.slug)}?lang=${lang}" crossorigin />` +
     (portrait ? `<link rel="preload" as="image" href="${attr(portrait)}" fetchpriority="high" />` : "")
   );

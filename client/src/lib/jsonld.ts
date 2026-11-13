@@ -150,8 +150,26 @@ export function raceLd(w: RaceWeekend): object {
     },
     image: cards(`/calendar/${w.season}/${w.round}`),
     organizer: { '@type': 'Organization', name: 'Formula 1', url: 'https://www.formula1.com' },
+    ...(w.teams?.length && {
+      performer: w.teams.map((t) => ({
+        '@type': 'SportsTeam',
+        name: t.name,
+        url: BASE + localizedPath(`/teams/${t.id}`, getLang()),
+      })),
+    }),
     url: pageUrl(),
   }
+}
+
+// An article's day as a full date-time, which Google's article checks ask for:
+// the start of that day in Kyiv, with its offset (+02:00, or +03:00 in summer).
+export function articleTime(date: string): string {
+  const at = new Date(`${date}T12:00:00Z`)
+  const off = new Intl.DateTimeFormat('en-US', { timeZone: 'Europe/Kyiv', timeZoneName: 'longOffset' })
+    .formatToParts(at)
+    .find((p) => p.type === 'timeZoneName')
+    ?.value.replace('GMT', '')
+  return `${date}T00:00:00${off || '+00:00'}`
 }
 
 // An article of ours as a schema.org NewsArticle; its image is the page's
@@ -164,8 +182,8 @@ export function articleLd(a: Article): object {
     '@type': 'NewsArticle',
     headline: a.title,
     description: a.description,
-    datePublished: a.date,
-    dateModified: a.date,
+    datePublished: articleTime(a.date),
+    dateModified: articleTime(a.date),
     image: cards(`/articles/${a.slug}`),
     url: BASE + path,
     mainEntityOfPage: BASE + path,
