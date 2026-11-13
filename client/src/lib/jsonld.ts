@@ -150,6 +150,13 @@ export function raceLd(w: RaceWeekend): object {
     },
     image: cards(`/calendar/${w.season}/${w.round}`),
     organizer: { '@type': 'Organization', name: 'Formula 1', url: 'https://www.formula1.com' },
+    ...(w.teams?.length && {
+      performer: w.teams.map((t) => ({
+        '@type': 'SportsTeam',
+        name: t.name,
+        url: BASE + localizedPath(`/teams/${t.id}`, getLang()),
+      })),
+    }),
     url: pageUrl(),
   }
 }

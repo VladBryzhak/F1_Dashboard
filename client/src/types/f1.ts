@@ -530,6 +530,7 @@ export interface RaceWeekend {
   circuitId: string
   circuitName: string
   placeName?: string // the circuit's town or city
+  teams?: { id: string; name: string }[] // the season's teams (the event's performers)
   qualifying: QualifyingEntry[]
   results: WeekendResult[]
   sprintResults: WeekendResult[]

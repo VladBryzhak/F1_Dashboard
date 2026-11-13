@@ -1440,6 +1440,15 @@ export interface SeasonDriver {
 
 // A season's drivers with their team (the one they drove most rounds for),
 // to recognise the drivers in an OpenF1 session.
+// A season's teams (each driver's team of most rounds), by name.
+function seasonTeams(ds: Dataset, season: number): { id: string; name: string }[] {
+  const ids = new Set<string>();
+  for (const [key, constructorId] of ds.teamByYearDriver) if (key.startsWith(`${season}:`)) ids.add(constructorId);
+  return [...ids]
+    .map((id) => ({ id, name: ds.constructors.get(id)?.name ?? id }))
+    .sort((a, b) => a.name.localeCompare(b.name));
+}
+
 export async function getSeasonDrivers(season: number): Promise<SeasonDriver[]> {
   const ds = await dataset();
   const out: SeasonDriver[] = [];
@@ -2039,6 +2048,7 @@ export async function getRaceWeekend(
     circuitId: race.circuitId,
     circuitName: ds.circuits.get(race.circuitId)?.fullName ?? race.circuitId,
     placeName: ds.circuits.get(race.circuitId)?.placeName ?? "",
+    teams: seasonTeams(ds, Number(season)),
     qualifying,
     results,
     sprintResults,

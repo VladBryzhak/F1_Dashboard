@@ -85,7 +85,7 @@ export async function pageJsonLd(siteUrl: string, pagePath: string, lang: Lang):
       if (!w) return null;
       const path = `/calendar/${w.season}/${w.round}`;
       return [
-        raceLd(w, url(path), cards(path), lang),
+        raceLd(w, url(path), cards(path), lang, (id) => url(`/teams/${id}`)),
         crumbs([
           home,
           { name: uk ? "Календар" : "Calendar", path: "/calendar" },
@@ -240,7 +240,7 @@ export function eventDescription(w: Pick<RaceWeekend, "round" | "season" | "sess
     : `Round ${w.round} of the ${w.season} FIA Formula One World Championship: practice, ${sprint ? "the sprint, " : ""}qualifying and the race.`;
 }
 
-function raceLd(w: RaceWeekend, pageUrl: string, images: string[], lang: Lang): object {
+function raceLd(w: RaceWeekend, pageUrl: string, images: string[], lang: Lang, teamUrl: (id: string) => string): object {
   const uk = lang === "uk";
   const { start, end } = eventSpan(w);
   return {
@@ -264,6 +264,7 @@ function raceLd(w: RaceWeekend, pageUrl: string, images: string[], lang: Lang): 
     },
     image: images,
     organizer: { "@type": "Organization", name: "Formula 1", url: "https://www.formula1.com" },
+    ...(w.teams?.length && { performer: w.teams.map((t) => ({ "@type": "SportsTeam", name: t.name, url: teamUrl(t.id) })) }),
     url: pageUrl,
   };
 }
